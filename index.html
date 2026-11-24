@@ -62,8 +62,9 @@
 
       <section class="a4-kart" aria-labelledby="a4-kart-h">
         <div class="a4-sechead">
-          <h2 id="a4-kart-h">Oppgavekart H2023–H2025</h2>
-          <p>Oppgavene i den rekkefølgen de kom, med nummer og poeng. Lenkene går rett til oppgaven.</p>
+          <h2 id="a4-kart-h">Oppgavekart H2020–H2025</h2>
+          <p>Oppgavene i den rekkefølgen de kom, med nummer og poeng. Lenkene går rett til oppgaven.
+            Fra 2023 har settet en egen sant/usant-del; før det lå sant/usant inne i oppgavene.</p>
         </div>
         <div id="task-map" class="a4-map"></div>
       </section>
@@ -108,8 +109,7 @@
 
     // ===== Eksamensoppgavene som er løst på sidene =====
     // [side, fane, år, oppgavenr., tittel (som på siden), poeng, element-id på siden, (valgfritt) søketekst]
-    // Hentet fra eksamenskortene (IN.examTask) og eksamensdelene i fanene. Gnome sort er oppgave 4 i
-    // H2023 (siden 01-sortering skriver «Oppgave 5»; se plan/eksamensmonster.md, forbehold).
+    // Hentet fra eksamenskortene (IN.examTask) og eksamensdelene i fanene. Gnome sort er oppgave 4 i H2023.
     var X = {
       s20sub:  ["sortering", "bucket",     "H2020", "7d", "SortSubanagrams", 6, "exam-bucket"],
       s21stab: ["sortering", "bucket",     "H2021", "2",  "Stabilitet", 3, "exam-bucket"],
@@ -276,7 +276,43 @@
     // ===== Oppgavekart =====
     // [år, oppgavenr. (tom = unummerert), tittel, poeng, side, fane, nøkkel i X når oppgaven er løst på siden]
     // Numrene følger oppgavesettene: oppvarmingen er «Oppgave 1» i H2023 og H2024, men unummerert i H2025.
+    // side = null: ingen side tar for seg oppgaven (vises som ren tekst).
     var TASKS = [
+      ["H20", "1",  "Oppvarming", 2, "begreper", "algoritme"],
+      ["H20", "2",  "Binære søketrær", 4, "traer", "bst", "t20bst"],
+      ["H20", "3",  "Grafegenskaper", 8, "grafer", ""],
+      ["H20", "4",  "Linear probing", 2, "hashing", ""],
+      ["H20", "5",  "Søk (Intersection)", 12, "sok", "sortersok", "k20int"],
+      ["H20", "6",  "AVL-innsetting", 9, "traer", "avl", "t20avl"],
+      ["H20", "7",  "Subanagrammer: kjøretid, frekvenstabell, strategi (a–c)", 17, "hashing", ""],
+      ["H20", "7d", "SortSubanagrams (bøttesortering)", 6, "sortering", "bucket", "s20sub"],
+      ["H20", "8",  "Type 2-grafer: NP, stier, Kruskal, korteste vei (a–h)", 38, "grafer", ""],
+      ["H20", "9",  "Velformede tagger (stakk)", 12, null, ""],
+      ["H21", "1",  "Oppvarming", 2, "begreper", "algoritme"],
+      ["H21", "2",  "Stabilitet", 3, "sortering", "bucket", "s21stab"],
+      ["H21", "3",  "Litt sortering (sant/usant)", 10, "sortering", "test", "s21tf"],
+      ["H21", "4",  "Binære heaps", 6, "heap", "removemin", "h21bin"],
+      ["H21", "5",  "Huffman-trær", 5, "traer", "huffman", "t21huf"],
+      ["H21", "6",  "Beregnbarhet og kompleksitet (P og NP)", 8, "strategi", ""],
+      ["H21", "7",  "Korteste avstander i grafer", 8, "grafer", ""],
+      ["H21", "8",  "Intervall i et binært søketre", 10, "traer", "bst", "t21rng"],
+      ["H21", "9",  "Flest forekomster (hashing)", 8, "hashing", ""],
+      ["H21", "10", "Par som summerer til x", 10, "sok", "triks", "k21par"],
+      ["H21", "11", "To-fargelegge en graf", 10, "grafer", ""],
+      ["H21", "12", "Whops!-oppgjør", 10, "grafer", ""],
+      ["H21", "13", "Whops!-logger", 10, "grafer", ""],
+      ["H22", "",   "Oppvarming", 2, "begreper", "algoritme"],
+      ["H22", "1",  "Litt av hvert (sant/usant)", 10, null, ""],
+      ["H22", "2",  "Grafegenskaper", 10, "grafer", ""],
+      ["H22", "3",  "AVL-trær", 6, "traer", "avl", "t22avl"],
+      ["H22", "4",  "Prioritetskøer og heaper (sant/usant)", 10, "heap", "test", "h22tf"],
+      ["H22", "5",  "Kjøretid på grafalgoritmer", 8, "grafer", ""],
+      ["H22", "6",  "Linear probing", 10, "hashing", ""],
+      ["H22", "7",  "Garbage collection", 8, "grafer", ""],
+      ["H22", "8",  "Autofullføring (prefikstre mot hashmap)", 6, "traer", "huffman", "t22auto"],
+      ["H22", "9",  "Bucket queue (bøttekø)", 10, "heap", "pk", "h22bq"],
+      ["H22", "10", "Er binærtreet et søketre?", 10, "traer", "bst", "t22chk"],
+      ["H22", "11", "Minimal forside", 10, "grafer", ""],
       ["H23", "1", "Oppvarming", 2, "begreper", "algoritme"],
       ["H23", "2", "Innsetting i heap", 10, "heap", "innsetting", "h23ins"],
       ["H23", "3", "Finn duplikat", 12, "sok", "duplikat", "k23dup"],
@@ -300,17 +336,18 @@
       ["H25", "5", "Finn k minste", 12, "sok", "kminste", "k25kmin"],
       ["H25", "6", "Kollektivtilbudet i Oslo", 15, "grafer", "mst"]
     ];
-    var DEL1 = { H23: 32, H24: 22, H25: 26 };   // del 1 sant/usant, poeng per år
+    var DEL1 = { H23: 32, H24: 22, H25: 26 };   // egen del 1 sant/usant (fra 2023), poeng per år
     var mapHost = IN.qs("#task-map");
-    ["H23", "H24", "H25"].forEach(function (y) {
+    ["H20", "H21", "H22", "H23", "H24", "H25"].forEach(function (y) {
       var ol = el("ol");
       TASKS.filter(function (r) { return r[0] === y; }).forEach(function (r, i) {
         var name;
-        if (r[6] && ready[r[4]]) name = taskLink(r[6], r[2], "a4-mlink");                  // dyplenke til oppgaven
+        if (r[4] === null) name = el("span", { class: "a4-off", text: r[2] });             // ingen side for denne
+        else if (r[6] && ready[r[4]]) name = taskLink(r[6], r[2], "a4-mlink");              // dyplenke til oppgaven
         else if (ready[r[4]]) name = lnk(r[4], r[5], r[2]);                                  // finnes ikke som oppgavekort: fanen
         else name = el("span", { class: "a4-off" }, [r[2] + " ", el("span", { class: "tag", text: "snart" })]);
         ol.appendChild(el("li", {}, [el("span", { class: "a4-nr", text: r[1] }), name, el("span", { class: "a4-p", text: r[3] })]));
-        if (i === 0) ol.appendChild(el("li", { class: "a4-d1" }, [el("span", { class: "a4-nr" }), el("span", { text: "Del 1: sant/usant" }), el("span", { class: "a4-p", text: DEL1[y] })]));
+        if (i === 0 && DEL1[y]) ol.appendChild(el("li", { class: "a4-d1" }, [el("span", { class: "a4-nr" }), el("span", { text: "Del 1: sant/usant" }), el("span", { class: "a4-p", text: DEL1[y] })]));
       });
       mapHost.appendChild(el("div", { class: "a4-year" }, [el("h3", { text: "H20" + y.slice(1) }), ol]));
     });
