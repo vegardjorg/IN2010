@@ -369,11 +369,11 @@
     // Stabil identitet + gjenoppretting av svar
     // kilde: eksamen påstanden kommer fra (eget felt, ellers årstallet i teksten, f.eks. «(H2022)»)
     function kildeOf(it) {
-      if (it.kilde) return it.kilde;
+      if (it.kilde !== undefined) return it.kilde || null;   // kilde: false = aldri eksamensmerke
       var m = /\b([HV]20\d\d)\b/.exec((it.s || "") + " " + (it.explain || ""));
       return m ? m[1] : null;
     }
-    items = items.map(function (it, i) { return { s: it.s, answer: !!it.answer, explain: it.explain || "", blokk: it.blokk || null, kilde: kildeOf(it), _id: i }; });
+    items = items.map(function (it, i) { return { s: it.s, answer: !!it.answer, explain: it.explain || "", blokk: it.blokk || null, tema: it.tema || null, kilde: kildeOf(it), _id: i }; });
     var answers = {}; // _id -> true/false
     var checked = false;
     if (storeKey) {
@@ -442,6 +442,7 @@
         item.appendChild(el("span", { class: "tf-num", text: (pos + 1) }));
         var stmt = el("div", { class: "tf-stmt", html: it.s });
         if (it.kilde) stmt.appendChild(el("span", { class: "tag blokk tf-eks", text: it.kilde, title: "Fra eksamen " + it.kilde }));
+        else if (it.tema) stmt.appendChild(el("span", { class: "tag blokk", text: it.tema }));
         else if (it.blokk) stmt.appendChild(el("span", { class: "tag blokk", text: "Blokk " + it.blokk }));
         item.appendChild(stmt);
 
@@ -613,6 +614,12 @@
     buildNav();
     buildLevelBar();
     IN.tabs(document);
+    // Genererte sant/usant-påstander (data-tf.js): <div data-tf-gen="sortering"></div>
+    qsa("[data-tf-gen]").forEach(function (host) {
+      var sek = host.getAttribute("data-tf-gen");
+      var items = IN.TF_GEN && IN.TF_GEN[sek];
+      if (items && items.length) IN.tfTest(host, items, { id: "gen-" + sek });
+    });
   }
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", boot);
   else boot();
