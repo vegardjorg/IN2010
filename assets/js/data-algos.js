@@ -351,25 +351,26 @@
       { code: "low ← 0", indent: 1, eli5: "Vi ser på hele boka. «low» er første side vi vurderer.", normal: "Nedre grense for søkeintervallet.", teknisk: "Intervall [low, high]." },
       { code: "high ← n − 1", indent: 1, eli5: "«high» er siste side vi vurderer.", normal: "Øvre grense.", teknisk: "Start: hele arrayet." },
       { code: "while low ≤ high do", indent: 1, eli5: "Så lenge det er sider igjen å lete i …", normal: "Fortsett mens intervallet ikke er tomt.", teknisk: "Halverer intervallet hver runde → O(log n)." },
-      { code: "mid ← ⌊(low + high) / 2⌋", indent: 2, eli5: "Vi slår opp midt i bunken.", normal: "Finn midtindeksen.", teknisk: "Heltallsdivisjon; unngå overløp med low+(high−low)/2." },
+      { code: "mid ← ⌊(low + high) / 2⌋", indent: 2, eli5: "Vi slår opp midt i bunken.", normal: "Finn midtindeksen.", teknisk: "Heltallsdivisjon rundet ned. Siden low ≤ high, ligger mid alltid i intervallet [low, high]." },
       { code: "if A[mid] = x then", indent: 2, eli5: "Er tallet i midten akkurat det vi leter etter?", normal: "Treff?", teknisk: "Likhetssjekk." },
       { code: "return mid", indent: 3, eli5: "Ja! Vi fant det. Svar med plassen.", normal: "Returner indeksen.", teknisk: "Funnet på mid." },
       { code: "else if A[mid] < x then", indent: 2, eli5: "Er midten for liten? Da ligger tallet til høyre.", normal: "For lite → søk i høyre halvdel.", teknisk: "Kast venstre halvdel." },
-      { code: "low ← mid + 1", indent: 3, eli5: "Vi flytter «low» forbi midten.", normal: "Snevr inn fra venstre.", teknisk: "low ← mid+1." },
+      { code: "low ← mid + 1", indent: 3, eli5: "Vi flytter «low» forbi midten.", normal: "Snevr inn fra venstre.", teknisk: "A[mid] &lt; x og A er sortert, så alt i A[low..mid] er for lite. Den nye nedre grensen er mid + 1." },
       { code: "else", indent: 2, eli5: "Ellers er midten for stor, og tallet ligger til venstre.", normal: "For stort → søk i venstre halvdel.", teknisk: "Kast høyre halvdel." },
-      { code: "high ← mid − 1", indent: 3, eli5: "Vi flytter «high» forbi midten.", normal: "Snevr inn fra høyre.", teknisk: "high ← mid−1." },
+      { code: "high ← mid − 1", indent: 3, eli5: "Vi flytter «high» forbi midten.", normal: "Snevr inn fra høyre.", teknisk: "A[mid] &gt; x, så alt i A[mid..high] er for stort. Den nye øvre grensen er mid − 1." },
       { code: "return −1", indent: 1, eli5: "Lette ferdig uten å finne det. Svar −1.", normal: "Ikke funnet.", teknisk: "Intervallet tomt → −1." }
     ],
     bigO: {
       best: "O(1)", avg: "O(log n)", worst: "O(log n)", space: "O(1)",
       why: t(
         "Hver gang halverer vi bunken vi leter i. Å halvere 1000 sider ned til 1 tar bare ca. 10 steg – derfor er det lynraskt.",
-        "Intervallet halveres hvert steg, så antall steg er ca. log₂ n. Krever at arrayet er sortert på forhånd.",
-        "T(n)=T(n/2)+O(1) → O(log n). Best O(1) hvis x ligger på første mid. Forutsetter sortert input."
+        "Intervallet halveres hver runde, så det blir høyst ⌊log n⌋ + 1 runder, altså O(log n). Krever at arrayet er sortert på forhånd.",
+        "Hver runde gjør konstant arbeid og halverer intervallet, så O(log n) runder. Best O(1) hvis x ligger på første mid. Kursets versjon svarer true/false; returnerer du indeksen, si at du har endret den."
       )
     }
   };
   // line-indeks: Procedure=1, low=2, high=3, while=4, mid=5, if=6, return mid=7, elseif=8, low←=9, else=10, high←=11, return −1=12
+  // Brukes ikke av sidene i dag (02-sok har IN.gen.binarySearchTrace), men holdes riktig.
   IN.gen.binarySearch = function (input) {
     // input: { array:[sortert], x:target }  ELLER bare array (da velges en x)
     var A, x;
@@ -381,6 +382,8 @@
       t("Vi leter etter " + x + " i hele det sorterte arrayet.", "Søker etter x=" + x + " i [0.." + high + "].", "x=" + x + ", intervall [" + low + "," + high + "]."), "Start");
     var found = -1;
     while (low <= high) {
+      snap(4, {}, { low: low, high: high },
+        t("Det er fortsatt plasser igjen å lete i, fra " + low + " til " + high + ".", "low ≤ high (" + low + " ≤ " + high + ") → ny runde.", "Intervallet [" + low + ", " + high + "] er ikke tomt."), "Løkke");
       var mid = Math.floor((low + high) / 2);
       snap(5, { compare: [mid] }, { low: low, mid: mid, high: high },
         t("Midten er plass " + mid + " med verdi " + A[mid] + ".",
@@ -391,15 +394,16 @@
           t("Det er tallet vårt! Funnet på plass " + mid + ".", "Treff på indeks " + mid + ".", "return " + mid + "."), "Funnet");
         found = mid; break;
       } else if (A[mid] < x) {
-        snap(8, { compare: [mid] }, { low: low, mid: mid, high: high },
+        snap(9, { compare: [mid] }, { low: low, mid: mid, high: high },
           t(A[mid] + " er mindre enn " + x + ", så vi leter til høyre.", "A[mid]<x → gå høyre.", "low ← mid+1."), "Gå høyre");
         low = mid + 1;
       } else {
-        snap(10, { compare: [mid] }, { low: low, mid: mid, high: high },
+        snap(11, { compare: [mid] }, { low: low, mid: mid, high: high },
           t(A[mid] + " er større enn " + x + ", så vi leter til venstre.", "A[mid]>x → gå venstre.", "high ← mid−1."), "Gå venstre");
         high = mid - 1;
       }
     }
+    if (found < 0) snap(4, {}, {}, t("Nå er low større enn high, så det er ingen plasser igjen å lete i.", "low &gt; high → intervallet er tomt.", "low = " + low + " &gt; high = " + high + ": løkka stopper."), "Tomt");
     if (found < 0) snap(12, {}, {}, t("Vi lette ferdig uten å finne " + x + ".", "Ikke funnet → −1.", "return −1."), "Ikke funnet");
     return steps;
   };
@@ -407,7 +411,7 @@
   /* ===================== HEAPINSERT (min-heap, H2023) ===================== */
   /* Kun pseudokode + forklaringer + Parsons (tre-demo kommer i 03-heap). */
   IN.algos.heapInsert = {
-    title: "Innsetting i min-heap (boble opp)",
+    title: "HeapInsert – sett inn i heap (boble opp)",
     name: "HeapInsert", params: "A, x",
     input: "Et array A som representerer en heap med n elementer, og et element x",
     output: "Et array som representerer en heap, som inneholder x",
@@ -419,7 +423,7 @@
       { code: "i ← n", indent: 1,
         eli5: "Vi husker hvor det nye tallet står.",
         normal: "i peker på det nye elementet.",
-        teknisk: "Boble-opp starter fra bladet." },
+        teknisk: "Boble opp starter i den nye løvnoden." },
       { code: "while i > 0 and A[⌊(i−1)/2⌋] > A[i] do", indent: 1,
         eli5: "Så lenge forelderen (tallet over) er STØRRE enn vårt, er det feil i en min-heap.",
         normal: "Mens forelder > barn: heap-egenskapen er brutt.",
@@ -437,15 +441,15 @@
       best: "O(1)", avg: "O(log n)", worst: "O(log n)", space: "O(1)",
       why: t(
         "Treet er lavt – bare noen få «etasjer». Tallet kan maks boble opp én etasje om gangen helt til toppen, og det er få etasjer.",
-        "Boble-opp går maks fra blad til rot = høyden ≈ log₂ n. Best O(1) hvis x alt er ≥ forelder.",
-        "Komplett tre har høyde ⌊log₂ n⌋ → O(log n) bytter i verste fall; O(1) ekstra minne."
+        "Boble opp går høyst fra løvnoden til roten, altså høyden – omtrent log n. Best O(1) hvis x allerede er ≥ forelderen.",
+        "Et komplett tre har høyde ⌊log n⌋, så det blir O(log n) bytter i verste tilfelle, og O(1) ekstra minne."
       )
     }
   };
 
   /* ===================== MERGE SORT ===================== */
   IN.algos.mergeSort = {
-    title: "Merge sort (flettesortering)",
+    title: "Merge sort",
     name: "MergeSort", params: "A, lo, hi",
     input: "Et array A og et intervall [lo, hi]",
     output: "A[lo..hi] er sortert",

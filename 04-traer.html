@@ -7,59 +7,6 @@
   <meta name="description" content="Trær i IN2010: begreper, traverseringer, binære søketrær, diameter, laveste felles forfeder, AVL og rotasjoner, Anti-AVL og Huffman – med stegvise demoer, pseudokode og eksamensoppgaver.">
   <script>(function(){try{var d=document.documentElement;var t=localStorage.getItem('in-theme');if(t&&t!=='system')d.setAttribute('data-theme',t);var l=localStorage.getItem('in-level')||'normal';d.setAttribute('data-level',l);}catch(e){document.documentElement.setAttribute('data-level','normal');}})();</script>
   <link rel="stylesheet" href="assets/css/styles.css">
-  <!-- MIDLERTIDIG sidelokal stil for trevisualiseringen (tv-*).
-       Foreslått flyttet til styles.css / felles viz-tree – se plan/foresporsler-traer.md. -->
-  <style>
-    :root { --tv-on: #ffffff; }
-    @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --tv-on: #10131a; } }
-    :root[data-theme="dark"] { --tv-on: #10131a; }
-
-    .tv-host .sp-stage { height: auto; min-height: 240px; display: block; padding: var(--d-sm); }
-    .tv { display: flex; flex-direction: column; gap: .45rem; min-width: 0; }
-    .tv-svg { display: block; width: 100%; height: auto; margin: 0 auto; overflow: visible; }
-    .tv-empty { fill: var(--color-on-surface-variant); font-size: 13px; }
-    .tv-edge { stroke: var(--color-outline); stroke-width: 2; }
-    .tv-edge.on { stroke: var(--c-target); stroke-width: 3.5; }
-    .tv-edge.hot { stroke: var(--c-swap); stroke-width: 4.5; }
-    .tv-bit { fill: var(--c-min); font: 700 11px var(--font-mono); }
-    .tv-node circle { fill: var(--color-surface-container-high); stroke: var(--c-default); stroke-width: 2; }
-    .tv-node .k { fill: var(--color-on-surface); font: 600 13px var(--font-mono); dominant-baseline: central; }
-    .tv-node .k.sm { font-size: 11px; }
-    .tv-lab { fill: var(--color-on-surface-variant); font: 11px var(--font-mono); }
-    .tv-sup { fill: var(--color-primary); font: 700 10px var(--font-mono); }
-    .tv-node.is-done circle   { fill: var(--c-sorted); stroke: var(--c-sorted); }
-    .tv-node.is-queued circle { stroke: var(--c-compare); stroke-width: 3; stroke-dasharray: 4 3; }
-    .tv-node.is-path circle   { stroke: var(--c-target); stroke-width: 3.5; }
-    .tv-node.is-sub circle    { fill: var(--color-surface-container); stroke: var(--c-target); stroke-dasharray: 3 3; }
-    .tv-node.is-alt circle    { fill: var(--c-target); stroke: var(--c-target); }
-    .tv-node.is-cur circle    { fill: var(--c-compare); stroke: var(--c-compare); }
-    .tv-node.is-fresh circle  { fill: var(--c-min); stroke: var(--c-min); }
-    .tv-node.is-found circle  { fill: var(--c-target); stroke: var(--c-target); stroke-width: 4; }
-    .tv-node.is-rot circle,
-    .tv-node.is-warn circle   { fill: var(--c-swap); stroke: var(--c-swap); }
-    .tv-node.is-done .k, .tv-node.is-alt .k, .tv-node.is-cur .k, .tv-node.is-fresh .k,
-    .tv-node.is-found .k, .tv-node.is-rot .k, .tv-node.is-warn .k { fill: var(--tv-on); }
-    .tv-node.click { cursor: pointer; }
-    .tv-node.click:focus { outline: none; }
-    .tv-node.click:focus circle { stroke: var(--color-primary); stroke-width: 4; }
-    .tv-counter { align-self: flex-end; font-weight: 600; font-size: var(--text-sm); color: var(--color-on-surface); }
-    .tv-info { display: flex; flex-wrap: wrap; gap: .3rem; align-items: center; font-size: var(--text-sm); }
-    .tv-info .lbl { color: var(--color-on-surface-variant); margin-right: .2rem; }
-    .tv-chip { font-family: var(--font-mono); border: 1px solid var(--color-outline-variant); border-radius: var(--radius); padding: 0 .4rem; background: var(--color-surface-container); }
-    .tv-chip.first { border-color: var(--c-compare); box-shadow: inset 0 -2px 0 var(--c-compare); }
-    .tv-none { color: var(--color-on-surface-variant); font-style: italic; }
-
-    .tv-switch { display: flex; flex-wrap: wrap; gap: .35rem; margin: .7rem 0 .2rem; }
-    .tv-switch button[aria-pressed="true"] { background: var(--color-primary); color: var(--color-on-primary); border-color: var(--color-primary); }
-    .tv-mini { border: 1px solid var(--color-outline-variant); border-radius: var(--radius-lg); padding: .3rem; background: var(--color-surface); }
-    .tv-facts { margin: .4rem 0 0; display: grid; grid-template-columns: max-content 1fr; gap: .15rem .8rem; font-size: var(--text-sm); }
-    .tv-facts dt { color: var(--color-on-surface-variant); }
-    .tv-facts dd { margin: 0; font-family: var(--font-mono); }
-    .tv-codec input { width: 100%; max-width: 22rem; }
-    .tv-codec .out { font-family: var(--font-mono); word-break: break-all; }
-    /* Lange pseudokodelinjer skal ikke blåse opp grid-kolonnen på mobil (1fr har min-width:auto) */
-    [data-panel] .grid > *, [data-panel] .pc-explainer > * { min-width: 0; }
-  </style>
 </head>
 <body data-page="traer">
   <a class="skip-link" href="#main">Hopp til innhold</a>
@@ -167,7 +114,7 @@
 
       <div class="callout uni"><span class="lbl">Universitetsnivå</span>
         <p>På dybde d kan et binærtre ha høyst 2<sup>d</sup> noder. Et binærtre med høyde h har derfor høyst
-          1 + 2 + … + 2<sup>h</sup> = 2<sup>h+1</sup> − 1 noder. Snur vi det, må et binærtre med n noder ha høyde minst ⌊log₂ n⌋.
+          1 + 2 + … + 2<sup>h</sup> = 2<sup>h+1</sup> − 1 noder. Snur vi det, må et binærtre med n noder ha høyde minst ⌊log n⌋.
           Høyden er høyst n − 1 (en kjede). Nesten alle trealgoritmer i kurset koster O(h). Hele poenget med balanserte trær er å presse h ned mot log n.</p>
       </div>
 
@@ -879,7 +826,7 @@
     IN.explain("#intro-bst", t(
       "Et søketre holder tallene i orden, slik at du kan finne et tall uten å se på alle.",
       "Søk, innsetting og fjerning følger én sti fra roten, så de koster O(h). Hvor god h er, avhenger av rekkefølgen tallene ble satt inn i.",
-      "Søketre-egenskapen er en invariant: inorder gir sortert rekkefølge. Alle tre operasjonene er O(h), med h mellom ⌊log₂ n⌋ og n − 1. Vanlige BST-er gir ingen garanti for h. Det er AVL-treets jobb."
+      "Søketre-egenskapen er en invariant: inorder gir sortert rekkefølge. Alle tre operasjonene er O(h), med h mellom ⌊log n⌋ og n − 1. Vanlige BST-er gir ingen garanti for h. Det er AVL-treets jobb."
     ), { label: "Nivå:" });
     mountDemo("#demo-bstins", { algo: "bstInsert", inputLabel: "f.eks. 50,30,70,20",
       presets: { "Balansert": BST7.slice(), "Sortert (kjede)": [10, 20, 30, 40, 50], "Med duplikat": [8, 3, 10, 3, 6] } });

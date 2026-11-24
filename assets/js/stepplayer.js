@@ -179,7 +179,9 @@
 
     // Når fanen vises første gang (fra core.js tabs-event): sørg for layout
     var shown = false;
-    host.addEventListener("in:shown", function () { if (!shown && steps.length) { shown = true; renderStep(); } });
+    // Hendelsen sendes på fane-panelet (som ligger utenfor host), så vi lytter der.
+    var panelEl = (host.closest && host.closest("[data-panel]")) || host;
+    panelEl.addEventListener("in:shown", function () { if (!shown && steps.length) { shown = true; renderStep(); } });
 
     // Init
     if (opts.initial) setInput(opts.initial);

@@ -295,9 +295,32 @@
     var start = (fromHash && ids.indexOf(fromHash) >= 0) ? fromHash : ids[0];
     activate(start, false);
 
+    // Dyplenke til en eksamensoppgave: #fane=<fane>&oppg=<element-id>.
+    // Oppgavekortene bygges av sidens eget skript, så vi venter til siden er lastet,
+    // åpner kortet og ruller dit.
+    function reveal() {
+      var m = location.hash.match(/oppg=([\w-]+)/);
+      if (!m) return;
+      try { history.scrollRestoration = "manual"; } catch (e) {}
+      var go = function () {
+        var t = document.getElementById(m[1]);
+        if (!t) return;
+        var card = t.matches && t.matches("details") ? t : t.querySelector("details.examtask");
+        if (card) card.open = true;
+        var top = t.getBoundingClientRect().top + window.pageYOffset - 90; // under den faste toppmenyen
+        window.scrollTo({ top: Math.max(0, top), behavior: "instant" });
+      };
+      // To ganger: demoene over kan endre høyde rett etter lasting
+      var run = function () { setTimeout(go, 60); setTimeout(go, 450); };
+      if (document.readyState === "complete") run();
+      else window.addEventListener("load", run);
+    }
+    reveal();
+
     window.addEventListener("hashchange", function () {
       var h = (location.hash.match(/fane=([\w-]+)/) || [])[1];
       if (h && ids.indexOf(h) >= 0) activate(h, false);
+      reveal();
     });
     return { activate: activate };
   };
@@ -344,7 +367,13 @@
     var storeKey = opts.id ? "in-tf:" + opts.id : null;
 
     // Stabil identitet + gjenoppretting av svar
-    items = items.map(function (it, i) { return { s: it.s, answer: !!it.answer, explain: it.explain || "", blokk: it.blokk || null, _id: i }; });
+    // kilde: eksamen påstanden kommer fra (eget felt, ellers årstallet i teksten, f.eks. «(H2022)»)
+    function kildeOf(it) {
+      if (it.kilde) return it.kilde;
+      var m = /\b([HV]20\d\d)\b/.exec((it.s || "") + " " + (it.explain || ""));
+      return m ? m[1] : null;
+    }
+    items = items.map(function (it, i) { return { s: it.s, answer: !!it.answer, explain: it.explain || "", blokk: it.blokk || null, kilde: kildeOf(it), _id: i }; });
     var answers = {}; // _id -> true/false
     var checked = false;
     if (storeKey) {
@@ -358,7 +387,9 @@
       IN.store.set(storeKey, JSON.stringify({ a: answers, c: checked }));
     }
 
-    var order = items.map(function (it) { return it._id; });
+    // Påstander fra eksamen først, deretter resten (ellers uendret rekkefølge)
+    var order = items.filter(function (it) { return it.kilde; }).concat(items.filter(function (it) { return !it.kilde; }))
+      .map(function (it) { return it._id; });
     function shuffle() { for (var i = order.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)); var t = order[i]; order[i] = order[j]; order[j] = t; } }
     if (opts.shuffle) shuffle();
 
@@ -406,13 +437,13 @@
       order.forEach(function (id, pos) {
         var it = items[id];
         var sel = answers[id];
+        // Én rad per påstand: nr · påstand · Sant/Usant · Fasit/Forklar (fasit/forklaring folder ut under raden)
         var item = el("div", { class: "tf-item" + (sel != null ? " answered" : "") });
-        var head = el("div", { class: "tf-head" });
-        head.appendChild(el("span", { class: "tf-num", text: (pos + 1) }));
+        item.appendChild(el("span", { class: "tf-num", text: (pos + 1) }));
         var stmt = el("div", { class: "tf-stmt", html: it.s });
-        if (it.blokk) stmt.appendChild(el("span", { class: "tag blokk", text: "Blokk " + it.blokk }));
-        head.appendChild(stmt);
-        item.appendChild(head);
+        if (it.kilde) stmt.appendChild(el("span", { class: "tag blokk tf-eks", text: it.kilde, title: "Fra eksamen " + it.kilde }));
+        else if (it.blokk) stmt.appendChild(el("span", { class: "tag blokk", text: "Blokk " + it.blokk }));
+        item.appendChild(stmt);
 
         var choices = el("div", { class: "tf-choices", role: "group", "aria-label": "Sant eller usant" });
         [["Sant", true], ["Usant", false]].forEach(function (pair) {
@@ -431,9 +462,11 @@
         var tools = el("div", { class: "tf-tools" });
         var itemKey = !!it._showKey || keyShown;
         var itemExp = !!it._showExp || expShown;
-        var tKey = el("button", { class: "linklike", type: "button", text: itemKey ? "Skjul fasit" : "Fasit",
+        var tKey = el("button", { class: "linklike" + (itemKey ? " on" : ""), type: "button", text: "Fasit",
+          "aria-expanded": itemKey ? "true" : "false", title: itemKey ? "Skjul fasit" : "Vis fasit",
           onclick: function () { it._showKey = !itemKey; render(); } });
-        var tExp = el("button", { class: "linklike", type: "button", text: itemExp ? "Skjul forklaring" : "Forklaring",
+        var tExp = el("button", { class: "linklike" + (itemExp ? " on" : ""), type: "button", text: "Forklar",
+          "aria-expanded": itemExp ? "true" : "false", title: itemExp ? "Skjul forklaring" : "Vis forklaring",
           onclick: function () { it._showExp = !itemExp; render(); } });
         tools.appendChild(tKey);
         if (it.explain) tools.appendChild(tExp);
@@ -482,6 +515,7 @@
     if (!host) return;
     var d = data || {};
     var card = el("details", { class: "examtask" });
+    if (d.id) card.id = d.id;
     if (d.open) card.setAttribute("open", "");
     var sum = el("summary", { class: "examtask-sum" });
     if (d.year) sum.appendChild(el("span", { class: "et-year", text: d.year }));

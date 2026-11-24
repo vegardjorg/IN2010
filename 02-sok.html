@@ -7,40 +7,6 @@
   <meta name="description" content="Søk i IN2010: rett-frem søk, binærsøk med varianter, sorter-én-gang-avveiningen, finn duplikat, finn k minste og array-triks med hashing – med stegvise demoer og kjøretid.">
   <script>(function(){try{var d=document.documentElement;var t=localStorage.getItem('in-theme');if(t&&t!=='system')d.setAttribute('data-theme',t);var l=localStorage.getItem('in-level')||'normal';d.setAttribute('data-level',l);}catch(e){document.documentElement.setAttribute('data-level','normal');}})();</script>
   <link rel="stylesheet" href="assets/css/styles.css">
-  <!-- MIDLERTIDIG sideintern CSS for søke-visualiseringen. Skal flyttes til styles.css
-       (se plan/foresporsler/sok/01-sok-viz-css.md). -->
-  <style>
-    .pc-explainer > * { min-width: 0; } .pc-explainer > :first-child { overflow-x: auto; } /* lange linjer (BinarySearchRec) på mobil */
-    .grid > * { min-width: 0; } /* hindrer at brede søyler blåser opp kolonnen på mobil */
-    .sok-viz { display: flex; flex-direction: column; gap: .45rem; min-width: 100%; width: max-content; align-self: stretch; justify-content: flex-end; }
-    .sok-info { display: flex; flex-wrap: wrap; gap: .3rem; position: sticky; left: 0; }
-    .sok-info .pill { font-size: var(--text-xs); }
-    .sok-viz .bar-ptrs { height: auto; min-height: 2.4rem; overflow: visible; }
-    .sok-viz .bar-col { transition: opacity .2s ease; }
-    .sok-viz .bar-col.sok-out { opacity: .28; }
-    .sok-map { display: flex; flex-wrap: wrap; gap: .3rem; min-height: 1.9rem; align-items: center; position: sticky; left: 0; }
-    .sok-map .lbl { font-size: var(--text-xs); color: var(--color-on-surface-variant); margin-right: .2rem; }
-    .sok-chip { font-family: var(--font-mono, monospace); font-size: var(--text-xs); padding: .15rem .45rem; border-radius: var(--radius-md);
-      border: 1px solid var(--color-outline-variant); background: var(--color-surface-container-high); color: var(--color-on-surface); }
-    .sok-chip.is-new { border-color: var(--c-target); box-shadow: 0 0 0 2px color-mix(in srgb, var(--c-target) 35%, transparent); }
-    .tall-stage .sp-stage { height: auto; min-height: 300px; }
-    .sok-calc { display: grid; gap: .6rem; }
-    .sok-calc .row { display: flex; flex-wrap: wrap; gap: .4rem; align-items: center; }
-    .sok-calc output, .sok-big { font-variant-numeric: tabular-nums; font-weight: 700; }
-    .sok-meter { display: grid; grid-template-columns: minmax(7.5rem, max-content) 1fr; gap: .35rem .6rem; align-items: center; }
-    .sok-meter .bar-h { height: 1.1rem; border-radius: var(--radius); background: var(--c-compare); min-width: 3px; transition: width .3s ease; }
-    .sok-meter .bar-h.alt { background: var(--c-sorted); }
-    .sok-meter .bar-h.alt2 { background: var(--c-target); }
-    .sok-meter .bar-h.alt3 { background: var(--c-min); }
-    .sok-meter .val { font-size: var(--text-sm); font-variant-numeric: tabular-nums; }
-    .sok-meter .cell { display: flex; align-items: center; gap: .5rem; min-width: 0; }
-    .cmp-table tr.win td { background: color-mix(in srgb, var(--c-sorted) 16%, transparent); font-weight: 600; }
-    .cmp-table tr.bad td { opacity: .65; text-decoration: line-through; }
-    .sok-sol-code { margin: .5rem 0 .8rem; }
-    .sok-sol-code .bigo-compact { margin-top: .4rem; }
-    input[type=range].sok-range { width: min(100%, 18rem); }
-    @media (prefers-reduced-motion: reduce) { .sok-viz .bar-col, .sok-meter .bar-h { transition: none; } }
-  </style>
 </head>
 <body data-page="sok">
   <a class="skip-link" href="#main">Hopp til innhold</a>
@@ -287,7 +253,7 @@
         Binærsøk virker fordi én sammenligning med midten forteller oss hvilken halvdel vi kan kaste. I (b) har vi ingen <code>x</code> å sammenligne med,
         og et nabopar i midten som er ulikt, sier ingenting om hvilken side duplikatet ligger på. Derfor må vi i verste fall se på alle n − 1 naboparene.</div>
       <div class="callout felle"><span class="lbl">Felle i (c)</span>
-        Vil du sortere først, må det være en <b>sammenligningsbasert</b> algoritme (Merge sort, Heapsort, eller Quicksort – men si at Quicksort er O(n²) i verste tilfelle). Bucket sort og Radix sort går ikke,
+        Vil du sortere først, må det være en <b>sammenligningsbasert</b> algoritme (Merge sort, Heapsort, eller Quicksort – men si at Quicksort er O(n²) i verste tilfelle). Bøttesortering og radix sort går ikke,
         for oppgaven sier bare at elementene kan sammenlignes. Og sorterer du, må du huske de <i>opprinnelige</i> indeksene.</div>
       <h4>Faktisk eksamensoppgave</h4>
       <div id="exam-duplikat"></div>
@@ -719,12 +685,12 @@
           after: "<b>Poeng:</b> opptil 3p for lineær tid. −1p for feil kjøretid. Over lineær tid ga 1p." },
         { html: "<b>(c) Forventet O(n)</b> med et hashmap fra verdi til indeks: for hvert element, sjekk om verdien er sett før. Ved treff skriver vi ut lagret og nåværende indeks.",
           code: ["findDupHash"],
-          after: "Alternativ på O(n log n): sorter med en sammenligningsbasert algoritme (Merge sort eller Heapsort; Quicksort går også, men si at den er O(n²) i verste tilfelle – ikke Bucket sort eller Radix sort, for bare sammenlignbarhet er gitt), husk de opprinnelige indeksene, og skann etter like naboer. <b>Poeng:</b> opptil 5p for lineær, 4p for O(n log n), 1p for dårligere. −1p for feil eller manglende kjøretid." }
+          after: "Alternativ på O(n log n): sorter med en sammenligningsbasert algoritme (Merge sort eller Heapsort; Quicksort går også, men si at den er O(n²) i verste tilfelle – ikke bøttesortering eller radix sort, for bare sammenlignbarhet er gitt), husk de opprinnelige indeksene, og skann etter like naboer. <b>Poeng:</b> opptil 5p for lineær, 4p for O(n log n), 1p for dårligere. −1p for feil eller manglende kjøretid." }
       ]),
       kjerne: "<p>Oppgaven tester om du utnytter antakelsene: sortering gir binærsøk og nabosammenligning, og når sorteringen forsvinner, gir hashing lineær tid. Det sentrale er å velge riktig verktøy for hver antakelse og begrunne kjøretiden.</p>",
       tips: [
         "I (a): skriv eksplisitt at binærsøket returnerer en indeks. Ellers mister du 1p.",
-        "I (c): nevn hashing først (forventet O(n)). Sorterer du, begrunn hvorfor Bucket sort og Radix sort ikke kan brukes.",
+        "I (c): nevn hashing først (forventet O(n)). Sorterer du, begrunn hvorfor bøttesortering og radix sort ikke kan brukes.",
         "Oppgi kjøretid i <i>hver</i> deloppgave – det trekkes for hver som mangler."
       ]
     }]);

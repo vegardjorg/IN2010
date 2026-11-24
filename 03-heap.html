@@ -238,7 +238,7 @@
         <i>at</i> det er lineært, og intuisjonen: de mange nodene nederst er billige, og bare roten kan synke hele veien.</div>
 
       <div class="callout felle"><span class="lbl">Vanlig felle</span>
-        Å gå <b>oppover</b> fra 0. BubbleDown krever at begge deltrærne allerede er heaper, og det har vi bare når vi
+        Å gå <b>oppover</b> fra 0. BubbleDown krever at begge subtrærne allerede er heaper, og det har vi bare når vi
         går nedenfra og opp (downto). Den andre fellen: å svare O(n log n). Det er kjøretiden for n innsettinger, ikke
         for BuildMinHeap.</div>
 
@@ -501,7 +501,7 @@
       { cls: "target", label: "noden vi jobber med" },
       { cls: "compare", label: "sammenlignes" },
       { cls: "swap", label: "byttes" },
-      { cls: "sorted", label: "deltre som alt er en heap" }
+      { cls: "sorted", label: "subtre som alt er en heap" }
     ];
     var LEG_HS = [
       { cls: "target", label: "plass i / noden som synker" },
@@ -676,7 +676,7 @@
     intro("#intro-build", {
       eli5: "<p>Har vi alle tallene på en gang, trenger vi ikke sette dem inn ett og ett. Vi legger dem rett inn i treet, i den rekkefølgen de står. Så rydder vi nedenfra: hvert tall som har barn, får synke til det står riktig. Vi begynner nederst og går mot toppen.</p>",
       normal: "<p><b>BuildMinHeap</b> gjør et vilkårlig array om til en heap. Løvnodene er allerede heaper. Gå baklengs fra ⌊n/2⌋ til 0, og la hver node boble ned. Totalt <b>O(n)</b>, raskere enn n innsettinger (O(n log n)).</p>",
-      teknisk: "<p>Invariant: når vi er ferdige med i, er alle deltrær med rot ≥ i heaper. Da holder forutsetningen til BubbleDown (begge deltrær er heaper) for neste i. Kostnaden er summen av høydene, og den er O(n). Analysen står nedenfor.</p>"
+      teknisk: "<p>Invariant: når vi er ferdige med i, er alle subtrær med rot ≥ i heaper. Da holder forutsetningen til BubbleDown (begge subtrær er heaper) for neste i. Kostnaden er summen av høydene, og den er O(n). Analysen står nedenfor.</p>"
     });
     var hBuild = render("#pc-build", "buildMinHeap"), hBdMin = render("#pc-bdmin", "bubbleDownMin");
     IN.stepPlayer("#tracer-build", {

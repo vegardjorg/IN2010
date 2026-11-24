@@ -261,8 +261,8 @@
   def(IN.algos, "bubbleDownMin", {
     title: "BubbleDown for heap – boble ned fra indeks i",
     name: "BubbleDownMin", params: "A, i, n",
-    input: "Et array A, en indeks i og heapstørrelsen n, der begge deltrærne til i allerede er heaper",
-    output: "Deltreet med rot i er en heap",
+    input: "Et array A, en indeks i og heapstørrelsen n, der begge subtrærne til i allerede er heaper",
+    output: "Subtreet med rot i er en heap",
     lines: [
       { code: "smallest ← i", indent: 1,
         eli5: "Vi later først som om tallet vårt er det minste av seg selv og barna.",
@@ -297,11 +297,11 @@
       { code: "if i ≠ smallest then", indent: 1,
         eli5: "Er et av barna mindre enn tallet vårt? Da står det feil.",
         normal: "Står i feil? (Et barn er mindre.)",
-        teknisk: "Er i fortsatt minst, holder heap-egenskapen her. Begge deltrærne var allerede heaper, så vi er ferdige." },
+        teknisk: "Er i fortsatt minst, holder heap-egenskapen her. Begge subtrærne var allerede heaper, så vi er ferdige." },
       { code: "swap A[i] and A[smallest]", indent: 2,
         eli5: "Tallet bytter plass med det minste barnet og synker én etasje.",
         normal: "Bytt med det minste barnet.",
-        teknisk: "Nå er det minste av de tre øverst. Feilen kan bare ha flyttet seg ned i deltreet til smallest." },
+        teknisk: "Nå er det minste av de tre øverst. Feilen kan bare ha flyttet seg ned i subtreet til smallest." },
       { code: "BubbleDownMin(A, smallest, n)", indent: 2,
         eli5: "Vi gjør det samme på nytt der tallet havnet.",
         normal: "Fortsett nedover (rekursivt).",
@@ -320,8 +320,8 @@
   /* ===================== BUILDMINHEAP ===================== */
   var G_BUILD = g("Hvorfor starte på ⌊n/2⌋, og hvorfor baklengs?",
     t("Tallene i den bakerste halvdelen har ingen barn, så de kan ikke synke. Vi starter rundt midten og går baklengs mot toppen. En node kan nemlig bare synke riktig når alt under den allerede er i orden.",
-      "Siste element står på n − 1, og forelderen er ⌊(n − 2)/2⌋ = ⌊n/2⌋ − 1. Det er den siste noden med barn. Forelesningen starter på ⌊n/2⌋, som alltid er en løvnode, så det gir ett ekstra kall som ikke gjør noe. Begge er riktige. Å starte lavere er feil, fordi da hopper vi over noder med barn. Vi går nedover (downto) fordi BubbleDown krever at begge deltrærne allerede er heaper.",
-      "Indeksene ⌊n/2⌋ … n − 1 er løvnoder, og hver løvnode er alene en heap. Den siste interne noden er ⌊n/2⌋ − 1. Å starte på ⌊n/2⌋ (som forelesningen) eller høyere er korrekt, bare litt sløsete. Å starte lavere er feil. Retningen er viktig. Går vi oppover fra 0, kaller vi BubbleDown på roten før deltrærne er heaper, og da holder ikke forutsetningen. En liten verdi langt nede kan da bli liggende under en større."));
+      "Siste element står på n − 1, og forelderen er ⌊(n − 2)/2⌋ = ⌊n/2⌋ − 1. Det er den siste noden med barn. Forelesningen starter på ⌊n/2⌋, som alltid er en løvnode, så det gir ett ekstra kall som ikke gjør noe. Begge er riktige. Å starte lavere er feil, fordi da hopper vi over noder med barn. Vi går nedover (downto) fordi BubbleDown krever at begge subtrærne allerede er heaper.",
+      "Indeksene ⌊n/2⌋ … n − 1 er løvnoder, og hver løvnode er alene en heap. Den siste interne noden er ⌊n/2⌋ − 1. Å starte på ⌊n/2⌋ (som forelesningen) eller høyere er korrekt, bare litt sløsete. Å starte lavere er feil. Retningen er viktig. Går vi oppover fra 0, kaller vi BubbleDown på roten før subtrærne er heaper, og da holder ikke forutsetningen. En liten verdi langt nede kan da bli liggende under en større."));
   def(IN.algos, "buildMinHeap", {
     title: "BuildMinHeap – lag en heap av et array på lineær tid",
     name: "BuildMinHeap", params: "A, n",
@@ -331,12 +331,12 @@
       { code: "for i ← ⌊n/2⌋ downto 0 do", indent: 1,
         eli5: "Vi starter rundt midten og jobber oss baklengs mot toppen. Tallene bakerst har ingen barn, så de er allerede i orden.",
         normal: "Gå baklengs fra midten til roten. Løvnodene bakerst er allerede heaper.",
-        teknisk: "Vi går nedenfra og opp. Når vi kommer til i, er begge deltrærne under i allerede heaper. Det er nettopp forutsetningen BubbleDown trenger.",
+        teknisk: "Vi går nedenfra og opp. Når vi kommer til i, er begge subtrærne under i allerede heaper. Det er nettopp forutsetningen BubbleDown trenger.",
         grense: G_BUILD },
       { code: "BubbleDownMin(A, i, n)", indent: 2,
         eli5: "Vi lar tallet på plass i synke ned til det står riktig.",
-        normal: "Reparer deltreet med rot i ved å boble ned.",
-        teknisk: "Etter kallet er deltreet med rot i en heap (invariant). Når i = 0 er hele arrayet en heap." }
+        normal: "Reparer subtreet med rot i ved å boble ned.",
+        teknisk: "Etter kallet er subtreet med rot i en heap (invariant). Når i = 0 er hele arrayet en heap." }
     ],
     bigO: {
       best: "O(n)", avg: "O(n)", worst: "O(n)", space: "O(log n)",
@@ -352,8 +352,8 @@
   def(IN.algos, "heapBubbleDown", {
     title: "BubbleDown for max-heap (hjelpeprosedyre i Heapsort)",
     name: "BubbleDown", params: "A, i, n",
-    input: "Et array A, en indeks i og heapstørrelsen n, der begge deltrærne til i allerede er max-heaper",
-    output: "Deltreet med rot i er en max-heap",
+    input: "Et array A, en indeks i og heapstørrelsen n, der begge subtrærne til i allerede er max-heaper",
+    output: "Subtreet med rot i er en max-heap",
     lines: [
       { code: "largest ← i", indent: 1,
         eli5: "Vi later først som om tallet vårt er det største av seg selv og barna.",
@@ -384,7 +384,7 @@
       { code: "swap A[i] and A[largest]", indent: 2,
         eli5: "Bytt med det største barnet.",
         normal: "Bytt med det største barnet.",
-        teknisk: "Feilen flytter seg ned i deltreet til largest." },
+        teknisk: "Feilen flytter seg ned i subtreet til largest." },
       { code: "BubbleDown(A, largest, n)", indent: 2,
         eli5: "Fortsett der tallet havnet.",
         normal: "Fortsett nedover (rekursivt).",
@@ -410,8 +410,8 @@
         grense: G_BUILD },
       { code: "BubbleDown(A, i, n)", indent: 2,
         eli5: "La tallet på plass i synke til det står riktig.",
-        normal: "Reparer deltreet med rot i.",
-        teknisk: "Etter kallet er deltreet med rot i en max-heap." }
+        normal: "Reparer subtreet med rot i.",
+        teknisk: "Etter kallet er subtreet med rot i en max-heap." }
     ],
     bigO: { best: "O(n)", avg: "O(n)", worst: "O(n)", space: "O(log n)",
       why: t("De fleste tallene trenger nesten ikke synke.", "Samme argument som for BuildMinHeap: O(n).", "Samme sum som for BuildMinHeap: n · (1/4 + 2/8 + 3/16 + …) = n, altså O(n). Beviset er utenfor pensum.") }
@@ -797,7 +797,7 @@
       }
       if (s === i) {
         snap(code(9), { target: i },
-          t(A[i] + " står riktig. Ferdig med dette tallet.", "i = " + key + ": ferdig.", "i = " + key + ", så deltreet med rot " + i + " er en " + (isMax ? "max-heap" : "heap") + "."), "Står riktig");
+          t(A[i] + " står riktig. Ferdig med dette tallet.", "i = " + key + ": ferdig.", "i = " + key + ", så subtreet med rot " + i + " er en " + (isMax ? "max-heap" : "heap") + "."), "Står riktig");
         return;
       }
       snap(code(9), { target: i, compare: [s] }, t("Barnet " + A[s] + " er " + word + ", så tallet står feil.", "i ≠ " + key + " (" + s + ").", "i ≠ " + key + " = " + s + ": må bytte."), null, [i, s]);
@@ -823,7 +823,7 @@
     snap(null, {},
       t("Her er tallene, lagt inn i treet akkurat slik de står i arrayet. Det er ikke en heap ennå. De grønne bakerst har ingen barn, så de er allerede i orden.",
         "Arrayet " + list(A) + " sett som et komplett tre. Løvnodene (grønne, indeks " + Math.floor(n / 2) + "–" + (n - 1) + ") er allerede heaper.",
-        "Utgangspunkt: et vilkårlig array. Hver løvnode (indeks ≥ ⌊n/2⌋ = " + Math.floor(n / 2) + ") er alene en heap. Vi jobber nedenfra og opp, så begge deltrærne er ferdige heaper når vi kommer til en node."),
+        "Utgangspunkt: et vilkårlig array. Hver løvnode (indeks ≥ ⌊n/2⌋ = " + Math.floor(n / 2) + ") er alene en heap. Vi jobber nedenfra og opp, så begge subtrærne er ferdige heaper når vi kommer til en node."),
       "Start");
     for (var i0 = Math.floor(n / 2); i0 >= 0; i0--) {
       var leaf = 2 * i0 + 1 >= n;
@@ -834,14 +834,14 @@
               "i = ⌊n/2⌋ = " + i0 + " er alltid en løvnode. Forelesningen starter her; ⌊n/2⌋ − 1 hadde spart dette ene, tomme kallet.")
           : t("Neste plass: " + i0 + " (" + A[i0] + "). Vi lar tallet synke til det står riktig.",
               "i = " + i0 + ": BubbleDownMin fra " + i0 + ".",
-              "i = " + i0 + ". Begge deltrærne under " + i0 + " er allerede heaper, så BubbleDownMin(A, " + i0 + ", n) gjør hele deltreet til en heap."),
+              "i = " + i0 + ". Begge subtrærne under " + i0 + " er allerede heaper, så BubbleDownMin(A, " + i0 + ", n) gjør hele subtreet til en heap."),
         "i = " + i0);
       if (leaf) continue;
       snap(3, { target: i0 }, t("Vi kaller BubbleDownMin på plass " + i0 + ".", "BubbleDownMin(A, " + i0 + ", " + n + ").", "Kall: BubbleDownMin(A, " + i0 + ", " + n + ")."), null);
       bubbleSteps(A, i0, n, false, 100, 3, snap, counter);
       subtree(i0, n).forEach(function (v) { if (done.indexOf(v) < 0) done.push(v); });
       snap(3, {},
-        t("Nå er hele grenen under plass " + i0 + " i orden (grønn).", "Deltreet med rot " + i0 + " er en heap.", "Invariant: alle deltrær med rot ≥ " + i0 + " er heaper."), null);
+        t("Nå er hele grenen under plass " + i0 + " i orden (grønn).", "Subtreet med rot " + i0 + " er en heap.", "Invariant: alle subtrær med rot ≥ " + i0 + " er heaper."), null);
     }
     steps.push({ line: null, array: clone(A), size: n, marks: { sorted: A.map(function (_, k) { return k; }) },
       text: t("Ferdig! Hele treet er en heap: " + list(A) + ". Vi trengte bare " + counter.swaps + " bytter.",

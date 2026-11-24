@@ -200,7 +200,7 @@
       <h3>Gnome sort <span class="tag">H2023 · 10p</span></h3>
       <div id="intro-gnome"></div>
       <div class="callout sensor exam-jump"><span class="lbl">Eksamen</span>
-        <b>H2023 · Oppgave 5</b> (10p): drøft gnome sort opp mot pensum.
+        <b>H2023 · Oppgave 4</b> (10p): drøft gnome sort opp mot pensum.
         <a href="#eksamen-gnome" data-jump="eksamen-gnome">Til oppgaven ↓</a></div>
       <div class="grid cols-2">
         <div><div id="tracer-gnome"></div></div>
@@ -400,16 +400,15 @@
       <p class="muted small">Prøv deg selv på påstander i eksamensstil. Svar Sant/Usant, trykk
         <b>Sjekk svar</b> for antall riktige, og bruk <b>Fasit</b>/<b>Forklaring</b> på hver påstand når du
         vil se mer. Svarene huskes i nettleseren din.</p>
-      <div class="callout sensor exam-jump"><span class="lbl">Eksamen</span>
-        <b>H2021 · Oppgave 3</b> (10p): sant/usant om bubble, selection og insertion.
-        <a href="#eksamen-test" data-jump="eksamen-test">Til oppgaven ↓</a></div>
-      <div id="tf-sortering"></div>
-
-      <h3 id="eksamen-test" class="exam-anchor" style="margin-top:2rem">Eksamen H2021 · Oppgave 3 <span class="tag">10p</span></h3>
+      <h3 id="eksamen-test" class="exam-anchor" style="margin-top:1rem">Eksamen H2021 · Oppgave 3 <span class="tag">10p</span></h3>
       <p class="muted small">A er et array med n elementer, og 0 ≤ i &lt; n. «Runde» betyr én iterasjon av den
         ytre løkka. På eksamen ga hvert riktig svar 1 poeng og hvert feil eller ubesvart −1 (minst 0 totalt).
         Ubesvart koster like mye som feil, så svar på alle.</p>
       <div id="tf-h2021"></div>
+
+      <h3 style="margin-top:2rem">Flere påstander</h3>
+      <p class="muted small">Påstander merket med årstall er hentet fra eksamen; resten er laget i samme stil.</p>
+      <div id="tf-sortering"></div>
     </section>
   </main>
 
@@ -648,7 +647,7 @@
        denne innebygde teksten. All tekst er parafrasert fra UiO-settene. */
     var EXAM_FALLBACK = {
       gnome: {
-        year: "H2023", oppgave_nr: "Oppgave 5", title: "Gnome sort", points: 10,
+        year: "H2023", oppgave_nr: "Oppgave 4", title: "Gnome sort", points: 10,
         oppgave: "<p>Gnome sort presenteres som en enkel sorteringsalgoritme utenfor pensum, med en figur fra en kjøring. Pseudokoden tar inn et array <code>A</code> med <code>n</code> elementer og returnerer de samme elementene sortert. Logikken er: sett <code>i ← 0</code>; så lenge <code>i &lt; n</code>: hvis <code>i &gt; 0</code> og <code>A[i-1] &gt; A[i]</code>, bytt de to og sett <code>i ← i − 1</code>; ellers <code>i ← i + 1</code>.</p><p>Drøft fordeler og ulemper ved Gnome sort opp mot sorteringsalgoritmene i pensum. Svaret skal inneholde: (1) en kort forklaring av virkemåten i naturlig språk, (2) kjøretidskompleksiteten med kort begrunnelse, (3) en sammenligning mot pensums sorteringsalgoritmer, og (4) en kort vurdering av om den er stabil og/eller in-place.</p>",
         losning: [
           "<b>Virkemåte:</b> algoritmen vandrer over elementene; møter den et element som er mindre enn det foregående, flytter den det bakover med gjentatte nabobytter. Nesten identisk med insertion sort, men holder styr på bare én indeks.",
