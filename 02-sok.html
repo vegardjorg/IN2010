@@ -639,7 +639,21 @@
     })();
     IN.examTasks("#exam-sortersok", [{
       year: "H2020", oppgave_nr: "Oppgave 5", title: "Søk (Intersection)", points: 12,
-      oppgave: "<p>Du har tre hjelpeprosedyrer: <code>Search</code> (rett-frem søk, O(n)), <code>BinarySearch</code> (binærsøk, krever sortert input) og <code>Sort</code> (O(n log n)). Fire prosedyrer skal skrive ut tallene som finnes i både heltallsarrayet <code>A</code> (lengde n) og <code>B</code> (lengde k):</p><ul><li><b>Intersection1:</b> for hver x i B, rett-frem søk etter x i A.</li><li><b>Intersection2:</b> for hver x i B, binærsøk i A uten å sortere.</li><li><b>Intersection3:</b> sorter A én gang, og binærsøk så for hver x i B.</li><li><b>Intersection4:</b> for hver x i B, sorter A og binærsøk (sorterer på nytt hver gang).</li></ul><p>Tre av dem gir alltid riktig svar, én kan gi feil. Oppgi for hvert tilfelle den riktige prosedyren med lavest kjøretidskompleksitet: (a) k = 1, (b) k = log n, (c) k = n, (d) k = n².</p>",
+      oppgave: (function () {
+        function P(name, body) { return { name: name, params: "A, B", lines: body.map(function (x) { return { code: x[0], indent: x[1] }; }) }; }
+        var ISECT = [
+          P("Intersection1", [["for x in B do", 1], ["if Search(A, x) then", 2], ["print(x)", 3]]),
+          P("Intersection2", [["for x in B do", 1], ["if BinarySearch(A, x) then", 2], ["print(x)", 3]]),
+          P("Intersection3", [["A ← Sort(A)", 1], ["for x in B do", 1], ["if BinarySearch(A, x) then", 2], ["print(x)", 3]]),
+          P("Intersection4", [["for x in B do", 1], ["A ← Sort(A)", 2], ["if BinarySearch(A, x) then", 2], ["print(x)", 3]])
+        ];
+        return IN.oppg({
+          intro: "<p>Du har tre hjelpeprosedyrer: <code>Search(A, x)</code> (rett-frem søk, O(n)), <code>BinarySearch(A, x)</code> (binærsøk, O(log n), krever sortert input) og <code>Sort(A)</code> (O(n log n)). Begge søkene returnerer true hvis x finnes i A. De fire prosedyrene under skal skrive ut tallene som finnes i både heltallsarrayet <code>A</code> (lengde n) og <code>B</code> (lengde k).</p>",
+          figs: ISECT.map(function (a) { return { cls: "code", draw: function (h) { IN.pseudo.render(h, a, { head: false, tooltips: false }); } }; }),
+          outro: "<p>Tre av dem gir alltid riktig svar, én kan gi feil. Oppgi for hvert tilfelle den riktige prosedyren med lavest kjøretidskompleksitet. Er flere like gode, holder det å nevne én.</p>" +
+            IN.partsHTML(["k = 1", "k = log n", "k = n", "k = n²"])
+        });
+      })(),
       losning: [
         "<b>Først:</b> Intersection2 kan gi feil svar, for A er ikke nødvendigvis sortert. Intersection4 er aldri best, for den gjentar en sortering som bare trengs én gang.",
         "<b>(a) k = 1:</b> Intersection1. Ett rett-frem søk er O(n), mens Intersection3 må betale O(n log n) for sorteringen.",
@@ -753,7 +767,7 @@
     staticCode("kminb", "findMinKSort");
     staticCode("kminc", "findMinKHeap");
     IN.examTasks("#exam-kminste", [{
-      year: "H2025", oppgave_nr: "Oppgave 5", title: "Finn k minste", points: 12,
+      year: "H2025", oppgave_nr: "Oppgave 6", title: "Finn k minste", points: 12,
       oppgave: "<p>Arrayet <code>A</code> har n sammenlignbare elementer, og k er et heltall med 1 ≤ k ≤ n. Skriv prosedyren <code>FindMin(A, k)</code>, som returnerer en liste med de k minste elementene i <code>A</code>. Gi tre ulike løsninger, én i hver kjøretidsklasse: <b>(a)</b> O(k·n), <b>(b)</b> O(n log n), <b>(c)</b> O(n log k) eller O(n + k log n).</p>",
       losning: solution([
         { html: "<b>(a) O(k·n):</b> gjenta k ganger: finn minste gjenværende element og legg det til svaret. Det er de k første rundene av Selection sort. Byttet sørger for at et element ikke blir plukket på nytt, også når det finnes like verdier.", code: ["findMinKSelect"] },

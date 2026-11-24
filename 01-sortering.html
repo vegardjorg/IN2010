@@ -624,7 +624,7 @@
       { s: "Heapsort er stabil.", answer: false,
         explain: "Heapsort er ustabil: bytter over lang avstand (rot ↔ siste) kan endre rekkefølgen mellom like elementer.", blokk: "1" },
       { s: "Merge sort har kjøretid O(n log n).", answer: true,
-        explain: "Arrayet halveres til bitene har ett element: log n nivåer. På hvert nivå koster flettingen O(n) til sammen. (H2022, Oppgave 1.)", blokk: "1" },
+        explain: "Arrayet halveres til bitene har ett element: log n nivåer. På hvert nivå koster flettingen O(n) til sammen. (H2022, Oppgave 2.)", blokk: "1" },
       { s: "En sortering er stabil når den alltid bruker like mange steg på n elementer.", answer: false,
         explain: "Stabil handler om rekkefølge, ikke tid: elementer med lik nøkkel står i samme innbyrdes rekkefølge etterpå som før.", blokk: "1" },
       { s: "Insertion sort er O(n) når arrayet allerede er sortert.", answer: true,
@@ -655,7 +655,11 @@
     var EXAM_FALLBACK = {
       gnome: {
         year: "H2023", oppgave_nr: "Oppgave 4", title: "Gnome sort", points: 10,
-        oppgave: "<p>Gnome sort presenteres som en enkel sorteringsalgoritme utenfor pensum, med en figur fra en kjøring. Pseudokoden tar inn et array <code>A</code> med <code>n</code> elementer og returnerer de samme elementene sortert. Logikken er: sett <code>i ← 0</code>; så lenge <code>i &lt; n</code>: hvis <code>i &gt; 0</code> og <code>A[i-1] &gt; A[i]</code>, bytt de to og sett <code>i ← i − 1</code>; ellers <code>i ← i + 1</code>.</p><p>Drøft fordeler og ulemper ved Gnome sort opp mot sorteringsalgoritmene i pensum. Svaret skal inneholde: (1) en kort forklaring av virkemåten i naturlig språk, (2) kjøretidskompleksiteten med kort begrunnelse, (3) en sammenligning mot pensums sorteringsalgoritmer, og (4) en kort vurdering av om den er stabil og/eller in-place.</p>",
+        oppgave: IN.oppg({
+          intro: "<p>Gnome sort presenteres som en enkel sorteringsalgoritme utenfor pensum. Pseudokoden under tar inn et array <code>A</code> med <code>n</code> elementer og sorterer det. Tenk deg en nisse som står på plass <code>i</code>: står de to nabo-elementene riktig (eller han står helt først), går han ett steg fram. Ellers bytter han dem og går ett steg tilbake.</p>",
+          figs: [{ cls: "code", draw: function (h) { IN.pseudo.render(h, IN.algos.gnomeSort, { head: false, tooltips: false }); } }],
+          outro: "<p>Drøft fordeler og ulemper ved Gnome sort opp mot sorteringsalgoritmene i pensum. Svaret skal inneholde:</p><ol><li>en kort forklaring av virkemåten med vanlige ord,</li><li>kjøretidskompleksiteten med kort begrunnelse,</li><li>en sammenligning mot sorteringsalgoritmene i pensum,</li><li>en kort vurdering av om den er stabil og/eller in-place.</li></ol><p class=\"small muted\">Prøv selv: <a href=\"#fane=gnome&amp;oppg=tracer-gnome\">demoen over</a> viser nissen steg for steg.</p>"
+        }),
         losning: [
           "<b>Virkemåte:</b> algoritmen vandrer over elementene; møter den et element som er mindre enn det foregående, flytter den det bakover med gjentatte nabobytter. Nesten identisk med insertion sort, men holder styr på bare én indeks.",
           "<b>Kjøretid:</b> kvadratisk, O(n²) (som bubble og selection). Best O(n) når alt allerede er sortert. Nøyaktig like mange bytter som insertion sort, men omtrent dobbelt så mange sammenligninger.",

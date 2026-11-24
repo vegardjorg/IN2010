@@ -119,25 +119,25 @@
       k20int:  ["sok",       "sortersok",  "H2020", "5",  "Søk (Intersection)", 12, "exam-sortersok"],
       k21par:  ["sok",       "triks",      "H2021", "10", "Par med sum x", 10, "exam-triks"],
       k23dup:  ["sok",       "duplikat",   "H2023", "3",  "Finn duplikat", 12, "exam-duplikat"],
-      k25kmin: ["sok",       "kminste",    "H2025", "5",  "Finn k minste", 12, "exam-kminste"],
+      k25kmin: ["sok",       "kminste",    "H2025", "6",  "Finn k minste", 12, "exam-kminste"],
       h21bin:  ["heap",      "removemin",  "H2021", "4",  "Binære heaps", 6, "exam-removemin"],
-      h22bq:   ["heap",      "pk",         "H2022", "9",  "Bucket queue (bøttekø)", 10, "exam-pk"],
-      h22tf:   ["heap",      "test",       "H2022", "4",  "Prioritetskøer og binære heaps (sant/usant)", 10, "exam-test"],
+      h22bq:   ["heap",      "pk",         "H2022", "10", "Bucket queue (bøttekø)", 10, "exam-pk"],
+      h22tf:   ["heap",      "test",       "H2022", "5",  "Prioritetskøer og binære heaps (sant/usant)", 10, "exam-test"],
       h23ins:  ["heap",      "innsetting", "H2023", "2",  "Innsetting i heap", 10, "exam-innsetting"],
       h24med:  ["heap",      "median",     "H2024", "7",  "Mediankø", 12, "exam-median"],
-      h25lvl:  ["heap",      "levelorder", "H2025", "4",  "Level-order", 12, "exam-levelorder"],
+      h25lvl:  ["heap",      "levelorder", "H2025", "5",  "Level-order", 12, "exam-levelorder"],
       t20bst:  ["traer",     "bst",        "H2020", "2",  "Binære søketrær", 4, "exam-h2020-2"],
       t21rng:  ["traer",     "bst",        "H2021", "8",  "Verdier i et intervall (InRange)", 10, "exam-h2021-8"],
-      t22chk:  ["traer",     "bst",        "H2022", "10", "Er treet et søketre? (CheckBST)", 10, "exam-h2022-10"],
+      t22chk:  ["traer",     "bst",        "H2022", "11", "Er treet et søketre? (CheckBST)", 10, "exam-h2022-10"],
       t23dia:  ["traer",     "diameter",   "H2023", "5",  "Diameteren til et binærtre", 12, "exam-h2023-5"],
       t24lca:  ["traer",     "lca",        "H2024", "6",  "Laveste felles forfeder", 12, "exam-h2024-6"],
       t20avl:  ["traer",     "avl",        "H2020", "6",  "AVL-innsetting", 9, "exam-h2020-6"],
-      t22avl:  ["traer",     "avl",        "H2022", "3",  "AVL-trær", 6, "exam-h2022-3"],
-      t25anti: ["traer",     "antiavl",    "H2025", "3",  "Anti-AVL", 12, "exam-h2025-3"],
+      t22avl:  ["traer",     "avl",        "H2022", "4",  "Balanserte søketrær (AVL)", 6, "exam-h2022-3"],
+      t25anti: ["traer",     "antiavl",    "H2025", "4",  "Anti-AVL", 12, "exam-h2025-3"],
       t21huf:  ["traer",     "huffman",    "H2021", "5",  "Huffman-trær", 5, "exam-h2021-5"],
-      t22auto: ["traer",     "huffman",    "H2022", "8",  "Autofullføring: prefikstre mot hashmap", 6, "exam-h2022-8"],
+      t22auto: ["traer",     "huffman",    "H2022", "9",  "Autofullføring: prefikstre mot hashmap", 6, "exam-h2022-8"],
       t24huf:  ["traer",     "huffman",    "H2024", "2",  "Huffman", 10, "exam-h2024-2"],
-      t25lvl:  ["traer",     "trav",       "H2025", "4",  "Level-order", 12, "exam-h2025-4"]
+      t25lvl:  ["traer",     "trav",       "H2025", "5",  "Level-order", 12, "exam-h2025-4"]
     };
     var ICON = '<svg viewBox="0 0 12 12" aria-hidden="true" focusable="false">' +
       '<path d="M3 1.25h4.1L9.5 3.65v7.1H3z" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/>' +
@@ -275,7 +275,7 @@
 
     // ===== Oppgavekart =====
     // [år, oppgavenr. (tom = unummerert), tittel, poeng, side, fane, nøkkel i X når oppgaven er løst på siden]
-    // Numrene følger oppgavesettene: oppvarmingen er «Oppgave 1» i H2023 og H2024, men unummerert i H2025.
+    // Settene trykker ingen oppgavenumre. Vi teller oppvarmingen som «Oppgave 1» alle år (H2020–H2025).
     // side = null: ingen side tar for seg oppgaven (vises som ren tekst).
     var TASKS = [
       ["H20", "1",  "Oppvarming", 2, "begreper", "algoritme"],
@@ -301,18 +301,18 @@
       ["H21", "11", "To-fargelegge en graf", 10, "grafer", ""],
       ["H21", "12", "Whops!-oppgjør", 10, "grafer", ""],
       ["H21", "13", "Whops!-logger", 10, "grafer", ""],
-      ["H22", "",   "Oppvarming", 2, "begreper", "algoritme"],
-      ["H22", "1",  "Litt av hvert (sant/usant)", 10, null, ""],
-      ["H22", "2",  "Grafegenskaper", 10, "grafer", ""],
-      ["H22", "3",  "AVL-trær", 6, "traer", "avl", "t22avl"],
-      ["H22", "4",  "Prioritetskøer og heaper (sant/usant)", 10, "heap", "test", "h22tf"],
-      ["H22", "5",  "Kjøretid på grafalgoritmer", 8, "grafer", ""],
-      ["H22", "6",  "Linear probing", 10, "hashing", ""],
-      ["H22", "7",  "Garbage collection", 8, "grafer", ""],
-      ["H22", "8",  "Autofullføring (prefikstre mot hashmap)", 6, "traer", "huffman", "t22auto"],
-      ["H22", "9",  "Bucket queue (bøttekø)", 10, "heap", "pk", "h22bq"],
-      ["H22", "10", "Er binærtreet et søketre?", 10, "traer", "bst", "t22chk"],
-      ["H22", "11", "Minimal forside", 10, "grafer", ""],
+      ["H22", "1",  "Oppvarming", 2, "begreper", "algoritme"],
+      ["H22", "2",  "Litt av hvert (sant/usant)", 10, null, ""],
+      ["H22", "3",  "Grafegenskaper", 10, "grafer", ""],
+      ["H22", "4",  "Balanserte søketrær (AVL)", 6, "traer", "avl", "t22avl"],
+      ["H22", "5",  "Prioritetskøer og heaper (sant/usant)", 10, "heap", "test", "h22tf"],
+      ["H22", "6",  "Kjøretid på grafalgoritmer", 8, "grafer", ""],
+      ["H22", "7",  "Linear probing", 10, "hashing", ""],
+      ["H22", "8",  "Garbage collection", 8, "grafer", ""],
+      ["H22", "9",  "Autofullføring (prefikstre mot hashmap)", 6, "traer", "huffman", "t22auto"],
+      ["H22", "10", "Bucket queue (bøttekø)", 10, "heap", "pk", "h22bq"],
+      ["H22", "11", "Er binærtreet et søketre?", 10, "traer", "bst", "t22chk"],
+      ["H22", "12", "Minimal forside", 10, "grafer", ""],
       ["H23", "1", "Oppvarming", 2, "begreper", "algoritme"],
       ["H23", "2", "Innsetting i heap", 10, "heap", "innsetting", "h23ins"],
       ["H23", "3", "Finn duplikat", 12, "sok", "duplikat", "k23dup"],
@@ -328,13 +328,13 @@
       ["H24", "6", "Laveste felles forfeder (LCA)", 12, "traer", "lca", "t24lca"],
       ["H24", "7", "Mediankø (to heaper)", 12, "heap", "median", "h24med"],
       ["H24", "8", "Rundtur med DNT (SCC/Dijkstra)", 12, "grafer", "scc"],
-      ["H25", "",  "Oppvarming", 2, "begreper", "algoritme"],
-      ["H25", "1", "Separate chaining", 10, "hashing", "chaining"],
-      ["H25", "2", "Sykler i grafer", 11, "grafer", "sykler"],
-      ["H25", "3", "Anti-AVL", 12, "traer", "antiavl", "t25anti"],
-      ["H25", "4", "Level-order (heap/BST)", 12, "heap", "levelorder", "h25lvl"],
-      ["H25", "5", "Finn k minste", 12, "sok", "kminste", "k25kmin"],
-      ["H25", "6", "Kollektivtilbudet i Oslo", 15, "grafer", "mst"]
+      ["H25", "1", "Oppvarming", 2, "begreper", "algoritme"],
+      ["H25", "2", "Separate chaining", 10, "hashing", "chaining"],
+      ["H25", "3", "Sykler i grafer", 11, "grafer", "sykler"],
+      ["H25", "4", "Anti-AVL", 12, "traer", "antiavl", "t25anti"],
+      ["H25", "5", "Level-order (heap/BST)", 12, "heap", "levelorder", "h25lvl"],
+      ["H25", "6", "Finn k minste", 12, "sok", "kminste", "k25kmin"],
+      ["H25", "7", "Kollektivtilbudet i Oslo", 15, "grafer", "mst"]
     ];
     var DEL1 = { H23: 32, H24: 22, H25: 26 };   // egen del 1 sant/usant (fra 2023), poeng per år
     var mapHost = IN.qs("#task-map");

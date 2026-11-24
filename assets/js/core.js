@@ -546,6 +546,42 @@
     return card;
   };
 
+  /* ---------- Oppgavetekst med figurer og merkede deloppgaver ----------
+     IN.oppg({ intro: html, figs: [{ draw: fn(host), cap: html, cls: "code"|"wide" }],
+               parts: [ { t: html, p: 2 } | { note: html } | "html" ], outro: html })
+     Returnerer en DOM-node som kan brukes som examTask.oppgave. Deloppgavene merkes (a), (b), …
+     ({ note } er en mellomtekst uten bokstav). figsAfter: figurer etter deloppgavene. */
+  IN.partsHTML = function (parts) {
+    return '<ol class="et-parts">' + parts.map(function (x) {
+      if (x && x.note != null) return '<li class="et-note">' + x.note + "</li>";
+      var o = typeof x === "string" ? { t: x } : x;
+      return "<li>" + o.t + (o.p != null ? ' <span class="et-p">(' + o.p + "p)</span>" : "") + "</li>";
+    }).join("") + "</ol>";
+  };
+  IN.oppg = function (d) {
+    var wrap = el("div", { class: "et-oppg" });
+    function html(h) { if (h) { var x = el("div"); x.innerHTML = h; wrap.appendChild(x); } }
+    function figs(list) {
+      if (!list || !list.length) return;
+      var row = el("div", { class: "exam-figs" });
+      list.forEach(function (f) {
+        var fig = el("figure", { class: "exam-fig" + (f.cls ? " " + f.cls : "") }), h = el("div", { class: "exam-fig-h" });
+        fig.appendChild(h);
+        if (f.cap) fig.appendChild(el("figcaption", { html: f.cap }));
+        row.appendChild(fig);
+        // Tegnes med en gang: motorene måler ikke DOM-en, så verten trenger ikke være montert ennå
+        try { f.draw(h); } catch (e) { if (window.console) console.error(e); }
+      });
+      wrap.appendChild(row);
+    }
+    html(d.intro);
+    figs(d.figs);
+    if (d.parts && d.parts.length) html(IN.partsHTML(d.parts));
+    figs(d.figsAfter);   // figurer som deloppgavene viser til «under»
+    html(d.outro);
+    return wrap;
+  };
+
   /* Monter en liste av eksamensoppgaver i samme vert. */
   IN.examTasks = function (host, arr) {
     if (typeof host === "string") host = qs(host);

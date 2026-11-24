@@ -987,7 +987,7 @@
   };
 
   IN.heapGen = { insert: genInsert, removeMin: genRemoveMin, buildMin: genBuildMin, heapSort: genHeapSort, median: genMedian };
-  /* ===================== BØTTEKØ / BUCKET QUEUE (H2022 oppg. 9) ===================== */
+  /* ===================== BØTTEKØ / BUCKET QUEUE (H2022 oppg. 10) ===================== */
   def(IN.algos, "bucketQueueInsert", {
     title: "Bøttekø: Insert",
     name: "BucketQueueInsert", params: "Q, x, p",

@@ -177,7 +177,7 @@
         </ul>
       </div>
 
-      <div class="tv-switch" role="group" aria-label="Velg traversering" data-switch="trav">
+      <div class="tv-switch" role="group" aria-label="Velg traversering" data-switch="trav" id="trav-switch">
         <button class="btn sm" type="button" data-sub="pre" aria-pressed="true">Preorder</button>
         <button class="btn sm" type="button" data-sub="in" aria-pressed="false">Inorder</button>
         <button class="btn sm" type="button" data-sub="post" aria-pressed="false">Postorder</button>
@@ -1005,20 +1005,68 @@
 
     /* ===================== EKSAMEN (gjengitt med egne ord) ===================== */
     // Løsning som DOM-node: nummerert liste + pseudokode rendret med IN.pseudo (BYGGEGUIDE 5.4)
-    function sol(items, algos) {
+    // Punktene merkes (a), (b), … som deloppgavene. o.intro: innledende avsnitt, o.figs: figurer (IN.oppg).
+    function sol(items, algos, o) {
+      o = o || {};
       var d = el("div");
-      var ol = el("ol"); items.forEach(function (x) { ol.appendChild(el("li", { html: x })); }); d.appendChild(ol);
+      if (o.intro) d.appendChild(el("p", { html: o.intro }));
+      var ol = el(o.plain ? "ul" : "ol", o.plain ? {} : { class: "et-parts" }); items.forEach(function (x) { ol.appendChild(el("li", { html: x })); }); d.appendChild(ol);
+      if (o.figs) d.appendChild(IN.oppg({ figs: o.figs }));
       (algos || []).forEach(function (key) {
         d.appendChild(el("h5", { style: "margin:.8rem 0 .3rem", text: "Pseudokode: " + A[key].name }));
         var h = el("div"); d.appendChild(h); IN.pseudo.render(h, A[key], {});
       });
       return d;
     }
+    // Figur til IN.oppg: et tre (binært fra fromNested eller generelt fra genFrom), med valgfrie marks/sup/lab
+    function treFig(tree, cap, extra) {
+      return { cap: cap, draw: function (h) {
+        var s = { tree: tree }; for (var k in (extra || {})) s[k] = extra[k];
+        vizTree(h, s, { ariaLabel: (cap ? cap.replace(/<[^>]+>/g, "") + ": " : "") + "tre" });
+        fastSkala(h, 0.95);
+      } };
+    }
+    // Fast målestokk: små trær skal ikke blåses opp til full bredde
+    function fastSkala(h, f) {
+      var svg = h.querySelector("svg"), vb = svg && svg.getAttribute("viewBox");
+      if (vb) { svg.style.width = Math.round(+vb.split(" ")[2] * f) + "px"; svg.style.maxWidth = "100%"; }
+    }
+    // H2025: ConstructBST, gjengitt med egne ord
+    var CONSTRUCTBST = { name: "ConstructBST", params: "v", lines: [
+      { code: "L ← LevelOrderBST(v)", indent: 1 },
+      { code: "u ← null", indent: 1 },
+      { code: "for x in L do", indent: 1 },
+      { code: "u ← Insert(u, x)", indent: 2 },
+      { code: "return u", indent: 1 }] };
+    function pcFig(algo) { return { cls: "code", draw: function (h) { IN.pseudo.render(h, algo, { head: false, tooltips: false }); } }; }
+    function freqTab(pairs) {
+      return '<table class="et-tab"><tr><th>Tegn</th>' + pairs.map(function (p) { return "<td><b>" + p[0] + "</b></td>"; }).join("") +
+        "</tr><tr><th>Frekvens</th>" + pairs.map(function (p) { return "<td>" + p[1] + "</td>"; }).join("") + "</tr></table>";
+    }
+    function demoLink(fane, demo, txt) { return '<p class="small muted">Prøv selv: <a href="#fane=' + fane + "&amp;oppg=" + demo + '">' + txt + "</a>.</p>"; }
+    // Prefikstre (trie) som generelt tre; ordslutt markeres grønt. Unike id-er, siden bokstavene gjentas.
+    function trie(words) {
+      var n = 0, root = { id: "t0", k: "·", ch: [] }, ends = [];
+      words.forEach(function (w) {
+        var v = root;
+        for (var i = 0; i < w.length; i++) {
+          var c = null; v.ch.forEach(function (u) { if (u.k === w[i]) c = u; });
+          if (!c) { c = { id: "t" + (++n), k: w[i], ch: [] }; v.ch.push(c); }
+          v = c;
+        }
+        ends.push(v.id);
+      });
+      return { tree: root, ends: ends };
+    }
     var EXAM = {
       "h2020-2": { year: "H2020", title: "Binære søketrær", oppgave_nr: "Oppgave 2", points: 4,
-        oppgave: ["Et tre har rot A med tre barn B, C og D. B har barna E og F, og D har barna G og H. Hvilken node må fjernes for at treet skal bli et binærtre?",
-          "Et binærtre har rot 4 med venstre barn 2 (barna 5 og 3) og høyre barn 6 (barnet 8). Hvilken node må fjernes for at det skal bli et binært søketre?",
-          "Er alle binære søketrær AVL-trær?", "Er alle AVL-trær binære søketrær?"],
+        oppgave: IN.oppg({
+          figs: [treFig(TR.genFrom(["A", ["B", ["E"], ["F"]], ["C"], ["D", ["G"], ["H"]]]), "Tre til (a)"),
+                 treFig(TR.fromNested([4, [2, [5], [3]], [6, null, [8]]]), "Tre til (b)")],
+          parts: [{ t: "Treet til venstre er ikke et binærtre. Hvilken node må fjernes for at det skal bli et binærtre?", p: 1 },
+            { t: "Treet til høyre er et binærtre, men ikke et binært søketre. Hvilken node må fjernes for at det skal bli et binært søketre?", p: 1 },
+            { t: "Er alle binære søketrær AVL-trær?", p: 1 }, { t: "Er alle AVL-trær binære søketrær?", p: 1 }]
+        }),
         losning: sol(["<b>C</b>. Roten har tre barn, men et binærtre tillater høyst to. C er en løvnode, så den kan fjernes uten å miste andre noder.",
           "<b>5</b>. Den står som venstre barn av 2, men er større enn både 2 og 4. Fjernes den, oppfyller resten søketre-egenskapen.",
           "<b>Nei.</b> En skjev kjede (f.eks. 1, 2, 3 satt inn sortert) er et søketre, men roten har balansefaktor −2.",
@@ -1027,25 +1075,50 @@
         tips: ["Begrunn med én setning hver gang. Det er den som viser at du forstår, ikke bare bokstaven."] },
 
       "h2021-8": { year: "H2021", title: "Verdier i et intervall (InRange)", oppgave_nr: "Oppgave 8", points: 10,
-        oppgave: ["Skriv en prosedyre som skriver ut alle verdier x i et binært søketre med a ≤ x ≤ b, i stigende rekkefølge, og oppgi kjøretiden.",
-          "Hva blir kjøretiden i et balansert tre når a er den minste og b den største verdien?", "Hva blir kjøretiden når a = b?"],
+        oppgave: IN.oppg({
+          intro: "<p>Du får et binært søketre B og to heltall a ≤ b. Skriv ut alle verdiene x i B med a ≤ x ≤ b, i <b>stigende</b> rekkefølge. Grensene er med. Eksempel med treet B1 i figuren: InRange(B1, 2, 7) skriver ut 2, 5, 7, og InRange(B1, 10, 20) skriver ut 10, 12, 15, 17.</p>",
+          figs: [treFig(TR.fromNested([10, [5, [2], [7]], [15, [12], [17]]]), "B1")],
+          parts: [{ t: "Gi algoritmen <code>InRange(B, a, b)</code> i pseudokode. Raskere algoritme gir mer uttelling." },
+            { note: "Fra nå av er B balansert, har n noder og ingen like verdier." },
+            { t: "Anta at a er den minste og b den største verdien i B. Hva er kjøretiden?" },
+            { t: "Anta at a = b. Hva er kjøretiden nå?" }],
+          outro: "<p class=\"small muted\">10p totalt. Nesten alt ligger i (a), og der avgjør kjøretiden poengene.</p>"
+        }),
         losning: sol(["Inorder gir stigende rekkefølge. Legg til <b>beskjæring</b>: gå til venstre bare hvis a &lt; v.element, skriv ut hvis a ≤ v.element ≤ b, og gå til høyre bare hvis v.element &lt; b. Kjøretiden er O(h + k), der k er antall treff, altså O(log n + k) i et balansert tre.",
           "Alle n verdier skal skrives ut, så O(n).", "Bare én sti fra roten: O(log n) i et balansert tre."], ["inRange"]),
         kjerne: "<p>InRange = inorder + beskjæring. Uten beskjæring er løsningen O(n) uansett intervall.</p>",
-        tips: ["Inorder med filtrering, men uten beskjæring, ga høyst 8 av 10 poeng.", "Oppgi kjøretiden med k (antall treff). Det viser at du har forstått hvorfor beskjæringen hjelper."] },
+        tips: ["Full uttelling krever en løsning som er O(log n) når a = b. O(n) ga høyst 8, O(n log n) høyst 5 og O(n²) høyst 2.", "Oppgi kjøretiden med k (antall treff). Det viser at du har forstått hvorfor beskjæringen hjelper."] },
 
-      "h2022-10": { year: "H2022", title: "Er treet et søketre? (CheckBST)", oppgave_nr: "Oppgave 10", points: 10,
-        oppgave: ["Forklar søketre-egenskapen.", "Skriv CheckBST(v) som avgjør om et binærtre med unike heltall er et binært søketre. FindMin og FindMax (lineær tid) kan brukes.", "Oppgi kjøretiden til løsningen din."],
+      "h2022-10": { year: "H2022", title: "Er treet et søketre? (CheckBST)", oppgave_nr: "Oppgave 11", points: 10,
+        oppgave: IN.oppg({
+          intro: "<p>Du får rotnoden v til et binærtre med <b>unike</b> heltall. Hver node har feltene <code>v.element</code>, <code>v.left</code> og <code>v.right</code>. <code>CheckBST(v)</code> skal returnere true hvis treet er et binært søketre, og false ellers. For treet i figuren skal svaret være true.</p><p>Du kan bruke <code>FindMin</code> og <code>FindMax</code>, men siden treet verken er garantert balansert eller et søketre, tar de lineær tid. Du kan også lage en egen hjelpeprosedyre.</p>",
+          figs: [treFig(TR.fromNested([5, [2, [1], [4]], [7, [6], null]]), "CheckBST gir true")],
+          parts: [{ t: "Forklar søketre-egenskapen.", p: 2 },
+            { t: "Fullfør <code>CheckBST(v)</code>. Lavere kjøretid gir mer uttelling.", p: "inntil 6" },
+            { t: "Oppgi kjøretiden til løsningen din, uttrykt med antall noder.", p: 2 }]
+        }),
         losning: sol(["Hver node er større enn alt i venstre subtre og mindre enn alt i høyre subtre.",
           "Den naive løsningen sammenligner v.element med FindMax(v.left) og FindMin(v.right) i hver node. Det er riktig, men O(n²). Bedre: send med grensene (low, high) som under. Et like godt alternativ er å gjøre en inorder og sjekke at lista er strengt stigende.",
-          "Grensemetoden og inorder-metoden er begge O(n)."], ["checkBST"]),
+          "Grensemetoden og inorder-metoden er begge O(n)."], ["checkBST"],
+          { figs: [treFig(TR.fromNested([5, [2, [1], [9]], [7, [6], null]]), "Moteksempel: CheckBST gir false", { marks: { warn: ["9"] } })] }),
         kjerne: "<p>Kravet gjelder hele subtrær. Grensene koder kravet fra alle forfedrene, så hver node sjekkes én gang.</p>",
-        tips: ["Inorder + sjekk av sortert rekkefølge ga full uttelling.", "Raskere løsninger ga mer uttelling enn den kvadratiske med FindMin/FindMax per node.", "Å bare sjekke direkte barn er feil: se moteksempelet over."] },
+        tips: ["Inorder + sjekk av sortert rekkefølge ga full uttelling.", "Den kvadratiske løsningen med FindMin/FindMax per node ga høyst 4 av 6 på (b).", "Å bare sjekke direkte barn er feil. I moteksempelet i løsningen er 9 et gyldig høyre barn av 2, men ligger i venstre subtre til 5."] },
 
       "h2023-5": { year: "H2023", title: "Diameteren til et binærtre", oppgave_nr: "Oppgave 5", points: 12,
-        oppgave: ["(1p) Finn diameteren til et gitt tre T4 (figur).", "(2p) Går den lengste stien alltid gjennom roten? Begrunn.",
-          "(8p) Skriv Diameter(v) som finner diameteren.", "(1p) Oppgi kjøretiden."],
-        losning: sol(["<b>5</b> (lest av figuren: stien går fra en løvnode, via roten, ned til en løvnode på andre siden).",
+        oppgave: IN.oppg({
+          intro: "<p>Diameteren til et tre er antall kanter på den lengste stien mellom to noder. Stien trenger ikke gå gjennom roten. I figuren har T1, T2 og T3 diameter 2, 4 og 3. (Bokstavene er bare navn på nodene.)</p>",
+          figs: [treFig(TR.genFrom(["a", ["b", ["c"]]]), "T1 · diameter 2"),
+                 treFig(TR.genFrom(["a", ["b", ["d"], ["e"]], ["c", ["f"]]]), "T2 · diameter 4"),
+                 treFig(TR.genFrom(["a", ["b"], ["c", ["e"], ["f"]], ["d"]]), "T3 · diameter 3"),
+                 treFig(TR.genFrom(["a", ["b", ["f"]], ["c"], ["d"], ["e", ["g"], ["h", ["i"]]]]), "T4 · diameter ?")],
+          parts: [{ t: "Hva er diameteren til T4?", p: 1 },
+            { note: "Fra nå av er treet binært, og hver node v har <code>v.left</code> og <code>v.right</code>." },
+            { t: "Går den lengste stien alltid gjennom roten? Begrunn svaret.", p: 2 },
+            { t: "Skriv <code>Diameter(v)</code>, som finner diameteren til treet med rot v. Lavere kjøretid gir mer uttelling.", p: 8 },
+            { t: "Oppgi kjøretiden, uttrykt med antall noder n.", p: 1 }],
+          outro: demoLink("diameter", "demo-diameter", "Diameter-demoen over")
+        }),
+        losning: sol(["<b>5</b>. Stien f – b – a – e – h – i går fra en løvnode under b, via roten, ned til den dypeste løvnoden under e.",
           "<b>Nei.</b> Lag et nytt tre ved å sette en ny rot over et gammelt tre. Den lengste stien i det gamle treet er der fortsatt, og går ikke gjennom den nye roten. Se eksempelet «Ikke gjennom roten» i demoen.",
           "Én postorder-rekursjon som returnerer (høyde, diameter). Høyde −1 for null. Stien gjennom v er hL + hR + 2.",
           "O(n): hver node besøkes én gang med O(1) arbeid."], ["treDiameter"]),
@@ -1053,49 +1126,91 @@
         tips: ["c): 8p for lineær løsning, 5p for kvadratisk, og 3p for et godt forsøk som ikke virker.", "d) må stemme med løsningen din i c).", "b): 1p for svaret, 1p for begrunnelsen. Et moteksempel er nok."] },
 
       "h2024-6": { year: "H2024", title: "Laveste felles forfeder", oppgave_nr: "Oppgave 6", points: 12,
-        oppgave: ["(1p) Forklar hvorfor to noder i samme tre alltid har en felles forfeder.",
-          "(5p) Hver node har <code>parent</code> og <code>depth</code>. Skriv en prosedyre som finner den laveste felles forfederen til u og v.",
-          "(5p) Gjør det samme i et binært søketre med unike heltall, gitt x &lt; y.", "(1p) Oppgi kjøretiden."],
+        oppgave: IN.oppg({
+          intro: "<p>Den laveste felles forfederen LCA(u, v) til to noder er den dypeste noden som har både u og v under seg (i sitt subtre). En node regnes som forfeder til seg selv. I treet i figuren er LCA(a, a) = a, LCA(b, e) = a, LCA(g, j) = e og LCA(e, j) = e. Du kan anta at nodene alltid finnes i treet.</p>",
+          figs: [treFig(TR.genFrom(TR.LCATRE), "Eksempeltreet")],
+          parts: [{ t: "Forklar hvorfor to noder i samme tre alltid har en felles forfeder.", p: 1 },
+            { t: "Hver node har bare feltene <code>v.parent</code>, <code>v.children</code> og <code>v.depth</code>. Skriv <code>LCA(u, v)</code>.", p: 5 },
+            { t: "Nå er treet et binært søketre med unike heltall og feltene <code>v.element</code>, <code>v.left</code> og <code>v.right</code>. Du får roten og to verdier x &lt; y som begge finnes i treet. Finn noden som er LCA.", p: 5 },
+            { t: "Oppgi kjøretiden til (c), både i verste fall og når treet er balansert.", p: 1 }],
+          outro: demoLink("lca", "demo-lca", "LCA-demoen over (knappen «Binært søketre (c)» viser søketre-versjonen)")
+        }),
         losning: sol(["Roten er forfeder til alle noder.",
           "Løft den dypeste av de to ett nivå om gangen til de er like (prosedyren LCA under). Eksempler fra treet: LCA(g, j) = e og LCA(e, j) = e.",
           "Start i roten. Ligger v.element mellom x og y (med ≤), er v svaret. Er y &lt; v.element, gå til venstre, ellers til høyre (LCABST under).",
-          "Begge er O(h): O(n) i verste fall og O(log n) når treet er balansert."], ["lca", "lcaBST"]),
+          "O(h): O(n) i verste fall og O(log n) når treet er balansert. Løsningen i (b) har samme kjøretid."], ["lca", "lcaBST"]),
         kjerne: "<p>Bruk strukturen du får: parent/depth i b), søketre-ordningen i c). Da holder det å følge én sti.</p>",
         tips: ["O(h) gir full uttelling i b) og c). En lineær løsning ga høyst 3 av 5.", "Husk tilfellet der den ene noden er forfeder til den andre."] },
 
       "h2020-6": { year: "H2020", title: "AVL-innsetting", oppgave_nr: "Oppgave 6", points: 9,
-        oppgave: ["Utgangspunktet er et binært søketre som er en høyrekjede 1 → 2 → 3 → 4 (ikke et AVL-tre). Tallet 5 settes inn med AVL-prosedyren, der hver node kjenner høyden sin og Balance kalles på hver node på veien opp.",
-          "Hvordan ser treet ut etter den første rotasjonen?", "Hvor mange enkle rotasjoner gjøres totalt (en dobbel teller som to)?", "Er resultatet et AVL-tre, og hva står i roten?"],
-        losning: sol(["5 settes inn som høyre barn av 4. På veien opp har 4 b = −1, som er lov, men 3 har b = −2.",
-          "<b>Første rotasjon:</b> venstrerotasjon på 3. Treet blir 1 → 2 → 4, der 4 har barna 3 og 5.",
-          "Videre opp: 2 har b = −2, og høyre barn 4 er i balanse (b = 0), så det blir en enkel venstrerotasjon på 2. Da står 4 under 1, med 2 (og 3) til venstre. 1 har nå b = −3, og høyre barn 4 er venstretungt (en knekk). Derfor blir det en <b>dobbel rotasjon</b>: høyrerotasjon på 4, så venstrerotasjon på 1.",
-          "Totalt <b>4 enkle rotasjoner</b>: tre venstrerotasjoner og én høyrerotasjon.",
-          "Ja, resultatet er et AVL-tre: roten <b>2</b> med venstre barn 1 og høyre barn 4, som har barna 3 og 5. Kjør «H2020: kjede + 5» i demoen for å se hvert steg."], ["avlInsert", "avlBalance"]),
+        oppgave: IN.oppg({
+          intro: "<p>Treet i figuren er et binært søketre, men <b>ikke</b> et AVL-tre. AVL-innsetting kan likevel kjøres på et vanlig søketre, så lenge hver node lagrer høyden sin: Balance kalles på hver node på veien opp. Vi setter inn 5.</p>",
+          figs: [(function () { var r = TR.fromNested([1, null, [2, null, [3, null, [4]]]]), sup = {}; TR.fixHeights(r);
+            [1, 2, 3, 4].forEach(function (k, i) { sup[String(k)] = String(3 - i); });
+            return treFig(r, "Høyrekjeden 1 → 2 → 3 → 4 (tallet oppe til høyre er høyden)", { sup: sup }); })()],
+          parts: [{ t: "Hvordan ser treet ut etter den første rotasjonen?", p: 2 },
+            { t: "Hvor mange enkle rotasjoner gjøres totalt? En dobbel rotasjon teller som to.", p: 4 },
+            { t: "Er resultatet et AVL-tre?", p: 1 },
+            { t: "Hvilken verdi står i roten til slutt?", p: 2 }],
+          outro: demoLink("avl", "demo-avl", "AVL-demoen over, eksempelet «H2020: kjede + 5»")
+        }),
+        losning: sol(["<b>Venstrerotasjon på 3.</b> Treet blir 1 → 2 → 4, der 4 har barna 3 og 5.",
+          "<b>4.</b> Videre opp har 2 b = −2, og høyre barn 4 er i balanse (b = 0), så det blir en enkel venstrerotasjon på 2. Da står 4 under 1, med 2 (og 3) til venstre. 1 har nå b = −3, og høyre barn 4 er venstretungt (en knekk). Derfor blir det en <b>dobbel rotasjon</b>: høyrerotasjon på 4, så venstrerotasjon på 1. Totalt tre venstrerotasjoner og én høyrerotasjon.",
+          "<b>Ja.</b> Alle nodene har balansefaktor −1, 0 eller 1.",
+          "<b>2</b>, med venstre barn 1 og høyre barn 4, som har barna 3 og 5."], ["avlInsert", "avlBalance"],
+          { intro: "5 settes inn som høyre barn av 4. På veien opp har 4 b = −1, som er lov, men 3 har b = −2." }),
         kjerne: "<p>Balance kalles på <b>hver</b> node på veien opp. Starter du fra et ubalansert tre, kan det derfor bli rotasjoner på flere nivåer.</p>",
         tips: ["Tegn treet etter hver rotasjon. Da er det lett å telle.", "Sjekk om det er en knekk før du roterer. Det avgjør om det blir enkel eller dobbel rotasjon."] },
 
-      "h2022-3": { year: "H2022", title: "AVL-trær", oppgave_nr: "Oppgave 3", points: 6,
-        oppgave: ["Seks AVL-trær med tallene 1–5 er gitt som figur.", "Hvilket av dem får du ved å sette inn 2, 4, 3, 1, 5 i et tomt AVL-tre?",
-          "Hvor mange av trærne kan fargelegges som rød-svarte trær?", "I hvilke av trærne fører innsetting av 6 til en rotasjon? Svar med summen av trenumrene."],
-        losning: sol(["Innsetting av 2, 4, 3 gir en knekk i 2, og en dobbel rotasjon gjør 3 til rot. Så kommer 1 til venstre for 2 og 5 til høyre for 4. Sluttreet er 3 med barna 2 (venstre barn 1) og 4 (høyre barn 5). I figuren var dette tre nr. 5. Kjør «H2022: 2,4,3,1,5» i demoen.",
-          "Alle 6.", "Trærne 2, 4 og 5, så svaret er 11."]),
+      "h2022-3": { year: "H2022", title: "Balanserte søketrær (AVL)", oppgave_nr: "Oppgave 4", points: 6,
+        oppgave: IN.oppg({
+          intro: "<p>Figuren viser alle de seks AVL-trærne som inneholder tallene 1–5, nummerert 1–6.</p>",
+          figs: [[4, [2, [1], [3]], [5]], [2, [1], [4, [3], [5]]], [3, [2, [1], null], [5, [4], null]],
+                 [3, [1, null, [2]], [4, null, [5]]], [3, [2, [1], null], [4, null, [5]]], [3, [1, null, [2]], [5, [4], null]]]
+            .map(function (n, i) { return treFig(TR.fromNested(n), "Tre " + (i + 1)); }),
+          parts: [{ t: "Hvilket av trærne får du ved å sette inn 2, 4, 3, 1, 5 i et tomt AVL-tre? Svar med ett tall.", p: 2 },
+            { t: "Hvor mange av trærne kan fargelegges som rød-svarte trær?", p: 2 },
+            { t: "Sett inn 6 i hvert av trærne. I hvilke av dem fører det til en rotasjon? Svar med <b>summen</b> av trenumrene (passer tre 2 og 5, svarer du 7).", p: 2 }],
+          outro: demoLink("avl", "demo-avl", "AVL-demoen over, eksempelet «H2022: 2,4,3,1,5»")
+        }),
+        losning: sol(["<b>5.</b> Innsetting av 2, 4, 3 gir en knekk i 2, og en dobbel rotasjon gjør 3 til rot. Så kommer 1 til venstre for 2 og 5 til høyre for 4. Sluttreet er 3 med barna 2 (venstre barn 1) og 4 (høyre barn 5), altså tre 5.",
+          "<b>Alle 6.</b> Ethvert AVL-tre kan fargelegges som et rød-svart tre.",
+          "<b>11.</b> 6 havner under 5. I tre 2 får roten 2 balansefaktor −2, og i tre 4 og 5 får noden 4 balansefaktor −2. I tre 1, 3 og 6 holder alle seg innenfor ±1. 2 + 4 + 5 = 11."]),
         kjerne: "<p>Spor innsettingen steg for steg, med høyder og balansefaktorer, i stedet for å gjette ut fra formen.</p>",
-        tips: ["Figurene er ikke gjengitt her. Øv på a) med demoen, og tegn trærne selv."] },
+        tips: ["Skriv høyden ved hver node før du setter inn 6. Da ser du raskt hvor balansefaktoren blir ±2."] },
 
-      "h2025-3": { year: "H2025", title: "Anti-AVL", oppgave_nr: "Oppgave 3", points: 12,
-        oppgave: ["InsertAntiAVL setter inn som i et BST, men gjør en høyrerotasjon når en node på veien har et venstre barn.",
-          "Sett inn 3, 1, 4, 2, 5 i et tomt tre. Tegn resultatet og tell rotasjonene.", "Hvilken form får et Anti-AVL-tre generelt?",
-          "Er treet fortsatt et binært søketre?", "Hva er kjøretiden for oppslag?", "Hvordan skiller Anti-AVL seg fra AVL?"],
+      "h2025-3": { year: "H2025", title: "Anti-AVL", oppgave_nr: "Oppgave 4", points: 12,
+        oppgave: IN.oppg({
+          intro: "<p>Et Anti-AVL-tre bygges med prosedyren <code>InsertAntiAVL(v, x)</code> under. Den setter inn x som i et vanlig binært søketre, og på veien tilbake opp gjør den en høyrerotasjon i hver node som har et venstre barn. Hjelpeprosedyren <code>RightRotate(z)</code> står ved siden av.</p>",
+          figs: [pcFig(A.insertAntiAVL), pcFig({ name: "RightRotate", params: "z", lines: [
+            { code: "y ← z.left", indent: 1 }, { code: "T2 ← y.right", indent: 1 }, { code: "y.right ← z", indent: 1 },
+            { code: "z.left ← T2", indent: 1 }, { code: "return y", indent: 1 }] })],
+          parts: [{ t: "Sett inn 3, 1, 4, 2, 5 i denne rekkefølgen i et tomt tre. Beskriv treet du får, og oppgi hvor mange rotasjoner som skjer totalt.", p: 2 },
+            { t: "Hvordan ser Anti-AVL-trær ut generelt?", p: 2 },
+            { t: "Et binært søketre har den egenskapen at alt i venstre subtre til en node er mindre enn noden, og alt i høyre subtre er større. Har Anti-AVL-trær denne egenskapen? Forklar.", p: 3 },
+            { t: "Hva er kjøretiden for å slå opp en verdi, gjort som i et vanlig binært søketre? Begrunn.", p: 2 },
+            { t: "Hvordan skiller innsetting i Anti-AVL seg fra innsetting i et AVL-tre?", p: 3 }],
+          outro: demoLink("antiavl", "demo-antiavl", "Anti-AVL-demoen over, eksempelet «H2025: 3,1,4,2,5»")
+        }),
         losning: sol(["Resultatet er høyrekjeden 1 → 2 → 3 → 4 → 5, etter <b>2 rotasjoner</b> (ved innsetting av 1 og av 2). Se demoen.",
-          "Alltid en høyrekjede, altså en sortert lenket liste.", "Ja. Rotasjoner bevarer søketre-egenskapen.",
-          "O(n), fordi høyden er n − 1.", "AVL roterer ut fra høyder for å holde treet balansert. Anti-AVL ser bare på om det finnes et venstre barn, og blir maksimalt ubalansert."], ["insertAntiAVL"]),
+          "Hver node har høyst et høyre barn. Treet er en høyrekjede, altså en sortert lenket liste.",
+          "<b>Ja.</b> Innsettingen er vanlig BST-innsetting, og en høyrerotasjon bevarer søketre-egenskapen.",
+          "<b>O(n).</b> Høyden er n − 1: for å finne den største verdien må vi følge n − 1 høyrepekere.",
+          "AVL bygger et så balansert tre som mulig. Det lagrer høyder og roterer når høydene til to subtrær er mer enn 1 fra hverandre. Anti-AVL ser bare på om det finnes et venstre barn, og bygger et så ubalansert tre som mulig."]),
         kjerne: "<p>Invarianten «ingen venstre barn» gir høyst én rotasjon per innsetting og en kjede som resultat.</p>",
         tips: ["Følg kallene nedenfra og opp. Rotasjonen skjer etter det rekursive kallet."] },
 
-      "h2025-4": { year: "H2025", title: "Level-order", oppgave_nr: "Oppgave 4", points: 12,
-        oppgave: ["Skriv LevelOrderHeap(A) som returnerer elementene i en binær heap (lagret i array A) i level-order.",
-          "Skriv LevelOrderBST(v) som returnerer elementene i et binært søketre i level-order.", "Oppgi kjøretiden til begge.",
-          "Setter du inn elementene fra b) i et tomt BST i den rekkefølgen, hvilket tre får du?"],
+      "h2025-4": { year: "H2025", title: "Level-order", oppgave_nr: "Oppgave 5", points: 12,
+        oppgave: IN.oppg({
+          intro: "<p>Level-order besøker nodene nivå for nivå: roten først, så barna til roten, så barnebarna, og så videre, fra venstre mot høyre. For treet i figuren blir rekkefølgen 10, 15, 5, 12, 17, 7, 2. (Treet viser bare formen. Det er ikke et søketre.)</p>",
+          figs: [treFig(TR.fromNested([10, [15, [12], [17]], [5, [7], [2]]]), "Eksempel på form")],
+          parts: [{ t: "Treet er en binær heap lagret i et array A med n elementer. Skriv <code>LevelOrderHeap(A)</code>, som returnerer en liste med elementene i level-order.", p: 2 },
+            { t: "Treet er et binært søketre med feltene <code>v.element</code>, <code>v.left</code> og <code>v.right</code>. Skriv <code>LevelOrderBST(v)</code>, som returnerer en liste med elementene i level-order.", p: 6 },
+            { t: "Oppgi kjøretiden til (a) og (b).", p: 1 },
+            { t: "Se på prosedyren <code>ConstructBST(v)</code> under. Hva er forholdet mellom søketreet den får inn og søketreet den returnerer? Du trenger ikke begrunne.", p: 3 }],
+          figsAfter: [pcFig(CONSTRUCTBST)],
+          outro: demoLink("trav", "trav-switch", "traverseringsdemoen over (velg «Level-order»)") + demoLink("bst", "rebuild-btns", "«Samme tre fra level-order» under Binært søketre")
+        }),
         losning: sol(["Heap-arrayet er allerede i level-order. Returner A.",
           "Bredde først med en kø: legg inn roten, ta ut én node om gangen, legg den bakerst i resultatet, og legg inn barna som ikke er null. Et tre har ingen sykler, så vi trenger ingen visited-mengde.",
           "Begge er O(n). Hver node behandles én gang.", "Nøyaktig samme tre. Hver node settes inn etter forfedrene sine og havner på samme plass. Se demoen «Samme tre fra level-order» under Binært søketre."], ["levelOrder"]),
@@ -1103,7 +1218,13 @@
         tips: ["Bruk kø, ikke stakk: med stakk blir det dybde først.", "Husk null-sjekk før Enqueue."] },
 
       "h2024-2": { year: "H2024", title: "Huffman", oppgave_nr: "Oppgave 2", points: 10,
-        oppgave: ["(2p) Finn kodelengden til hvert symbol for frekvensene A = 1, B = 3, C = 7, D = 2.", "(1p) Hva inneholder løvnodene?", "(7p) Beskriv algoritmen som bygger Huffman-treet."],
+        oppgave: IN.oppg({
+          intro: "<p>Tabellen gir frekvensene til fire symboler.</p>" + freqTab([["A", 1], ["B", 3], ["C", 7], ["D", 2]]),
+          parts: [{ t: "Bygg Huffman-treet og oppgi kodelengden (antall bit) til hvert symbol.", p: 2 },
+            { t: "Hva inneholder løvnodene i et Huffman-tre?", p: 1 },
+            { t: "Hver node har feltene <code>symbol</code>, <code>freq</code>, <code>left</code> og <code>right</code>. Input er en mengde par (s, f) av symbol og frekvens. Beskriv hvordan Huffman-treet bygges og returneres. Det holder å beskrive med ord; pseudokode er ikke nødvendig.", p: 7 }],
+          outro: demoLink("huffman", "demo-huffman", "Huffman-demoen over, eksempelet «H2024: A1 B3 C7 D2»")
+        }),
         losning: sol(["A og D slås sammen (3), så den nye noden og B (6), så 6 og C (13). Kodelengder: <b>A = 3, B = 2, C = 1, D = 3</b>.",
           "Symbolene og frekvensene deres.",
           "Legg alle symbolene i en prioritetskø ordnet på frekvens. Så lenge køen har mer enn én node: ta ut de to minste, lag en forelder med summen som frekvens, og legg den tilbake. Returner den siste noden, som er roten."], ["huffman"]),
@@ -1111,20 +1232,35 @@
         tips: ["c) ble gitt 2,5p for prioritetskøen, 2,5p for sammenslåingen, 1p for riktig stopp og 1p for å returnere roten.", "Skriv stoppbetingelsen eksplisitt: Size(Q) > 1."] },
 
       "h2021-5": { year: "H2021", title: "Huffman-trær", oppgave_nr: "Oppgave 5", points: 5,
-        oppgave: ["Frekvensene er a = 2, b = 1, c = 12, d = 1, e = 4.", "Hva er den lengste kodelengden?", "Hva er kodelengden til e?",
-          "Hvor mange bit trengs for strengen «aaabbcdee»?", "Hvor mange noder har et Huffman-tre for 8 symboler?", "Hva er den lengste mulige koden med 8 symboler?"],
+        oppgave: IN.oppg({
+          intro: "<p>Lag et Huffman-tre for tegnene i tabellen.</p>" + freqTab([["a", 2], ["b", 1], ["c", 12], ["d", 1], ["e", 4]]),
+          parts: [{ t: "Hva er den lengste kodelengden?", p: 1 }, { t: "Hvor mange bit har koden for e?", p: 1 },
+            { t: "Hvor mange bit trengs for å kode strengen «aaabbcdee»?", p: 1 },
+            { t: "En annen tabell har 8 ulike tegn. Hvor mange noder har Huffman-treet?", p: 1 },
+            { t: "Med 8 tegn (8 løvnoder): hva er den lengste mulige kodelengden?", p: 1 }],
+          outro: demoLink("huffman", "demo-huffman", "Huffman-demoen over, eksempelet «H2021: a2 b1 c12 d1 e4»") .replace("</a>.", "</a>, og kode-/dekodeboksen under den.")
+        }),
         losning: sol(["Kodelengdene blir c = 1, e = 2, a = 3, b = 4, d = 4. Den lengste er <b>4</b>.", "<b>2</b>.",
           "3 · 3 (a) + 2 · 4 (b) + 1 (c) + 4 (d) + 2 · 2 (e) = <b>26</b>. Prøv strengen i kode-/dekodeboksen.",
           "<b>15</b>: 8 løvnoder og 7 interne noder (n − 1 sammenslåinger).", "<b>7</b>, når treet er helt skjevt (f.eks. frekvenser 1, 1, 2, 4, 8, …)."]),
         kjerne: "<p>n symboler gir 2n − 1 noder. Maks kodelengde er n − 1.</p>",
         tips: ["1p per del. Regn raskt, men sjekk summen i bit-oppgaven."] },
 
-      "h2022-8": { year: "H2022", title: "Autofullføring: prefikstre mot hashmap", oppgave_nr: "Oppgave 8", points: 6,
-        oppgave: ["Ordene bin, binary, bind, head, headache, hello, help, slack, sleep og sleepy skal brukes til autofullføring.",
-          "Drøft tid og minne for et prefikstre (trie) og for et hashmap fra prefiks til liste av ord."],
+      "h2022-8": { year: "H2022", title: "Autofullføring: prefikstre mot hashmap", oppgave_nr: "Oppgave 9", points: 6,
+        oppgave: IN.oppg({
+          intro: "<p>Ordene bin, binary, bind, head, headache, hello, help, slack, sleep og sleepy skal brukes til autofullføring: brukeren skriver et prefiks og vil se alle ord som starter slik. Figuren viser to måter å lagre ordlista på.</p>",
+          figs: [(function () { var T = trie(["bin", "binary", "bind", "head", "headache", "hello", "help", "slack", "sleep", "sleepy"]);
+              return { cls: "lg", cap: "Prefikstre (trie): hver kant er en bokstav. Grønn node = et ord slutter her.", draw: function (h) { vizTree(h, { tree: T.tree, marks: { done: T.ends } }, { ariaLabel: "Prefikstre for ordlista" }); fastSkala(h, 0.7); } }; })(),
+            { cls: "lg", cap: "Hashmap fra prefiks til liste med ord (utdrag)", draw: function (h) {
+              h.innerHTML = '<table class="et-tab"><tr><th>Prefiks</th><th>Ord</th></tr>' +
+                [["«» (tom)", "alle de ti ordene"], ["b, bi, bin", "bin, binary, bind"], ["bina", "binary"], ["he", "head, headache, hello, help"],
+                 ["hel", "hello, help"], ["sle", "sleep, sleepy"], ["…", "…"]]
+                  .map(function (r) { return "<tr><td>" + r[0] + '</td><td style="text-align:left">' + r[1] + "</td></tr>"; }).join("") + "</table>"; } }],
+          outro: "<p>Drøft fordeler og ulemper ved de to løsningene, både når det gjelder minnebruk og kjøretid for å sette inn ord og slå opp et prefiks.</p>"
+        }),
         losning: sol(["<b>Prefikstre:</b> felles prefikser deles (bin-, hea-, hel-, sle-), så minnet blir lavt. Innsetting tar tid lik ordlengden. Fullføringer finnes ved å gå ned til prefikset og traversere subtreet, lineært i størrelsen på subtreet.",
           "<b>Hashmap:</b> hvert prefiks peker til en liste med alle ord som starter slik. Den tomme strengen peker til hele ordlista, og korte prefikser gir lange lister, så minnet blir stort. Innsetting tar tid lik ordlengden (ett prefiks per tegn). Oppslag er forventet O(1) pluss antall treff.",
-          "Konklusjon: en avveining. Prefikstreet sparer minne, hashmapet gir raskere oppslag."]),
+          "Konklusjon: en avveining. Prefikstreet sparer minne, hashmapet gir raskere oppslag."], null, { plain: true }),
         kjerne: "<p>En drøfting må dekke begge datastrukturene, og både tid og minne.</p>",
         tips: ["Bruk eksempelordene konkret: vis hvilke prefikser som deles."] }
     };

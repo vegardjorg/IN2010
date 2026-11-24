@@ -389,7 +389,7 @@
             <tr><td>Sortert liste</td><td>O(n)</td><td>O(1)</td><td>Må finne plassen ved innsetting</td></tr>
             <tr><td><b>Binær heap</b></td><td><b>O(log n)</b></td><td><b>O(log n)</b></td><td>Standardvalget, rett i et array</td></tr>
             <tr><td>Balansert søketre (AVL)</td><td>O(log n)</td><td>O(log n)</td><td>Fungerer også (H2022 (e) er sant)</td></tr>
-            <tr><td>Bøttekø (prioritet 0 … N − 1)</td><td>O(1)</td><td>O(N)</td><td>O(1) når N er en konstant (H2022 oppg. 9)</td></tr>
+            <tr><td>Bøttekø (prioritet 0 … N − 1)</td><td>O(1)</td><td>O(N)</td><td>O(1) når N er en konstant (H2022 oppg. 10)</td></tr>
           </tbody>
         </table>
       </div>
@@ -445,7 +445,7 @@
         prioritetene ligger i et fast, lite område. Da kan de brukes direkte som indeks, som i bøttesortering.</div>
 
       <div class="callout snarvei"><span class="lbl">Finn k minste (H2025)</span>
-        Heapen er nøkkelen til den raskeste løsningen på H2025 oppgave 5: enten en max-heap med plass til k
+        Heapen er nøkkelen til den raskeste løsningen på H2025 oppgave 6: enten en max-heap med plass til k
         (<span class="mono">O(n log k)</span>), eller BuildMinHeap av hele arrayet og så removeMin k ganger
         (<span class="mono">O(n + k log n)</span>). Hele oppgaven, med demo og løsning, står i
         <a href="02-sok.html#fane=kminste">Blokk 2 · Søk → Finn k minste</a>.</div>
@@ -458,7 +458,7 @@
     <!-- ================= SANT/USANT ================= -->
     <section data-panel="test">
       <h3>Sant eller usant? (heaper og prioritetskøer)</h3>
-      <p>Påstandene fra H2022 oppgave 4, pluss noen ekstra fra samme tankegang. Svar på alle, og trykk så «Sjekk».</p>
+      <p>Påstandene fra H2022 oppgave 5, pluss noen ekstra fra samme tankegang. Svar på alle, og trykk så «Sjekk».</p>
       <h4>Eksamensoppgaven</h4>
       <div id="exam-test"></div>
       <h4 style="margin-top:1.5rem">Påstandene</h4>
@@ -669,7 +669,19 @@
     ]);
     exam("#exam-removemin", {
       year: "H2021", oppgave_nr: "Oppgave 4", title: "Binære heaps", points: 6,
-      oppgave: "<p>H1 er en heap (minste i roten) med arrayet <span class=\"mono\">[4, 28, 11, 43, 32, 27, 55, 59, 66]</span>, indeks 0–8. Deloppgavene er uavhengige og starter alle fra H1.</p><ul><li><b>(a)</b> Hvordan ser heapen ut etter ett kall på <span class=\"mono\">H1.RemoveMin()</span>?</li><li><b>(b)</b> Hvordan ser heapen ut etter ett kall på <span class=\"mono\">H1.Insert(7)</span>?</li><li><b>(c)</b> I en annen heap H2 kjenner vi bare verdiene på dybde 3: 59, 66, 83, 52, 82, 27, 97, 75. Hva er den minste verdien som kan ligge på dybde 4?</li></ul>",
+      oppgave: IN.oppg({
+        intro: "<p>H1 er en heap (minste i roten) med arrayet <span class=\"mono\">[4, 28, 11, 43, 32, 27, 55, 59, 66]</span>, indeks 0–8. Deloppgavene (a) og (b) er uavhengige og starter begge fra H1.</p>",
+        figs: [
+          { cap: "H1", cls: "lg", draw: function (h) { IN.vizHeap(h, { array: [4, 28, 11, 43, 32, 27, 55, 59, 66] }, { arrName: "H1" }); } },
+          { cap: "H2: bare dybde 3 er kjent («?» er ukjent; dybde 4 er full)", cls: "lg", draw: function (h) { IN.vizHeap(h, { array: ["?", "?", "?", "?", "?", "?", "?", 59, 66, 83, 52, 82, 27, 97, 75].concat(Array(16).fill("?")) }, { hideArray: true }); } }
+        ],
+        parts: [
+          { t: "Hvordan ser heapen ut etter ett kall på <span class=\"mono\">H1.RemoveMin()</span>?", p: 2 },
+          { t: "Hvordan ser heapen ut etter ett kall på <span class=\"mono\">H1.Insert(7)</span>?", p: 2 },
+          { t: "I en annen heap H2 kjenner vi bare verdiene på dybde 3 (se figuren): 59, 66, 83, 52, 82, 27, 97, 75. Hva er den minste verdien som kan ligge på dybde 4?", p: 2 }
+        ],
+        outro: "<p class=\"small muted\">Prøv selv: <a href=\"#fane=removemin&amp;oppg=tracer-rm\">demoen over</a>, eksempelet «H2021 H1».</p>"
+      }),
       losning: [
         "<b>(a)</b> <span class=\"mono\">[11, 28, 27, 43, 32, 66, 55, 59]</span>. 4 tas ut, og det siste elementet, 66, flyttes til roten. Minste barn er 11: bytt. Så er barna 27 og 55, og minste er 27: bytt. 66 har ingen barn igjen. Prøv «H2021 H1» i demoen.",
         "<b>(b)</b> <span class=\"mono\">[4, 7, 11, 43, 28, 27, 55, 59, 66, 32]</span>. 7 legges på plass 9 og bobler opp forbi 32 (plass 4) og 28 (plass 1). 4 i roten er mindre, så den stopper der.",
@@ -717,8 +729,19 @@
     bigO("#pc-lo", "levelOrderHeap");
     IN.pseudo.explainer("#exp-lo", IN.algos.levelOrderHeap, {});
     exam("#exam-levelorder", {
-      year: "H2025", oppgave_nr: "Oppgave 4", title: "Level-order", points: 12,
-      oppgave: "<p>Level-order besøker nodene nivå for nivå: roten først, så alle barna til roten, og så videre.</p><ul><li><b>(a)</b> Treet er en binær heap lagret i et array A med n elementer. Gi en algoritme <span class=\"mono\">LevelOrderHeap(A)</span> som returnerer en liste med elementene i level-order.</li><li><b>(b)</b> Treet er et binært søketre med noder v (<span class=\"mono\">v.element</span>, <span class=\"mono\">v.left</span>, <span class=\"mono\">v.right</span>). Gi <span class=\"mono\">LevelOrderBST(v)</span>.</li><li><b>(c)</b> Oppgi kjøretiden for begge.</li><li><b>(d)</b> <span class=\"mono\">ConstructBST(v)</span> setter inn elementene fra <span class=\"mono\">LevelOrderBST(v)</span> i rekkefølge i et nytt, tomt søketre. Hva er forholdet mellom input-treet og output-treet?</li></ul>",
+      year: "H2025", oppgave_nr: "Oppgave 5", title: "Level-order", points: 12,
+      oppgave: IN.oppg({
+        intro: "<p>Level-order besøker nodene nivå for nivå: roten først, så alle barna til roten, så barnebarna, og så videre, fra venstre mot høyre. For treet i figuren blir rekkefølgen 10, 15, 5, 12, 17, 7, 2. (Figuren viser bare formen. Treet er verken en heap eller et søketre.)</p>",
+        figs: [{ cap: "Eksempel på form", cls: "lg", draw: function (h) { IN.vizHeap(h, { array: [10, 15, 5, 12, 17, 7, 2] }, { hideArray: true }); } }],
+        parts: [{ t: "Treet er en binær heap lagret i et array A med n elementer. Gi en algoritme <span class=\"mono\">LevelOrderHeap(A)</span> som returnerer en liste med elementene i level-order.", p: 2 },
+          { t: "Treet er et binært søketre med noder v (<span class=\"mono\">v.element</span>, <span class=\"mono\">v.left</span>, <span class=\"mono\">v.right</span>). Gi <span class=\"mono\">LevelOrderBST(v)</span>, som også returnerer en liste.", p: 6 },
+          { t: "Oppgi kjøretiden for begge.", p: 1 },
+          { t: "Se på <span class=\"mono\">ConstructBST(v)</span> under. Den henter elementene fra <span class=\"mono\">LevelOrderBST(v)</span> og setter dem inn i rekkefølge i et nytt, tomt søketre. Hva er forholdet mellom søketreet den får inn og søketreet den returnerer? Du trenger ikke begrunne.", p: 3 }],
+        figsAfter: [{ cls: "code", draw: function (h) { IN.pseudo.render(h, { name: "ConstructBST", params: "v", lines: [
+          { code: "L ← LevelOrderBST(v)", indent: 1 }, { code: "u ← null", indent: 1 }, { code: "for x in L do", indent: 1 },
+          { code: "u ← Insert(u, x)", indent: 2 }, { code: "return u", indent: 1 }] }, { head: false, tooltips: false }); } }],
+        outro: "<p class=\"small muted\">Prøv selv: <a href=\"#fane=levelorder&amp;oppg=tracer-lo\">demoen over</a> viser (a). Binærtre-delen (b) har egen demo under Blokk 4 · Trær.</p>"
+      }),
       losning: [
         "<b>(a)</b> En heap er allerede lagret i level-order, så det holder å returnere arrayet som en liste. Se pseudokoden under.",
         "<b>(b)</b> Bredde-først søk med en <b>kø</b>: legg roten i køen. Så lenge køen ikke er tom: ta ut u, legg <span class=\"mono\">u.element</span> i lista, og legg <span class=\"mono\">u.left</span> og <span class=\"mono\">u.right</span> bakerst i køen hvis de finnes. Et tre har ingen sykler, så vi trenger ingen mengde med besøkte noder. (Mer i Blokk 4 · Trær.)",
@@ -827,8 +850,15 @@
     qs("#pg-clear").addEventListener("click", function () { PG.H = []; pgRun(null); });
 
     exam("#exam-pk", {
-      year: "H2022", oppgave_nr: "Oppgave 9", title: "Bucket queue (bøttekø)", points: 10,
-      oppgave: "<p>En bøttekø (bucket queue) er en prioritetskø inspirert av bøttesortering. Elementer settes inn med en prioritet mellom 0 og N − 1, der N er fast. RemoveMin fjerner og returnerer et element med lavest prioritet.</p><ul><li><b>(a)</b> Forklar kort hvilken datastruktur som passer.</li><li><b>(b)</b> Gi en algoritme for <span class=\"mono\">Insert(Q, x, p)</span>.</li><li><b>(c)</b> Gi en algoritme for <span class=\"mono\">RemoveMin(Q)</span>. Du kan anta at køen ikke er tom.</li><li><b>(d)</b> Anta N = 100. Hva er kjøretiden for Insert og RemoveMin i en kø med n elementer?</li></ul>",
+      year: "H2022", oppgave_nr: "Oppgave 10", title: "Bucket queue (bøttekø)", points: 10,
+      oppgave: IN.oppg({
+        intro: "<p>En bøttekø (bucket queue) er en prioritetskø inspirert av bøttesortering. Prioritetene er heltall fra 0 til N − 1, der N er fast og bestemt når køen lages. Køen har to operasjoner:</p><ul><li><span class=\"mono\">Insert(Q, x, p)</span> legger elementet x inn i Q med prioritet p. Den returnerer ingenting.</li><li><span class=\"mono\">RemoveMin(Q)</span> fjerner og returnerer et element med lavest prioritet. Er det flere, kan hvilket som helst av dem returneres.</li></ul>",
+        parts: [{ t: "Forklar kort hvilken datastruktur som passer.", p: 1 },
+          { t: "Gi en algoritme for <span class=\"mono\">Insert(Q, x, p)</span>.", p: 3 },
+          { t: "Gi en algoritme for <span class=\"mono\">RemoveMin(Q)</span>. Du kan anta at køen ikke er tom.", p: 4 },
+          { t: "Anta N = 100. Hva er kjøretiden for Insert og for RemoveMin i en kø med n elementer?", p: 2 }],
+        outro: "<p class=\"small muted\">Prøv selv: <a href=\"#fane=pk&amp;oppg=tracer-pg\">prioritetskø-demoen over</a> viser den vanlige heap-varianten til sammenligning.</p>"
+      }),
       losning: [
         "<b>(a)</b> Et <b>array med N bøtter</b>, der bøtte p er en liste (for eksempel lenket) med elementene som har prioritet p. Akkurat som bøttene i bøttesortering.",
         "<b>(b)</b> Legg x i bøtta <span class=\"mono\">Q[p]</span>. Se BucketQueueInsert under.",
@@ -836,7 +866,7 @@
         "<b>(d)</b> Med N = 100 er begge <b>O(1)</b>. Insert er alltid O(1), og RemoveMin ser i høyst 100 bøtter, som er en konstant. (Generelt er RemoveMin O(N).)"
       ],
       kjerne: "<p>Når prioritetene er heltall i et fast, kjent område, kan et array med bøtter gi konstant tid på operasjonene. En binær heap gir O(log n).</p>",
-      tips: ["Se etter «fast område 0 … N − 1». Da er bøtter svaret.", "RemoveMin skanner fra laveste prioritet. Med konstant N er det O(1).", "En binær heap virker, men gir lav uttelling her."]
+      tips: ["Se etter «fast område 0 … N − 1». Da er bøtter svaret.", "RemoveMin skanner fra laveste prioritet. Med konstant N er det O(1).", "En binær heap virker, men ga høyst 4 av 10 poeng."]
     }, ["bucketQueueInsert", "bucketQueueRemoveMin"]);
     IN.pseudo.explainer("#exp-bq-ins", IN.algos.bucketQueueInsert, {});
     IN.pseudo.explainer("#exp-bq-rm", IN.algos.bucketQueueRemoveMin, {});
@@ -861,8 +891,8 @@
     ];
     IN.tfTest("#tf-heap", TF.map(function (x) { x.blokk = "3"; return x; }), { id: "heap-tf" });
     exam("#exam-test", {
-      year: "H2022", oppgave_nr: "Oppgave 4", title: "Prioritetskøer og binære heaps (sant/usant)", points: 10,
-      oppgave: "<p>«Heap» betyr her et array som representerer en binær heap med minste i roten. Avgjør om hver påstand er sann eller usann (1p hver). Påstandene (a)–(j) er de ti første i testen over.</p>",
+      year: "H2022", oppgave_nr: "Oppgave 5", title: "Prioritetskøer og binære heaps (sant/usant)", points: 10,
+      oppgave: "<p>«Heap» betyr her et array som representerer en binær heap med minste i roten. Avgjør om hver påstand er sann eller usann (1p hver). Påstandene (a)–(j) er de ti første i testen under.</p>",
       losning: [
         "(a) Sant · (b) Usant · (c) Usant · (d) Sant · (e) Sant",
         "(f) Sant · (g) Usant (noe tvetydig) · (h) Sant · (i) Usant · (j) Sant",
