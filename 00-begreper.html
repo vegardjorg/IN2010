@@ -93,7 +93,8 @@
     <section data-panel="stabil">
       <div class="callout begrep"><span class="lbl">Begrep</span>
         <b>Stabil:</b> like elementer beholder sin innbyrdes rekkefølge etter sortering.
-        <b>In-place:</b> algoritmen bruker bare O(1) ekstra minne (sorterer «i selve arrayet»).</div>
+        <b>In-place:</b> algoritmen sorterer i selve arrayet, uten en ekstra datastruktur (som et hjelpearray
+        eller bøtter) å mellomlagre elementene i. Merge sort er det klassiske moteksempelet.</div>
 
       <h3>Forklaring</h3>
       <div id="ex-stabil"></div>
@@ -121,14 +122,17 @@
             <tr><td>Selection</td><td>Nei</td><td>Ja</td><td class="mono">O(n²)</td></tr>
             <tr><td>Bubble</td><td>Ja</td><td>Ja</td><td class="mono">O(n²)</td></tr>
             <tr><td>Insertion</td><td>Ja</td><td>Ja</td><td class="mono">O(n²)</td></tr>
-            <tr><td>Merge</td><td>Ja</td><td>Nei (O(n))</td><td class="mono">O(n log n)</td></tr>
-            <tr><td>Quick</td><td>Nei</td><td>Ja*</td><td class="mono">O(n²)</td></tr>
+            <tr><td>Gnome</td><td>Ja</td><td>Ja</td><td class="mono">O(n²)</td></tr>
+            <tr><td>Merge</td><td>Ja</td><td>Nei (hjelpearray)</td><td class="mono">O(n log n)</td></tr>
+            <tr><td>Quick</td><td>Nei</td><td>Ja</td><td class="mono">O(n²)</td></tr>
             <tr><td>Heapsort</td><td>Nei</td><td>Ja</td><td class="mono">O(n log n)</td></tr>
+            <tr><td>Bøtte</td><td>Ja</td><td>Nei (bøttene)</td><td class="mono">O(N+n)</td></tr>
+            <tr><td>Radix</td><td>Ja</td><td>Nei (bøttene)</td><td class="mono">O(d·(N+n))</td></tr>
           </tbody>
         </table>
       </div>
-      <p class="muted small">*Quicksort bruker O(log n) stakkplass til rekursjonen i forventning, men O(n) i verste fall
-        (maksimalt skjeve partisjoner).</p>
+      <p class="muted small">In-place betyr at algoritmen ikke mellomlagrer elementene i en ekstra datastruktur.
+        Derfor er quicksort in-place, mens merge sort (hjelpearray) og bøtte/radix (bøttene) ikke er det.</p>
     </section>
 
     <!-- ADT -->
@@ -204,8 +208,8 @@
 
     IN.explain("#ex-stabil", {
       eli5: "<p><b>Stabil</b>: hvis to kort har samme tall, holder de samme rekkefølge som før. <b>In-place</b>: vi rydder i selve bunken uten en ekstra stor bunke ved siden av.</p>",
-      normal: "<p><b>Stabil</b> sortering bevarer rekkefølgen mellom like nøkler – viktig når du sorterer på flere nøkler etter hverandre. <b>In-place</b> bruker bare O(1) ekstra minne.</p>",
-      teknisk: "<p>Stabilitet: for like nøkler bevares den relative inputrekkefølgen i outputen. Avgjørende for radix/flernøkkel-sortering (sorter minst viktig nøkkel først, stabilt). In-place: O(1) hjelpeminne utover inputen (rekursjonsstakk teller som plass).</p>"
+      normal: "<p><b>Stabil</b> sortering bevarer rekkefølgen mellom like nøkler – viktig når du sorterer på flere nøkler etter hverandre. <b>In-place</b> betyr at algoritmen sorterer i selve arrayet, uten en ekstra datastruktur å mellomlagre elementene i.</p>",
+      teknisk: "<p>Stabilitet: for like nøkler bevares den relative inputrekkefølgen i outputen. Avgjørende for radix/flernøkkel-sortering (sorter minst viktig nøkkel først, stabilt). In-place: elementene mellomlagres aldri i en ekstra datastruktur – merge sort, som fletter via et hjelpearray, er derfor ikke in-place. Quicksort sorterer derimot inne i selve arrayet og er in-place.</p>"
     }, { label: "Nivå:" });
 
     IN.explain("#ex-adt", {
@@ -217,7 +221,7 @@
     IN.explain("#ex-rekursjon", {
       eli5: "<p>Rekursjon er som russiske dukker: for å åpne den store må du åpne den litt mindre inni, helt til den minste som ikke kan åpnes (basis). Så setter du alt sammen igjen.</p>",
       normal: "<p>En rekursiv funksjon løser et problem ved å kalle seg selv på en mindre del, og kombinere svarene. Den må ha et basistilfelle for å stoppe.</p>",
-      teknisk: "<p>Rekursjon realiseres via kallstakken: hvert kall får en ramme med egne lokale variabler. Dybden styrer plassforbruket (O(dybde)). Kjøretiden analyseres med rekurrenser, f.eks. fakultet: T(n)=T(n−1)+O(1)=O(n).</p>"
+      teknisk: "<p>Hvert kall løser en mindre utgave av samme problem og har sine egne lokale variabler. For å finne kjøretiden teller vi kall og arbeid per kall: fakultet gjør n kall med O(1) arbeid hver, altså O(n).</p>"
     }, { label: "Nivå:" });
 
     /* ---- Quiz: algoritme ---- */

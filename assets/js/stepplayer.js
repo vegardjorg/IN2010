@@ -34,12 +34,15 @@
           onclick: function () { setInput(opts.presets[navn]); }
         }));
       });
+      wrap.appendChild(presetRow);
+      // Egen linje: eget array (felt + Bruk samlet) og antall − / +
+      var toolRow = el("div", { class: "sp-presets sp-tools" });
       if (opts.customInput !== false) {
-        var fld = el("input", { type: "text", placeholder: opts.inputLabel || "f.eks. 5,1,4,2,8", "aria-label": "Eget array", style: "width:11rem" });
+        var fld = el("input", { type: "text", placeholder: opts.inputLabel || "f.eks. 5,1,4,2,8", "aria-label": "Eget array" });
         var go = el("button", { class: "btn sm", type: "button", text: "Bruk",
           onclick: function () { var v = parseInput(fld.value); if (v.length) setInput(v); } });
         fld.addEventListener("keydown", function (e) { if (e.key === "Enter") { e.preventDefault(); go.click(); } });
-        presetRow.appendChild(fld); presetRow.appendChild(go);
+        toolRow.appendChild(el("span", { class: "sp-custom" }, [el("span", { class: "lbl", text: "Eget:" }), fld, go]));
       }
       // Flere / færre tall (med fornuftige grenser)
       if (opts.countControl) {
@@ -54,11 +57,11 @@
           cval.textContent = n + " tall";
           bMinus.disabled = n <= cmin; bPlus.disabled = n >= cmax;
         };
-        presetRow.appendChild(el("span", { class: "sp-count" }, [
+        toolRow.appendChild(el("span", { class: "sp-count" }, [
           el("span", { class: "lbl", text: "Antall:" }), bMinus, cval, bPlus
         ]));
       }
-      wrap.appendChild(presetRow);
+      if (toolRow.childNodes.length) wrap.appendChild(toolRow);
     }
 
     var stage = el("div", { class: "sp-stage", tabindex: "0", role: "group", "aria-label": "Visualisering" });
@@ -97,7 +100,8 @@
     }
 
     var steps = [], idx = 0, timer = null, input = null;
-    var countUpdate = function () {};
+    // (countUpdate er satt over når countControl finnes – ikke overskriv den)
+    var countUpdate = countUpdate || function () {};
 
     function setInput(inp) { input = inp.slice(); regen(); countUpdate(); }
     function regen() {

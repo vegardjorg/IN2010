@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>IN2010 · interaktiv eksamensguide</title>
-  <meta name="description" content="Interaktiv eksamensguide for IN2010 – Algoritmer og datastrukturer. Dekker eksamen H2023–H2025.">
+  <meta name="description" content="Interaktiv eksamensguide for IN2010 – Algoritmer og datastrukturer. Slik ser eksamen ut, og alle eksamensoppgavene fra H2020 til H2025.">
   <script>(function(){try{var d=document.documentElement;var t=localStorage.getItem('in-theme');if(t&&t!=='system')d.setAttribute('data-theme',t);var l=localStorage.getItem('in-level')||'normal';d.setAttribute('data-level',l);}catch(e){document.documentElement.setAttribute('data-level','normal');}})();</script>
   <link rel="stylesheet" href="assets/css/styles.css">
 </head>
@@ -15,16 +15,34 @@
   <main id="main" class="wrap">
     <div class="pagehead">
       <h1>IN2010 – interaktiv eksamensguide</h1>
-      <p class="lead">Algoritmer og datastrukturer, forklart steg for steg og knyttet til hver
-        eksamensoppgave i H2023, H2024 og H2025. Velg forklaringsnivå øverst – eller på hvert felt –
+      <p class="lead">Algoritmer og datastrukturer, forklart steg for steg og knyttet til
+        eksamensoppgavene fra H2020 til H2025. Velg forklaringsnivå øverst – eller på hvert felt –
         fra <b>5-åring</b> til <b>Teknisk</b>.</p>
     </div>
 
-    <div class="notice">
-      <b>Dette er et tidlig utsnitt (S1).</b> Rammeverk, forside, pseudokode-skolen, Begreper og
-      Sortering er på plass. De øvrige blokkene er merket «snart» og kommer i neste runder.
-      Si fra om stilen og pedagogikken treffer før resten masseproduseres.
-    </div>
+    <section class="exam-overview" aria-labelledby="eo-h">
+      <h2 id="eo-h">Slik ser eksamen ut</h2>
+      <p class="eo-lead">100 poeng og ingen hjelpemidler. Oppbygningen har vært den samme hvert år siden 2021.
+        Her er delene i den rekkefølgen de kommer, hva de pleier å inneholde, og hvor du øver på dem.</p>
+      <div id="exam-flow"></div>
+
+      <h3 id="eo-temaer">Temaene i del 2 – hvor ofte de kommer</h3>
+      <p class="muted small">Telt over de seks eksamenene H2020–H2025. Prikkene viser hvor mange av dem
+        temaet hadde en egen oppgave i.</p>
+      <div id="exam-topics" class="eo-topics"></div>
+
+      <div class="callout snarvei eo-rules"><span class="lbl">Gjelder hver oppgave i del 2</span>
+        <ul>
+          <li><b>Pseudokode</b> – eller en presis forklaring på vanlig norsk. Riktig idé uten pseudokode gir
+            som regel høyst halv pott.</li>
+          <li><b>Oppgi alltid kjøretid.</b> Mangler den eller er den feil, trekkes det typisk 1 poeng.</li>
+          <li><b>Poengene trappes etter kjøretid:</b> den beste løsningen gir full pott, ett trinn dårligere
+            omtrent halvparten.</li>
+          <li>Du kan bruke algoritmer og datastrukturer fra pensum uten å skrive dem selv – si hva kallet gjør
+            og hva det koster. Skriv ned antagelsene dine.</li>
+        </ul>
+        Øv på å skrive svaret i <a href="pseudokode.html#fane=skriveguide">Pseudokode → Skriveguide</a>.</div>
+    </section>
 
     <section>
       <h2>Slik bruker du siden</h2>
@@ -36,7 +54,7 @@
         </div>
         <div class="card">
           <h3>2 · Spill demoene</h3>
-          <p class="muted small">Steg deg gjennom algoritmene med <span class="kbd">←</span>
+          <p class="muted small">Gå gjennom algoritmene steg for steg med <span class="kbd">←</span>
             <span class="kbd">→</span> eller Spill av. Pseudokoden lyser opp linje for linje i takt
             med stegene.</p>
         </div>
@@ -65,18 +83,6 @@
       </div>
     </section>
 
-    <section>
-      <h2>Eksamen på 60 sekunder</h2>
-      <div class="card">
-        <ul>
-          <li><b>Oppvarming (2p):</b> «Hva er en algoritme / en datastruktur?» – alle rimelige svar gir full uttelling.</li>
-          <li><b>Del 1:</b> små oppgaver som rettes automatisk. Ubesvart = feil, så <b>svar på alt</b>.</li>
-          <li><b>Del 2:</b> større oppgaver (10–15p) med pseudokode, skriving og resonnering.</li>
-          <li>Ingen hjelpemidler. <b>Lavere kjøretid foretrekkes.</b> Pensumalgoritmer kan antas tilgjengelige
-            med mindre annet er sagt – si hva kallet returnerer og oppgi kjøretiden.</li>
-        </ul>
-      </div>
-    </section>
   </main>
 
   <footer class="footer">
@@ -91,10 +97,10 @@
     // Blokk-kort
     var BLOCKS = [
       { page:"begreper",  n:"0", title:"Begreper",  desc:"Algoritme, datastruktur, Big-O, stabil/in-place, ADT, rekursjon.", tasks:3 },
-      { page:"sortering", n:"1", title:"Sortering", desc:"Selection, bubble, insertion, gnome, merge, quick, bøtte, heapsort.", tasks:2 },
-      { page:"sok",       n:"2", title:"Søk & array-triks", desc:"Binærsøk, finn duplikat, finn k minste, hashtriks.", tasks:3 },
-      { page:"heap",      n:"3", title:"Heap / prioritetskø", desc:"Innsetting, removeMin, buildHeap, mediankø, level-order.", tasks:3 },
-      { page:"traer",     n:"4", title:"Trær & søketrær", desc:"Traversering, BST, diameter, LCA, AVL/Anti-AVL, Huffman.", tasks:5 },
+      { page:"sortering", n:"1", title:"Sortering", desc:"Selection, bubble, insertion, gnome, merge, quick, bøtte, radix og heapsort.", tasks:5 },
+      { page:"sok",       n:"2", title:"Søk & array-triks", desc:"Rett-frem søk og binærsøk, sorter én gang, finn duplikat, finn k minste, hashtriks.", tasks:4 },
+      { page:"heap",      n:"3", title:"Heap / prioritetskø", desc:"Insert, removeMin, BuildHeap, level-order, mediankø, heapsort, bøttekø.", tasks:6 },
+      { page:"traer",     n:"4", title:"Trær & søketrær", desc:"Traversering, BST (CheckBST, InRange), diameter, LCA, AVL/Anti-AVL, Huffman og prefikstre.", tasks:12 },
       { page:"hashing",   n:"5", title:"Hashing", desc:"Chaining, linear probing, rehash, Python 3.6-dict.", tasks:2 },
       { page:"grafer",    n:"6", title:"Grafer", desc:"BFS, DFS, sykler, topsort, SCC, Dijkstra, Bellman-Ford, MST.", tasks:7 },
       { page:"strategi",  n:"7", title:"Eksamensstrategi", desc:"Snarveier, verktøykasse, sikringssetninger, jukselapp.", tasks:0 }
@@ -120,6 +126,105 @@
       host.appendChild(card);
     });
 
+    // ===== Slik ser eksamen ut =====
+    // Lenke til en fane – eller «snart» hvis blokken ikke er bygget ennå
+    function lnk(page, fane, text) {
+      if (ready[page]) return el("a", { href: pageHref[page] + (fane ? "#fane=" + fane : ""), text: text });
+      return el("span", { class: "eo-soon" }, [el("span", { text: text }), el("span", { class: "tag", text: "snart" })]);
+    }
+    function links(list) {
+      var p = el("p", { class: "eo-links small" }, [el("span", { class: "muted", text: "Øv: " })]);
+      list.forEach(function (l, i) { if (i) p.appendChild(document.createTextNode(" · ")); p.appendChild(lnk(l[0], l[1], l[2])); });
+      return p;
+    }
+
+    var FLOW = [
+      { key: "opp", part: "Start", name: "Oppvarming", pts: "2 p", w: 2,
+        text: "De samme to spørsmålene hvert år: hva er en algoritme, og hva er en datastruktur? Svar kort – alle rimelige svar gir full pott.",
+        links: [["begreper", "algoritme", "Begreper → Algoritme"]] },
+      { key: "d1", part: "Del 1", name: "Sant/usant", pts: "22–32 p", w: 26,
+        text: "Mange korte påstander om kjøretid, stabil og in-place, heaper og trær. Rettes automatisk. Feil og ubesvart teller likt, og gjetting gir i snitt 0 – så svar på alle, men tenk.",
+        links: [["sortering", "test", "Sortering"], ["sok", "test", "Søk"], ["heap", "test", "Heap"], ["traer", "test", "Trær"], ["begreper", "bigo", "Big-O"]] },
+      { key: "std", part: "Del 2 · først", name: "Standardoppgaven", short: "Første oppg.", pts: "10 p", w: 10,
+        text: "Kjør en pensumoperasjon for hånd – innsetting i heap, hashing eller Huffman – forklar den, skriv pseudokode og oppgi kjøretid.",
+        links: [["heap", "innsetting", "Heap-innsetting"], ["traer", "huffman", "Huffman"], ["hashing", "", "Hashing"]] },
+      { key: "mid", part: "Del 2 · midten", name: "4–5 oppgaver", pts: "10–12 p hver", w: 48,
+        text: "Ett problem per oppgave, ofte med en liten historie: trær, heap, søk i array, sortering, hashing. Lavere kjøretid gir flere poeng.",
+        anchor: "eo-temaer" },
+      { key: "graf", part: "Del 2 · sist", name: "Grafhistorien", pts: "12–15 p", w: 14,
+        text: "En historie som skal gjøres om til en graf: hva er nodene og kantene? Velg en pensumalgoritme (BFS/DFS, Dijkstra, MST, topologisk sortering) og oppgi kjøretiden.",
+        links: [["grafer", "", "Grafer"]] }
+    ];
+    var flowHost = IN.qs("#exam-flow");
+    var bar = el("div", { class: "eo-bar", role: "img", "aria-label": "Poengfordeling på en typisk eksamen: oppvarming 2, del 1 om lag 26, del 2 om lag 72 poeng." });
+    var steps = el("ol", { class: "eo-steps" });
+    FLOW.forEach(function (f, i) {
+      var seg = el("a", { class: "eo-seg eo-" + f.key, href: "#eo-" + f.key, title: f.name + " · " + f.pts });
+      seg.style.flexGrow = f.w;
+      if (f.w >= 10) seg.appendChild(el("span", { text: f.short || f.name }));
+      bar.appendChild(seg);
+      var li = el("li", { class: "eo-step eo-" + f.key, id: "eo-" + f.key }, [
+        el("div", { class: "eo-head" }, [
+          el("span", { class: "eo-num", text: String(i + 1) }),
+          el("span", { class: "eo-part small", text: f.part }),
+          el("span", { class: "pts", text: f.pts })
+        ]),
+        el("h3", { text: f.name }),
+        el("p", { class: "small", text: f.text })
+      ]);
+      if (f.links) li.appendChild(links(f.links));
+      if (f.anchor) li.appendChild(el("p", { class: "eo-links small" }, [el("a", { href: "#" + f.anchor, text: "Se temaene under ↓" })]));
+      steps.appendChild(li);
+    });
+    flowHost.appendChild(bar);
+    flowHost.appendChild(steps);
+
+    var TOPICS = [
+      { name: "Grafer", n: 6, pts: "22–46 p", often: "Alltid",
+        items: ["Gjør en historie om til en graf", "BFS/DFS, sykler, topologisk sortering, komponenter", "Dijkstra, Bellman-Ford, minimalt spenntre"],
+        tip: "O(|V| + |E|) gir full pott. Én traversering per node gir omtrent halvparten.",
+        links: [["grafer", "", "Grafer"]] },
+      { name: "Trær", n: 6, pts: "12–24 p", often: "Alltid",
+        items: ["En rekursiv treoppgave hvert år: er det et søketre, diameter, laveste felles forfeder", "AVL og rotasjoner", "Huffman"],
+        tip: "Ofte to oppgaver. Oppgi kjøretiden både generelt og for balanserte trær.",
+        links: [["traer", "bst", "BST"], ["traer", "diameter", "Diameter"], ["traer", "lca", "LCA"], ["traer", "avl", "AVL"], ["traer", "huffman", "Huffman"]] },
+      { name: "Heap og prioritetskø", n: 5, pts: "6–20 p", often: "Nesten alltid",
+        items: ["Insert og RemoveMin for hånd", "Bygg noe nytt oppå en heap: mediankø, bøttekø"],
+        tip: "Mediankø: to heaper gir full pott; å lete etter medianen ved behov gir lite.",
+        links: [["heap", "innsetting", "Insert"], ["heap", "removemin", "RemoveMin"], ["heap", "median", "Mediankø"], ["heap", "pk", "Prioritetskø"]] },
+      { name: "Hashing", n: 5, pts: "8–10 p", often: "Nesten alltid",
+        items: ["Linear probing eller separate chaining for hånd", "Pseudokode for innsetting", "Hashset som verktøy for lineære løsninger"],
+        tip: "Oppgi både forventet O(1) og verste tilfelle O(n).",
+        links: [["hashing", "", "Hashing"], ["sok", "triks", "Array-triks"]] },
+      { name: "Søk i array", n: 5, pts: "10–12 p", often: "Nesten alltid",
+        items: ["Finn duplikat, par eller de k minste", "Sorter én gang, søk mange ganger", "Modifisert binærsøk"],
+        tip: "Kjøretidstrapp: jo raskere, jo flere poeng – og 0 for en treg løsning når en bedre finnes.",
+        links: [["sok", "binaersok", "Binærsøk"], ["sok", "duplikat", "Finn duplikat"], ["sok", "kminste", "Finn k minste"], ["sok", "sortersok", "Sorter én gang"]] },
+      { name: "Sortering", n: 4, pts: "6–13 p", often: "Ofte",
+        items: ["Stabil bøttesortering når nøklene er få", "Stabilitet", "Drøft en ukjent algoritme mot pensum (gnome sort)"],
+        tip: "Stabil og lineær gir full pott; stabil O(n log n) gir mindre.",
+        links: [["sortering", "bucket", "Bøtte"], ["sortering", "gnome", "Gnome"], ["sortering", "oversikt", "Oversikt"]] },
+      { name: "Drøfting", n: 4, pts: "6–10 p", often: "Ofte, men ingen siden 2023",
+        items: ["Sammenlign to oppgitte løsninger", "Kjøretid i variabler du definerer selv", "Når bør hver av dem velges?"],
+        tip: "Definer variablene dine (n, k, L …) før du bruker dem i O-uttrykk.",
+        links: [["pseudokode", "skriveguide", "Skriveguide"], ["sortering", "gnome", "Gnome sort"]] }
+    ];
+    var topicHost = IN.qs("#exam-topics");
+    TOPICS.forEach(function (tp) {
+      var dots = el("span", { class: "eo-dots", "aria-label": tp.n + " av 6 eksamener" });
+      for (var d = 0; d < 6; d++) dots.appendChild(el("i", { class: d < tp.n ? "on" : "" }));
+      var ul = el("ul", { class: "small" });
+      tp.items.forEach(function (x) { ul.appendChild(el("li", { text: x })); });
+      topicHost.appendChild(el("div", { class: "card eo-topic" + (tp.n === 6 ? " eo-always" : "") }, [
+        el("div", { class: "eo-thead" }, [el("h4", { text: tp.name }), el("span", { class: "pts", text: tp.pts })]),
+        el("div", { class: "eo-freq small" }, [dots, el("span", { class: "muted", text: tp.often + " · " + tp.n + " av 6" })]),
+        ul,
+        el("p", { class: "eo-tip small", text: tp.tip }),
+        links(tp.links)
+      ]));
+    });
+    topicHost.appendChild(el("p", { class: "muted small eo-rare", html: "Sjeldne: P og NP (2020 og 2021) og stakk (2020)." }));
+
     // Oppgavekart
     var TASKS = [
       ["H23","Oppvarming (algoritme/datastruktur)",2,"begreper","algoritme"],
@@ -131,7 +236,7 @@
       ["H23","Dependency hell (sykel/DAG)",12,"grafer","sykler"],
       ["H24","Oppvarming",2,"begreper","algoritme"],
       ["H24","Huffman-trær",10,"traer","huffman"],
-      ["H24","Etymologisk ordliste (bøttesort)",10,"sortering","bucket"],
+      ["H24","Etymologisk ordliste (bøttesortering)",10,"sortering","bucket"],
       ["H24","Jazz eller klassisk? (BFS ≤ k)",10,"grafer","bfs"],
       ["H24","Python 3.6-dict",10,"hashing","python"],
       ["H24","Laveste felles forfeder (LCA)",12,"traer","lca"],

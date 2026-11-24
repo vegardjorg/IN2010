@@ -37,7 +37,7 @@
       col.appendChild(el("div", { class: "bar-idx", text: String(i) }));
 
       var pbox = el("div", { class: "bar-ptrs" });
-      ["i", "k", "j", "low", "mid", "high"].forEach(function (key) {
+      ["i", "k", "j", "left", "right", "low", "mid", "high"].forEach(function (key) {
         if (ptrs[key] === i) pbox.appendChild(el("span", { class: "ptr " + key, text: key }));
       });
       col.appendChild(pbox);

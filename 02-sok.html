@@ -1,0 +1,854 @@
+<!doctype html>
+<html lang="nb">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Blokk 2 · Søk · IN2010</title>
+  <meta name="description" content="Søk i IN2010: rett-frem søk, binærsøk med varianter, sorter-én-gang-avveiningen, finn duplikat, finn k minste og array-triks med hashing – med stegvise demoer og kjøretid.">
+  <script>(function(){try{var d=document.documentElement;var t=localStorage.getItem('in-theme');if(t&&t!=='system')d.setAttribute('data-theme',t);var l=localStorage.getItem('in-level')||'normal';d.setAttribute('data-level',l);}catch(e){document.documentElement.setAttribute('data-level','normal');}})();</script>
+  <link rel="stylesheet" href="assets/css/styles.css">
+  <!-- MIDLERTIDIG sideintern CSS for søke-visualiseringen. Skal flyttes til styles.css
+       (se plan/foresporsler/sok/01-sok-viz-css.md). -->
+  <style>
+    .pc-explainer > * { min-width: 0; } .pc-explainer > :first-child { overflow-x: auto; } /* lange linjer (BinarySearchRec) på mobil */
+    .grid > * { min-width: 0; } /* hindrer at brede søyler blåser opp kolonnen på mobil */
+    .sok-viz { display: flex; flex-direction: column; gap: .45rem; min-width: 100%; width: max-content; align-self: stretch; justify-content: flex-end; }
+    .sok-info { display: flex; flex-wrap: wrap; gap: .3rem; position: sticky; left: 0; }
+    .sok-info .pill { font-size: var(--text-xs); }
+    .sok-viz .bar-ptrs { height: auto; min-height: 2.4rem; overflow: visible; }
+    .sok-viz .bar-col { transition: opacity .2s ease; }
+    .sok-viz .bar-col.sok-out { opacity: .28; }
+    .sok-map { display: flex; flex-wrap: wrap; gap: .3rem; min-height: 1.9rem; align-items: center; position: sticky; left: 0; }
+    .sok-map .lbl { font-size: var(--text-xs); color: var(--color-on-surface-variant); margin-right: .2rem; }
+    .sok-chip { font-family: var(--font-mono, monospace); font-size: var(--text-xs); padding: .15rem .45rem; border-radius: var(--radius-md);
+      border: 1px solid var(--color-outline-variant); background: var(--color-surface-container-high); color: var(--color-on-surface); }
+    .sok-chip.is-new { border-color: var(--c-target); box-shadow: 0 0 0 2px color-mix(in srgb, var(--c-target) 35%, transparent); }
+    .tall-stage .sp-stage { height: auto; min-height: 300px; }
+    .sok-calc { display: grid; gap: .6rem; }
+    .sok-calc .row { display: flex; flex-wrap: wrap; gap: .4rem; align-items: center; }
+    .sok-calc output, .sok-big { font-variant-numeric: tabular-nums; font-weight: 700; }
+    .sok-meter { display: grid; grid-template-columns: minmax(7.5rem, max-content) 1fr; gap: .35rem .6rem; align-items: center; }
+    .sok-meter .bar-h { height: 1.1rem; border-radius: var(--radius); background: var(--c-compare); min-width: 3px; transition: width .3s ease; }
+    .sok-meter .bar-h.alt { background: var(--c-sorted); }
+    .sok-meter .bar-h.alt2 { background: var(--c-target); }
+    .sok-meter .bar-h.alt3 { background: var(--c-min); }
+    .sok-meter .val { font-size: var(--text-sm); font-variant-numeric: tabular-nums; }
+    .sok-meter .cell { display: flex; align-items: center; gap: .5rem; min-width: 0; }
+    .cmp-table tr.win td { background: color-mix(in srgb, var(--c-sorted) 16%, transparent); font-weight: 600; }
+    .cmp-table tr.bad td { opacity: .65; text-decoration: line-through; }
+    .sok-sol-code { margin: .5rem 0 .8rem; }
+    .sok-sol-code .bigo-compact { margin-top: .4rem; }
+    input[type=range].sok-range { width: min(100%, 18rem); }
+    @media (prefers-reduced-motion: reduce) { .sok-viz .bar-col, .sok-meter .bar-h { transition: none; } }
+  </style>
+</head>
+<body data-page="sok">
+  <a class="skip-link" href="#main">Hopp til innhold</a>
+  <header id="topnav"></header>
+  <main id="main" class="wrap">
+    <div class="pagehead">
+      <h1>Blokk 2 · Søk</h1>
+      <p class="lead">Å finne et element er grunnoperasjonen bak nesten alt. Her går vi fra rett-frem søk til binærsøk, ser når det lønner seg å sortere først, og løser eksamensoppgavene om duplikater, de k minste og par med en gitt sum.</p>
+      <div class="badges">
+        <span class="badge" data-go="duplikat"><b>H2023</b> · Finn duplikat · <span class="pts">12p</span></span>
+        <span class="badge" data-go="kminste"><b>H2025</b> · Finn k minste · <span class="pts">12p</span></span>
+        <span class="badge" data-go="sortersok"><b>H2020</b> · Søk (Intersection) · <span class="pts">12p</span></span>
+        <span class="badge" data-go="triks"><b>H2021</b> · Par med sum x · <span class="pts">10p</span></span>
+        <span class="badge" data-go="varianter"><b>H2024</b> · Binærsøk i [low, high] · <span class="pts">del (b)</span></span>
+      </div>
+    </div>
+
+    <div class="tabs" role="tablist" aria-label="Søk">
+      <button data-tab="oversikt">Oversikt</button>
+      <button data-tab="rettfrem">Rett-frem søk</button>
+      <button data-tab="binaersok">Binærsøk</button>
+      <button data-tab="varianter">Varianter</button>
+      <button data-tab="sortersok">Sorter én gang</button>
+      <button data-tab="duplikat">Finn duplikat</button>
+      <button data-tab="kminste">Finn k minste</button>
+      <button data-tab="triks">Array-triks</button>
+      <button data-tab="test">Sant/usant</button>
+    </div>
+
+    <!-- ===================== OVERSIKT ===================== -->
+    <section data-panel="oversikt">
+      <h3>Hva er søk?</h3>
+      <div class="callout begrep"><span class="lbl">Begrep</span>
+        Et <b>søk</b> tar en samling og et element <code>x</code> og svarer på om <code>x</code> finnes, og gjerne <i>hvor</i>.
+        Hvor raskt det går, avhenger helt av hva vi vet om samlingen: er den sortert, og kan vi hoppe rett til en vilkårlig plass?</div>
+      <div id="ex-sok"></div>
+
+      <h4>Kappløpet: hvor mange steg i verste tilfelle?</h4>
+      <div class="card">
+        <div class="sok-calc">
+          <div class="row">
+            <label class="fld" for="race-n">Antall elementer n:</label>
+            <input id="race-n" class="sok-range" type="range" min="1" max="9" step="1" value="3" aria-describedby="race-n-out">
+            <output id="race-n-out"></output>
+          </div>
+          <div class="sok-meter" id="race-meter"></div>
+          <p class="muted small" id="race-note"></p>
+        </div>
+      </div>
+
+      <h4>Sammenligning</h4>
+      <p class="muted small">Alle tider er O(…). Hold musa over – eller trykk på – en overskrift eller celle for å se <i>hvorfor</i>.</p>
+      <div class="table-wrap">
+        <table class="cmp-table" id="cmp-sok">
+          <thead><tr><th>Metode</th>
+            <th data-tip="Det metoden må kunne anta om dataene for å gi riktig svar.">Krever</th>
+            <th data-tip="Kjøretiden for den gunstigste inputen – typisk at x ligger akkurat der vi ser først.">Best</th>
+            <th data-tip="Typisk kjøretid. For hashing er dette forventet tid, under antakelsen om en god hashfunksjon.">Snitt</th>
+            <th data-tip="Kjøretiden for den verst tenkelige inputen, for eksempel at x ikke finnes.">Verst</th>
+            <th data-tip="Ekstra minne utover selve dataene.">Minne</th></tr></thead>
+          <tbody>
+            <tr><td><a href="#fane=rettfrem">Rett-frem søk</a></td>
+              <td data-tip="Virker på hva som helst vi kan gå gjennom én og én: usortert array, lenket liste.">ingenting</td>
+              <td class="mono" data-tip="x ligger på første plass vi ser på.">1</td>
+              <td class="mono" data-tip="I snitt må vi se på omtrent halvparten, og n/2 vokser lineært.">n</td>
+              <td class="mono" data-tip="x ligger sist eller finnes ikke: alle n må sjekkes.">n</td>
+              <td class="mono" data-tip="Bare en teller.">1</td></tr>
+            <tr><td><a href="#fane=binaersok">Binærsøk</a></td>
+              <td data-tip="Sortert, og vi må kunne slå opp A[mid] i konstant tid. Lenket liste duger ikke.">sortert array</td>
+              <td class="mono" data-tip="x ligger på den første midten vi ser på.">1</td>
+              <td class="mono" data-tip="Intervallet halveres hver runde, så det blir omtrent log n runder.">log n</td>
+              <td class="mono" data-tip="Høyst ⌊log n⌋ + 1 runder før intervallet er tomt.">log n</td>
+              <td class="mono" data-tip="Den iterative versjonen trenger bare low, mid og high. Den rekursive bruker O(log n) kallstakk.">1</td></tr>
+            <tr><td><a href="#fane=varianter">Binærsøk, første forekomst</a></td>
+              <td data-tip="Som binærsøk. Kan ha like verdier.">sortert array</td>
+              <td class="mono" data-tip="Stopper ikke ved første treff, så den halverer alltid helt ned til et tomt intervall.">log n</td>
+              <td class="mono" data-tip="Samme halvering som vanlig binærsøk.">log n</td>
+              <td class="mono" data-tip="Høyst ⌊log n⌋ + 1 runder.">log n</td>
+              <td class="mono" data-tip="Bare low, mid, high og ans.">1</td></tr>
+            <tr><td><a href="#fane=duplikat">Oppslag i hashset</a></td>
+              <td data-tip="Elementene må være lagt inn i settet først. Å bygge settet koster forventet O(n).">bygget hashset</td>
+              <td class="mono" data-tip="Riktig bøtte har ett element.">1</td>
+              <td class="mono" data-tip="Forventet O(1) med en god hashfunksjon. Skriv alltid «forventet».">1 (forventet)</td>
+              <td class="mono" data-tip="Alt har havnet i samme bøtte, så vi må gå gjennom alle n.">n</td>
+              <td class="mono" data-tip="Settet lagrer alle n elementene.">n</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="callout snarvei"><span class="lbl">Setninger som redder poeng</span>
+        <ul>
+          <li>«Jeg antar at <code>BinarySearch</code> returnerer indeksen til elementet i stedet for <code>true</code>.» (Kursets versjon svarer bare true/false.)</li>
+          <li>«Jeg antar forventet konstant tid for innsetting og oppslag i hashbaserte datastrukturer.»</li>
+          <li>Når du bruker en pensumalgoritme som byggekloss: si hva kallet returnerer, og oppgi kjøretiden til slutt.</li>
+        </ul></div>
+      <div class="callout felle"><span class="lbl">Felle</span>
+        Binærsøk forutsetter et <b>sortert array</b>. På et usortert array gir det <b>feil svar</b>, ikke bare et tregt svar. Og på en lenket liste
+        koster hvert oppslag på <code>A[mid]</code> O(n), så gevinsten forsvinner – da er rett-frem søk bedre.</div>
+    </section>
+
+    <!-- ===================== RETT-FREM SØK ===================== -->
+    <section data-panel="rettfrem">
+      <h3>Rett-frem søk</h3>
+      <div id="intro-rettfrem"></div>
+      <div class="grid cols-2">
+        <div><div id="tracer-rettfrem"></div></div>
+        <div><h4 style="margin:.2rem 0 .4rem">Pseudokode (følger demoen)</h4><div id="pc-rettfrem"></div></div>
+      </div>
+      <div class="callout eksempel"><span class="lbl">Når er rett-frem søk riktig valg?</span>
+        <ul>
+          <li>Dataene er <b>usorterte</b>, og du skal bare søke én eller noen få ganger. Å sortere først koster O(n log n), mer enn ett søk på O(n).</li>
+          <li>Dataene ligger i en <b>lenket liste</b>. Da kan vi uansett bare gå ett steg om gangen.</li>
+        </ul></div>
+      <div class="callout uni"><span class="lbl">Universitetsnivå</span>
+        Ingen sammenligningsbasert metode kan gjøre det bedre enn O(n) på et usortert array: hvis vi hopper over en plass, kan <code>x</code> ligge akkurat der.
+        Skal vi under O(n), må vi enten vite noe om rekkefølgen (sortering → binærsøk) eller ha bygget en hjelpestruktur på forhånd (hashset).</div>
+      <h4>Koden, linje for linje</h4>
+      <div id="exp-rettfrem"></div>
+    </section>
+
+    <!-- ===================== BINÆRSØK ===================== -->
+    <section data-panel="binaersok">
+      <h3>Binærsøk</h3>
+      <div class="callout begrep"><span class="lbl">Begrep</span>
+        <b>Binærsøk</b> leter i et <b>sortert array</b> ved å se på midten av søkeområdet <code>[low, high]</code> og kaste den halvdelen der <code>x</code> umulig kan ligge.
+        Det krever to ting: at arrayet er sortert, og at vi kan slå opp en vilkårlig plass <code>A[mid]</code> i konstant tid.
+        Versjonen her returnerer indeksen (eller −1), så demoen kan vise hvor x står. Kursets <code>BinarySearch</code> svarer bare true/false.</div>
+      <div id="intro-binaersok"></div>
+      <div class="grid cols-2">
+        <div><div id="tracer-binaersok"></div></div>
+        <div><h4 style="margin:.2rem 0 .4rem">Pseudokode (følger demoen)</h4><div id="pc-binaersok"></div></div>
+      </div>
+      <p class="muted small">Eget array: skriv tallene, så <code>;</code> og x, for eksempel <code>3, 8, 12, 20, 31 ; 20</code>. Usorterte tall blir sortert først.</p>
+
+      <div class="callout uni"><span class="lbl">Universitetsnivå: hvorfor høyst ⌊log n⌋ + 1 runder?</span>
+        Hver runde krymper intervallet til høyst halvparten: fra <i>m</i> elementer til høyst ⌊<i>m</i>/2⌋. Fra n kommer vi til 1 element etter
+        ⌊log n⌋ halveringer, og så trengs én runde til for å sjekke det siste elementet. Med n = 1 000 000 er det høyst 20 runder, mot opptil
+        1 000 000 sammenligninger med rett-frem søk. Som rekurrens: T(n) = T(n/2) + O(1), som gir O(log n).</div>
+      <div class="callout sensor"><span class="lbl">Sensor ser etter</span>
+        <ul>
+          <li>Kursets <code>BinarySearch</code> svarer <code>true</code>/<code>false</code>. Bruker du den til å finne en <b>indeks</b>, må du si at du har endret den. Det kostet 1p i 2023.</li>
+          <li>Riktig kjøretid med begrunnelse: «intervallet halveres hver runde, derfor O(log n)».</li>
+          <li>At du har sjekket forutsetningen: er input faktisk sortert?</li>
+        </ul></div>
+      <div class="callout felle"><span class="lbl">Felle: binærsøk i lenket liste</span>
+        I en lenket liste må vi gå fra starten for å nå <code>A[mid]</code>, og det koster O(n) hver gang. Med omtrent log n slike oppslag blir det
+        O(n log n) – verre enn å bare gå gjennom lista én gang med rett-frem søk på O(n).</div>
+
+      <h4>Øv selv: forutsi stegene</h4>
+      <p class="muted small">Bruk arrayet <code>A = [0, 1, 2, 3, 5, 5, 7, 8, 9]</code> (n = 9) og søk etter <code>x = 3</code> med pseudokoden over.</p>
+      <div id="quiz-binaersok"></div>
+
+      <h4>Koden, linje for linje</h4>
+      <div id="exp-binaersok"></div>
+    </section>
+
+    <!-- ===================== VARIANTER ===================== -->
+    <section data-panel="varianter">
+      <h3>Varianter av binærsøk</h3>
+      <div id="intro-varianter"></div>
+
+      <h4>1 · Første forekomst</h4>
+      <div id="intro-first"></div>
+      <div class="grid cols-2">
+        <div><div id="tracer-first"></div></div>
+        <div><h4 style="margin:.2rem 0 .4rem">Pseudokode (følger demoen)</h4><div id="pc-first"></div></div>
+      </div>
+
+      <h4>2 · Søk i et delintervall [low, high] – rekursivt <span class="tag">H2024 · del (b)</span></h4>
+      <div id="intro-rec"></div>
+      <div class="grid cols-2">
+        <div><div id="tracer-rec"></div></div>
+        <div><h4 style="margin:.2rem 0 .4rem">Pseudokode (følger demoen)</h4><div id="pc-rec"></div></div>
+      </div>
+      <div class="callout eksempel"><span class="lbl">Eksempelet i demoen</span>
+        Arrayet er sortert <i>innenfor hver kategori</i>: plass 0–3, 4–8 og 9–11 er tre kategorier. Hele arrayet er altså <b>ikke</b> sortert.
+        Søker vi i <code>[4, 8]</code>, får vi riktig svar. Søker vi i hele arrayet, kaster binærsøket feil halvdel og finner ikke 2, selv om tallet står på plass 4.</div>
+      <div class="callout sensor"><span class="lbl">H2024 (b): det sensor ville ha</span>
+        Bruk binærsøk, men start med <code>low</code> og <code>high</code> fra <code>K[v.category]</code> i stedet for 0 og n − 1, og søk etter <code>v.string</code>.
+        Det virker bare fordi sorteringen i (a) var <b>stabil</b>, slik at hver kategori fortsatt er alfabetisk sortert. Kjøretid O(log n); en lineær løsning ga 2p.
+        Hele oppgaven, med (a), ligger under <a href="01-sortering.html#fane=bucket">Sortering → Bøtte</a>.</div>
+      <h4>Koden, linje for linje</h4>
+      <div id="exp-rec"></div>
+      <h4>Øv selv: sett linjene i riktig rekkefølge</h4>
+      <div id="parsons-rec"></div>
+    </section>
+
+    <!-- ===================== SORTER ÉN GANG (H2020) ===================== -->
+    <section data-panel="sortersok">
+      <h3>Sorter én gang, søk mange ganger <span class="tag">H2020 · 12p</span></h3>
+      <div id="intro-sortersok"></div>
+      <h4>Regn selv: hvilken Intersection vinner?</h4>
+      <div class="card">
+        <div class="sok-calc">
+          <div class="row"><span class="lbl muted small">n =</span><span id="isect-n"></span></div>
+          <div class="row"><span class="lbl muted small">k =</span><span id="isect-k"></span></div>
+          <div class="table-wrap">
+            <table class="cmp-table" id="isect-table">
+              <thead><tr><th>Prosedyre</th><th>Idé</th><th>Kjøretid</th><th>Omtrent antall steg</th></tr></thead>
+              <tbody></tbody>
+            </table>
+          </div>
+          <p class="small" id="isect-note"></p>
+        </div>
+      </div>
+      <div class="callout snarvei"><span class="lbl">Oppskrift</span>
+        Total kostnad = <b>forarbeid + k · kostnad per søk</b>. Sammenlign «0 + k · n» (rett-frem søk) med «n log n + k · log n» (sorter én gang, så binærsøk).
+        Når k er liten, vinner rett-frem søk. Når k vokser, betaler sorteringen seg.</div>
+      <h4>Faktisk eksamensoppgave</h4>
+      <div id="exam-sortersok"></div>
+    </section>
+
+    <!-- ===================== FINN DUPLIKAT (H2023) ===================== -->
+    <section data-panel="duplikat">
+      <h3>Finn duplikat <span class="tag">H2023 · 12p</span></h3>
+      <div id="intro-duplikat"></div>
+      <div class="table-wrap">
+        <table class="cmp-table">
+          <thead><tr><th>Deloppgave</th><th>Antakelse</th><th>Beste idé</th><th>Kjøretid</th><th data-tip="Poeng for beste løsning, og hva svakere løsninger ga.">Uttelling (2023)</th></tr></thead>
+          <tbody>
+            <tr><td>(a)</td><td>sortert, x gitt</td><td>binærsøk + naboer</td><td class="mono">O(log n)</td><td data-tip="Logaritmisk ga opptil 4p, lineær 2p. Minus 1p hvis du ikke sier at binærsøket må returnere indeks.">4p (lineær 2p)</td></tr>
+            <tr><td>(b)</td><td>sortert, x ukjent</td><td>sammenlign naboer</td><td class="mono">O(n)</td><td data-tip="Lineær ga opptil 3p. Løsninger over lineær tid ga 1p.">3p</td></tr>
+            <tr><td>(c)</td><td>usortert</td><td>hashmap: «har jeg sett denne før?»</td><td class="mono">forventet O(n)</td><td data-tip="Lineær (hashing) opptil 5p, sorter-og-skann O(n log n) 4p, kvadratisk 1p.">5p (sortering 4p)</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h4>(a) Sortert, x er gitt: binærsøk + se på naboene</h4>
+      <div class="grid cols-2">
+        <div><div id="tracer-dupa"></div></div>
+        <div><h4 style="margin:.2rem 0 .4rem">Pseudokode (følger demoen)</h4><div id="pc-dupa"></div></div>
+      </div>
+      <h4>(b) Sortert, x er ukjent: sammenlign naboer</h4>
+      <div class="grid cols-2">
+        <div><div id="tracer-dupb"></div></div>
+        <div><h4 style="margin:.2rem 0 .4rem">Pseudokode (følger demoen)</h4><div id="pc-dupb"></div></div>
+      </div>
+      <h4>(c) Usortert: «har jeg sett denne før?» med hashmap</h4>
+      <div class="grid cols-2">
+        <div class="tall-stage"><div id="tracer-dupc"></div></div>
+        <div><h4 style="margin:.2rem 0 .4rem">Pseudokode (følger demoen)</h4><div id="pc-dupc"></div></div>
+      </div>
+      <div class="callout uni"><span class="lbl">Universitetsnivå: hvorfor ikke binærsøk i (b)?</span>
+        Binærsøk virker fordi én sammenligning med midten forteller oss hvilken halvdel vi kan kaste. I (b) har vi ingen <code>x</code> å sammenligne med,
+        og et nabopar i midten som er ulikt, sier ingenting om hvilken side duplikatet ligger på. Derfor må vi i verste fall se på alle n − 1 naboparene.</div>
+      <div class="callout felle"><span class="lbl">Felle i (c)</span>
+        Vil du sortere først, må det være en <b>sammenligningsbasert</b> algoritme (Merge sort, Heapsort, eller Quicksort – men si at Quicksort er O(n²) i verste tilfelle). Bucket sort og Radix sort går ikke,
+        for oppgaven sier bare at elementene kan sammenlignes. Og sorterer du, må du huske de <i>opprinnelige</i> indeksene.</div>
+      <h4>Faktisk eksamensoppgave</h4>
+      <div id="exam-duplikat"></div>
+      <h4>Koden, linje for linje – (c)</h4>
+      <div id="exp-dupc"></div>
+    </section>
+
+    <!-- ===================== FINN k MINSTE (H2025) ===================== -->
+    <section data-panel="kminste">
+      <h3>Finn k minste <span class="tag">H2025 · 12p</span></h3>
+      <div id="intro-kminste"></div>
+
+      <h4>Operasjonsteller: tre algoritmer på samme input</h4>
+      <div class="card">
+        <div class="sok-calc">
+          <div class="row">
+            <label class="fld" for="km-n">n:</label>
+            <select id="km-n"><option value="100">100</option><option value="1000" selected>1 000</option><option value="5000">5 000</option></select>
+            <label class="fld" for="km-k">k:</label>
+            <input id="km-k" class="sok-range" type="range" min="1" max="1000" value="10">
+            <output id="km-k-out"></output>
+          </div>
+          <div class="row" id="km-quick"></div>
+          <div class="sok-meter" id="km-meter"></div>
+          <p class="muted small">Tallene er faktiske sammenligninger mellom elementer, talt mens algoritmene kjører på et tilfeldig array. Nytt array hver gang du endrer noe.</p>
+          <p class="muted small">Legg merke til: på et tilfeldig array er de fleste nye tall større enn toppen av heapen av størrelse k, så de avvises etter én sammenligning, og heapen trenger sjelden å repareres. O-kolonnen er en øvre grense for hvordan arbeidet vokser i verste tilfelle, ikke et antall steg for akkurat denne inputen. Ved k = n er hele arrayet svaret, og da har heapen av størrelse k nesten ingenting å gjøre.</p>
+        </div>
+      </div>
+
+      <h4>(a) O(k·n): k runder med «finn minste»</h4>
+      <div class="grid cols-2">
+        <div><div id="tracer-kmina"></div></div>
+        <div><h4 style="margin:.2rem 0 .4rem">Pseudokode (følger demoen)</h4><div id="pc-kmina"></div></div>
+      </div>
+      <div class="grid cols-2">
+        <div><h4>(b) O(n log n): sorter alt</h4><div id="pc-kminb"></div></div>
+        <div><h4>(c) O(n + k log n): heap</h4><div id="pc-kminc"></div></div>
+      </div>
+      <div class="callout uni"><span class="lbl">Universitetsnivå: den andre (c)-løsningen, O(n log k)</span>
+        Gå gjennom A og hold på de k minste du har sett så langt i en heap av størrelse k der det <b>største</b> av dem ligger øverst
+        (eksamensløsningen kaller den en max-heap – kursets heap er en min-heap, og dette er samme struktur med motsatt ordning).
+        For hvert nytt element: er det mindre enn toppen, bytter vi ut toppen og reparerer heapen. Heapen har aldri mer enn k elementer,
+        så hver operasjon koster O(log k), og totalt blir det O(n log k). I telleren over er det linjen «heap av størrelse k».</div>
+      <div class="callout sensor"><span class="lbl">Sensor ser etter</span>
+        <ul>
+          <li>Tre <i>ulike</i> løsninger, én per kjøretidsklasse, hver med kjøretid oppgitt.</li>
+          <li>I (b): en sortering som er O(n log n) også i verste tilfelle, som Merge sort. Quicksort (O(n²) i verste tilfelle) ga lavere uttelling.</li>
+          <li>Et riktig svar på (c) godtas også som svar på (a) og (b) – men si det eksplisitt.</li>
+        </ul></div>
+      <h4>Faktisk eksamensoppgave</h4>
+      <div id="exam-kminste"></div>
+      <h4>Koden, linje for linje – (c)</h4>
+      <div id="exp-kminc"></div>
+    </section>
+
+    <!-- ===================== ARRAY-TRIKS ===================== -->
+    <section data-panel="triks">
+      <h3>Array-triks</h3>
+      <div id="intro-triks"></div>
+
+      <h4>Par med sum x <span class="tag">H2021 · 10p</span></h4>
+      <div class="grid cols-2">
+        <div><div id="tracer-tosum"></div></div>
+        <div><h4 style="margin:.2rem 0 .4rem">Sortert: to pekere (følger demoen)</h4><div id="pc-tosum"></div></div>
+      </div>
+      <div class="grid cols-2">
+        <div><h4>Usortert: hashset</h4><div id="pc-tosumh"></div></div>
+        <div>
+          <div class="callout snarvei"><span class="lbl">Komplement-trikset</span>
+            Spørsmålet «finnes det en z med y + z = x?» er det samme som «har jeg sett <code>x − y</code> før?». Det gjør et parproblem om til et oppslag,
+            og et oppslag i et hashset er forventet O(1).</div>
+          <div class="callout eksempel"><span class="lbl">Tre måter, tre kjøretider</span>
+            Dobbel løkke over alle par: O(n²). Sorter (Merge sort) og to pekere: O(n log n). Hashset: forventet O(n). Heltall kan også sorteres med Radix sort, og da blir sorter-og-to-pekere O(n).</div>
+        </div>
+      </div>
+      <h4>Faktisk eksamensoppgave</h4>
+      <div id="exam-triks"></div>
+
+      <div class="grid cols-3">
+        <div><h4>Mest frekvente</h4><div id="pc-freq"></div></div>
+        <div><h4>Felles elementer</h4><div id="pc-common"></div></div>
+        <div><h4>Permutasjon</h4><div id="pc-perm"></div></div>
+      </div>
+      <div class="callout snarvei"><span class="lbl">Mønstre å kjenne igjen</span>
+        <ul>
+          <li><b>«Har jeg sett denne før?»</b> → hashset, forventet O(n). Uten hashing: sorter først, O(n log n).</li>
+          <li><b>Telling</b> → hashmap med standardverdi 0.</li>
+          <li><b>Felles elementer</b> → hashset av den ene, slå opp hvert element i den andre.</li>
+          <li><b>Permutasjon</b> → frekvenstabell (forventet O(n)), eller sorter begge og sammenlign plass for plass (O(n log n)).</li>
+        </ul></div>
+    </section>
+
+    <!-- ===================== SANT/USANT ===================== -->
+    <section data-panel="test">
+      <h3>Sant eller usant – søk</h3>
+      <p class="muted small">Svarene lagres i nettleseren din. Trykk «Sjekk svar» når du er klar.</p>
+      <div id="tf-sok"></div>
+    </section>
+  </main>
+  <footer class="footer">IN2010-guide · Blokk 2 · Søk</footer>
+
+  <script src="assets/js/core.js"></script>
+  <script src="assets/js/pseudocode.js"></script>
+  <script src="assets/js/stepplayer.js"></script>
+  <script src="assets/js/viz-bars.js"></script>
+  <script src="assets/js/data-algos.js"></script>
+  <script src="assets/js/data-sok.js"></script>
+  <script>
+  (function () {
+    "use strict";
+    var IN = window.IN, qs = IN.qs, el = IN.el;
+
+    // Merkelapper → riktig fane
+    IN.qsa(".badge[data-go]").forEach(function (b) {
+      b.style.cursor = "pointer";
+      b.setAttribute("role", "link"); b.setAttribute("tabindex", "0");
+      function go() {
+        var id = b.getAttribute("data-go");
+        location.hash = "fane=" + id;
+        var card = qs("#exam-" + id + " .examtask");
+        if (card) { card.setAttribute("open", ""); setTimeout(function () { card.scrollIntoView({ behavior: "smooth", block: "center" }); }, 60); }
+      }
+      b.addEventListener("click", go);
+      b.addEventListener("keydown", function (e) { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); go(); } });
+    });
+
+    function fmt(v) { return Math.round(v).toLocaleString("nb-NO"); }
+    function log2(v) { return Math.log(v) / Math.LN2; }
+
+    /* ---------- Felles tegning: søyler + info + bleking utenfor søkeområdet ---------- */
+    function renderSearch(s, ctx) {
+      var stage = ctx.stage; IN.clear(stage);
+      var box = el("div", { class: "sok-viz" });
+      if (s.info && s.info.length) {
+        var row = el("div", { class: "sok-info" });
+        s.info.forEach(function (p) { row.appendChild(el("span", { class: "pill" }, [el("span", { class: "k", text: p[0] + ": " }), el("b", { text: String(p[1]) })])); });
+        box.appendChild(row);
+      }
+      if (s.map) {
+        var mrow = el("div", { class: "sok-map", "aria-label": "Innholdet i hashmapet H" }, [el("span", { class: "lbl", text: "H:" })]);
+        if (!s.map.length) mrow.appendChild(el("span", { class: "muted small", text: "(tomt)" }));
+        s.map.forEach(function (kv) { mrow.appendChild(el("span", { class: "sok-chip" + (kv[0] === s.mapNew ? " is-new" : ""), text: kv[0] + " → " + kv[1] })); });
+        box.appendChild(mrow);
+      }
+      var bh = el("div"); box.appendChild(bh);
+      stage.appendChild(box);
+      IN.vizBars(bh, s);
+      var cols = IN.qsa(".bar-col", bh);
+      if (s.range) cols.forEach(function (c, i) { if (i < s.range[0] || i > s.range[1]) c.classList.add("sok-out"); });
+      if (s.dim) s.dim.forEach(function (i) { if (cols[i]) cols[i].classList.add("sok-out"); });
+    }
+    var DIM = "color-mix(in srgb, var(--c-default) 30%, transparent)";
+    var LEG_SEARCH = [
+      { cls: "compare", label: "sammenlignes nå" },
+      { cls: "sorted", label: "funnet" },
+      { cls: "default", label: "utenfor søkeområdet (blek)", color: DIM }
+    ];
+
+    // «3, 8, 12 ; 12» → [3, 8, 12, 12] (siste tall = x)
+    function parseWithX(maxN) {
+      return function (str) {
+        var parts = String(str).split(/[;|]|x\s*=/i);
+        var nums = parts[0].split(",").map(function (v) { return parseInt(v.trim(), 10); })
+          .filter(function (v) { return !isNaN(v) && v >= 0; }).slice(0, maxN || 12);
+        if (!nums.length) return [];
+        var x = parts.length > 1 ? parseInt(parts[1].replace(/[^\d-]/g, ""), 10) : NaN;
+        if (isNaN(x)) x = nums[Math.floor(nums.length / 2)];
+        return nums.concat([x]);
+      };
+    }
+
+    /* Bygg én demo: pseudokode + steg-spiller + kompakt kjøretidskort under pseudokoden */
+    function demo(id, algoKey, opts) {
+      var algo = IN.algos[algoKey];
+      var pc = IN.pseudo.render("#pc-" + id, algo, {});
+      var conf = {
+        generate: opts.generate,
+        presets: opts.presets,
+        render: opts.render || renderSearch,
+        pseudo: pc,
+        legend: opts.legend || LEG_SEARCH
+      };
+      if (opts.parseInput) conf.parseInput = opts.parseInput;
+      if (opts.inputLabel) conf.inputLabel = opts.inputLabel;
+      if (opts.customInput === false) conf.customInput = false;
+      if (opts.countControl) conf.countControl = opts.countControl;
+      var player = IN.stepPlayer("#tracer-" + id, conf);
+      var bo = IN.pseudo.bigO(algo, { compact: true });
+      if (bo) qs("#pc-" + id).parentNode.appendChild(bo);
+      return player;
+    }
+    // Bare pseudokode + kjøretidskort (ingen demo)
+    function staticCode(id, algoKey) {
+      IN.pseudo.render("#pc-" + id, IN.algos[algoKey], {});
+      var bo = IN.pseudo.bigO(IN.algos[algoKey], { compact: true });
+      if (bo) qs("#pc-" + id).parentNode.appendChild(bo);
+    }
+    // Pseudokode inne i et eksamenskort (BYGGEGUIDE 5.4)
+    function codeBlock(key) {
+      var w = el("div", { class: "sok-sol-code" }), h = el("div");
+      w.appendChild(h);
+      IN.pseudo.render(h, IN.algos[key], {});
+      var bo = IN.pseudo.bigO(IN.algos[key], { compact: true });
+      if (bo) w.appendChild(bo);
+      return w;
+    }
+    function solution(items) {
+      var ol = el("ol");
+      items.forEach(function (it) {
+        var li = el("li");
+        if (typeof it === "string") li.innerHTML = it;
+        else { li.innerHTML = it.html || ""; (it.code || []).forEach(function (k) { li.appendChild(codeBlock(k)); }); if (it.after) li.appendChild(el("p", { html: it.after })); }
+        ol.appendChild(li);
+      });
+      return ol;
+    }
+
+    /* ===================== OVERSIKT ===================== */
+    IN.explain("#ex-sok", {
+      eli5: "<p>Tenk deg at du leter etter et navn i en stabel med papirer. Ligger de hulter til bulter, må du se på ett og ett ark til du finner det. Men ligger de i alfabetisk rekkefølge, som i en telefonkatalog, kan du slå opp på midten, se om navnet kommer før eller etter, og kaste halve bunken med en gang. Det går utrolig mye fortere.</p>",
+      normal: "<p>Det finnes to grunnmetoder. <b>Rett-frem søk</b> ser på elementene ett og ett og virker på alt, men bruker O(n) tid. <b>Binærsøk</b> krever et sortert array, men halverer søkeområdet hver runde og bruker bare O(log n). Mellom dem ligger et viktig valg: lønner det seg å sortere først? Og når vi har ekstra minne, kan et <b>hashset</b> svare på «finnes x?» på forventet O(1).</p>",
+      teknisk: "<p>Hvor raskt vi kan søke, bestemmes av hva vi vet om dataene. Uten noen ordning må hvert element sjekkes, og O(n) er det beste vi kan få. Med sortering kan én sammenligning utelukke halvparten av kandidatene, og da blir antall runder logaritmisk. Med en hashbasert struktur flytter vi arbeidet til forhånd: å bygge settet koster forventet O(n), og hvert oppslag etterpå er forventet O(1). Eksamensoppgavene i denne blokka handler nesten alltid om å velge riktig av disse tre verktøyene og regne ut totalkostnaden.</p>"
+    }, { label: "Nivå:" });
+
+    (function race() {
+      var inp = qs("#race-n"), out = qs("#race-n-out"), meter = qs("#race-meter"), note = qs("#race-note");
+      function paint() {
+        var e = +inp.value, n = Math.pow(10, e), b = Math.floor(log2(n)) + 1;
+        out.textContent = "n = " + fmt(n);
+        IN.clear(meter);
+        function line(lbl, v, cls) {
+          var w = Math.max(0.4, 100 * Math.log(v + 1) / Math.log(n + 1));
+          meter.appendChild(el("span", { class: "small", text: lbl }));
+          meter.appendChild(el("span", { class: "cell" }, [el("span", { class: "bar-h " + cls, style: "width:" + w.toFixed(1) + "%" }), el("span", { class: "val", text: fmt(v) })]));
+        }
+        line("Rett-frem søk", n, "");
+        line("Binærsøk", b, "alt");
+        note.textContent = "Søylene er på logaritmisk skala – ellers ville binærsøk-søylen vært usynlig. Binærsøk: ⌊log n⌋ + 1 = " + b + " runder. Rett-frem søk: opptil " + fmt(n) + " sammenligninger (én per runde), altså omtrent " + fmt(n / b) + " ganger så mange.";
+      }
+      inp.addEventListener("input", paint); paint();
+    })();
+    IN.tips(qs("#cmp-sok"));
+
+    /* ===================== RETT-FREM SØK ===================== */
+    IN.explain("#intro-rettfrem", {
+      eli5: "<p>Du leter etter den røde sokken i en skuff. Du tar opp ett plagg om gangen og ser om det er sokken. Er du heldig, ligger den øverst. Er du uheldig, ligger den nederst – eller den er ikke der i det hele tatt, og da har du løftet opp alt.</p>",
+      normal: "<p>Rett-frem søk går gjennom arrayet fra venstre mot høyre og sammenligner hvert element med <code>x</code>. Ved første treff returnerer vi indeksen. Kommer vi til slutten uten treff, returnerer vi −1. Det krever ingenting av dataene, men kan måtte se på alle n elementene.</p>",
+      teknisk: "<p>Rett-frem søk er den naive, men helt robuste løsningen: én løkke, én sammenligning per runde, tidlig retur ved treff. Beste tilfelle er O(1) (x ligger først), verste er O(n) (x ligger sist eller finnes ikke). Den eneste antakelsen er at vi kan gå gjennom elementene ett og ett, så den virker like godt på lenkede lister som på arrayer.</p>"
+    }, { label: "Nivå:" });
+    demo("rettfrem", "linearSearch", {
+      generate: IN.gen.linearSearch,
+      presets: { "Finnes (x = 9)": [7, 2, 9, 4, 1, 8, 6, 3, 9], "Ligger først": [5, 2, 9, 4, 1, 8, 5], "Finnes ikke": [7, 2, 9, 4, 1, 8, 6, 3, 5] },
+      parseInput: parseWithX(10), inputLabel: "f.eks. 7,2,9,4 ; 9",
+      legend: [{ cls: "compare", label: "sammenlignes nå" }, { cls: "sorted", label: "funnet" }, { cls: "default", label: "allerede sjekket (blek)", color: DIM }]
+    });
+    IN.pseudo.explainer("#exp-rettfrem", IN.algos.linearSearch, {});
+
+    /* ===================== BINÆRSØK ===================== */
+    IN.explain("#intro-binaersok", {
+      eli5: "<p>Jeg tenker på et tall mellom 1 og 100, og du får bare høre «høyere» eller «lavere». Lurt gjettet er 50: da forsvinner halvparten av tallene uansett svar. Så 25 eller 75, og så videre. Etter høyst 7 gjett vet du svaret. Binærsøk er akkurat den leken, bare i et sortert array.</p>",
+      normal: "<p>Vi holder styr på et søkeområde <code>[low, high]</code>, først hele arrayet. Hver runde ser vi på midten <code>mid</code>. Er <code>A[mid] = x</code>, er vi ferdige. Er <code>A[mid] &lt; x</code>, kan x bare ligge til høyre, så vi setter <code>low ← mid + 1</code>. Ellers setter vi <code>high ← mid − 1</code>. Blir området tomt (<code>low &gt; high</code>), finnes ikke x.</p>",
+      teknisk: "<p>Algoritmen bevarer én invariant: <i>hvis x finnes i A, ligger det i A[low..high]</i>. Den er sann i starten (hele arrayet), og hver runde bevarer den fordi sorteringen garanterer at delen vi kaster, bare inneholder elementer som er for små eller for store. Samtidig krymper intervallet til høyst halvparten, så løkka stopper etter høyst ⌊log n⌋ + 1 runder. Når den stopper med tomt intervall, sier invarianten at x ikke finnes.</p>"
+    }, { label: "Nivå:" });
+    demo("binaersok", "binarySearch", {
+      generate: IN.gen.binarySearchTrace,
+      presets: {
+        "Finnes (x = 23)": [2, 5, 8, 12, 16, 23, 38, 56, 72, 91, 23],
+        "Finnes ikke (x = 40)": [2, 5, 8, 12, 16, 23, 38, 56, 72, 91, 40],
+        "Treff med en gang (x = 7)": [1, 3, 5, 7, 9, 11, 13, 7],
+        "Fra ukeoppgavene (x = 3)": [0, 1, 2, 3, 5, 5, 7, 8, 9, 3]
+      },
+      parseInput: parseWithX(12), inputLabel: "f.eks. 3,8,12,20,31 ; 20"
+    });
+    IN.quiz("#quiz-binaersok", [
+      { q: "Runde 1: hvilken verdi har <code>A[mid]</code>?", options: ["3", "5", "2", "7"], answer: 1,
+        explain: "low = 0, high = 8, så mid = ⌊(0 + 8) / 2⌋ = 4 og A[4] = 5. Siden 5 &gt; 3, setter vi high ← 3." },
+      { q: "Runde 2: hvilken verdi har <code>A[mid]</code>?", options: ["1", "2", "3", "0"], answer: 0,
+        explain: "Nå er low = 0 og high = 3, så mid = ⌊3 / 2⌋ = 1 og A[1] = 1. Siden 1 &lt; 3, setter vi low ← 2." },
+      { q: "Hvor mange runder trengs før vi finner 3?", options: ["2", "3", "4", "9"], answer: 2,
+        explain: "Runde 3: low = 2, high = 3, mid = 2, A[2] = 2 &lt; 3, så low ← 3. Runde 4: mid = 3, A[3] = 3. Treff i runde 4." },
+      { q: "Hva er det største antallet runder binærsøk kan trenge når n = 9?", options: ["3", "4", "5", "9"], answer: 1,
+        explain: "⌊log 9⌋ + 1 = 3 + 1 = 4. Søket etter 3 var altså et verste tilfelle." },
+      { q: "Hvorfor kan vi ikke binærsøke etter 4 i <code>[7, 2, 9, 4, 1]</code>?", options: ["Det blir for tregt", "Arrayet er ikke sortert, så vi kan kaste feil halvdel og få feil svar", "n må være en toerpotens", "4 ligger ikke i midten"], answer: 1,
+        explain: "Første midte er 9 &gt; 4, så binærsøket kaster høyre del – men 4 står nettopp der. Svaret blir −1, som er feil." }
+    ]);
+    IN.pseudo.explainer("#exp-binaersok", IN.algos.binarySearch, {});
+
+    /* ===================== VARIANTER ===================== */
+    IN.explain("#intro-varianter", {
+      eli5: "<p>Binærsøk er som en oppskrift du kan justere litt. Noen ganger vil du finne det <i>første</i> av flere like tall. Andre ganger skal du bare lete i en del av hylla. Selve triksene – se i midten og kast halvparten – er de samme.</p>",
+      normal: "<p>Små endringer i binærsøk løser mange beslektede problemer. Her ser vi på to som går igjen: å finne <b>første forekomst</b> når det finnes like verdier, og å søke i et <b>delintervall</b> <code>[low, high]</code> i stedet for hele arrayet. Det siste skriver vi rekursivt, fordi grensene da blir parametere.</p>",
+      teknisk: "<p>Begge variantene bevarer den samme invarianten som vanlig binærsøk, men med et justert mål. For første forekomst endrer vi hva vi gjør ved treff: vi husker treffet og fortsetter til venstre. For delintervallet endrer vi bare startverdiene, slik at kravet om sortering bare gjelder <code>A[low..high]</code>. Kjøretiden er fortsatt O(log n), der n er størrelsen på intervallet vi søker i.</p>"
+    }, { label: "Nivå:" });
+    IN.explain("#intro-first", {
+      eli5: "<p>I hylla står det fire bøker med samme tittel ved siden av hverandre, og du vil finne den første. Når du finner en av dem, skriver du ned plassen, men leter videre til venstre i tilfelle det står en til der.</p>",
+      normal: "<p>Vanlig binærsøk returnerer <i>en</i> indeks med <code>A[mid] = x</code>, men ikke nødvendigvis den første. Løsningen er å huske treffet i <code>ans</code> og så fortsette til venstre med <code>high ← mid − 1</code>. Når intervallet er tomt, er <code>ans</code> den første forekomsten.</p>",
+      teknisk: "<p>Invarianten blir: <i>den første forekomsten er enten ans, eller den ligger i A[low..high]</i>. Ved treff settes ans ← mid, og alt til høyre for mid kan utelukkes som <i>første</i> forekomst. Fordi vi aldri stopper tidlig, gjør algoritmen alltid omtrent log n runder – også i beste tilfelle.</p>"
+    }, { label: "Nivå:" });
+    demo("first", "binarySearchFirst", {
+      generate: IN.gen.binarySearchFirst,
+      presets: { "Fire like (x = 4)": [1, 2, 4, 4, 4, 4, 7, 9, 4], "Like i starten (x = 3)": [3, 3, 3, 5, 6, 8, 9, 3], "Finnes ikke (x = 5)": [1, 2, 4, 4, 6, 7, 9, 5] },
+      parseInput: parseWithX(12), inputLabel: "f.eks. 1,4,4,4,7 ; 4"
+    });
+    IN.explain("#intro-rec", {
+      eli5: "<p>I et bibliotek står bøkene først sortert etter tema, og innenfor hvert tema alfabetisk. Skal du finne en kokebok, går du rett til kokebokhylla og leter bare der. Hele biblioteket er ikke i alfabetisk rekkefølge, men den ene hylla er det.</p>",
+      normal: "<p>Den rekursive versjonen tar grensene <code>low</code> og <code>high</code> som parametere. Kaller vi den med <code>(A, x, 0, n − 1)</code>, er det vanlig binærsøk. Kaller vi den med et kjent intervall, for eksempel <code>K[v.category]</code> i H2024, søker den bare der – og da trenger bare den delen å være sortert.</p>",
+      teknisk: "<p>Hvert kall gjør konstant arbeid og så høyst ett nytt kall på et intervall som er høyst halvparten så stort: T(n) = T(n/2) + O(1), som gir O(log n). Kallstakken blir like dyp som antall halveringer, så den rekursive versjonen bruker O(log n) ekstra minne, mens den iterative bruker O(1). Korrekthetskravet er nøyaktig at A[low..high] er sortert – resten av arrayet spiller ingen rolle.</p>"
+    }, { label: "Nivå:" });
+    var CAT = [3, 9, 14, 20, 2, 6, 11, 17, 25, 5, 12, 30];
+    demo("rec", "binarySearchRec", {
+      generate: IN.gen.binarySearchRec,
+      presets: {
+        "Kategori [4, 8], x = 2": CAT.concat([2, 4, 8]),
+        "Kategori [4, 8], x = 17": CAT.concat([17, 4, 8]),
+        "Hele arrayet, x = 2 (feil!)": CAT.concat([2, 0, 11])
+      },
+      customInput: false
+    });
+    IN.pseudo.explainer("#exp-rec", IN.algos.binarySearchRec, {});
+    IN.pseudo.parsons("#parsons-rec", IN.algos.binarySearchRec, {});
+
+    /* ===================== SORTER ÉN GANG (H2020) ===================== */
+    IN.explain("#intro-sortersok", {
+      eli5: "<p>Skal du finne ett navn i en rotete bunke, er det raskest å bare lete. Men skal du finne hundre navn, lønner det seg å rydde bunken i alfabetisk rekkefølge først. Ryddingen tar litt tid, men etterpå går hvert oppslag lynraskt.</p>",
+      normal: "<p>Vi skal finne hvilke av k tall fra B som også finnes i A (lengde n). Vi kan rett-frem søke i A for hvert tall (k · n), eller sortere A én gang og så binærsøke (n log n + k · log n). Hvilken som vinner, avhenger av hvor stor k er sammenlignet med n. Én variant er ugyldig: å binærsøke uten å sortere gir feil svar.</p>",
+      teknisk: "<p>Dette er en klassisk avveining mellom forarbeid og kostnad per spørring. Forarbeidet (sortering) er O(n log n) og gjøres én gang. Det betaler seg når k · n vokser raskere enn n log n, altså når k vokser raskere enn log n. Ved k = log n er de to like i O-klasse. Å sortere på nytt inne i løkka (Intersection4) gir k · n log n og er aldri best.</p>"
+    }, { label: "Nivå:" });
+    (function isect() {
+      var nBox = qs("#isect-n"), kBox = qs("#isect-k"), tb = qs("#isect-table tbody"), note = qs("#isect-note");
+      var N = [1000, 1000000], KS = [
+        { id: "1", lbl: "1", f: function () { return 1; }, ans: "(a) k = 1: <b>Intersection1</b>. Ett rett-frem søk, O(n), slår å sortere hele A." },
+        { id: "log", lbl: "log n", f: function (n) { return log2(n); }, ans: "(b) k = log n: <b>Intersection1 og Intersection3 er like gode</b> – begge blir O(n log n), og begge ble godtatt." },
+        { id: "n", lbl: "n", f: function (n) { return n; }, ans: "(c) k = n: <b>Intersection3</b>, O(n log n), mot O(n²) for Intersection1." },
+        { id: "n2", lbl: "n²", f: function (n) { return n * n; }, ans: "(d) k = n²: <b>Intersection3</b>, O(n² log n), mot O(n³) for Intersection1." }
+      ];
+      var O = {
+        "1":   ["O(n)", "O(n log n)", "O(n log n)"],
+        "log": ["O(n log n)", "O(n log n)", "O(n·(log n)²)"],
+        "n":   ["O(n²)", "O(n log n)", "O(n² log n)"],
+        "n2":  ["O(n³)", "O(n² log n)", "O(n³ log n)"]
+      };
+      var WIN = { "1": [0], "log": [0, 1], "n": [1], "n2": [1] };
+      var st = { n: 1000, k: "1" };
+      function btns(box, items, key) {
+        IN.clear(box);
+        items.forEach(function (it) {
+          var v = it.id != null ? it.id : it, lbl = it.lbl || fmt(it);
+          box.appendChild(el("button", { class: "btn sm" + (String(st[key]) === String(v) ? " primary" : ""), type: "button", text: lbl, "aria-pressed": String(st[key]) === String(v) ? "true" : "false",
+            onclick: function () { st[key] = v; paint(); } }));
+        });
+      }
+      var SUP = "⁰¹²³⁴⁵⁶⁷⁸⁹";
+      function big(v) {
+        if (v < 1e7) return "≈ " + fmt(v);
+        var e = Math.floor(Math.log10(v)), m = v / Math.pow(10, e);
+        return "≈ " + m.toFixed(1).replace(".", ",") + " · 10" + String(e).split("").map(function (d) { return SUP[+d]; }).join("");
+      }
+      function paint() {
+        btns(nBox, N, "n"); btns(kBox, KS, "k");
+        var n = +st.n, kc = KS.filter(function (x) { return x.id === st.k; })[0], k = kc.f(n), L = log2(n);
+        var rows = [
+          ["Intersection1", "rett-frem søk i A for hver x i B", O[st.k][0], n * k],
+          ["Intersection2", "binærsøk i A uten å sortere", "–", null],
+          ["Intersection3", "sorter A én gang, binærsøk for hver x", O[st.k][1], n * L + k * L],
+          ["Intersection4", "sorter A på nytt for hver x, så binærsøk", O[st.k][2], k * (n * L + L)]
+        ];
+        IN.clear(tb);
+        rows.forEach(function (r, i) {
+          var cls = r[3] == null ? "bad" : (WIN[st.k].indexOf(i === 0 ? 0 : i === 2 ? 1 : 9) >= 0 ? "win" : "");
+          tb.appendChild(el("tr", { class: cls }, [el("td", { text: r[0] }), el("td", { text: r[1] }), el("td", { class: "mono", text: r[2] }),
+            el("td", { class: "mono", text: r[3] == null ? "kan gi feil svar" : big(r[3]) })]));
+        });
+        note.innerHTML = kc.ans + " Intersection2 er utelukket fordi binærsøk på usortert input kan gi feil svar.";
+      }
+      paint();
+    })();
+    IN.examTasks("#exam-sortersok", [{
+      year: "H2020", oppgave_nr: "Oppgave 5", title: "Søk (Intersection)", points: 12,
+      oppgave: "<p>Du har tre hjelpeprosedyrer: <code>Search</code> (rett-frem søk, O(n)), <code>BinarySearch</code> (binærsøk, krever sortert input) og <code>Sort</code> (O(n log n)). Fire prosedyrer skal skrive ut tallene som finnes i både heltallsarrayet <code>A</code> (lengde n) og <code>B</code> (lengde k):</p><ul><li><b>Intersection1:</b> for hver x i B, rett-frem søk etter x i A.</li><li><b>Intersection2:</b> for hver x i B, binærsøk i A uten å sortere.</li><li><b>Intersection3:</b> sorter A én gang, og binærsøk så for hver x i B.</li><li><b>Intersection4:</b> for hver x i B, sorter A og binærsøk (sorterer på nytt hver gang).</li></ul><p>Tre av dem gir alltid riktig svar, én kan gi feil. Oppgi for hvert tilfelle den riktige prosedyren med lavest kjøretidskompleksitet: (a) k = 1, (b) k = log n, (c) k = n, (d) k = n².</p>",
+      losning: [
+        "<b>Først:</b> Intersection2 kan gi feil svar, for A er ikke nødvendigvis sortert. Intersection4 er aldri best, for den gjentar en sortering som bare trengs én gang.",
+        "<b>(a) k = 1:</b> Intersection1. Ett rett-frem søk er O(n), mens Intersection3 må betale O(n log n) for sorteringen.",
+        "<b>(b) k = log n:</b> Intersection1 og Intersection3 godtas begge. I1 = O(n log n), I3 = O(n log n + log n · log n) = O(n log n).",
+        "<b>(c) k = n:</b> Intersection3. O(n log n + n log n) = O(n log n), mot O(n²) for Intersection1.",
+        "<b>(d) k = n²:</b> Intersection3. O(n log n + n² log n) = O(n² log n), mot O(n³) for Intersection1."
+      ],
+      kjerne: "<p>Oppgaven tester avveiningen «sorter én gang, søk mange ganger». Når k er liten, lønner rett-frem søk seg. Når k vokser, lønner det seg å betale O(n log n) én gang og deretter binærsøke. Og binærsøk forutsetter sortert input – derfor er Intersection2 ugyldig, ikke bare treg.</p>",
+      tips: [
+        "Skriv totalkostnaden som «forarbeid + k · kostnad per søk», og sett inn k for hvert tilfelle.",
+        "Binærsøk i et usortert array er <b>feil</b>, ikke bare tregt. Si det.",
+        "Å sortere inne i løkka er aldri optimalt. Nevn det kort, så sensor ser at du har vurdert det."
+      ]
+    }]);
+
+    /* ===================== FINN DUPLIKAT (H2023) ===================== */
+    IN.explain("#intro-duplikat", {
+      eli5: "<p>I en klasse har nøyaktig to elever samme navn. Står elevene i alfabetisk rekkefølge og du vet navnet, slår du opp navnet og ser på naboen. Står de i rekkefølge men du vet ikke navnet, går du langs rekka og ser om to naboer heter det samme. Står de hulter til bulter, går du gjennom alle og skriver navnene i en notatbok: «har jeg sett dette navnet før?»</p>",
+      normal: "<p>Den naive løsningen sammenligner alle par, O(n²). Oppgaven belønner å utnytte det du vet: (a) sortert og x gitt → binærsøk og se på naboene, O(log n). (b) sortert men x ukjent → sammenlign naboer, O(n). (c) usortert → hashmap fra verdi til indeks, forventet O(n). Samme problem, tre antakelser, tre verktøy.</p>",
+      teknisk: "<p>Hver deloppgave fjerner en antakelse, og løsningen må bytte verktøy deretter. I (a) gir sorteringen og den kjente x at vi kan binærsøke: like elementer ligger inntil hverandre, så den andre kopien er en nabo. I (b) kan vi ikke binærsøke, for vi har ingenting å sammenligne midten med, men sorteringen gjør fortsatt at duplikatet er et likt nabopar. I (c) mister vi sorteringen også, og da er hashing den eneste veien til lineær tid. Sorter-så-skann gir O(n log n).</p>"
+    }, { label: "Nivå:" });
+    demo("dupa", "findDupSorted", {
+      generate: IN.gen.findDupSorted,
+      presets: { "Kopien til venstre": [2, 4, 7, 11, 11, 15, 18, 21, 25, 11], "Kopien til høyre": [1, 3, 5, 8, 8, 13, 20, 8], "Kopien først": [4, 4, 6, 9, 12, 14, 17, 4] },
+      parseInput: parseWithX(12), inputLabel: "f.eks. 1,3,5,5,9 ; 5",
+      legend: [{ cls: "compare", label: "sammenlignes nå" }, { cls: "sorted", label: "funnet" }, { cls: "default", label: "utenfor søkeområdet (blek)", color: DIM }]
+    });
+    demo("dupb", "findDupScan", {
+      generate: IN.gen.findDupScan,
+      presets: { "Duplikat i midten": [2, 5, 7, 9, 9, 12, 15, 18], "Duplikat bakerst": [1, 3, 4, 6, 8, 10, 13, 13], "Duplikat først": [3, 3, 5, 6, 9, 11] },
+      inputLabel: "f.eks. 1,4,4,7,9",
+      legend: [{ cls: "compare", label: "naboparet som sammenlignes" }, { cls: "sorted", label: "duplikatet" }, { cls: "default", label: "ferdig sjekket (blek)", color: DIM }]
+    });
+    demo("dupc", "findDupHash", {
+      generate: IN.gen.findDupHash,
+      presets: { "Usortert": [7, 3, 9, 1, 6, 3, 8], "Duplikat langt unna": [5, 2, 8, 4, 9, 1, 7, 5], "Duplikat bakerst": [4, 8, 1, 6, 2, 9, 2] },
+      inputLabel: "f.eks. 5,2,8,2,9",
+      countControl: { min: 3, max: 9 },
+      legend: [{ cls: "compare", label: "slås opp i H" }, { cls: "target", label: "legges inn i H" }, { cls: "sorted", label: "duplikatet" }, { cls: "default", label: "ferdig sjekket (blek)", color: DIM }]
+    });
+    IN.examTasks("#exam-duplikat", [{
+      year: "H2023", oppgave_nr: "Oppgave 3", title: "Finn duplikat", points: 12,
+      oppgave: "<p>Arrayet <code>A</code> har sammenlignbare elementer. Nøyaktig ett element forekommer to ganger; alle andre er unike.</p><ul><li><b>(a)</b> <code>A</code> er sortert, og duplikatet <code>x</code> er oppgitt. Skriv <code>FindSortedIndicesOfDuplicate(A, x)</code>, som skriver ut de to posisjonene der <code>x</code> står, og oppgi kjøretiden.</li><li><b>(b)</b> <code>A</code> er sortert, men duplikatet er ikke oppgitt. Skriv <code>FindSortedDuplicateIndices(A)</code>, som skriver ut de to posisjonene, med kjøretid.</li><li><b>(c)</b> <code>A</code> er ikke sortert. Skriv <code>FindDuplicateIndices(A)</code>, med kjøretid.</li></ul>",
+      losning: solution([
+        { html: "<b>(a) O(log n).</b> Bruk et binærsøk som er endret til å returnere <i>indeksen</i> der x ligger (ikke bare true/false). Én av de to kopiene blir funnet. Fordi A er sortert, står den andre rett ved siden av: sjekk venstre nabo, ellers er det høyre.",
+          code: ["findDupSorted"],
+          after: "<b>Poeng:</b> opptil 4p for logaritmisk tid, 2p for lineær. −1p for feil eller manglende kjøretid, −1p for ikke å si at binærsøket må endres. Over lineær tid ga 0p." },
+        { html: "<b>(b) O(n).</b> Gå gjennom nabopar og stopp når to naboer er like. I et sortert array må duplikatet være et slikt par.",
+          code: ["findDupScan"],
+          after: "<b>Poeng:</b> opptil 3p for lineær tid. −1p for feil kjøretid. Over lineær tid ga 1p." },
+        { html: "<b>(c) Forventet O(n)</b> med et hashmap fra verdi til indeks: for hvert element, sjekk om verdien er sett før. Ved treff skriver vi ut lagret og nåværende indeks.",
+          code: ["findDupHash"],
+          after: "Alternativ på O(n log n): sorter med en sammenligningsbasert algoritme (Merge sort eller Heapsort; Quicksort går også, men si at den er O(n²) i verste tilfelle – ikke Bucket sort eller Radix sort, for bare sammenlignbarhet er gitt), husk de opprinnelige indeksene, og skann etter like naboer. <b>Poeng:</b> opptil 5p for lineær, 4p for O(n log n), 1p for dårligere. −1p for feil eller manglende kjøretid." }
+      ]),
+      kjerne: "<p>Oppgaven tester om du utnytter antakelsene: sortering gir binærsøk og nabosammenligning, og når sorteringen forsvinner, gir hashing lineær tid. Det sentrale er å velge riktig verktøy for hver antakelse og begrunne kjøretiden.</p>",
+      tips: [
+        "I (a): skriv eksplisitt at binærsøket returnerer en indeks. Ellers mister du 1p.",
+        "I (c): nevn hashing først (forventet O(n)). Sorterer du, begrunn hvorfor Bucket sort og Radix sort ikke kan brukes.",
+        "Oppgi kjøretid i <i>hver</i> deloppgave – det trekkes for hver som mangler."
+      ]
+    }]);
+    IN.pseudo.explainer("#exp-dupc", IN.algos.findDupHash, {});
+
+    /* ===================== FINN k MINSTE (H2025) ===================== */
+    IN.explain("#intro-kminste", {
+      eli5: "<p>Du skal velge ut de tre korteste i en klasse. Du kan lete etter den korteste, så den nest korteste, så den tredje (det er greit når du bare trenger noen få). Du kan stille opp hele klassen etter høyde og ta de tre første (grundig, men du ordner flere enn du trenger). Eller du kan bruke en smart «hvem er minst?»-pyramide som alltid har den minste på toppen.</p>",
+      normal: "<p>Oppgaven ber om tre løsninger med ulik kjøretid. <b>(a)</b> Finn minste k ganger, som k runder av Selection sort: O(k·n). <b>(b)</b> Sorter alt med Merge sort og ta de k første: O(n log n). <b>(c)</b> Bruk en heap: bygg den på O(n) og ta ut minste k ganger, O(n + k log n). Telleren under viser hvordan valget avhenger av k.</p>",
+      teknisk: "<p>Alle tre er naturlige forbedringer av hverandre. (a) gjør bare arbeidet som trengs for k elementer, men hvert uttak koster O(n). (b) gjør for mye arbeid – den ordner også de n − k elementene vi ikke trenger – men har en fast O(n log n). (c) kombinerer det beste: BuildMinHeap organiserer alt på lineær tid, og hvert uttak koster bare O(log n). For liten k er (c) nesten lineær. For k = n blir den Heapsort, O(n log n).</p>"
+    }, { label: "Nivå:" });
+    (function kCounter() {
+      var nSel = qs("#km-n"), kIn = qs("#km-k"), kOut = qs("#km-k-out"), meter = qs("#km-meter"), quick = qs("#km-quick");
+      function perm(n) { var a = []; for (var i = 0; i < n; i++) a.push(i + 1); for (i = n - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)), s = a[i]; a[i] = a[j]; a[j] = s; } return a; }
+      function paintQuick() {
+        var n = +nSel.value; IN.clear(quick);
+        quick.appendChild(el("span", { class: "muted small", text: "Hurtigvalg:" }));
+        [["k = 1", 1], ["k = log n", Math.max(1, Math.round(log2(n)))], ["k = √n", Math.round(Math.sqrt(n))], ["k = n/2", Math.round(n / 2)], ["k = n", n]].forEach(function (q) {
+          quick.appendChild(el("button", { class: "btn sm", type: "button", text: q[0], onclick: function () { kIn.value = q[1]; paint(); } }));
+        });
+      }
+      function paint() {
+        var n = +nSel.value; kIn.max = n; var k = Math.min(n, Math.max(1, +kIn.value));
+        kOut.textContent = "k = " + fmt(k);
+        var r = IN.sok.countKSmallest(perm(n), k);
+        var rows = [
+          ["(a) k × finn minste", "O(k·n)", r.select, ""],
+          ["(b) Merge sort", "O(n log n)", r.merge, "alt"],
+          ["(c) BuildMinHeap + k × removeMin", "O(n + k log n)", r.buildHeap, "alt2"],
+          ["(c) heap av størrelse k", "O(n log k)", r.heapK, "alt3"]
+        ];
+        var max = Math.max.apply(null, rows.map(function (x) { return x[2]; }).concat([1]));
+        var best = Math.min.apply(null, rows.map(function (x) { return x[2]; }));
+        IN.clear(meter);
+        rows.forEach(function (x) {
+          meter.appendChild(el("span", { class: "small", html: x[0] + "<br><span class=\"mono muted\">" + x[1] + "</span>" }));
+          meter.appendChild(el("span", { class: "cell" }, [
+            el("span", { class: "bar-h " + x[3], style: "width:" + Math.max(0.5, 100 * x[2] / max).toFixed(1) + "%" }),
+            el("span", { class: "val", html: fmt(x[2]) + (x[2] === best ? " <b>← færrest</b>" : "") })
+          ]));
+        });
+      }
+      nSel.addEventListener("change", function () { paintQuick(); paint(); });
+      kIn.addEventListener("input", paint);
+      paintQuick(); paint();
+    })();
+    demo("kmina", "findMinKSelect", {
+      generate: IN.gen.findMinKSelect,
+      presets: { "k = 3": [7, 2, 9, 4, 1, 8, 6, 3, 3], "k = 1": [5, 8, 2, 9, 4, 7, 1], "k = 2, like verdier": [6, 3, 8, 3, 5, 9, 2] },
+      customInput: false,
+      legend: [{ cls: "compare", label: "sammenlignes" }, { cls: "min", label: "minste så langt" }, { cls: "swap", label: "byttes fram" }, { cls: "sorted", label: "en av de k minste" }]
+    });
+    staticCode("kminb", "findMinKSort");
+    staticCode("kminc", "findMinKHeap");
+    IN.examTasks("#exam-kminste", [{
+      year: "H2025", oppgave_nr: "Oppgave 5", title: "Finn k minste", points: 12,
+      oppgave: "<p>Arrayet <code>A</code> har n sammenlignbare elementer, og k er et heltall med 1 ≤ k ≤ n. Skriv prosedyren <code>FindMin(A, k)</code>, som returnerer en liste med de k minste elementene i <code>A</code>. Gi tre ulike løsninger, én i hver kjøretidsklasse: <b>(a)</b> O(k·n), <b>(b)</b> O(n log n), <b>(c)</b> O(n log k) eller O(n + k log n).</p>",
+      losning: solution([
+        { html: "<b>(a) O(k·n):</b> gjenta k ganger: finn minste gjenværende element og legg det til svaret. Det er de k første rundene av Selection sort. Byttet sørger for at et element ikke blir plukket på nytt, også når det finnes like verdier.", code: ["findMinKSelect"] },
+        { html: "<b>(b) O(n log n):</b> sorter hele A med en sortering som er O(n log n) i verste tilfelle, for eksempel Merge sort, og ta de k første. Quicksort (O(n²) i verste tilfelle) ga litt lavere uttelling, og en kvadratisk sortering enda lavere.", code: ["findMinKSort"] },
+        { html: "<b>(c) O(n + k log n):</b> bygg en heap av hele A med BuildMinHeap på lineær tid, og ta ut minste element k ganger.", code: ["findMinKHeap"] },
+        "<b>(c) O(n log k), alternativt:</b> hold de k minste hittil i en heap av størrelse k med det største øverst. Legg inn de k første. For hvert av de resterende: er det mindre enn toppen, bytt ut toppen og reparer heapen. Til slutt inneholder heapen de k minste.",
+        "<b>Merk:</b> et riktig svar på (c) er også et riktig svar på (a) og (b), fordi en raskere algoritme også oppfyller de svakere kravene – men skriv det."
+      ]),
+      kjerne: "<p>Oppgaven tester sammenhengen mellom utvelgelse, sortering og kjøretid: de k minste kan hentes ut på flere måter med ulik kompleksitet. Hovedpoenget er at du ikke trenger å sortere hele arrayet for å hente ut bare k elementer.</p>",
+      tips: [
+        "Bruk Merge sort, ikke Quicksort, når oppgaven krever O(n log n) – Quicksort er O(n²) i verste tilfelle.",
+        "Oppgi kjøretiden for hver løsning, og begrunn kort hvor leddene kommer fra (O(n) for BuildMinHeap, O(log n) per uttak).",
+        "Prosedyrene <code>MergeSort</code> og <code>BuildMinHeap</code> er pensum og kan brukes direkte – si hva de returnerer."
+      ]
+    }]);
+    IN.pseudo.explainer("#exp-kminc", IN.algos.findMinKHeap, {});
+
+    /* ===================== ARRAY-TRIKS ===================== */
+    IN.explain("#intro-triks", {
+      eli5: "<p>Mange oppgaver er egentlig samme lille triks i forkledning: å huske det du har sett i en notatbok, slik at du slipper å lete på nytt. Lærer du triksene, kjenner du dem igjen på eksamen.</p>",
+      normal: "<p>Disse oppgavene har en naiv løsning med to nøstede løkker, O(n²). Nesten alltid finnes en bedre løsning med enten sortering + én gjennomgang (O(n log n)) eller et hashset/hashmap (forventet O(n)). Kortene under viser de vanligste mønstrene med kort pseudokode.</p>",
+      teknisk: "<p>Felles for triksene er at vi bytter minne mot tid: et hashset eller hashmap gjør spørsmålet «har jeg sett dette?» eller «hvor mange har jeg sett?» til en forventet O(1)-operasjon, og dermed blir hele algoritmen forventet lineær. Når input er sortert, kan to pekere ofte gjøre samme jobb uten ekstra minne, fordi sorteringen forteller hvilken peker vi skal flytte.</p>"
+    }, { label: "Nivå:" });
+    demo("tosum", "findSummandsSorted", {
+      generate: IN.gen.findSummandsSorted,
+      presets: { "x = 10": [0, 2, 4, 6, 8, 10, 10], "x = 15": [1, 3, 5, 7, 8, 10, 12, 14, 15], "Ingen par (x = 4)": [3, 5, 6, 9, 11, 4] },
+      parseInput: parseWithX(12), inputLabel: "f.eks. 0,2,4,6,8,10 ; 10",
+      legend: [{ cls: "compare", label: "paret som summeres" }, { cls: "sorted", label: "funnet par" }]
+    });
+    staticCode("tosumh", "findSummandsHash");
+    staticCode("freq", "mostFrequent");
+    staticCode("common", "commonElements");
+    staticCode("perm", "isPermutation");
+    IN.examTasks("#exam-triks", [{
+      year: "H2021", oppgave_nr: "Oppgave 10", title: "Par med sum x", points: 10,
+      oppgave: "<p>Arrayet <code>A</code> har unike heltall, og x er et heltall. Skriv ut alle par (y, z) fra A der y + z = x. Et tall på en gitt plass kan være med i høyst ett par, og rekkefølgen spiller ingen rolle. Eksempel: <code>FindSummands([0, 2, 4, 6, 8, 10], 10)</code> skriver ut (0, 10), (2, 8) og (4, 6). Lavere kjøretid gir mer uttelling.</p><ul><li><b>(a)</b> Skriv <code>FindSummands</code> når A er sortert fra minst til størst.</li><li><b>(b)</b> Skriv <code>FindSummands</code> uten at A er sortert. Hint: innsetting, oppslag og sletting i hashbaserte strukturer kan antas å være O(1).</li></ul>",
+      losning: solution([
+        { html: "<b>(a) O(n) med to pekere:</b> start i hver ende. Er summen for liten, flytt venstre peker inn; er den for stor, flytt høyre. Ved treff skriver vi ut og flytter videre. Det virker fordi A er sortert.", code: ["findSummandsSorted"] },
+        { html: "<b>(b) Forventet O(n) med hashset:</b> for hvert y, se om komplementet x − y er sett før. Fjern det ved treff, slik løsningsforslaget gjør.", code: ["findSummandsHash"] },
+        "<b>Alternativer:</b> i (b) kan du også sortere først og bruke løsningen fra (a). Tallene er heltall, så Radix sort er lov: det gir O(n) og ble godtatt som fullgod løsning. Med Merge sort blir det O(n log n), som ga noe lavere uttelling. Begge deloppgaver kan løses med en dobbel løkke på O(n²), men det ga klart lavere uttelling."
+      ]),
+      kjerne: "<p>Dette er «to-sum»-problemet: med sortert input gir to pekere O(n) uten ekstra minne. Uten sortering gir et hashset forventet O(n) ved å gjøre parsøket om til et oppslag etter komplementet x − y.</p>",
+      tips: [
+        "Sortert → to pekere fra hver ende som beveger seg mot midten.",
+        "Usortert → hashset: let etter komplementet x − y.",
+        "Fjern komplementet ved treff, slik løsningsforslaget gjør. Med unike tall er det strengt tatt ikke nødvendig, men det viser tydelig at hvert tall inngår i høyst ett par."
+      ]
+    }]);
+
+    /* ===================== SANT/USANT ===================== */
+    IN.tfTest("#tf-sok", [
+      { s: "Binærsøk krever at arrayet er sortert.", answer: true, explain: "Uten sortering kan vi ikke vite hvilken halvdel x ligger i, og binærsøket kan kaste feil halvdel.", blokk: "2" },
+      { s: "Binærsøk i et usortert array gir riktig svar, men bruker lengre tid.", answer: false, explain: "Det gir <b>feil</b> svar: det kan kaste halvdelen der x faktisk står og returnere −1.", blokk: "2" },
+      { s: "Binærsøk i array er vesentlig raskere enn binærsøk i lenket liste. (H2022)", answer: true, explain: "Binærsøk trenger direkte oppslag på A[mid] i O(1). I en lenket liste må vi gå dit, og det koster O(n) per oppslag.", blokk: "2" },
+      { s: "Det er umulig å avgjøre om et array er sortert i O(n). (H2022)", answer: false, explain: "Én gjennomgang der vi sjekker at hvert nabopar er i riktig rekkefølge, er nok: O(n).", blokk: "2" },
+      { s: "Binærsøk bruker O(log n) tid i verste tilfelle.", answer: true, explain: "Intervallet halveres hver runde, så det blir høyst ⌊log n⌋ + 1 runder.", blokk: "2" },
+      { s: "Binærsøk må alltid gjøre omtrent log n runder, også i beste tilfelle.", answer: false, explain: "Ligger x på den første midten, er vi ferdige etter én runde: O(1). (Varianten for første forekomst er derimot alltid O(log n).)", blokk: "2" },
+      { s: "Med 1 000 000 sorterte elementer trenger binærsøk høyst omtrent 20 runder.", answer: true, explain: "⌊log 1 000 000⌋ + 1 = 19 + 1 = 20.", blokk: "2" },
+      { s: "Rett-frem søk krever at arrayet er sortert.", answer: false, explain: "Rett-frem søk ser på alle elementene ett og ett og antar ingenting om rekkefølgen.", blokk: "2" },
+      { s: "Skal du søke etter mange elementer i et stort usortert array, kan det lønne seg å sortere først.", answer: true, explain: "Sorter én gang (O(n log n)) og binærsøk hver gang (O(log n)). Når antall søk k vokser raskere enn log n, slår det k rett-frem søk (O(k·n)). (H2020)", blokk: "2" },
+      { s: "Oppslag i et hashset er garantert O(1).", answer: false, explain: "Det er <b>forventet</b> O(1). I verste fall havner alt i samme bøtte, og oppslaget blir O(n).", blokk: "2" },
+      { s: "I Finn duplikat (a) holder det å skrive «bruk BinarySearch» uten å si noe om hva den returnerer.", answer: false, explain: "Kursets BinarySearch svarer true/false. Du må si at du endrer den til å returnere indeksen, ellers trekkes 1p. (H2023)", blokk: "2" },
+      { s: "I Finn k minste (b) er Quicksort et like godt svar som Merge sort.", answer: false, explain: "Quicksort er O(n²) i verste tilfelle, så den oppfyller ikke kravet O(n log n) i verste tilfelle. Den ga lavere uttelling. (H2025)", blokk: "2" },
+      { s: "BuildMinHeap etterfulgt av k removeMin gir O(n + k log n).", answer: true, explain: "BuildMinHeap er O(n), og hver removeMin er O(log n).", blokk: "2" },
+      { s: "To-peker-teknikken for «par med sum x» virker også på et usortert array.", answer: false, explain: "Teknikken bruker sorteringen til å vite hvilken peker som skal flyttes. Usortert input må sorteres først, eller løses med hashset.", blokk: "2" },
+      { s: "mid ← ⌊(low + high) / 2⌋ ligger alltid i intervallet [low, high] når low ≤ high.", answer: true, explain: "Gjennomsnittet av low og high, rundet ned, kan aldri bli mindre enn low eller større enn high.", blokk: "2" }
+    ], { id: "sok-tf" });
+  })();
+  </script>
+</body>
+</html>

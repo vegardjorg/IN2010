@@ -46,9 +46,9 @@
     { id: "pseudokode", href: "pseudokode.html",   label: "Pseudokode",  ready: true },
     { id: "begreper",   href: "00-begreper.html",  label: "0 · Begreper", ready: true },
     { id: "sortering",  href: "01-sortering.html", label: "1 · Sortering", ready: true },
-    { id: "sok",        href: "02-sok.html",       label: "2 · Søk",     ready: false },
-    { id: "heap",       href: "03-heap.html",      label: "3 · Heap",    ready: false },
-    { id: "traer",      href: "04-traer.html",     label: "4 · Trær",    ready: false },
+    { id: "sok",        href: "02-sok.html",       label: "2 · Søk",     ready: true },
+    { id: "heap",       href: "03-heap.html",      label: "3 · Heap",    ready: true },
+    { id: "traer",      href: "04-traer.html",     label: "4 · Trær",    ready: true },
     { id: "hashing",    href: "05-hashing.html",   label: "5 · Hashing", ready: false },
     { id: "grafer",     href: "06-grafer.html",    label: "6 · Grafer",  ready: false },
     { id: "strategi",   href: "07-strategi.html",  label: "7 · Strategi", ready: false }

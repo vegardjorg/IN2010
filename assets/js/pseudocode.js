@@ -60,7 +60,8 @@
     function textFor(n) {
       var l = lines[n - 1];
       if (!l || l.proc) return "";
-      return IN.level.pick({ eli5: l.eli5, normal: l.normal, teknisk: l.teknisk });
+      var txt = IN.level.pick({ eli5: l.eli5, normal: l.normal, teknisk: l.teknisk }) || "";
+      return txt + grenseHTML(l.grense);
     }
     function show(row, n) {
       var txt = textFor(n);
@@ -101,10 +102,22 @@
       return {
         code: l.code, indent: l.indent || 0,
         eli5: l.eli5, normal: l.normal != null ? l.normal : l.what,
-        teknisk: l.teknisk != null ? l.teknisk : l.why
+        teknisk: l.teknisk != null ? l.teknisk : l.why,
+        grense: l.grense || null
       };
     }));
   }
+
+  /* «Hvorfor n − 1 og ikke n?» – valgfritt felt på en linje: { q, a }.
+     a er en streng (samme på alle nivåer) eller { eli5, normal, teknisk }.
+     Brukes bare der grensen (±1, < vs ≤, start på 0 vs 1) er en naturlig felle. */
+  function grenseHTML(g, lvl) {
+    if (!g) return "";
+    var a = typeof g.a === "string" ? g.a : IN.level.pick(g.a, lvl);
+    if (!a) return "";
+    return '<div class="pc-grense"><span class="pc-grense-q">' + g.q + "</span> " + a + "</div>";
+  }
+  IN.pseudo.grenseHTML = grenseHTML;
 
   /* ---------- render(host, algo, opts) ---------- */
   IN.pseudo.render = function (host, algo, opts) {
@@ -125,6 +138,10 @@
       var row = el("div", { class: "pc-line", "data-line": lineNo });
       row.appendChild(el("span", { class: "ln", text: String(lineNo) }));
       row.appendChild(el("span", { class: "code", html: indentGuides(l.indent) + tokenize(l.code) }));
+      if (l.grense) {
+        row.classList.add("has-grense");
+        row.appendChild(el("span", { class: "pc-grense-mark", title: l.grense.q, "aria-hidden": "true", text: "?" }));
+      }
       if (opts.interactive) {
         row.tabIndex = 0;
         row.setAttribute("role", "button");
@@ -170,9 +187,10 @@
   };
 
   /* ---------- Big-O-boks ---------- */
-  IN.pseudo.bigO = function (algo) {
+  IN.pseudo.bigO = function (algo, opts) {
     var b = algo.bigO;
     if (!b) return null;
+    if (opts && opts.compact) return bigOCompact(b);
     var box = el("div", { class: "card bigo" });
     box.appendChild(el("h3", { text: "Kjøretid og minne", style: "margin-top:.2rem" }));
     var grid = el("div", { class: "bigo-grid" });
@@ -199,6 +217,39 @@
     }
     return box;
   };
+
+  /* Kompakt variant: ligger rett under pseudokoden, så kjøretiden er synlig mens man øver.
+     Én rad med Best/Snitt/Verst/Minne, egenskaper som piller, og «Hvorfor?» sammenfoldet. */
+  function bigOCompact(b) {
+    var box = el("div", { class: "bigo bigo-compact" });
+    var head = el("div", { class: "bigo-head" }, [el("span", { class: "bigo-title", text: "Kjøretid og minne" })]);
+    if (b.stable != null || b.inplace != null) {
+      var flags = el("div", { class: "pills" });
+      if (b.stable != null)  flags.appendChild(el("span", { class: "pill", html: '<span class="k">stabil</span> ' + (b.stable ? "ja" : "nei") }));
+      if (b.inplace != null) flags.appendChild(el("span", { class: "pill", html: '<span class="k">in-place</span> ' + (b.inplace ? "ja" : "nei") }));
+      head.appendChild(flags);
+    }
+    box.appendChild(head);
+    var grid = el("div", { class: "bigo-grid" });
+    [["Best", b.best], ["Snitt", b.avg], ["Verst", b.worst], ["Minne", b.space]].forEach(function (p) {
+      if (p[1] == null) return;
+      grid.appendChild(el("div", { class: "bigo-cell" }, [
+        el("div", { class: "bigo-lbl", text: p[0] }),
+        el("div", { class: "bigo-val", html: p[1] })
+      ]));
+    });
+    box.appendChild(grid);
+    if (b.why) {
+      var det = el("details", { class: "bigo-why" });
+      var body = el("div");
+      det.appendChild(el("summary", { text: "Hvorfor?" }));
+      det.appendChild(body);
+      box.appendChild(det);
+      var paint = function () { body.innerHTML = IN.level.pick(b.why); };
+      paint(); IN.level.onChange(paint);
+    }
+    return box;
+  }
 
   /* ---------- Nivåstyrt linjeforklarer ---------- */
   IN.pseudo.explainer = function (host, algo, opts) {
@@ -238,6 +289,8 @@
       clear(body);
       if (txt) body.appendChild(el("p", { html: txt }));
       else body.appendChild(el("p", { class: "pc-exp-hint", text: "Klikk en linje for forklaring." }));
+      var g = handle.lines[sel - 1].grense;
+      if (g) body.insertAdjacentHTML("beforeend", grenseHTML(g, lvl));
       handle.select(sel); handle.highlight(sel);
     }
     handle.onLineClick(function (n) { sel = n; paint(); });

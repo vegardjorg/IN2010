@@ -1,0 +1,1227 @@
+<!doctype html>
+<html lang="nb">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Blokk 4 · Trær · IN2010</title>
+  <meta name="description" content="Trær i IN2010: begreper, traverseringer, binære søketrær, diameter, laveste felles forfeder, AVL og rotasjoner, Anti-AVL og Huffman – med stegvise demoer, pseudokode og eksamensoppgaver.">
+  <script>(function(){try{var d=document.documentElement;var t=localStorage.getItem('in-theme');if(t&&t!=='system')d.setAttribute('data-theme',t);var l=localStorage.getItem('in-level')||'normal';d.setAttribute('data-level',l);}catch(e){document.documentElement.setAttribute('data-level','normal');}})();</script>
+  <link rel="stylesheet" href="assets/css/styles.css">
+  <!-- MIDLERTIDIG sidelokal stil for trevisualiseringen (tv-*).
+       Foreslått flyttet til styles.css / felles viz-tree – se plan/foresporsler-traer.md. -->
+  <style>
+    :root { --tv-on: #ffffff; }
+    @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --tv-on: #10131a; } }
+    :root[data-theme="dark"] { --tv-on: #10131a; }
+
+    .tv-host .sp-stage { height: auto; min-height: 240px; display: block; padding: var(--d-sm); }
+    .tv { display: flex; flex-direction: column; gap: .45rem; min-width: 0; }
+    .tv-svg { display: block; width: 100%; height: auto; margin: 0 auto; overflow: visible; }
+    .tv-empty { fill: var(--color-on-surface-variant); font-size: 13px; }
+    .tv-edge { stroke: var(--color-outline); stroke-width: 2; }
+    .tv-edge.on { stroke: var(--c-target); stroke-width: 3.5; }
+    .tv-edge.hot { stroke: var(--c-swap); stroke-width: 4.5; }
+    .tv-bit { fill: var(--c-min); font: 700 11px var(--font-mono); }
+    .tv-node circle { fill: var(--color-surface-container-high); stroke: var(--c-default); stroke-width: 2; }
+    .tv-node .k { fill: var(--color-on-surface); font: 600 13px var(--font-mono); dominant-baseline: central; }
+    .tv-node .k.sm { font-size: 11px; }
+    .tv-lab { fill: var(--color-on-surface-variant); font: 11px var(--font-mono); }
+    .tv-sup { fill: var(--color-primary); font: 700 10px var(--font-mono); }
+    .tv-node.is-done circle   { fill: var(--c-sorted); stroke: var(--c-sorted); }
+    .tv-node.is-queued circle { stroke: var(--c-compare); stroke-width: 3; stroke-dasharray: 4 3; }
+    .tv-node.is-path circle   { stroke: var(--c-target); stroke-width: 3.5; }
+    .tv-node.is-sub circle    { fill: var(--color-surface-container); stroke: var(--c-target); stroke-dasharray: 3 3; }
+    .tv-node.is-alt circle    { fill: var(--c-target); stroke: var(--c-target); }
+    .tv-node.is-cur circle    { fill: var(--c-compare); stroke: var(--c-compare); }
+    .tv-node.is-fresh circle  { fill: var(--c-min); stroke: var(--c-min); }
+    .tv-node.is-found circle  { fill: var(--c-target); stroke: var(--c-target); stroke-width: 4; }
+    .tv-node.is-rot circle,
+    .tv-node.is-warn circle   { fill: var(--c-swap); stroke: var(--c-swap); }
+    .tv-node.is-done .k, .tv-node.is-alt .k, .tv-node.is-cur .k, .tv-node.is-fresh .k,
+    .tv-node.is-found .k, .tv-node.is-rot .k, .tv-node.is-warn .k { fill: var(--tv-on); }
+    .tv-node.click { cursor: pointer; }
+    .tv-node.click:focus { outline: none; }
+    .tv-node.click:focus circle { stroke: var(--color-primary); stroke-width: 4; }
+    .tv-counter { align-self: flex-end; font-weight: 600; font-size: var(--text-sm); color: var(--color-on-surface); }
+    .tv-info { display: flex; flex-wrap: wrap; gap: .3rem; align-items: center; font-size: var(--text-sm); }
+    .tv-info .lbl { color: var(--color-on-surface-variant); margin-right: .2rem; }
+    .tv-chip { font-family: var(--font-mono); border: 1px solid var(--color-outline-variant); border-radius: var(--radius); padding: 0 .4rem; background: var(--color-surface-container); }
+    .tv-chip.first { border-color: var(--c-compare); box-shadow: inset 0 -2px 0 var(--c-compare); }
+    .tv-none { color: var(--color-on-surface-variant); font-style: italic; }
+
+    .tv-switch { display: flex; flex-wrap: wrap; gap: .35rem; margin: .7rem 0 .2rem; }
+    .tv-switch button[aria-pressed="true"] { background: var(--color-primary); color: var(--color-on-primary); border-color: var(--color-primary); }
+    .tv-mini { border: 1px solid var(--color-outline-variant); border-radius: var(--radius-lg); padding: .3rem; background: var(--color-surface); }
+    .tv-facts { margin: .4rem 0 0; display: grid; grid-template-columns: max-content 1fr; gap: .15rem .8rem; font-size: var(--text-sm); }
+    .tv-facts dt { color: var(--color-on-surface-variant); }
+    .tv-facts dd { margin: 0; font-family: var(--font-mono); }
+    .tv-codec input { width: 100%; max-width: 22rem; }
+    .tv-codec .out { font-family: var(--font-mono); word-break: break-all; }
+    /* Lange pseudokodelinjer skal ikke blåse opp grid-kolonnen på mobil (1fr har min-width:auto) */
+    [data-panel] .grid > *, [data-panel] .pc-explainer > * { min-width: 0; }
+  </style>
+</head>
+<body data-page="traer">
+  <a class="skip-link" href="#main">Hopp til innhold</a>
+  <header id="topnav"></header>
+
+  <main id="main" class="wrap">
+    <div class="pagehead">
+      <h1>Blokk 4 · Trær</h1>
+      <p class="lead">Trær er overalt i IN2010: søketrær som holder data sortert, AVL-trær som holder seg lave,
+        traverseringer som besøker alt, og Huffman-trær som komprimerer tekst.
+        Steg deg gjennom hver algoritme, se pseudokoden lyse opp, og lær kjøretiden og hvorfor.</p>
+      <div class="badges">
+        <span class="badge" data-go="avl" data-card="h2020-6"><b>H2020</b> · AVL-innsetting · <span class="pts">9p</span></span>
+        <span class="badge" data-go="bst" data-card="h2021-8"><b>H2021</b> · InRange · <span class="pts">10p</span></span>
+        <span class="badge" data-go="bst" data-card="h2022-10"><b>H2022</b> · CheckBST · <span class="pts">10p</span></span>
+        <span class="badge" data-go="diameter" data-card="h2023-5"><b>H2023</b> · Diameter · <span class="pts">12p</span></span>
+        <span class="badge" data-go="huffman" data-card="h2024-2"><b>H2024</b> · Huffman · <span class="pts">10p</span></span>
+        <span class="badge" data-go="lca" data-card="h2024-6"><b>H2024</b> · Laveste felles forfeder · <span class="pts">12p</span></span>
+        <span class="badge" data-go="antiavl" data-card="h2025-3"><b>H2025</b> · Anti-AVL · <span class="pts">12p</span></span>
+        <span class="badge" data-go="trav" data-card="h2025-4"><b>H2025</b> · Level-order · <span class="pts">12p</span></span>
+      </div>
+    </div>
+
+    <div class="tabs" role="tablist" aria-label="Emner om trær">
+      <button data-tab="begreper">Begreper</button>
+      <button data-tab="trav">Traverseringer</button>
+      <button data-tab="bst">Binært søketre</button>
+      <button data-tab="diameter">Diameter</button>
+      <button data-tab="lca">Felles forfeder</button>
+      <button data-tab="avl">AVL &amp; rotasjoner</button>
+      <button data-tab="antiavl">Anti-AVL</button>
+      <button data-tab="huffman">Huffman</button>
+      <button data-tab="test">Sant/usant</button>
+    </div>
+
+    <!-- ===================== BEGREPER ===================== -->
+    <section data-panel="begreper">
+      <div class="callout begrep"><span class="lbl">Begrep</span>
+        <p>Et <b>tre</b> er en samling <b>noder</b> koblet sammen med <b>kanter</b>, uten sykler. Én node er <b>roten</b>.
+          Alle andre noder har nøyaktig én <b>forelder</b>. Nodene under en node er <b>barna</b> dens, og barn av samme forelder er <b>søsken</b>.
+          En node uten barn er en <b>løvnode</b>. En node med minst ett barn er en <b>intern node</b>.</p>
+      </div>
+      <div id="intro-begreper"></div>
+
+      <h3>Klikk på en node</h3>
+      <p class="muted small">Velg en node for å se dybde, høyde, forelder, barn, søsken og subtreet. Forfedrene markeres med blå ring, og subtreet med stiplet ring.</p>
+      <div class="tv-switch" role="group" aria-label="Velg tre" id="sw-utforsk">
+        <button class="btn sm" type="button" data-pick="bin" aria-pressed="true">Binærtre (kurseksempelet)</button>
+        <button class="btn sm" type="button" data-pick="gen" aria-pressed="false">Generelt tre (H2024)</button>
+      </div>
+      <div class="grid cols-2">
+        <div class="tv-mini" id="utforsk-tre"></div>
+        <div class="card" id="utforsk-info" aria-live="polite"><p class="muted small">Ingen node valgt ennå. Klikk eller trykk på en node.</p></div>
+      </div>
+
+      <div class="grid cols-2">
+        <div class="callout eli5"><span class="lbl">ELI5</span>
+          <p>Tenk på et slektstre snudd opp-ned. Oldemor står øverst (roten). Barna hennes står under, og barnebarna under dem igjen.
+            <b>Dybde</b> er hvor mange trinn du må gå ned fra toppen for å nå noen.
+            <b>Høyde</b> er hvor mange trinn det er fra noen og ned til den yngste i deres gren.</p>
+        </div>
+        <div class="callout eksempel"><span class="lbl">Eksempel</span>
+          <p>I kurstreet over er <code>e</code> roten med dybde 0. <code>h</code>, <code>i</code> og <code>j</code> er løvnoder med høyde 0.
+            <code>g</code> har høyde 1, og hele treet har høyde 2. Subtreet med rot <code>f</code> består av <code>f</code>, <code>h</code> og <code>i</code>.</p>
+        </div>
+      </div>
+
+      <h3>Dybde, høyde og nivå</h3>
+      <div class="callout begrep"><span class="lbl">Begrep</span>
+        <ul>
+          <li><b>Sti:</b> en følge noder der hver er forbundet med neste med en kant. <b>Lengden</b> måles i kanter.</li>
+          <li><b>Dybden</b> til en node er lengden på stien fra roten ned til den. Roten har dybde 0.</li>
+          <li><b>Høyden</b> til en node er lengden på den lengste stien fra den ned til en løvnode. En løvnode har høyde 0, og et tomt tre (null) har høyde −1. Høyden til treet er høyden til roten.</li>
+          <li><b>Nivå</b> <span class="muted small">(standardbegrep)</span>: alle noder med samme dybde. Nivå d er nodene med dybde d.</li>
+          <li><b>Forfeder / etterkommer:</b> u er forfeder til v hvis u ligger på stien fra roten til v. Kurset regner en node som etterkommer av seg selv.</li>
+          <li><b>Subtre</b> med rot v: v og alle etterkommerne til v.</li>
+        </ul>
+      </div>
+      <div class="grid cols-2">
+        <div><h4 style="margin:.2rem 0 .4rem">Dybde (rekursivt oppover)</h4><div id="pc-depth"></div></div>
+        <div><h4 style="margin:.2rem 0 .4rem">Høyde (rekursivt nedover)</h4><div id="pc-height"></div></div>
+      </div>
+      <details class="card" style="margin-top:.6rem"><summary><b>Koden, linje for linje</b> (Depth og Height)</summary>
+        <div id="exp-depth"></div><div id="exp-height"></div>
+      </details>
+
+      <h3>Typer binærtrær</h3>
+      <div class="callout begrep"><span class="lbl">Begrep</span>
+        <p>Et <b>binærtre</b> er et tre der hver node har høyst to barn, et <b>venstre barn</b> og et <b>høyre barn</b>. Rekkefølgen betyr noe: et venstre barn alene er ikke det samme som et høyre barn alene.</p>
+      </div>
+      <div class="grid cols-3">
+        <div class="card"><h4 style="margin-top:.2rem">Fullt <span class="muted small">(standardbegrep)</span></h4>
+          <div class="tv-mini" id="mini-fullt"></div>
+          <p class="muted small">Hver node har enten 0 eller 2 barn. Ingen node har bare ett barn.</p></div>
+        <div class="card"><h4 style="margin-top:.2rem">Komplett</h4>
+          <div class="tv-mini" id="mini-komplett"></div>
+          <p class="muted small">Alle nivåer er fulle, unntatt kanskje det nederste, som fylles fra venstre mot høyre. Det er formen til en heap (blokk 3).</p></div>
+        <div class="card"><h4 style="margin-top:.2rem">Balansert</h4>
+          <div class="tv-mini" id="mini-balansert"></div>
+          <p class="muted small">Høyden er O(log n). Et AVL-tre er balansert fordi venstre og høyre subtre aldri skiller seg med mer enn 1 i høyde.</p></div>
+      </div>
+      <div class="callout felle"><span class="lbl">Felle</span>
+        <p>Ulike lærebøker bruker «fullt», «komplett» og «perfekt» litt ulikt. På eksamen er det tryggest å skrive én setning om hva du mener, f.eks. «komplett: alle nivåer fulle unntatt det nederste, som er fylt fra venstre».</p>
+      </div>
+
+      <div class="callout uni"><span class="lbl">Universitetsnivå</span>
+        <p>På dybde d kan et binærtre ha høyst 2<sup>d</sup> noder. Et binærtre med høyde h har derfor høyst
+          1 + 2 + … + 2<sup>h</sup> = 2<sup>h+1</sup> − 1 noder. Snur vi det, må et binærtre med n noder ha høyde minst ⌊log₂ n⌋.
+          Høyden er høyst n − 1 (en kjede). Nesten alle trealgoritmer i kurset koster O(h). Hele poenget med balanserte trær er å presse h ned mot log n.</p>
+      </div>
+
+      <h3>Kjøretider på ett sted</h3>
+      <p class="muted small">Alle tider er O(…). Hold musa over – eller trykk på – en celle for å se <i>hvorfor</i>.</p>
+      <div class="table-wrap">
+        <table class="cmp-table" id="tbl-traer">
+          <thead><tr><th>Operasjon</th>
+            <th data-tip="Kjøretiden for den gunstigste situasjonen, f.eks. at svaret ligger i roten.">Best</th>
+            <th data-tip="Kjøretiden i verste fall. For vanlige søketrær er det en skjev kjede med høyde n − 1.">Verst</th>
+            <th data-tip="Hvis treet er balansert (høyde O(log n)), som et AVL-tre.">Balansert</th></tr></thead>
+          <tbody>
+            <tr><td>Søk / innsetting / fjerning i BST</td>
+              <td data-tip="Svaret ligger i roten (søk), eller treet er tomt (innsetting).">O(1)</td>
+              <td data-tip="Én sti fra roten og ned, altså O(h). For en kjede er h = n − 1.">O(n)</td>
+              <td data-tip="h = O(log n), så én sti er O(log n).">O(log n)</td></tr>
+            <tr><td>Søk / innsetting / fjerning i AVL</td>
+              <td data-tip="Søk: svaret ligger i roten. Innsetting og fjerning må likevel ned til en løvnode og rebalansere: O(log n).">O(1)</td>
+              <td data-tip="AVL-regelen holder høyden O(log n), og hver rotasjon er O(1).">O(log n)</td>
+              <td data-tip="AVL-trær er alltid balanserte.">O(log n)</td></tr>
+            <tr><td>Pre-/in-/post-/level-order</td>
+              <td data-tip="Alle n noder må besøkes.">O(n)</td>
+              <td data-tip="Hver node besøkes én gang, O(1) arbeid per node.">O(n)</td>
+              <td data-tip="Formen spiller ingen rolle for antall besøk.">O(n)</td></tr>
+            <tr><td>Høyde, diameter, CheckBST</td>
+              <td data-tip="Høyde og diameter må se på alle noder. CheckBST er O(1) i beste fall (feil i roten), men O(n) for et gyldig søketre.">O(n)</td>
+              <td data-tip="Én gjennomgang med O(1) arbeid per node.">O(n)</td>
+              <td data-tip="Uavhengig av formen.">O(n)</td></tr>
+            <tr><td>Laveste felles forfeder</td>
+              <td data-tip="Nodene er like, eller splittpunktet er roten.">O(1)</td>
+              <td data-tip="Vi går én sti opp eller ned, O(h). For en kjede er det O(n).">O(n)</td>
+              <td data-tip="O(h) = O(log n).">O(log n)</td></tr>
+            <tr><td>Bygge Huffman-tre</td>
+              <td data-tip="n − 1 sammenslåinger med heap-operasjoner à O(log n), uansett input.">O(n log n)</td>
+              <td data-tip="Samme antall operasjoner.">O(n log n)</td>
+              <td data-tip="Ikke relevant: formen bestemmes av frekvensene.">–</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Øv selv</h3>
+      <div id="quiz-begreper"></div>
+    </section>
+
+    <!-- ===================== TRAVERSERINGER ===================== -->
+    <section data-panel="trav" hidden>
+      <div class="callout begrep"><span class="lbl">Begrep</span>
+        <p>En <b>traversering</b> besøker alle nodene i et tre nøyaktig én gang. Rekkefølgen er det som skiller dem:
+          <b>preorder</b> (noden før barna), <b>inorder</b> (venstre, noden, høyre), <b>postorder</b> (barna før noden) og
+          <b>level-order</b> (nivå for nivå, også kalt bredde først).</p>
+      </div>
+      <div id="intro-trav"></div>
+      <div class="callout eksempel"><span class="lbl">Eksempel</span>
+        <p>Kurstreet (<code>e</code> med barna <code>f</code> og <code>g</code>, <code>f</code> med <code>h</code> og <code>i</code>, <code>g</code> med <code>j</code> til venstre):</p>
+        <ul class="small">
+          <li>Preorder: <code>e f h i g j</code></li>
+          <li>Inorder: <code>h f i e j g</code></li>
+          <li>Postorder: <code>h i f j g e</code></li>
+          <li>Level-order: <code>e f g h i j</code></li>
+        </ul>
+      </div>
+
+      <div class="tv-switch" role="group" aria-label="Velg traversering" data-switch="trav">
+        <button class="btn sm" type="button" data-sub="pre" aria-pressed="true">Preorder</button>
+        <button class="btn sm" type="button" data-sub="in" aria-pressed="false">Inorder</button>
+        <button class="btn sm" type="button" data-sub="post" aria-pressed="false">Postorder</button>
+        <button class="btn sm" type="button" data-sub="level" aria-pressed="false">Level-order</button>
+      </div>
+      <div data-subs="trav">
+        <div data-sub="pre" id="demo-pre"></div>
+        <div data-sub="in" id="demo-in" hidden></div>
+        <div data-sub="post" id="demo-post" hidden></div>
+        <div data-sub="level" id="demo-level" hidden></div>
+      </div>
+
+      <div class="callout uni"><span class="lbl">Universitetsnivå</span>
+        <p>De rekursive traverseringene bruker <b>kallstakken</b> som en skjult stakk, så de går i dybden først. Ekstra minne er O(h).
+          Level-order bruker en eksplisitt <b>kø</b> og går i bredden. Køen kan holde et helt nivå, så minnet er O(n) i verste fall.
+          Pre- og postorder gir mening for generelle trær (besøk alle barna i rekkefølge). Inorder krever et binærtre, fordi «midten» bare er definert når det er et venstre og et høyre barn.</p>
+      </div>
+      <div class="callout felle"><span class="lbl">Felle</span>
+        <p>Inorder gir sortert rekkefølge <b>bare</b> i et binært søketre. Og level-order trenger en <b>kø</b>: med en stakk får du en dybde-først-rekkefølge.</p>
+      </div>
+
+      <h3>Eksamen</h3>
+      <div id="exam-h2025-4"></div>
+      <div class="callout sensor"><span class="lbl">Sensortips</span>
+        <ul>
+          <li>Si hvilken datastruktur du bruker (kø!) og at Enqueue/Dequeue er O(1). Da følger O(n) direkte.</li>
+          <li>Null-sjekk barna før du legger dem i køen, eller sjekk etter Dequeue. En av dem må være med.</li>
+          <li>Skriv rekkefølgen som en liste og dobbeltsjekk med kurstreet før du leverer.</li>
+        </ul>
+      </div>
+
+      <h3>Øv selv: sett linjene i riktig rekkefølge</h3>
+      <div id="parsons-level"></div>
+    </section>
+
+    <!-- ===================== BINÆRT SØKETRE ===================== -->
+    <section data-panel="bst" hidden>
+      <div class="callout begrep"><span class="lbl">Begrep</span>
+        <p>Et <b>binært søketre</b> (BST) er et binærtre der hver node v oppfyller <b>søketre-egenskapen</b>:
+          alle elementer i venstre subtre er mindre enn v.element, og alle i høyre subtre er større.
+          Kravet gjelder hele subtrærne, ikke bare de direkte barna.</p>
+      </div>
+      <div id="intro-bst"></div>
+      <div class="grid cols-2">
+        <div class="callout eli5"><span class="lbl">ELI5</span>
+          <p>Det er som å spille «høyere eller lavere». Ved hver node spør du: er tallet mitt mindre? Gå til venstre. Større? Gå til høyre.
+            Hvert svar lar deg glemme en hel gren.</p>
+        </div>
+        <div class="callout eksempel"><span class="lbl">Eksempel</span>
+          <p>Setter vi inn 50, 30, 70, 20, 40, 60, 80, blir 50 roten. 30 og 70 blir barna, og de fire siste blir løvnoder. Høyden er 2.
+            Setter vi inn de samme tallene sortert (20, 30, …, 80), blir treet en kjede med høyde 6.</p>
+        </div>
+      </div>
+
+      <div class="tv-switch" role="group" aria-label="Velg operasjon" data-switch="bst">
+        <button class="btn sm" type="button" data-sub="ins" aria-pressed="true">Innsetting</button>
+        <button class="btn sm" type="button" data-sub="search" aria-pressed="false">Søk</button>
+        <button class="btn sm" type="button" data-sub="rem" aria-pressed="false">Fjerning</button>
+      </div>
+      <div data-subs="bst">
+        <div data-sub="ins" id="demo-bstins"></div>
+        <div data-sub="search" id="demo-bstsearch" hidden></div>
+        <div data-sub="rem" hidden>
+          <div class="callout begrep"><span class="lbl">Tre tilfeller</span>
+            <p><b>0 barn:</b> fjern noden. <b>1 barn:</b> la barnet ta plassen. <b>2 barn:</b> kopier inn etterfølgeren (minste i høyre subtre), og fjern den gamle kopien. Den har høyst ett barn.</p>
+          </div>
+          <div id="demo-bstrem"></div>
+          <details class="card"><summary><b>Hjelperen FindMin</b></summary>
+            <div class="grid cols-2"><div id="pc-findmin"></div><div id="exp-findmin"></div></div>
+          </details>
+        </div>
+      </div>
+
+      <h3>Samme tre fra level-order (H2025 d)</h3>
+      <p>Setter du inn elementene i et BST i <b>level-order</b>-rekkefølge, får du nøyaktig samme tre tilbake.
+        Grunnen er at hver node settes inn etter alle forfedrene sine. Når den kommer, finnes stien ned til plassen allerede, og den havner på samme sted.</p>
+      <div class="btn-row" id="rebuild-btns"></div>
+      <div class="grid cols-2">
+        <div><h4 style="margin:.2rem 0 .4rem">Originalt tre</h4><div class="tv-mini" id="rebuild-a"></div></div>
+        <div><h4 style="margin:.2rem 0 .4rem">Bygget fra level-order</h4><div class="tv-mini" id="rebuild-b"></div></div>
+      </div>
+      <p class="small" id="rebuild-txt"></p>
+
+      <h3>Er treet et søketre? (CheckBST)</h3>
+      <div id="intro-check"></div>
+      <div class="grid cols-2">
+        <div><h4 style="margin:.2rem 0 .4rem">Pseudokode</h4><div id="pc-check"></div></div>
+        <div><h4 style="margin:.2rem 0 .4rem">Moteksempelet</h4><div class="tv-mini" id="mini-check"></div>
+          <p class="muted small">Hver forelder–barn-sjekk er grei (2 &lt; 5 og 7 &gt; 2), men 7 ligger i venstre subtre til 5. Grensene (−∞, 5) for venstre subtre fanger det.</p></div>
+      </div>
+      <details class="card"><summary><b>Koden, linje for linje</b> (CheckBST)</summary><div id="exp-check"></div></details>
+
+      <h3>Skriv ut et intervall (InRange)</h3>
+      <div class="grid cols-2">
+        <div><div id="pc-range"></div></div>
+        <div class="callout uni" style="margin-top:0"><span class="lbl">Universitetsnivå</span>
+          <p>InRange er en inorder med <b>beskjæring</b>: et subtre der intervallet ikke kan treffe, hoppes over. Da besøker vi to stier, én mot hvert endepunkt av intervallet, pluss de k treffene: O(h + k). Uten beskjæring blir det en vanlig inorder på O(n).</p></div>
+      </div>
+      <details class="card"><summary><b>Koden, linje for linje</b> (InRange)</summary><div id="exp-range"></div></details>
+
+      <div class="callout felle"><span class="lbl">Felle</span>
+        <p>Kjøretiden for et vanlig BST er O(h), og h kan være n − 1. Skriv aldri «O(log n)» uten å si at treet er balansert.</p>
+      </div>
+
+      <h3>Eksamen</h3>
+      <div id="exam-h2020-2"></div>
+      <div id="exam-h2021-8"></div>
+      <div id="exam-h2022-10"></div>
+      <div class="callout sensor"><span class="lbl">Sensortips</span>
+        <ul>
+          <li>Oppgi kjøretiden som O(h), og si hva h er for et balansert tre og for en kjede.</li>
+          <li>Fjerning med to barn: si eksplisitt at du bruker etterfølgeren (eller forgjengeren), og at den har høyst ett barn.</li>
+          <li>CheckBST: å bare sjekke direkte barn gir trekk. Send med grenser, eller sjekk at inorder er sortert.</li>
+        </ul>
+      </div>
+
+      <h3>Øv selv: sett linjene i riktig rekkefølge</h3>
+      <div id="parsons-insert"></div>
+    </section>
+
+    <!-- ===================== DIAMETER ===================== -->
+    <section data-panel="diameter" hidden>
+      <div class="callout begrep"><span class="lbl">Begrep</span>
+        <p><b>Diameteren</b> til et binærtre er lengden (i kanter) på den lengste stien mellom to noder i treet.
+          Stien kan gå opp og ned igjen. Den trenger ikke gå gjennom roten.</p>
+      </div>
+      <div id="intro-diameter"></div>
+      <div class="grid cols-2">
+        <div class="callout eli5"><span class="lbl">ELI5</span>
+          <p>Tenk deg treet som et nett av stier. Diameteren er den lengste turen du kan gå uten å gå samme vei to ganger. Hver node spør barna sine: «Hvor dypt går det under deg, og hva er den lengste turen hos deg?»</p>
+        </div>
+        <div class="callout eksempel"><span class="lbl">Eksempel</span>
+          <p>I eksempelet «Ikke gjennom roten» har roten bare ett barn. Den lengste stien går fra <code>d</code> opp til <code>a</code> og ned til <code>e</code>, og har lengde 4. Stien gjennom roten er bare 3 lang.</p>
+        </div>
+      </div>
+      <div id="demo-diameter"></div>
+
+      <div class="callout felle"><span class="lbl">Felle: kvadratisk snarvei</span>
+        <p>Det er fristende å kalle <code>Height(v.left) + Height(v.right) + 2</code> for hver node. Men Height er selv O(n), så for en skjev kjede blir det O(n²).
+          H2023 ga opptil 8 poeng for lineær løsning, og 5 for kvadratisk. Returner høyde og diameter <b>samtidig</b>, som over.</p>
+      </div>
+      <div class="callout uni"><span class="lbl">Universitetsnivå</span>
+        <p>Diameter er et typisk <b>postorder-mønster</b>: svaret for v bygges av svarene fra barna, så hver node trenger bare O(1) arbeid. Å returnere et par (h, d) er en vanlig teknikk for å slippe å regne ut samme verdi flere ganger.</p>
+      </div>
+
+      <h3>Eksamen</h3>
+      <div id="exam-h2023-5"></div>
+      <div class="callout sensor"><span class="lbl">Sensortips</span>
+        <ul>
+          <li>Tell kanter, ikke noder. En løvnode alene har diameter 0.</li>
+          <li>Vis at du vet at stien ikke trenger å gå gjennom roten. Max over de tre kandidatene er hele poenget.</li>
+          <li>Oppgi O(n), og forklar at hver node besøkes én gang.</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- ===================== LCA ===================== -->
+    <section data-panel="lca" hidden>
+      <div class="callout begrep"><span class="lbl">Begrep</span>
+        <p>Den <b>laveste felles forfederen</b> til u og v er den dypeste noden som har både u og v som etterkommere. En node regnes som etterkommer av seg selv, så hvis u er forfeder til v, er svaret u.</p>
+      </div>
+      <div id="intro-lca"></div>
+      <div class="callout eli5"><span class="lbl">ELI5</span>
+        <p>To slektninger leter etter sin nærmeste felles slektning. Den som står lengst nede i slektstreet, klatrer opp ett trinn om gangen til de står like høyt. Så klatrer de sammen til de møtes.</p>
+      </div>
+
+      <div class="tv-switch" role="group" aria-label="Velg variant" data-switch="lca">
+        <button class="btn sm" type="button" data-sub="gen" aria-pressed="true">Generelt tre (b)</button>
+        <button class="btn sm" type="button" data-sub="bst" aria-pressed="false">Binært søketre (c)</button>
+      </div>
+      <div data-subs="lca">
+        <div data-sub="gen">
+          <p class="small">Treet er eksempeltreet fra H2024. Hver node kjenner <code>parent</code> og <code>depth</code>. Dybden står under nodene.</p>
+          <div id="demo-lca"></div>
+        </div>
+        <div data-sub="bst" hidden>
+          <p class="small">I et søketre trenger vi verken parent eller depth. Vi går fra roten og ned til stedet der x og y havner på hver sin side.</p>
+          <div id="demo-lcabst"></div>
+        </div>
+      </div>
+
+      <div class="callout uni"><span class="lbl">Universitetsnivå</span>
+        <p>Begge variantene er O(h). Generell versjon: hvert kall løfter én node ett nivå, og summen av dybdene er høyst 2h.
+          BST-versjonen følger én sti fra roten. En løsning som går gjennom hele treet (O(n)) er riktig, men H2024 ga bare delvis uttelling for den.</p>
+      </div>
+
+      <h3>Eksamen</h3>
+      <div id="exam-h2024-6"></div>
+      <div class="callout sensor"><span class="lbl">Sensortips</span>
+        <ul>
+          <li>Bruk informasjonen du får (parent, depth). Da blir løsningen kort og O(h).</li>
+          <li>Husk tilfellet der den ene noden er forfeder til den andre.</li>
+          <li>BST-varianten: bruk ≤ i splittsjekken, ellers mister du tilfellet x = v.element.</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- ===================== AVL ===================== -->
+    <section data-panel="avl" hidden>
+      <div class="callout begrep"><span class="lbl">Begrep</span>
+        <p>Et <b>AVL-tre</b> er et binært søketre der hver node har <b>balansefaktor</b> −1, 0 eller 1.
+          Balansefaktoren er høyden til venstre subtre minus høyden til høyre subtre. Etter innsetting eller fjerning repareres brudd med <b>rotasjoner</b> på veien opp.</p>
+      </div>
+      <div id="intro-avl"></div>
+      <div class="grid cols-2">
+        <div class="callout eli5"><span class="lbl">ELI5</span>
+          <p>Tenk på en mobil som henger fra taket. Blir den ene siden for tung, vipper den. En rotasjon er å flytte opphengspunktet, så den henger rett igjen, uten å bytte rekkefølgen på tingene.</p>
+        </div>
+        <div class="callout eksempel"><span class="lbl">Eksempel</span>
+          <p>Setter vi inn 30, 10, 20, får 30 balansefaktor 2, og 10 er høyretung. Det er en knekk, så vi trenger en <b>dobbel rotasjon</b>: venstrerotasjon på 10, så høyrerotasjon på 30. Resultat: 20 med barna 10 og 30.</p>
+        </div>
+      </div>
+
+      <h3>Rotasjoner</h3>
+      <p class="small">En rotasjon løfter et barn opp og senker forelderen. Subtreet i midten (B) bytter forelder. Inorder-rekkefølgen er den samme etterpå: A &lt; z &lt; B &lt; y &lt; C.</p>
+      <div class="btn-row" id="rot-btns"></div>
+      <div class="tv-mini" id="rot-tre" style="max-width:420px"></div>
+      <p class="small" id="rot-txt"></p>
+      <div class="table-wrap">
+        <table class="cmp-table">
+          <thead><tr><th>Situasjon</th><th>Balansefaktor</th><th>Løsning</th><th>Kallenavn</th></tr></thead>
+          <tbody>
+            <tr><td>Venstretung, venstre barn venstretungt eller i balanse</td><td>b(v) = 2, b(v.left) ≥ 0</td><td>Høyrerotasjon på v</td><td class="muted">LL</td></tr>
+            <tr><td>Høyretung, høyre barn høyretungt eller i balanse</td><td>b(v) = −2, b(v.right) ≤ 0</td><td>Venstrerotasjon på v</td><td class="muted">RR</td></tr>
+            <tr><td>Venstretung, venstre barn høyretungt (knekk)</td><td>b(v) = 2, b(v.left) &lt; 0</td><td>Dobbel: venstre på v.left, så høyre på v</td><td class="muted">LR</td></tr>
+            <tr><td>Høyretung, høyre barn venstretungt (knekk)</td><td>b(v) = −2, b(v.right) &gt; 0</td><td>Dobbel: høyre på v.right, så venstre på v</td><td class="muted">RL</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="muted small">Kurset sier «enkel» og «dobbel rotasjon». LL/RR/LR/RL er bare kallenavn du kan møte i andre kilder.</p>
+
+      <h3>AVL-innsetting steg for steg</h3>
+      <p class="muted small">Tallet over noden er høyden. «b=» under noden er balansefaktoren. Rød node: |b| &gt; 1.</p>
+      <div id="demo-avl"></div>
+
+      <h3>Byggeklossene</h3>
+      <div class="grid cols-2">
+        <div><h4 style="margin:.2rem 0 .4rem">Balance</h4><div id="pc-balance"></div></div>
+        <div><h4 style="margin:.2rem 0 .4rem">LeftRotate <span class="muted small">(RightRotate er speilbildet)</span></h4><div id="pc-lrot"></div></div>
+      </div>
+      <details class="card"><summary><b>Koden, linje for linje</b> (Balance og LeftRotate)</summary><div id="exp-balance"></div><div id="exp-lrot"></div></details>
+      <details class="card"><summary><b>RightRotate, SafeHeight, SetHeight og BalanceFactor</b></summary>
+        <div class="grid cols-2"><div id="pc-rrot"></div><div id="pc-safe"></div><div id="pc-seth"></div><div id="pc-bf"></div></div>
+        <div id="exp-bf"></div>
+      </details>
+      <details class="card"><summary><b>Fjerning i AVL-tre</b></summary>
+        <p class="small">Som BST-fjerning, men hver node på veien opp får SetHeight og Balance. Ved fjerning kan det trengs rotasjoner på flere nivåer.</p>
+        <div id="pc-avlrem"></div><div id="exp-avlrem"></div>
+      </details>
+
+      <div class="callout uni"><span class="lbl">Universitetsnivå</span>
+        <p>Hvorfor er høyden O(log n)? La N(h) være det minste antall noder et AVL-tre med høyde h kan ha. Det minste treet har ett subtre med høyde h − 1 og ett med h − 2, så N(h) = 1 + N(h − 1) + N(h − 2).
+          Det vokser som Fibonacci-tallene, altså eksponentielt i h. Snur vi det, er h = O(log n).
+          Andre balanserte søketrær du kan høre om, er <b>rød-svarte trær</b>.</p>
+      </div>
+
+      <h3>Eksamen</h3>
+      <div id="exam-h2020-6"></div>
+      <div id="exam-h2022-3"></div>
+      <div class="callout sensor"><span class="lbl">Sensortips</span>
+        <ul>
+          <li>Tegn treet etter <b>hver</b> innsetting, og skriv hvilken rotasjon du gjør, og rundt hvilken node.</li>
+          <li>Oppdater høyder nedenfra og opp. Sjekk balansefaktoren i alle noder på stien til roten.</li>
+          <li>En dobbel rotasjon er to enkle. Teller oppgaven rotasjoner, teller den som to.</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- ===================== ANTI-AVL ===================== -->
+    <section data-panel="antiavl" hidden>
+      <div class="callout begrep"><span class="lbl">Begrep</span>
+        <p><b>Anti-AVL</b> (fra H2025) er et påfunnet tre som gjør det motsatte av AVL: hver gang en node på veien har et venstre barn, gjøres en høyrerotasjon. Resultatet blir alltid en <b>høyrekjede</b>, altså så ubalansert som mulig.</p>
+      </div>
+      <div id="intro-antiavl"></div>
+      <div class="callout eli5"><span class="lbl">ELI5</span>
+        <p>Det er som en kø der alle skal stå på én rekke. Prøver noen å stille seg ved siden av, blir de dyttet inn i rekka.</p>
+      </div>
+      <div id="demo-antiavl"></div>
+      <div class="callout uni"><span class="lbl">Universitetsnivå</span>
+        <p>Invarianten er at ingen node har venstre barn. En innsetting kan lage høyst ett venstre barn, og én høyrerotasjon fjerner det igjen. Derfor holder det med <code>if</code>, og hver innsetting gjør høyst én rotasjon.
+          Høyden blir n − 1, så innsetting og søk er O(n) i verste fall, mot O(log n) i et AVL-tre.</p>
+      </div>
+      <h3>Eksamen</h3>
+      <div id="exam-h2025-3"></div>
+      <div class="callout sensor"><span class="lbl">Sensortips</span>
+        <ul>
+          <li>Tell rotasjonene nøye ved å spore hver innsetting for seg.</li>
+          <li>Begrunn hvorfor treet blir en kjede: invarianten «ingen venstre barn» holder etter hver innsetting.</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- ===================== HUFFMAN ===================== -->
+    <section data-panel="huffman" hidden>
+      <div class="callout begrep"><span class="lbl">Begrep</span>
+        <p><b>Huffman-koding</b> gir hvert symbol et binært kodeord, slik at vanlige symboler får korte koder og sjeldne får lange.
+          Kodene er <b>prefiksfrie</b>: ingen kode er starten på en annen. Derfor kan en bitstreng dekodes entydig uten skilletegn.
+          Symbolene ligger i løvnodene, og koden er stien fra roten: venstre = 0, høyre = 1.</p>
+      </div>
+      <div id="intro-huffman"></div>
+      <div class="grid cols-2">
+        <div class="callout eli5"><span class="lbl">ELI5</span>
+          <p>Bokstaven du bruker oftest, får det korteste kallenavnet. Vi bygger treet nedenfra ved å hekte sammen de to sjeldneste bokstavene igjen og igjen, til alle henger i samme tre.</p>
+        </div>
+        <div class="callout eksempel"><span class="lbl">Eksempel (H2024)</span>
+          <p>A:1, B:3, C:7, D:2. Først slås A og D sammen (3). Så slås B og den nye noden sammen (6), og til slutt 6 og C (13).
+            Kodelengder: C = 1, B = 2, A = 3, D = 3.</p>
+        </div>
+      </div>
+      <div id="demo-huffman"></div>
+
+      <h3>Kode og dekode</h3>
+      <div class="card tv-codec" id="codec"></div>
+
+      <div class="callout uni"><span class="lbl">Universitetsnivå</span>
+        <p>Huffman er en <b>grådig</b> algoritme: den slår alltid sammen de to sjeldneste. Den gir en optimal prefikskode, altså minst mulig total lengde Σ f(s) · |kode(s)|.
+          Med en min-heap som prioritetskø blir kjøretiden O(n log n) for n symboler. Ved like frekvenser kan treet bli forskjellig, men den totale lengden blir den samme.</p>
+      </div>
+
+      <h3>Prefikstre (trie)</h3>
+      <div class="callout begrep"><span class="lbl">Begrep</span>
+        <p>Et <b>prefikstre</b> (trie) lagrer strenger tegn for tegn langs stier fra roten. Strenger med felles start deler sti. Et Huffman-tre er et binært prefikstre over kodeordene.
+          Oppslag av en streng med lengde k tar O(k), uavhengig av hvor mange strenger som er lagret.</p>
+      </div>
+
+      <h3>Eksamen</h3>
+      <div id="exam-h2024-2"></div>
+      <div id="exam-h2021-5"></div>
+      <div id="exam-h2022-8"></div>
+      <div class="callout sensor"><span class="lbl">Sensortips</span>
+        <ul>
+          <li>Skriv køen etter hver sammenslåing. Da ser sensor at du tar de to minste hver gang.</li>
+          <li>Merk kantene med 0 og 1, og si hvilken regel du bruker.</li>
+          <li>Total lengde = Σ frekvens · kodelengde. Regn den ut som kontroll.</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- ===================== SANT/USANT ===================== -->
+    <section data-panel="test" hidden>
+      <h3>Sant eller usant?</h3>
+      <p class="muted small">Ta stilling til hver påstand, og sjekk svarene. Forklaringen viser hvorfor.</p>
+      <div id="tf-traer"></div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <p class="muted small">IN2010 · Blokk 4 · Trær. Egne forklaringer og demoer basert på pensum. Eksamensoppgavene er gjengitt med egne ord.</p>
+  </footer>
+
+  <script src="assets/js/core.js"></script>
+  <script src="assets/js/pseudocode.js"></script>
+  <script src="assets/js/stepplayer.js"></script>
+  <script src="assets/js/viz-bars.js"></script>
+  <script src="assets/js/data-algos.js"></script>
+  <script src="assets/js/data-traer.js"></script>
+  <script>
+  (function () {
+    "use strict";
+    var IN = window.IN, qs = IN.qs, qsa = IN.qsa, el = IN.el, A = IN.algos, G = IN.gen, TR = IN.traer;
+    function t(e, n, k) { return { eli5: e, normal: n, teknisk: k }; }
+    function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
+
+    /* =====================================================================
+       vizTree – MIDLERTIDIG sidelokal trevisualisering (SVG).
+       Foreslått slått sammen med heap-modulens vizHeap til felles
+       assets/js/viz-tree.js (se plan/foresporsler-traer.md).
+       step: { tree | forest, marks:{cur,alt,found,fresh,rot[],warn[],done[],path[],queued[],sub[]},
+               lab:{id:tekst}, sup:{id:tekst}, edges:[[a,b]], bits, info:[{label,items,kind}], counter }
+       opts: { onNode(id), ariaLabel }
+       ===================================================================== */
+    var R = 16, DX = 44, PADX = 24;
+    var REDUCE = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    function layout(s) {
+      var roots = s.forest ? s.forest : (s.tree ? [s.tree] : []);
+      var pos = {}, nodes = [], edges = [], x = 0, maxY = 0;
+      roots.forEach(function (r, ri) {
+        if (!r) return;
+        if (ri > 0) x += 0.5;
+        if (r.ch) {
+          (function w(v, d) {
+            nodes.push(v); maxY = Math.max(maxY, d);
+            if (!v.ch.length) { pos[v.id] = { x: x++, y: d }; return; }
+            v.ch.forEach(function (c) { edges.push({ a: v.id, b: c.id }); w(c, d + 1); });
+            pos[v.id] = { x: (pos[v.ch[0].id].x + pos[v.ch[v.ch.length - 1].id].x) / 2, y: d };
+          })(r, 0);
+        } else {
+          (function w(v, d) {
+            if (!v) return;
+            maxY = Math.max(maxY, d);
+            if (v.l) { edges.push({ a: v.id, b: v.l.id, bit: "0" }); w(v.l, d + 1); }
+            pos[v.id] = { x: x++, y: d }; nodes.push(v);
+            if (v.r) { edges.push({ a: v.id, b: v.r.id, bit: "1" }); w(v.r, d + 1); }
+          })(r, 0);
+        }
+      });
+      return { pos: pos, nodes: nodes, edges: edges, w: Math.max(1, x), h: maxY + 1 };
+    }
+    function inA(a, id) { return Array.isArray(a) ? a.indexOf(id) >= 0 : a === id; }
+    function svgString(L, s, pos, opts, W, H, DY, TOP) {
+      var m = s.marks || {}, lab = s.lab || {}, sup = s.sup || {};
+      var hot = {};
+      (s.edges || []).forEach(function (e) { hot[e[0] + ">" + e[1]] = 1; hot[e[1] + ">" + e[0]] = 1; });
+      function X(id) { return PADX + pos[id].x * DX; }
+      function Y(id) { return TOP + pos[id].y * DY; }
+      var out = '<svg class="tv-svg" viewBox="0 0 ' + W + " " + H + '" style="max-width:' + Math.max(W, 160) * 1.25 + 'px" role="img" aria-label="' + esc(opts.ariaLabel || ariaOf(L)) + '">';
+      if (!L.nodes.length) out += '<text class="tv-empty" x="' + W / 2 + '" y="' + (TOP + 4) + '" text-anchor="middle">(tomt tre)</text>';
+      L.edges.forEach(function (e) {
+        if (!pos[e.a] || !pos[e.b]) return;
+        var c = "tv-edge";
+        if (hot[e.a + ">" + e.b]) c += " hot";
+        else if (inA(m.path, e.a) && inA(m.path, e.b)) c += " on";
+        out += '<line class="' + c + '" x1="' + X(e.a) + '" y1="' + Y(e.a) + '" x2="' + X(e.b) + '" y2="' + Y(e.b) + '"/>';
+        if (s.bits && e.bit) {
+          var mx = (X(e.a) + X(e.b)) / 2, my = (Y(e.a) + Y(e.b)) / 2;
+          out += '<text class="tv-bit" x="' + (mx + (e.bit === "0" ? -9 : 9)) + '" y="' + (my - 3) + '" text-anchor="middle">' + e.bit + "</text>";
+        }
+      });
+      L.nodes.forEach(function (v) {
+        if (!pos[v.id]) return;
+        var c = "tv-node";
+        if (inA(m.done, v.id)) c += " is-done";
+        if (inA(m.queued, v.id)) c += " is-queued";
+        if (inA(m.sub, v.id)) c += " is-sub";
+        if (inA(m.path, v.id)) c += " is-path";
+        if (inA(m.alt, v.id)) c += " is-alt";
+        if (m.cur === v.id) c += " is-cur";
+        if (m.fresh === v.id) c += " is-fresh";
+        if (m.found === v.id) c += " is-found";
+        if (inA(m.rot, v.id)) c += " is-rot";
+        if (inA(m.warn, v.id)) c += " is-warn";
+        var x = X(v.id), y = Y(v.id), txt = String(v.k);
+        if (opts.onNode) c += " click";
+        out += '<g class="' + c + '" data-id="' + esc(v.id) + '"' + (opts.onNode ? ' tabindex="0" role="button" aria-label="Node ' + esc(txt) + '"' : "") + ">" +
+          '<circle cx="' + x + '" cy="' + y + '" r="' + R + '"/>' +
+          '<text class="k' + (txt.length > 2 ? " sm" : "") + '" x="' + x + '" y="' + y + '" text-anchor="middle">' + esc(txt) + "</text></g>";
+        if (sup[v.id] != null) out += '<text class="tv-sup" x="' + (x + R + 2) + '" y="' + (y - R + 3) + '">' + esc(sup[v.id]) + "</text>";
+        if (lab[v.id] != null) out += '<text class="tv-lab" x="' + x + '" y="' + (y + R + 13) + '" text-anchor="middle">' + esc(lab[v.id]) + "</text>";
+      });
+      return out + "</svg>";
+    }
+    function ariaOf(L) { return L.nodes.length ? "Tre med " + L.nodes.length + " noder" : "Tomt tre"; }
+    function infoRow(row) {
+      var d = el("div", { class: "tv-info" });
+      d.appendChild(el("span", { class: "lbl", text: row.label + ":" }));
+      if (!row.items || !row.items.length) d.appendChild(el("span", { class: "tv-none", text: row.kind === "queue" ? "tom kø" : row.kind === "stack" ? "tom" : "ingen ennå" }));
+      else row.items.forEach(function (it, i) {
+        d.appendChild(el("span", { class: "tv-chip" + ((row.kind === "queue" && i === 0) || (row.kind === "stack" && i === row.items.length - 1) ? " first" : ""), text: String(it) }));
+      });
+      return d;
+    }
+    function vizTree(stage, s, opts) {
+      opts = opts || {}; s = s || {};
+      var L = layout(s);
+      var hasLab = s.lab && Object.keys(s.lab).length;
+      var DY = hasLab ? 64 : 54, TOP = R + 10;
+      var prev = stage.__tvPos;
+      var maxX = L.w - 1;
+      if (prev) Object.keys(L.pos).forEach(function (id) { if (prev[id]) maxX = Math.max(maxX, prev[id].x); });
+      var W = PADX * 2 + maxX * DX, H = TOP + (L.h - 1) * DY + R + (hasLab ? 22 : 10);
+      if (stage.__tvRaf) { cancelAnimationFrame(stage.__tvRaf); stage.__tvRaf = 0; }
+      stage.__tvPos = L.pos;
+
+      var wrap = el("div", { class: "tv" });
+      if (s.counter) wrap.appendChild(el("div", { class: "tv-counter", text: s.counter }));
+      var svgHost = el("div");
+      wrap.appendChild(svgHost);
+      (s.info || []).forEach(function (row) { wrap.appendChild(infoRow(row)); });
+      IN.clear(stage); stage.appendChild(wrap);
+
+      function draw(pos, final) {
+        svgHost.innerHTML = svgString(L, s, pos, opts, W, H, DY, TOP);
+        if (final && opts.onNode) qsa("g[data-id]", svgHost).forEach(function (g) {
+          var id = g.getAttribute("data-id");
+          g.addEventListener("click", function () { opts.onNode(id); });
+          g.addEventListener("keydown", function (e) { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); opts.onNode(id); } });
+        });
+      }
+      var moved = false;
+      if (prev && !REDUCE) Object.keys(L.pos).forEach(function (id) { var p = prev[id]; if (p && (p.x !== L.pos[id].x || p.y !== L.pos[id].y)) moved = true; });
+      if (!moved) { draw(L.pos, true); return; }
+      var t0 = null, DUR = 420;
+      function frame(ts) {
+        if (t0 === null) t0 = ts;
+        var u = Math.min(1, (ts - t0) / DUR), e = u < .5 ? 2 * u * u : 1 - Math.pow(-2 * u + 2, 2) / 2, pos = {};
+        Object.keys(L.pos).forEach(function (id) {
+          var a = prev[id] || L.pos[id], b = L.pos[id];
+          pos[id] = { x: a.x + (b.x - a.x) * e, y: a.y + (b.y - a.y) * e };
+        });
+        draw(pos, u >= 1);
+        stage.__tvRaf = u < 1 ? requestAnimationFrame(frame) : 0;
+      }
+      draw((function () { var p = {}; Object.keys(L.pos).forEach(function (id) { p[id] = prev[id] || L.pos[id]; }); return p; })(), false);
+      stage.__tvRaf = requestAnimationFrame(frame);
+    }
+    IN.vizTree = IN.vizTree || vizTree;   // midlertidig; overskriver ikke en felles komponent
+
+    /* ---------- Fellesoppsett for demoer ---------- */
+    var LEGEND = [
+      { cls: "compare", label: "Gjeldende node" },
+      { cls: "target", label: "Funnet / mål" },
+      { cls: "min", label: "Ny node" },
+      { cls: "swap", label: "Roteres / ubalansert" },
+      { cls: "sorted", label: "Besøkt / ferdig" }
+    ];
+    function parseKeys(s) {
+      return s.split(/[\s,;]+/).map(function (x) { return parseInt(x, 10); }).filter(function (x) { return !isNaN(x); }).slice(0, 15);
+    }
+    /* "50,30,70 / 30" → [{ keys:[50,30,70], x:30 }]  (to tall etter / → x og y) */
+    function parseKeysX(s) {
+      var p = s.split("/"); if (p.length < 2) return [];
+      var keys = parseKeys(p[0]), xs = parseKeys(p[1]);
+      if (!keys.length || !xs.length) return [];
+      var o = { keys: keys, x: xs[0] }; if (xs.length > 1) o.y = xs[1];
+      return [o];
+    }
+    function mountDemo(host, cfg) {
+      if (typeof host === "string") host = qs(host);
+      var algo = A[cfg.algo];
+      var player = el("div", { class: "tv-host" });
+      var pc = el("div"), exp = el("div");
+      var right = el("div", {}, [el("h4", { style: "margin:.2rem 0 .4rem", text: "Pseudokode (følger demoen)" }), pc]);
+      host.appendChild(el("div", { class: "grid cols-2" }, [el("div", {}, [player]), right]));
+      host.appendChild(el("details", { class: "card" }, [el("summary", { html: "<b>Koden, linje for linje</b> (" + esc(algo.name) + ")" }), exp]));
+      var handle = IN.pseudo.render(pc, algo, {});
+      var bo = IN.pseudo.bigO(algo, { compact: true }); if (bo) right.appendChild(bo);
+      IN.pseudo.explainer(exp, algo, {});
+      return IN.stepPlayer(player, {
+        generate: G[cfg.gen || cfg.algo], presets: cfg.presets,
+        render: function (s, ctx) { vizTree(ctx.stage, s); },
+        pseudo: handle, legend: cfg.legend || LEGEND,
+        parseInput: cfg.parseInput || parseKeys, inputLabel: cfg.inputLabel || "f.eks. 50,30,70,20"
+      });
+    }
+    function pcBlock(pcSel, expSel, key) {
+      IN.pseudo.render(pcSel, A[key], {});
+      var bo = IN.pseudo.bigO(A[key], { compact: true }); if (bo) qs(pcSel).appendChild(bo);
+      if (expSel) IN.pseudo.explainer(expSel, A[key], {});
+    }
+    function staticTree(sel, step, opts) { var h = qs(sel); vizTree(h, step, opts); return h; }
+    function switches() {
+      qsa("[data-switch]").forEach(function (sw) {
+        var name = sw.getAttribute("data-switch"), box = qs('[data-subs="' + name + '"]');
+        var btns = qsa("button[data-sub]", sw);
+        btns.forEach(function (b) {
+          b.addEventListener("click", function () {
+            var id = b.getAttribute("data-sub");
+            btns.forEach(function (x) { x.setAttribute("aria-pressed", x === b ? "true" : "false"); });
+            IN.qsa(":scope > [data-sub]", box).forEach(function (p) { p.hidden = p.getAttribute("data-sub") !== id; });
+          });
+        });
+      });
+    }
+
+    var KURS = [{ tree: TR.KURSTRE }];
+    var BST7 = [50, 30, 70, 20, 40, 60, 80];
+
+    /* ===================== BEGREPER ===================== */
+    IN.explain("#intro-begreper", t(
+      "Et tre er som et slektstre eller en mappestruktur på datamaskinen. Én ting øverst, og alt annet henger under, uten at noe henger i ring.",
+      "Trær brukes når data har en naturlig over-/underordning, eller når vi vil finne ting raskt. Nesten alle algoritmene i denne blokken følger én sti (O(h)) eller besøker alle noder (O(n)).",
+      "Et tre med n noder har nøyaktig n − 1 kanter og ingen sykler. Mellom to noder finnes det nøyaktig én sti. Rekursjon passer naturlig, fordi hvert subtre er et tre i seg selv."
+    ), { label: "Nivå:" });
+
+    (function utforsk() {
+      var host = qs("#utforsk-tre"), info = qs("#utforsk-info"), kind = "bin", sel = null;
+      var trees = {
+        bin: function () { var r = TR.fromNested(TR.KURSTRE); TR.fixHeights(r); return r; },
+        gen: function () { return TR.genFrom(TR.LCATRE); }
+      };
+      var root = trees.bin();
+      function kids(v) { return v.ch ? v.ch : [v.l, v.r].filter(Boolean); }
+      function find(v, id, par, d, anc) {
+        if (!v) return null;
+        if (v.id === id) return { v: v, par: par, d: d, anc: anc };
+        var ks = kids(v);
+        for (var i = 0; i < ks.length; i++) { var r = find(ks[i], id, v, d + 1, anc.concat([v.id])); if (r) return r; }
+        return null;
+      }
+      function height(v) { var ks = kids(v), h = -1; ks.forEach(function (c) { h = Math.max(h, height(c)); }); return h + 1; }
+      function subIds(v, out) { out.push(v.id); kids(v).forEach(function (c) { subIds(c, out); }); return out; }
+      function paint() {
+        var marks = {}, step = { tree: root, marks: marks };
+        if (sel) {
+          var f = find(root, sel, null, 0, []);
+          if (f) {
+            marks.cur = f.v.id; marks.path = f.anc.concat([f.v.id]); marks.sub = subIds(f.v, []).slice(1);
+            var ks = kids(f.v), sib = f.par ? kids(f.par).filter(function (x) { return x !== f.v; }) : [];
+            var names = function (a) { return a.length ? a.map(function (x) { return x.k; }).join(", ") : "ingen"; };
+            IN.clear(info);
+            info.appendChild(el("h4", { style: "margin:.1rem 0 .3rem", text: "Node " + f.v.k }));
+            var dl = el("dl", { class: "tv-facts" });
+            [["Dybde", f.d], ["Høyde", height(f.v)], ["Forelder", f.par ? f.par.k : "ingen (roten)"], ["Barn", names(ks)],
+             ["Søsken", names(sib)], ["Type", ks.length ? "intern node" : "løvnode"],
+             ["Forfedre", f.anc.length ? f.anc.join(", ") : "ingen"], ["Subtre", subIds(f.v, []).length + " noder"]]
+              .forEach(function (r) { dl.appendChild(el("dt", { text: r[0] })); dl.appendChild(el("dd", { text: String(r[1]) })); });
+            info.appendChild(dl);
+          }
+        }
+        vizTree(host, step, { onNode: function (id) { sel = id; paint(); var g = host.querySelector('g[data-id="' + id + '"]'); if (g) g.focus(); }, ariaLabel: "Utforsk treet: klikk en node" });
+      }
+      qsa("#sw-utforsk button").forEach(function (b) {
+        b.addEventListener("click", function () {
+          kind = b.getAttribute("data-pick"); root = trees[kind](); sel = null; host.__tvPos = null;
+          qsa("#sw-utforsk button").forEach(function (x) { x.setAttribute("aria-pressed", x === b ? "true" : "false"); });
+          IN.clear(info); info.appendChild(el("p", { class: "muted small", text: "Ingen node valgt ennå. Klikk eller trykk på en node." }));
+          paint();
+        });
+      });
+      paint();
+    })();
+
+    pcBlock("#pc-depth", "#exp-depth", "treDepth");
+    pcBlock("#pc-height", "#exp-height", "treHeight");
+    staticTree("#mini-fullt", { tree: TR.fromNested(["a", ["b", ["d"], ["e"]], ["c"]]) }, { ariaLabel: "Fullt binærtre" });
+    staticTree("#mini-komplett", { tree: TR.fromNested(["a", ["b", ["d"], ["e"]], ["c", ["f"], null]]) }, { ariaLabel: "Komplett binærtre" });
+    staticTree("#mini-balansert", { tree: TR.fromNested(["a", ["b", ["d"], null], ["c", null, ["e"]]]) }, { ariaLabel: "Balansert binærtre" });
+    IN.tips(qs("#tbl-traer"));
+
+    IN.quiz("#quiz-begreper", [
+      { q: "Hva er høyden til en løvnode, og til et tomt tre?", options: ["1 og 0", "0 og −1", "0 og 0", "1 og −1"], answer: 1,
+        explain: "Høyde måles i kanter. En løvnode har ingen kanter nedover (0), og et tomt tre har per definisjon høyde −1." },
+      { q: "Et binærtre har høyde 3. Hvor mange noder kan det høyst ha?", options: ["7", "8", "15", "16"], answer: 2,
+        explain: "2<sup>h+1</sup> − 1 = 2<sup>4</sup> − 1 = 15: 1 + 2 + 4 + 8 noder på de fire nivåene." },
+      { q: "Hvilken påstand om dybde er riktig?", options: ["Roten har dybde 1", "Dybde er antall noder fra roten", "Dybde er antall kanter fra roten", "Løvnoder har alltid størst dybde i treet"], answer: 2,
+        explain: "Dybden er lengden på stien fra roten, målt i kanter. Roten har dybde 0. Løvnoder kan ligge på ulike dybder." },
+      { q: "Hvilket tre er komplett?", options: ["Et tre der hver node har 0 eller 2 barn", "Et tre der alle nivåer er fulle unntatt kanskje det nederste, som er fylt fra venstre", "Et tre med høyde O(log n)", "Et tre der alle løvnoder har samme dybde"], answer: 1,
+        explain: "Det er definisjonen kurset bruker (og formen til en heap). 0 eller 2 barn kalles ofte «fullt»." }
+    ]);
+
+    /* ===================== TRAVERSERINGER ===================== */
+    IN.explain("#intro-trav", t(
+      "Vi skal hilse på alle i treet, én gang hver. Spørsmålet er bare i hvilken rekkefølge.",
+      "Alle fire besøker hver node én gang, så alle er O(n). Forskjellen er når en node behandles i forhold til barna. Velg rekkefølgen etter hva du trenger: inorder for sortert, postorder når forelderen trenger svar fra barna.",
+      "Pre-, in- og postorder er dybde-først-traverseringer (rekursjon, implisitt stakk). Level-order er bredde-først (eksplisitt FIFO-kø). Kjøretiden er O(n) for alle, minnet O(h) for de rekursive og O(n) for level-order."
+    ), { label: "Nivå:" });
+    // Et array av tall bygges som et BST (norm() i data-traer.js); {tree} gir et fast tre.
+    var TRAV_P = { "Kurstreet": KURS, "BST 50…80": BST7.slice(), "Ujevnt BST": [4, 2, 6, 1, 3, 5] };
+    mountDemo("#demo-pre", { algo: "preorder", presets: TRAV_P, inputLabel: "tall → BST, f.eks. 5,3,8,1" });
+    mountDemo("#demo-in", { algo: "inorder", presets: TRAV_P, inputLabel: "tall → BST, f.eks. 5,3,8,1" });
+    mountDemo("#demo-post", { algo: "postorder", presets: TRAV_P, inputLabel: "tall → BST, f.eks. 5,3,8,1" });
+    mountDemo("#demo-level", { algo: "levelOrder", presets: TRAV_P, inputLabel: "tall → BST, f.eks. 5,3,8,1" });
+    IN.pseudo.parsons("#parsons-level", A.levelOrder);
+
+    /* ===================== BST ===================== */
+    IN.explain("#intro-bst", t(
+      "Et søketre holder tallene i orden, slik at du kan finne et tall uten å se på alle.",
+      "Søk, innsetting og fjerning følger én sti fra roten, så de koster O(h). Hvor god h er, avhenger av rekkefølgen tallene ble satt inn i.",
+      "Søketre-egenskapen er en invariant: inorder gir sortert rekkefølge. Alle tre operasjonene er O(h), med h mellom ⌊log₂ n⌋ og n − 1. Vanlige BST-er gir ingen garanti for h. Det er AVL-treets jobb."
+    ), { label: "Nivå:" });
+    mountDemo("#demo-bstins", { algo: "bstInsert", inputLabel: "f.eks. 50,30,70,20",
+      presets: { "Balansert": BST7.slice(), "Sortert (kjede)": [10, 20, 30, 40, 50], "Med duplikat": [8, 3, 10, 3, 6] } });
+    mountDemo("#demo-bstsearch", { algo: "bstSearch", parseInput: parseKeysX, inputLabel: "nøkler / x, f.eks. 50,30,70 / 30",
+      presets: { "Finn 60": [{ keys: BST7.slice(), x: 60 }], "Finn 40": [{ keys: BST7.slice(), x: 40 }], "Finnes ikke (65)": [{ keys: BST7.slice(), x: 65 }] } });
+    var REM = [50, 30, 70, 20, 40, 60, 80, 35];
+    mountDemo("#demo-bstrem", { algo: "bstRemove", parseInput: parseKeysX, inputLabel: "nøkler / x, f.eks. 50,30,70 / 30",
+      presets: { "Løvnode (20)": [{ keys: REM.slice(), x: 20 }], "Ett barn (40)": [{ keys: REM.slice(), x: 40 }],
+                 "To barn (30)": [{ keys: REM.slice(), x: 30 }], "Roten (50)": [{ keys: REM.slice(), x: 50 }] } });
+    pcBlock("#pc-findmin", "#exp-findmin", "findMin");
+    IN.pseudo.parsons("#parsons-insert", A.bstInsert);
+
+    (function rebuild() {
+      var SETS = { "BST 50…80": BST7.slice(), "Skjevt": [8, 3, 10, 1, 6, 14, 4, 7, 13], "Sortert inn": [1, 2, 3, 4] };
+      var bar = qs("#rebuild-btns");
+      function show(keys) {
+        var a = TR.bstFrom(keys), lo = [], q = a ? [a] : [];
+        while (q.length) { var v = q.shift(); lo.push(v.k); if (v.l) q.push(v.l); if (v.r) q.push(v.r); }
+        var b = TR.bstFrom(lo);
+        var same = JSON.stringify(TR.inorder(a)) === JSON.stringify(TR.inorder(b)) && shape(a) === shape(b);
+        qs("#rebuild-a").__tvPos = null; qs("#rebuild-b").__tvPos = null;
+        vizTree(qs("#rebuild-a"), { tree: a }, { ariaLabel: "Originalt søketre" });
+        vizTree(qs("#rebuild-b"), { tree: b, marks: { done: [] } }, { ariaLabel: "Søketre bygget fra level-order" });
+        qs("#rebuild-txt").innerHTML = "Innsatt i rekkefølgen <code>" + keys.join(", ") + "</code>. Level-order: <code>" + lo.join(", ") +
+          "</code>. Setter vi inn level-order-rekkefølgen i et tomt BST, blir treet " + (same ? "<b>identisk</b>." : "annerledes.");
+      }
+      function shape(v) { return v ? "(" + v.k + shape(v.l) + shape(v.r) + ")" : "-"; }
+      Object.keys(SETS).forEach(function (n, i) {
+        var b = el("button", { class: "btn sm", type: "button", text: n, "aria-pressed": i === 0 ? "true" : "false", onclick: function () {
+          qsa("button", bar).forEach(function (x) { x.setAttribute("aria-pressed", x === b ? "true" : "false"); }); show(SETS[n]); } });
+        bar.appendChild(b);
+      });
+      show(SETS["BST 50…80"]);
+    })();
+
+    IN.explain("#intro-check", t(
+      "Vi vil sjekke at alle tallene står på riktig side, ikke bare i forhold til forelderen, men i forhold til alle over seg.",
+      "Hver node arver et intervall fra forfedrene sine. Går vi til venstre, blir v.element ny øvre grense. Går vi til høyre, blir den ny nedre grense. Alternativt: gjør en inorder og sjekk at rekkefølgen er strengt stigende.",
+      "Begge løsningene er O(n). Grensemetoden bruker O(h) stakk. Inorder-metoden kan også gjøres med O(h) minne ved å bare huske forrige verdi, i stedet for å lagre hele lista."
+    ), { label: "Nivå:" });
+    pcBlock("#pc-check", "#exp-check", "checkBST");
+    staticTree("#mini-check", { tree: TR.fromNested([5, [2, null, [7]], [8]]), marks: { warn: ["7"], cur: "5" } }, { ariaLabel: "Binærtre som ikke er et søketre" });
+    pcBlock("#pc-range", "#exp-range", "inRange");
+
+    /* ===================== DIAMETER ===================== */
+    IN.explain("#intro-diameter", t(
+      "Vi vil finne den lengste turen i treet. Hver node finner ut hvor dypt det går under den på hver side, og legger sammen.",
+      "For hver node v er den lengste stien som går gjennom v lik hL + hR + 2. Diameteren er den største av disse over alle noder. Regn ut høyde og diameter i samme rekursjon, så blir det O(n).",
+      "Returner paret (h, d) nedenfra og opp. Med høyde(null) = −1 stemmer formlene for alle antall barn. Kjøretiden er O(n) og stakken O(h)."
+    ), { label: "Nivå:" });
+    mountDemo("#demo-diameter", { algo: "treDiameter", inputLabel: "tall → BST, f.eks. 5,3,8,1",
+      presets: {
+        "Gjennom roten": [{ tree: ["r", ["a", ["c"], ["d"]], ["b", null, ["e"]]] }],
+        "Ikke gjennom roten": [{ tree: ["r", ["a", ["b", ["d"]], ["c", null, ["e"]]]] }],
+        "Kurstreet": KURS,
+        "Kjede": [1, 2, 3, 4]
+      } });
+
+    /* ===================== LCA ===================== */
+    IN.explain("#intro-lca", t(
+      "Vi finner det nærmeste stedet der to grener i treet møtes.",
+      "Generelt tre: løft den dypeste noden ett nivå om gangen til de to møtes. Søketre: start i roten og gå mot x og y så lenge begge ligger på samme side.",
+      "Begge løsningene er O(h). Den generelle bruker parent- og depth-pekere. Søketre-versjonen bruker ordningen og stopper i splittpunktet x ≤ v.element ≤ y."
+    ), { label: "Nivå:" });
+    mountDemo("#demo-lca", { algo: "lca", inputLabel: "to noder, f.eks. g, j",
+      parseInput: function (s) { var p = s.split(/[\s,;]+/).filter(Boolean); return p.length >= 2 ? [{ u: p[0], v: p[1] }] : []; },
+      presets: { "g og j": [{ u: "g", v: "j" }], "f og j": [{ u: "f", v: "j" }], "h og j (forfeder)": [{ u: "h", v: "j" }], "c og d": [{ u: "c", v: "d" }] } });
+    mountDemo("#demo-lcabst", { algo: "lcaBST", parseInput: parseKeysX, inputLabel: "nøkler / x, y, f.eks. 50,30,70 / 30, 70",
+      presets: { "20 og 40": [{ keys: BST7.slice(), x: 20, y: 40 }], "60 og 80": [{ keys: BST7.slice(), x: 60, y: 80 }],
+                 "30 og 40 (forfeder)": [{ keys: BST7.slice(), x: 30, y: 40 }], "20 og 80": [{ keys: BST7.slice(), x: 20, y: 80 }] } });
+
+    /* ===================== AVL ===================== */
+    IN.explain("#intro-avl", t(
+      "Et AVL-tre passer på at det aldri blir for skjevt. Blir det skjevt, vrir det seg tilbake.",
+      "Etter vanlig BST-innsetting går vi tilbake opp, oppdaterer høyden og sjekker balansefaktoren i hver node. Er den −2 eller 2, roterer vi. Da holder høyden seg O(log n), og alle operasjoner blir O(log n).",
+      "Invariant: |b(v)| ≤ 1 for alle v. Etter én innsetting er |b| høyst 2 langs stien. Én enkel eller dobbel rotasjon i den laveste ubalanserte noden gjenoppretter den. Fjerning kan kreve rotasjoner på flere nivåer."
+    ), { label: "Nivå:" });
+    (function rotWidget() {
+      var host = qs("#rot-tre"), bar = qs("#rot-btns"), txt = qs("#rot-txt");
+      var root = TR.fromNested(["z", ["A"], ["y", ["B"], ["C"]]]), state = "z";
+      function paint(msg, rot) {
+        vizTree(host, { tree: root, marks: { rot: rot || [], alt: ["A", "B", "C"] } }, { ariaLabel: "Rotasjonsdemo" });
+        txt.innerHTML = msg;
+      }
+      var bL = el("button", { class: "btn sm primary", type: "button", text: "LeftRotate(z)", onclick: function () {
+        if (state !== "z") return;
+        var y = root.r; root.r = y.l; y.l = root; root = y; state = "y";
+        bL.disabled = true; bR.disabled = false;
+        paint("Etter <b>venstrerotasjon</b>: y er ny rot, z er venstre barn av y, og B har flyttet fra y til z.", ["z", "y"]);
+      } });
+      var bR = el("button", { class: "btn sm", type: "button", text: "RightRotate(y)", onclick: function () {
+        if (state !== "y") return;
+        var z = root.l; root.l = z.r; z.r = root; root = z; state = "z";
+        bL.disabled = false; bR.disabled = true;
+        paint("Etter <b>høyrerotasjon</b>: z er rot igjen. En høyrerotasjon er det motsatte av en venstrerotasjon.", ["z", "y"]);
+      } });
+      bR.disabled = true;
+      bar.appendChild(bL); bar.appendChild(bR);
+      paint("Start: z har høyre barn y. A, B og C er hele subtrær (blå). Trykk for å rotere.");
+    })();
+    mountDemo("#demo-avl", { algo: "avlInsert", gen: "avlInsert", inputLabel: "f.eks. 10,20,30",
+      presets: {
+        "H2020: kjede + 5": [{ base: [1, 2, 3, 4], keys: [5] }],
+        "H2022: 2,4,3,1,5": [2, 4, 3, 1, 5],
+        "Sortert 1–7": [1, 2, 3, 4, 5, 6, 7],
+        "Dobbel (30,10,20)": [30, 10, 20]
+      } });
+    pcBlock("#pc-balance", "#exp-balance", "avlBalance");
+    pcBlock("#pc-lrot", "#exp-lrot", "leftRotate");
+    pcBlock("#pc-rrot", null, "rightRotate");
+    pcBlock("#pc-safe", null, "safeHeight");
+    pcBlock("#pc-seth", null, "setHeight");
+    pcBlock("#pc-bf", "#exp-bf", "balanceFactor");
+    pcBlock("#pc-avlrem", "#exp-avlrem", "avlRemove");
+
+    /* ===================== ANTI-AVL ===================== */
+    IN.explain("#intro-antiavl", t(
+      "Anti-AVL er en lek: vi vil ha et så skjevt tre som mulig, og vrir bort alle venstre barn.",
+      "InsertAntiAVL er vanlig BST-innsetting, men på veien tilbake opp sjekker vi om noden har fått et venstre barn. Har den det, gjør vi en høyrerotasjon. Resultatet er alltid en sortert høyrekjede.",
+      "Rotasjonen bevarer søketre-egenskapen, og invarianten «ingen venstre barn» gir høyst én rotasjon per innsetting. Høyden er n − 1, så innsetting er O(n) i verste fall."
+    ), { label: "Nivå:" });
+    mountDemo("#demo-antiavl", { algo: "insertAntiAVL", inputLabel: "f.eks. 3,1,4,2,5",
+      presets: { "H2025: 3,1,4,2,5": [3, 1, 4, 2, 5], "Stigende 1–5": [1, 2, 3, 4, 5], "Synkende 5–1": [5, 4, 3, 2, 1] } });
+
+    /* ===================== HUFFMAN ===================== */
+    IN.explain("#intro-huffman", t(
+      "Vi gir korte koder til bokstaver vi bruker mye, og lange koder til sjeldne bokstaver. Da blir teksten kortere totalt.",
+      "Legg alle symbolene i en prioritetskø etter frekvens. Ta ut de to minste, slå dem sammen til en ny node med summen, og legg den tilbake. Gjenta til ett tre står igjen.",
+      "Grådig konstruksjon med en min-heap: n − 1 sammenslåinger à O(log n) gir O(n log n). Treet er et fullt binærtre (0 eller 2 barn) med n løvnoder og n − 1 interne noder."
+    ), { label: "Nivå:" });
+    function parsePairs(s) {
+      var out = [];
+      (s.match(/[A-Za-zÆØÅæøå]\s*[:=]?\s*\d+/g) || []).forEach(function (m) { var sym = m.charAt(0), f = parseInt(m.slice(1).replace(/[:=\s]/g, ""), 10); if (f > 0) out.push([sym, f]); });
+      return out.length >= 2 ? [{ pairs: out.slice(0, 10) }] : [];
+    }
+    mountDemo("#demo-huffman", { algo: "huffman", parseInput: parsePairs, inputLabel: "f.eks. A1 B3 C7 D2",
+      legend: [{ cls: "compare", label: "v1 (minst)" }, { cls: "target", label: "v2 (nest minst)" }, { cls: "min", label: "Ny intern node" }, { cls: "sorted", label: "Ferdig tre" }],
+      presets: { "H2024: A1 B3 C7 D2": [{ pairs: [["A", 1], ["B", 3], ["C", 7], ["D", 2]] }],
+                 "H2021: a2 b1 c12 d1 e4": [{ pairs: [["a", 2], ["b", 1], ["c", 12], ["d", 1], ["e", 4]] }],
+                 "Like frekvenser": [{ pairs: [["w", 1], ["x", 1], ["y", 1], ["z", 1]] }] } });
+
+    (function codec() {
+      var host = qs("#codec");
+      var pairs = [["a", 2], ["b", 1], ["c", 12], ["d", 1], ["e", 4]], H = TR.huffman(pairs);
+      var rev = {}; Object.keys(H.codes).forEach(function (s) { rev[H.codes[s]] = s; });
+      host.appendChild(el("p", { class: "small", html: "Alfabetet fra H2021: " + pairs.map(function (p) { return "<code>" + p[0] + "</code> = <code>" + H.codes[p[0]] + "</code>"; }).join(", ") + "." }));
+      var inT = el("input", { type: "text", value: "aaabbcdee", "aria-label": "Tekst som skal kodes" });
+      var outT = el("div", { class: "out small" });
+      var inB = el("input", { type: "text", value: "", "aria-label": "Bitstreng som skal dekodes" });
+      var outB = el("div", { class: "out small" });
+      function enc() {
+        var s = inT.value, bits = "", bad = "";
+        for (var i = 0; i < s.length; i++) { var c = H.codes[s.charAt(i)]; if (c) bits += c; else if (!/\s/.test(s.charAt(i))) bad += s.charAt(i); }
+        outT.innerHTML = bad ? "Ukjente tegn: <b>" + esc(bad) + "</b>. Bruk bare a–e." : "<b>" + bits.length + " bit:</b> " + (bits || "–");
+        if (!bad) { inB.value = bits; dec(); }
+      }
+      function dec() {
+        var b = inB.value.replace(/\s/g, ""), cur = "", res = "", ok = /^[01]*$/.test(b);
+        if (!ok) { outB.textContent = "Bitstrengen kan bare inneholde 0 og 1."; return; }
+        for (var i = 0; i < b.length; i++) { cur += b.charAt(i); if (rev[cur]) { res += rev[cur]; cur = ""; } }
+        outB.innerHTML = "<b>Dekodet:</b> " + (esc(res) || "–") + (cur ? ' <span class="muted">(rest uten treff: ' + esc(cur) + ")</span>" : "");
+      }
+      inT.addEventListener("input", enc); inB.addEventListener("input", dec);
+      host.appendChild(el("label", { class: "small", text: "Tekst → bits" })); host.appendChild(inT); host.appendChild(outT);
+      host.appendChild(el("label", { class: "small", text: "Bits → tekst" })); host.appendChild(inB); host.appendChild(outB);
+      host.appendChild(el("p", { class: "muted small", text: "Fordi koden er prefiksfri, leser vi bit for bit til vi treffer et kodeord, og starter så på nytt." }));
+      enc();
+    })();
+
+    /* ===================== EKSAMEN (gjengitt med egne ord) ===================== */
+    // Løsning som DOM-node: nummerert liste + pseudokode rendret med IN.pseudo (BYGGEGUIDE 5.4)
+    function sol(items, algos) {
+      var d = el("div");
+      var ol = el("ol"); items.forEach(function (x) { ol.appendChild(el("li", { html: x })); }); d.appendChild(ol);
+      (algos || []).forEach(function (key) {
+        d.appendChild(el("h5", { style: "margin:.8rem 0 .3rem", text: "Pseudokode: " + A[key].name }));
+        var h = el("div"); d.appendChild(h); IN.pseudo.render(h, A[key], {});
+      });
+      return d;
+    }
+    var EXAM = {
+      "h2020-2": { year: "H2020", title: "Binære søketrær", oppgave_nr: "Oppgave 2", points: 4,
+        oppgave: ["Et tre har rot A med tre barn B, C og D. B har barna E og F, og D har barna G og H. Hvilken node må fjernes for at treet skal bli et binærtre?",
+          "Et binærtre har rot 4 med venstre barn 2 (barna 5 og 3) og høyre barn 6 (barnet 8). Hvilken node må fjernes for at det skal bli et binært søketre?",
+          "Er alle binære søketrær AVL-trær?", "Er alle AVL-trær binære søketrær?"],
+        losning: sol(["<b>C</b>. Roten har tre barn, men et binærtre tillater høyst to. C er en løvnode, så den kan fjernes uten å miste andre noder.",
+          "<b>5</b>. Den står som venstre barn av 2, men er større enn både 2 og 4. Fjernes den, oppfyller resten søketre-egenskapen.",
+          "<b>Nei.</b> En skjev kjede (f.eks. 1, 2, 3 satt inn sortert) er et søketre, men roten har balansefaktor −2.",
+          "<b>Ja.</b> Et AVL-tre er per definisjon et binært søketre med et ekstra balansekrav."]),
+        kjerne: "<p>Søketre-egenskapen gjelder <b>hele subtrær</b>. AVL er et strengere krav oppå BST.</p>",
+        tips: ["Begrunn med én setning hver gang. Det er den som viser at du forstår, ikke bare bokstaven."] },
+
+      "h2021-8": { year: "H2021", title: "Verdier i et intervall (InRange)", oppgave_nr: "Oppgave 8", points: 10,
+        oppgave: ["Skriv en prosedyre som skriver ut alle verdier x i et binært søketre med a ≤ x ≤ b, i stigende rekkefølge, og oppgi kjøretiden.",
+          "Hva blir kjøretiden i et balansert tre når a er den minste og b den største verdien?", "Hva blir kjøretiden når a = b?"],
+        losning: sol(["Inorder gir stigende rekkefølge. Legg til <b>beskjæring</b>: gå til venstre bare hvis a &lt; v.element, skriv ut hvis a ≤ v.element ≤ b, og gå til høyre bare hvis v.element &lt; b. Kjøretiden er O(h + k), der k er antall treff, altså O(log n + k) i et balansert tre.",
+          "Alle n verdier skal skrives ut, så O(n).", "Bare én sti fra roten: O(log n) i et balansert tre."], ["inRange"]),
+        kjerne: "<p>InRange = inorder + beskjæring. Uten beskjæring er løsningen O(n) uansett intervall.</p>",
+        tips: ["Inorder med filtrering, men uten beskjæring, ga høyst 8 av 10 poeng.", "Oppgi kjøretiden med k (antall treff). Det viser at du har forstått hvorfor beskjæringen hjelper."] },
+
+      "h2022-10": { year: "H2022", title: "Er treet et søketre? (CheckBST)", oppgave_nr: "Oppgave 10", points: 10,
+        oppgave: ["Forklar søketre-egenskapen.", "Skriv CheckBST(v) som avgjør om et binærtre med unike heltall er et binært søketre. FindMin og FindMax (lineær tid) kan brukes.", "Oppgi kjøretiden til løsningen din."],
+        losning: sol(["Hver node er større enn alt i venstre subtre og mindre enn alt i høyre subtre.",
+          "Den naive løsningen sammenligner v.element med FindMax(v.left) og FindMin(v.right) i hver node. Det er riktig, men O(n²). Bedre: send med grensene (low, high) som under. Et like godt alternativ er å gjøre en inorder og sjekke at lista er strengt stigende.",
+          "Grensemetoden og inorder-metoden er begge O(n)."], ["checkBST"]),
+        kjerne: "<p>Kravet gjelder hele subtrær. Grensene koder kravet fra alle forfedrene, så hver node sjekkes én gang.</p>",
+        tips: ["Inorder + sjekk av sortert rekkefølge ga full uttelling.", "Raskere løsninger ga mer uttelling enn den kvadratiske med FindMin/FindMax per node.", "Å bare sjekke direkte barn er feil: se moteksempelet over."] },
+
+      "h2023-5": { year: "H2023", title: "Diameteren til et binærtre", oppgave_nr: "Oppgave 5", points: 12,
+        oppgave: ["(1p) Finn diameteren til et gitt tre T4 (figur).", "(2p) Går den lengste stien alltid gjennom roten? Begrunn.",
+          "(8p) Skriv Diameter(v) som finner diameteren.", "(1p) Oppgi kjøretiden."],
+        losning: sol(["<b>5</b> (lest av figuren: stien går fra en løvnode, via roten, ned til en løvnode på andre siden).",
+          "<b>Nei.</b> Lag et nytt tre ved å sette en ny rot over et gammelt tre. Den lengste stien i det gamle treet er der fortsatt, og går ikke gjennom den nye roten. Se eksempelet «Ikke gjennom roten» i demoen.",
+          "Én postorder-rekursjon som returnerer (høyde, diameter). Høyde −1 for null. Stien gjennom v er hL + hR + 2.",
+          "O(n): hver node besøkes én gang med O(1) arbeid."], ["treDiameter"]),
+        kjerne: "<p>Lineær tid krever at høyden regnes ut <b>samtidig</b> med diameteren. Et nytt Height-kall per node gjør løsningen kvadratisk.</p>",
+        tips: ["c): 8p for lineær løsning, 5p for kvadratisk, og 3p for et godt forsøk som ikke virker.", "d) må stemme med løsningen din i c).", "b): 1p for svaret, 1p for begrunnelsen. Et moteksempel er nok."] },
+
+      "h2024-6": { year: "H2024", title: "Laveste felles forfeder", oppgave_nr: "Oppgave 6", points: 12,
+        oppgave: ["(1p) Forklar hvorfor to noder i samme tre alltid har en felles forfeder.",
+          "(5p) Hver node har <code>parent</code> og <code>depth</code>. Skriv en prosedyre som finner den laveste felles forfederen til u og v.",
+          "(5p) Gjør det samme i et binært søketre med unike heltall, gitt x &lt; y.", "(1p) Oppgi kjøretiden."],
+        losning: sol(["Roten er forfeder til alle noder.",
+          "Løft den dypeste av de to ett nivå om gangen til de er like (prosedyren LCA under). Eksempler fra treet: LCA(g, j) = e og LCA(e, j) = e.",
+          "Start i roten. Ligger v.element mellom x og y (med ≤), er v svaret. Er y &lt; v.element, gå til venstre, ellers til høyre (LCABST under).",
+          "Begge er O(h): O(n) i verste fall og O(log n) når treet er balansert."], ["lca", "lcaBST"]),
+        kjerne: "<p>Bruk strukturen du får: parent/depth i b), søketre-ordningen i c). Da holder det å følge én sti.</p>",
+        tips: ["O(h) gir full uttelling i b) og c). En lineær løsning ga høyst 3 av 5.", "Husk tilfellet der den ene noden er forfeder til den andre."] },
+
+      "h2020-6": { year: "H2020", title: "AVL-innsetting", oppgave_nr: "Oppgave 6", points: 9,
+        oppgave: ["Utgangspunktet er et binært søketre som er en høyrekjede 1 → 2 → 3 → 4 (ikke et AVL-tre). Tallet 5 settes inn med AVL-prosedyren, der hver node kjenner høyden sin og Balance kalles på hver node på veien opp.",
+          "Hvordan ser treet ut etter den første rotasjonen?", "Hvor mange enkle rotasjoner gjøres totalt (en dobbel teller som to)?", "Er resultatet et AVL-tre, og hva står i roten?"],
+        losning: sol(["5 settes inn som høyre barn av 4. På veien opp har 4 b = −1, som er lov, men 3 har b = −2.",
+          "<b>Første rotasjon:</b> venstrerotasjon på 3. Treet blir 1 → 2 → 4, der 4 har barna 3 og 5.",
+          "Videre opp: 2 har b = −2, og høyre barn 4 er i balanse (b = 0), så det blir en enkel venstrerotasjon på 2. Da står 4 under 1, med 2 (og 3) til venstre. 1 har nå b = −3, og høyre barn 4 er venstretungt (en knekk). Derfor blir det en <b>dobbel rotasjon</b>: høyrerotasjon på 4, så venstrerotasjon på 1.",
+          "Totalt <b>4 enkle rotasjoner</b>: tre venstrerotasjoner og én høyrerotasjon.",
+          "Ja, resultatet er et AVL-tre: roten <b>2</b> med venstre barn 1 og høyre barn 4, som har barna 3 og 5. Kjør «H2020: kjede + 5» i demoen for å se hvert steg."], ["avlInsert", "avlBalance"]),
+        kjerne: "<p>Balance kalles på <b>hver</b> node på veien opp. Starter du fra et ubalansert tre, kan det derfor bli rotasjoner på flere nivåer.</p>",
+        tips: ["Tegn treet etter hver rotasjon. Da er det lett å telle.", "Sjekk om det er en knekk før du roterer. Det avgjør om det blir enkel eller dobbel rotasjon."] },
+
+      "h2022-3": { year: "H2022", title: "AVL-trær", oppgave_nr: "Oppgave 3", points: 6,
+        oppgave: ["Seks AVL-trær med tallene 1–5 er gitt som figur.", "Hvilket av dem får du ved å sette inn 2, 4, 3, 1, 5 i et tomt AVL-tre?",
+          "Hvor mange av trærne kan fargelegges som rød-svarte trær?", "I hvilke av trærne fører innsetting av 6 til en rotasjon? Svar med summen av trenumrene."],
+        losning: sol(["Innsetting av 2, 4, 3 gir en knekk i 2, og en dobbel rotasjon gjør 3 til rot. Så kommer 1 til venstre for 2 og 5 til høyre for 4. Sluttreet er 3 med barna 2 (venstre barn 1) og 4 (høyre barn 5). I figuren var dette tre nr. 5. Kjør «H2022: 2,4,3,1,5» i demoen.",
+          "Alle 6.", "Trærne 2, 4 og 5, så svaret er 11."]),
+        kjerne: "<p>Spor innsettingen steg for steg, med høyder og balansefaktorer, i stedet for å gjette ut fra formen.</p>",
+        tips: ["Figurene er ikke gjengitt her. Øv på a) med demoen, og tegn trærne selv."] },
+
+      "h2025-3": { year: "H2025", title: "Anti-AVL", oppgave_nr: "Oppgave 3", points: 12,
+        oppgave: ["InsertAntiAVL setter inn som i et BST, men gjør en høyrerotasjon når en node på veien har et venstre barn.",
+          "Sett inn 3, 1, 4, 2, 5 i et tomt tre. Tegn resultatet og tell rotasjonene.", "Hvilken form får et Anti-AVL-tre generelt?",
+          "Er treet fortsatt et binært søketre?", "Hva er kjøretiden for oppslag?", "Hvordan skiller Anti-AVL seg fra AVL?"],
+        losning: sol(["Resultatet er høyrekjeden 1 → 2 → 3 → 4 → 5, etter <b>2 rotasjoner</b> (ved innsetting av 1 og av 2). Se demoen.",
+          "Alltid en høyrekjede, altså en sortert lenket liste.", "Ja. Rotasjoner bevarer søketre-egenskapen.",
+          "O(n), fordi høyden er n − 1.", "AVL roterer ut fra høyder for å holde treet balansert. Anti-AVL ser bare på om det finnes et venstre barn, og blir maksimalt ubalansert."], ["insertAntiAVL"]),
+        kjerne: "<p>Invarianten «ingen venstre barn» gir høyst én rotasjon per innsetting og en kjede som resultat.</p>",
+        tips: ["Følg kallene nedenfra og opp. Rotasjonen skjer etter det rekursive kallet."] },
+
+      "h2025-4": { year: "H2025", title: "Level-order", oppgave_nr: "Oppgave 4", points: 12,
+        oppgave: ["Skriv LevelOrderHeap(A) som returnerer elementene i en binær heap (lagret i array A) i level-order.",
+          "Skriv LevelOrderBST(v) som returnerer elementene i et binært søketre i level-order.", "Oppgi kjøretiden til begge.",
+          "Setter du inn elementene fra b) i et tomt BST i den rekkefølgen, hvilket tre får du?"],
+        losning: sol(["Heap-arrayet er allerede i level-order. Returner A.",
+          "Bredde først med en kø: legg inn roten, ta ut én node om gangen, legg den bakerst i resultatet, og legg inn barna som ikke er null. Et tre har ingen sykler, så vi trenger ingen visited-mengde.",
+          "Begge er O(n). Hver node behandles én gang.", "Nøyaktig samme tre. Hver node settes inn etter forfedrene sine og havner på samme plass. Se demoen «Samme tre fra level-order» under Binært søketre."], ["levelOrder"]),
+        kjerne: "<p>Level-order = kø. Heap-arrayet er level-order «gratis».</p>",
+        tips: ["Bruk kø, ikke stakk: med stakk blir det dybde først.", "Husk null-sjekk før Enqueue."] },
+
+      "h2024-2": { year: "H2024", title: "Huffman", oppgave_nr: "Oppgave 2", points: 10,
+        oppgave: ["(2p) Finn kodelengden til hvert symbol for frekvensene A = 1, B = 3, C = 7, D = 2.", "(1p) Hva inneholder løvnodene?", "(7p) Beskriv algoritmen som bygger Huffman-treet."],
+        losning: sol(["A og D slås sammen (3), så den nye noden og B (6), så 6 og C (13). Kodelengder: <b>A = 3, B = 2, C = 1, D = 3</b>.",
+          "Symbolene og frekvensene deres.",
+          "Legg alle symbolene i en prioritetskø ordnet på frekvens. Så lenge køen har mer enn én node: ta ut de to minste, lag en forelder med summen som frekvens, og legg den tilbake. Returner den siste noden, som er roten."], ["huffman"]),
+        kjerne: "<p>Grådig: slå alltid sammen de to sjeldneste. Prioritetskø gir O(n log n).</p>",
+        tips: ["c) ble gitt 2,5p for prioritetskøen, 2,5p for sammenslåingen, 1p for riktig stopp og 1p for å returnere roten.", "Skriv stoppbetingelsen eksplisitt: Size(Q) > 1."] },
+
+      "h2021-5": { year: "H2021", title: "Huffman-trær", oppgave_nr: "Oppgave 5", points: 5,
+        oppgave: ["Frekvensene er a = 2, b = 1, c = 12, d = 1, e = 4.", "Hva er den lengste kodelengden?", "Hva er kodelengden til e?",
+          "Hvor mange bit trengs for strengen «aaabbcdee»?", "Hvor mange noder har et Huffman-tre for 8 symboler?", "Hva er den lengste mulige koden med 8 symboler?"],
+        losning: sol(["Kodelengdene blir c = 1, e = 2, a = 3, b = 4, d = 4. Den lengste er <b>4</b>.", "<b>2</b>.",
+          "3 · 3 (a) + 2 · 4 (b) + 1 (c) + 4 (d) + 2 · 2 (e) = <b>26</b>. Prøv strengen i kode-/dekodeboksen.",
+          "<b>15</b>: 8 løvnoder og 7 interne noder (n − 1 sammenslåinger).", "<b>7</b>, når treet er helt skjevt (f.eks. frekvenser 1, 1, 2, 4, 8, …)."]),
+        kjerne: "<p>n symboler gir 2n − 1 noder. Maks kodelengde er n − 1.</p>",
+        tips: ["1p per del. Regn raskt, men sjekk summen i bit-oppgaven."] },
+
+      "h2022-8": { year: "H2022", title: "Autofullføring: prefikstre mot hashmap", oppgave_nr: "Oppgave 8", points: 6,
+        oppgave: ["Ordene bin, binary, bind, head, headache, hello, help, slack, sleep og sleepy skal brukes til autofullføring.",
+          "Drøft tid og minne for et prefikstre (trie) og for et hashmap fra prefiks til liste av ord."],
+        losning: sol(["<b>Prefikstre:</b> felles prefikser deles (bin-, hea-, hel-, sle-), så minnet blir lavt. Innsetting tar tid lik ordlengden. Fullføringer finnes ved å gå ned til prefikset og traversere subtreet, lineært i størrelsen på subtreet.",
+          "<b>Hashmap:</b> hvert prefiks peker til en liste med alle ord som starter slik. Den tomme strengen peker til hele ordlista, og korte prefikser gir lange lister, så minnet blir stort. Innsetting tar tid lik ordlengden (ett prefiks per tegn). Oppslag er forventet O(1) pluss antall treff.",
+          "Konklusjon: en avveining. Prefikstreet sparer minne, hashmapet gir raskere oppslag."]),
+        kjerne: "<p>En drøfting må dekke begge datastrukturene, og både tid og minne.</p>",
+        tips: ["Bruk eksempelordene konkret: vis hvilke prefikser som deles."] }
+    };
+    Object.keys(EXAM).forEach(function (id) { if (qs("#exam-" + id)) IN.examTasks("#exam-" + id, [EXAM[id]]); });
+
+    /* ===================== SANT/USANT ===================== */
+    IN.tfTest("#tf-traer", [
+      { s: "Inorder-traversering av et binærtre gir alltid elementene i sortert rekkefølge.", answer: false, blokk: "4",
+        explain: "Bare i et binært søketre. For et vilkårlig binærtre gir inorder bare rekkefølgen venstre–node–høyre." },
+      { s: "Høyden til en løvnode er 0.", answer: true, blokk: "4", explain: "Høyde måles i kanter ned til en løvnode. Løvnoden selv har 0 kanter under seg." },
+      { s: "Et binært søketre med n noder har alltid høyde O(log n).", answer: false, blokk: "4",
+        explain: "Setter du inn sortert, blir treet en kjede med høyde n − 1. Bare balanserte trær (som AVL) garanterer O(log n)." },
+      { s: "Søk, innsetting og fjerning i et AVL-tre er O(log n) i verste fall.", answer: true, blokk: "4",
+        explain: "AVL-invarianten holder høyden O(log n), og rebalansering koster O(1) per nivå." },
+      { s: "Level-order kan implementeres med en stakk i stedet for en kø.", answer: false, blokk: "4",
+        explain: "En stakk gir dybde-først-rekkefølge. Level-order krever FIFO, altså en kø." },
+      { s: "I et AVL-tre er balansefaktoren til hver node −1, 0 eller 1.", answer: true, blokk: "4", explain: "Det er selve AVL-invarianten: |b| ≤ 1." },
+      { s: "En dobbel rotasjon består av to enkle rotasjoner.", answer: true, blokk: "4",
+        explain: "Først roteres barnet (for å rette ut knekken), så noden selv." },
+      { s: "Diameteren til et binærtre går alltid gjennom roten.", answer: false, blokk: "4",
+        explain: "Den lengste stien kan ligge helt inne i ett subtre, f.eks. når roten bare har ett barn med et stort subtre under seg." },
+      { s: "Å kalle Height for hver node for å finne diameteren gir O(n) totalt.", answer: false, blokk: "4",
+        explain: "Height er O(n) per kall. For en kjede gir det O(n²). Returner høyde og diameter samtidig for å få O(n)." },
+      { s: "Fjerning av en node med to barn i et BST kan gjøres ved å kopiere inn det minste elementet i høyre subtre.", answer: true, blokk: "4",
+        explain: "Etterfølgeren ligger mellom venstre og høyre subtre i sortert rekkefølge, og har høyst ett barn, så den er lett å fjerne." },
+      { s: "I et Huffman-tre ligger symbolene i løvnodene.", answer: true, blokk: "4",
+        explain: "Interne noder har ikke symbol. Det er det som gjør koden prefiksfri." },
+      { s: "Huffman-koden for et symbol kan være prefiks av koden for et annet symbol.", answer: false, blokk: "4",
+        explain: "Symbolene ligger i løvnoder, så ingen kodesti fortsetter forbi et annet symbol. Koden er prefiksfri." },
+      { s: "Den laveste felles forfederen til u og v kan være u selv.", answer: true, blokk: "4",
+        explain: "Hvis u er forfeder til v, er u svaret. En node regnes som etterkommer av seg selv." },
+      { s: "Setter vi inn elementene i et BST i level-order-rekkefølge, får vi samme tre.", answer: true, blokk: "4",
+        explain: "Hver node settes inn etter alle forfedrene sine, så den følger samme sti og havner på samme plass (H2025 d)." },
+      { s: "Et binærtre med høyde h har høyst 2<sup>h</sup> noder.", answer: false, blokk: "4",
+        explain: "Høyst 2<sup>h+1</sup> − 1 noder: 1 + 2 + … + 2<sup>h</sup>." }
+    ], { id: "traer-tf" });
+
+    switches();
+
+    // Badge-klikk: gå til fanen og åpne eksamenskortet
+    qsa(".badge[data-go]").forEach(function (b) {
+      b.setAttribute("role", "button"); b.setAttribute("tabindex", "0");
+      function go() {
+        location.hash = "fane=" + b.getAttribute("data-go");
+        var card = qs("#exam-" + b.getAttribute("data-card") + " .examtask");
+        if (card) { card.setAttribute("open", ""); setTimeout(function () { card.scrollIntoView({ behavior: "smooth", block: "center" }); }, 60); }
+      }
+      b.addEventListener("click", go);
+      b.addEventListener("keydown", function (e) { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); go(); } });
+    });
+  })();
+  </script>
+</body>
+</html>
