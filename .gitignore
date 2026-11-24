@@ -1,0 +1,29 @@
+# ---------------------------------------------------------------
+# Kildemateriale fra UiO – deles IKKE. Tilhører Universitetet i Oslo.
+# Hele kilder-mappa (eksamenssett, sensorveiledninger, kompendier,
+# snarveier) og alle PDF-er holdes utenfor versjonskontroll.
+# ---------------------------------------------------------------
+kilder/
+*.pdf
+
+# Claude Code-verktøy og lokale sesjonsnotater
+.claude/
+
+# Internt arbeidsmateriale – IKKE publisert (kildegjennomganger, eksamensbank
+# under arbeid/ikke korrekturlest, komponent- og planskisser, symboldatabank).
+# Løftes selektivt inn i selve nettstedet (assets/) når innholdet er korrekturlest.
+plan/
+
+# Dokumentasjon/planer i rota trengs ikke for at siden skal kjøre (README, BYGGEGUIDE, PLAN …)
+/*.md
+
+# OS / editor
+.DS_Store
+Thumbs.db
+desktop.ini
+*~
+.vscode/
+.idea/
+
+# Node (hvis verktøy legges til senere)
+node_modules/

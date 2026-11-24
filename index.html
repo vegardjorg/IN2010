@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="nb">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>IN2010 · interaktiv eksamensguide</title>
+  <meta name="description" content="Interaktiv eksamensguide for IN2010 – Algoritmer og datastrukturer. Dekker eksamen H2023–H2025.">
+  <script>(function(){try{var d=document.documentElement;var t=localStorage.getItem('in-theme');if(t&&t!=='system')d.setAttribute('data-theme',t);var l=localStorage.getItem('in-level')||'normal';d.setAttribute('data-level',l);}catch(e){document.documentElement.setAttribute('data-level','normal');}})();</script>
+  <link rel="stylesheet" href="assets/css/styles.css">
+</head>
+<body data-page="index">
+  <a class="skip-link" href="#main">Hopp til innhold</a>
+  <header id="topnav"></header>
+
+  <main id="main" class="wrap">
+    <div class="pagehead">
+      <h1>IN2010 – interaktiv eksamensguide</h1>
+      <p class="lead">Algoritmer og datastrukturer, forklart steg for steg og knyttet til hver
+        eksamensoppgave i H2023, H2024 og H2025. Velg forklaringsnivå øverst – eller på hvert felt –
+        fra <b>5-åring</b> til <b>Teknisk</b>.</p>
+    </div>
+
+    <div class="notice">
+      <b>Dette er et tidlig utsnitt (S1).</b> Rammeverk, forside, pseudokode-skolen, Begreper og
+      Sortering er på plass. De øvrige blokkene er merket «snart» og kommer i neste runder.
+      Si fra om stilen og pedagogikken treffer før resten masseproduseres.
+    </div>
+
+    <section>
+      <h2>Slik bruker du siden</h2>
+      <div class="grid cols-3">
+        <div class="card">
+          <h3>1 · Velg nivå</h3>
+          <p class="muted small">Nivåbryteren øverst gjelder hele siden. Hver forklaring og hver demo
+            har i tillegg sin egen bryter, så du kan heve én ting til «Teknisk» uten å endre resten.</p>
+        </div>
+        <div class="card">
+          <h3>2 · Spill demoene</h3>
+          <p class="muted small">Steg deg gjennom algoritmene med <span class="kbd">←</span>
+            <span class="kbd">→</span> eller Spill av. Pseudokoden lyser opp linje for linje i takt
+            med stegene.</p>
+        </div>
+        <div class="card">
+          <h3>3 · Øv</h3>
+          <p class="muted small">Sorter pseudokode-linjer (Parsons), svar på quiz og forutsi neste
+            steg. Begynn gjerne i <a href="pseudokode.html">Pseudokode-skolen</a>.</p>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <h2>Blokkene</h2>
+      <div id="block-cards" class="grid cols-2"></div>
+    </section>
+
+    <section>
+      <h2>Oppgavekart – alle eksamensoppgaver</h2>
+      <p class="muted small">Hver oppgave fra H2023–H2025 lenker til riktig blokk og fane. Grå rader
+        peker til blokker som ikke er bygget ennå.</p>
+      <div class="table-wrap">
+        <table id="task-map">
+          <thead><tr><th>År</th><th>Oppgave</th><th class="num">Poeng</th><th>Blokk</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section>
+      <h2>Eksamen på 60 sekunder</h2>
+      <div class="card">
+        <ul>
+          <li><b>Oppvarming (2p):</b> «Hva er en algoritme / en datastruktur?» – alle rimelige svar gir full uttelling.</li>
+          <li><b>Del 1:</b> små oppgaver som rettes automatisk. Ubesvart = feil, så <b>svar på alt</b>.</li>
+          <li><b>Del 2:</b> større oppgaver (10–15p) med pseudokode, skriving og resonnering.</li>
+          <li>Ingen hjelpemidler. <b>Lavere kjøretid foretrekkes.</b> Pensumalgoritmer kan antas tilgjengelige
+            med mindre annet er sagt – si hva kallet returnerer og oppgi kjøretiden.</li>
+        </ul>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    IN2010-guide · laget for eksamensøving · fungerer frakoblet (file://) og på GitHub Pages.
+  </footer>
+
+  <script src="assets/js/core.js"></script>
+  <script>
+  (function () {
+    var IN = window.IN, el = IN.el;
+
+    // Blokk-kort
+    var BLOCKS = [
+      { page:"begreper",  n:"0", title:"Begreper",  desc:"Algoritme, datastruktur, Big-O, stabil/in-place, ADT, rekursjon.", tasks:3 },
+      { page:"sortering", n:"1", title:"Sortering", desc:"Selection, bubble, insertion, gnome, merge, quick, bøtte, heapsort.", tasks:2 },
+      { page:"sok",       n:"2", title:"Søk & array-triks", desc:"Binærsøk, finn duplikat, finn k minste, hashtriks.", tasks:3 },
+      { page:"heap",      n:"3", title:"Heap / prioritetskø", desc:"Innsetting, removeMin, buildHeap, mediankø, level-order.", tasks:3 },
+      { page:"traer",     n:"4", title:"Trær & søketrær", desc:"Traversering, BST, diameter, LCA, AVL/Anti-AVL, Huffman.", tasks:5 },
+      { page:"hashing",   n:"5", title:"Hashing", desc:"Chaining, linear probing, rehash, Python 3.6-dict.", tasks:2 },
+      { page:"grafer",    n:"6", title:"Grafer", desc:"BFS, DFS, sykler, topsort, SCC, Dijkstra, Bellman-Ford, MST.", tasks:7 },
+      { page:"strategi",  n:"7", title:"Eksamensstrategi", desc:"Snarveier, verktøykasse, sikringssetninger, jukselapp.", tasks:0 }
+    ];
+    var ready = {}; IN.PAGES.forEach(function (p) { ready[p.id] = p.ready; });
+    var pageHref = {}; IN.PAGES.forEach(function (p) { pageHref[p.id] = p.href; });
+
+    var host = IN.qs("#block-cards");
+    BLOCKS.forEach(function (b) {
+      var isReady = ready[b.page];
+      var card = el("div", { class: "card" });
+      var h = el("h3");
+      var title = (isReady)
+        ? el("a", { href: pageHref[b.page] + "#", text: "Blokk " + b.n + " · " + b.title })
+        : el("span", { text: "Blokk " + b.n + " · " + b.title });
+      h.appendChild(title);
+      if (!isReady) h.appendChild(el("span", { class: "tag", text: "snart", style: "margin-left:.5rem" }));
+      card.appendChild(h);
+      card.appendChild(el("p", { class: "muted small", text: b.desc }));
+      if (b.tasks > 0) card.appendChild(el("div", { class: "pills" }, [
+        el("span", { class: "pill", html: '<span class="k">eksamensoppgaver</span> ' + b.tasks })
+      ]));
+      host.appendChild(card);
+    });
+
+    // Oppgavekart
+    var TASKS = [
+      ["H23","Oppvarming (algoritme/datastruktur)",2,"begreper","algoritme"],
+      ["H23","Innsetting i heap",10,"heap","innsetting"],
+      ["H23","Finn duplikat",12,"sok","duplikat"],
+      ["H23","Gnome sort",10,"sortering","gnome"],
+      ["H23","Diameteren til et tre",12,"traer","diameter"],
+      ["H23","Blindern-problemet (MST)",10,"grafer","mst"],
+      ["H23","Dependency hell (sykel/DAG)",12,"grafer","sykler"],
+      ["H24","Oppvarming",2,"begreper","algoritme"],
+      ["H24","Huffman-trær",10,"traer","huffman"],
+      ["H24","Etymologisk ordliste (bøttesort)",10,"sortering","bucket"],
+      ["H24","Jazz eller klassisk? (BFS ≤ k)",10,"grafer","bfs"],
+      ["H24","Python 3.6-dict",10,"hashing","python"],
+      ["H24","Laveste felles forfeder (LCA)",12,"traer","lca"],
+      ["H24","Mediankø (to heaper)",12,"heap","median"],
+      ["H24","Rundtur med DNT (SCC/Dijkstra)",12,"grafer","scc"],
+      ["H25","Oppvarming",2,"begreper","algoritme"],
+      ["H25","Separate chaining",10,"hashing","chaining"],
+      ["H25","Sykler i grafer",11,"grafer","sykler"],
+      ["H25","Anti-AVL",12,"traer","antiavl"],
+      ["H25","Level-order (heap/BST)",12,"heap","levelorder"],
+      ["H25","Finn k minste",12,"sok","kminste"],
+      ["H25","Kollektivtilbudet i Oslo",15,"grafer","mst"]
+    ];
+    var tbody = IN.qs("#task-map tbody");
+    TASKS.forEach(function (r) {
+      var isReady = ready[r[3]];
+      var tr = el("tr");
+      tr.appendChild(el("td", {}, el("span", { class: "tag", text: r[0] })));
+      tr.appendChild(el("td", { text: r[1] }));
+      tr.appendChild(el("td", { class: "num", html: '<span class="pts">' + r[2] + "p</span>" }));
+      var dest = el("td");
+      if (isReady) dest.appendChild(el("a", { href: pageHref[r[3]] + "#fane=" + r[4], text: cap(r[3]) }));
+      else { dest.appendChild(el("span", { class: "muted", text: cap(r[3]) })); dest.appendChild(el("span", { class: "tag", text: "snart", style: "margin-left:.4rem" })); }
+      tr.appendChild(dest);
+      if (!isReady) tr.style.opacity = ".6";
+      tbody.appendChild(tr);
+    });
+    function cap(id){ var m={begreper:"0 Begreper",sortering:"1 Sortering",sok:"2 Søk",heap:"3 Heap",traer:"4 Trær",hashing:"5 Hashing",grafer:"6 Grafer",strategi:"7 Strategi"}; return m[id]||id; }
+  })();
+  </script>
+</body>
+</html>

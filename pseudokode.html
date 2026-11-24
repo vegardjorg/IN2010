@@ -1,0 +1,273 @@
+<!doctype html>
+<html lang="nb">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Pseudokode-skolen · IN2010</title>
+  <meta name="description" content="Lær eksamensformatet for pseudokode: notasjon, linjeleser, tracer og øving.">
+  <script>(function(){try{var d=document.documentElement;var t=localStorage.getItem('in-theme');if(t&&t!=='system')d.setAttribute('data-theme',t);var l=localStorage.getItem('in-level')||'normal';d.setAttribute('data-level',l);}catch(e){document.documentElement.setAttribute('data-level','normal');}})();</script>
+  <link rel="stylesheet" href="assets/css/styles.css">
+</head>
+<body data-page="pseudokode">
+  <a class="skip-link" href="#main">Hopp til innhold</a>
+  <header id="topnav"></header>
+
+  <main id="main" class="wrap">
+    <div class="pagehead">
+      <h1>Pseudokode-skolen</h1>
+      <p class="lead">Eksamen krever pseudokode som er «lett forståelig, entydig og presis». Her lærer du
+        eksamensformatet (algorithm2e-stil), leser algoritmer linje for linje på ditt nivå, kjører dem
+        steg for steg, og øver.</p>
+    </div>
+
+    <div class="tabs" role="tablist" aria-label="Underemner">
+      <button data-tab="notasjon">Notasjon</button>
+      <button data-tab="linjeleser">Linjeleser</button>
+      <button data-tab="tracer">Tracer</button>
+      <button data-tab="ov">Øv</button>
+      <button data-tab="skriveguide">Skriveguide</button>
+    </div>
+
+    <!-- ===================== NOTASJON ===================== -->
+    <section data-panel="notasjon">
+      <div class="callout begrep"><span class="lbl">Begrep</span>
+        Eksamen bruker en matematisk pseudokode (algorithm2e). Du trenger ikke et «ekte» språk –
+        du trenger å være entydig. Her er byggeklossene, med minieksempler.</div>
+
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Notasjon</th><th>Betyr</th><th>Eksempel</th></tr></thead>
+          <tbody id="notasjon-tbody"></tbody>
+        </table>
+      </div>
+
+      <div class="callout sensor"><span class="lbl">Sensortips</span>
+        Skriv <code>Input:</code> og <code>Output:</code> øverst, bruk entydige navn, hold ett
+        detaljnivå, og oppgi kjøretiden til slutt. En presis forklaring i naturlig språk kan gi mer
+        enn uklar kode.</div>
+    </section>
+
+    <!-- ===================== LINJELESER ===================== -->
+    <section data-panel="linjeleser">
+      <p class="muted small">Velg en algoritme. Klikk en linje (eller bruk <span class="kbd">↑</span>
+        <span class="kbd">↓</span>) for forklaring. Bryteren i forklaringsboksen styrer nivået bare for
+        dette feltet.</p>
+      <div class="btn-row" id="ll-picker" role="group" aria-label="Velg algoritme"></div>
+      <h3 id="ll-title"></h3>
+      <div id="ll-explainer"></div>
+      <div id="ll-bigo"></div>
+    </section>
+
+    <!-- ===================== TRACER ===================== -->
+    <section data-panel="tracer">
+      <p class="muted small">Kjør Selection sort på et lite array. Søylene viser arrayet; pseudokoden
+        lyser i takt. (Flere sorteringer kjører du på <a href="01-sortering.html">Sortering-siden</a>.)</p>
+      <div class="grid cols-2">
+        <div>
+          <div id="tr-player"></div>
+        </div>
+        <div>
+          <div id="tr-pseudo"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== ØV ===================== -->
+    <section data-panel="ov">
+      <h3>Sorter linjene (Parsons)</h3>
+      <p class="muted small">Dra linjene i riktig rekkefølge og sett riktig innrykk. Innrykk teller.</p>
+      <div class="btn-row" id="pa-picker" role="group" aria-label="Velg algoritme for Parsons"></div>
+      <div id="pa-host"></div>
+
+      <hr>
+      <h3>Forutsi neste steg</h3>
+      <div id="quiz-forutsi"></div>
+
+      <hr>
+      <h3>Finn feilen</h3>
+      <p class="muted small">Én linje er endret fra korrekt Selection sort. Klikk linja du tror er feil.</p>
+      <div id="ff-host"></div>
+      <div id="ff-status" class="muted small" aria-live="polite" style="margin-top:.4rem"></div>
+    </section>
+
+    <!-- ===================== SKRIVEGUIDE ===================== -->
+    <section data-panel="skriveguide">
+      <div class="callout eli5"><span class="lbl">ELI5</span>
+        Tenk at du forklarer en oppskrift til noen som skal følge den helt bokstavelig. Da må du være
+        tydelig: hva har du (Input), hva skal du ende med (Output), og hvert steg uten «skjønn».</div>
+
+      <h3>Oppskrift for god eksamens-pseudokode</h3>
+      <ol>
+        <li><b>Input / Output først.</b> Skriv hva prosedyren får inn og hva den gir ut.</li>
+        <li><b>Entydige navn.</b> <code>minste</code>, ikke <code>m</code> hvis det er uklart.</li>
+        <li><b>Ett detaljnivå.</b> Ikke bland høynivå og lavnivå i samme prosedyre.</li>
+        <li><b>Redegjør for antagelser.</b> «Jeg antar at <code>BinarySearch</code> returnerer indeksen.»</li>
+        <li><b>Bruk pensumkall som byggeklosser</b> – med en «sikringssetning» ved siden av.</li>
+        <li><b>Oppgi kjøretiden til slutt</b>, i Big-O.</li>
+      </ol>
+
+      <div class="grid cols-2">
+        <div class="card">
+          <h4 style="margin-top:.2rem">Uklar (trekker)</h4>
+          <div class="pseudo" id="sg-bad"></div>
+        </div>
+        <div class="card">
+          <h4 style="margin-top:.2rem">Presis (full score)</h4>
+          <div class="pseudo" id="sg-good"></div>
+        </div>
+      </div>
+
+      <div class="callout snarvei"><span class="lbl">Snarvei</span>
+        «Jeg bruker <code>MergeSort(A)</code> som er stabil og O(n log n) i verste tilfelle.» –
+        tre krav for snarvei: si hva kallet returnerer, hold kjøretiden, oppgi kjøretiden.
+        Mer i <a href="07-strategi.html">Strategi-blokken</a> (kommer).</div>
+    </section>
+  </main>
+
+  <footer class="footer">IN2010-guide · Pseudokode-skolen</footer>
+
+  <script src="assets/js/core.js"></script>
+  <script src="assets/js/pseudocode.js"></script>
+  <script src="assets/js/stepplayer.js"></script>
+  <script src="assets/js/viz-bars.js"></script>
+  <script src="assets/js/data-algos.js"></script>
+  <script>
+  (function () {
+    var IN = window.IN, el = IN.el, qs = IN.qs;
+
+    /* ---- Notasjon ---- */
+    var NOT = [
+      ["A ← b", "Tilordning: sett A til verdien b.", "k ← i"],
+      ["for i ← 0 to n − 1 do", "Løkke, BEGGE grenser inkludert (0 og n−1).", "for i ← 0 to 2 → i = 0,1,2"],
+      ["while … do", "Gjenta så lenge betingelsen er sann.", "while i &lt; n do"],
+      ["if … then … else", "Forgrening.", "if A[j] &lt; A[k] then k ← j"],
+      ["A[i]", "Element nr. i i array A (indeks fra 0).", "A[0] er første element"],
+      ["swap A[i] and A[k]", "Bytt verdiene på to plasser.", ""],
+      ["return", "Gi tilbake en verdi og avslutt prosedyren.", "return mid"],
+      ["Procedure Navn(A)", "Starten på en prosedyre med parameter.", "Procedure SelectionSort(A)"],
+      ["v.left / v.right / v.parent", "Felt på en node (venstre/høyre barn, forelder).", "v.left = null"],
+      ["⌊ x ⌋", "Rund ned til nærmeste heltall.", "⌊(low+high)/2⌋"],
+      ["|V|, |E|", "Antall noder / kanter i en graf.", "O(|V| + |E|)"],
+      ["∈", "«er element i».", "v ∈ V"],
+      ["∞", "Uendelig (ofte startavstand i Dijkstra).", "dist[v] ← ∞"],
+      ["← indeks fra 0", "Alt er 0-indeksert på eksamen.", "Første plass er 0"],
+      ["null", "Ingen verdi / peker til ingenting.", "v.parent = null"]
+    ];
+    var ntb = qs("#notasjon-tbody");
+    NOT.forEach(function (r) {
+      var tr = el("tr");
+      tr.appendChild(el("td", { html: '<span class="mono">' + r[0] + "</span>" }));
+      tr.appendChild(el("td", { text: r[1] }));
+      tr.appendChild(el("td", { html: r[2] ? '<span class="mono">' + r[2] + "</span>" : "" }));
+      ntb.appendChild(tr);
+    });
+
+    /* ---- Linjeleser ---- */
+    var LL = [
+      { id: "selectionSort", label: "Selection" },
+      { id: "bubbleSort", label: "Bubble" },
+      { id: "insertionSort", label: "Insertion" },
+      { id: "gnomeSort", label: "Gnome" },
+      { id: "binarySearch", label: "Binærsøk" },
+      { id: "heapInsert", label: "HeapInsert" }
+    ];
+    var llPicker = qs("#ll-picker"), llTitle = qs("#ll-title");
+    var llExp = qs("#ll-explainer"), llBig = qs("#ll-bigo");
+    function showLL(id) {
+      var algo = IN.algos[id];
+      llTitle.textContent = algo.title;
+      IN.pseudo.explainer(llExp, algo);
+      IN.clear(llBig);
+      var b = IN.pseudo.bigO(algo); if (b) llBig.appendChild(b);
+      IN.qsa("button", llPicker).forEach(function (btn) {
+        btn.classList.toggle("primary", btn.getAttribute("data-id") === id);
+      });
+    }
+    LL.forEach(function (a, i) {
+      llPicker.appendChild(el("button", { class: "btn sm", type: "button", "data-id": a.id, text: a.label,
+        onclick: function () { showLL(a.id); } }));
+    });
+    showLL("selectionSort");
+
+    /* ---- Tracer (Selection sort) ---- */
+    var trHandle = IN.pseudo.render("#tr-pseudo", IN.algos.selectionSort, {});
+    IN.stepPlayer("#tr-player", {
+      generate: IN.gen.selectionSort,
+      presets: { "5,1,4,2,8": [5, 1, 4, 2, 8], "nesten sortert": [1, 2, 4, 3, 5], "omvendt": [8, 5, 4, 2, 1] },
+      render: function (step, ctx) { IN.vizBars(ctx.stage, step); },
+      pseudo: trHandle,
+      legend: [
+        { cls: "default", label: "Usortert" }, { cls: "target", label: "Målplass i" },
+        { cls: "min", label: "Minste k" }, { cls: "compare", label: "Skanner j" },
+        { cls: "swap", label: "Bytter" }, { cls: "sorted", label: "Sortert" }
+      ],
+      initial: [5, 1, 4, 2, 8]
+    });
+
+    /* ---- Parsons ---- */
+    var paPicker = qs("#pa-picker"), paHost = qs("#pa-host");
+    var PA = [["selectionSort", "Selection"], ["gnomeSort", "Gnome"], ["binarySearch", "Binærsøk"], ["heapInsert", "HeapInsert"]];
+    function showPA(id) {
+      IN.pseudo.parsons(paHost, IN.algos[id]);
+      IN.qsa("button", paPicker).forEach(function (b) { b.classList.toggle("primary", b.getAttribute("data-id") === id); });
+    }
+    PA.forEach(function (a) { paPicker.appendChild(el("button", { class: "btn sm", type: "button", "data-id": a[0], text: a[1], onclick: function () { showPA(a[0]); } })); });
+    showPA("selectionSort");
+
+    /* ---- Forutsi-quiz ---- */
+    IN.quiz("#quiz-forutsi", [
+      { q: "I Selection sort på <span class='mono'>[5,1,4,2,8]</span>: hva er <span class='mono'>k</span> (indeks for minste) etter at indre løkke er ferdig for <span class='mono'>i = 0</span>?",
+        options: ["0", "1", "3", "4"], answer: 1,
+        explain: "Minste verdi er 1 på indeks 1, så k = 1. Deretter byttes A[0] og A[1]." },
+      { q: "Hvor mange bytter gjør Selection sort <b>totalt</b> på et array med n elementer (verste tilfelle)?",
+        options: ["O(1)", "O(n)", "O(n log n)", "O(n²)"], answer: 1,
+        explain: "Nøyaktig ett bytte per ytre runde → O(n) bytter, selv om det er O(n²) sammenligninger." },
+      { q: "Bubble sort med swapped-flagg på et allerede sortert array bruker …",
+        options: ["O(n) tid (én runde uten bytter)", "O(n log n)", "O(n²) uansett", "O(log n)"], answer: 0,
+        explain: "Første runde gir ingen bytter → swapped er false → break. Det er best-case O(n)." }
+    ]);
+
+    /* ---- Finn feilen ---- */
+    (function () {
+      var orig = IN.algos.selectionSort;
+      var faulty = { title: orig.title, name: orig.name, params: orig.params, input: orig.input, output: orig.output,
+        lines: orig.lines.map(function (l) { return { code: l.code, indent: l.indent }; }) };
+      var badLine = 4; // display-linje: "for j ← i + 1 to n − 1 do"
+      faulty.lines[2].code = "for j ← i + 1 to n − 2 do"; // ekte feil: hopper over siste element
+      var h = IN.pseudo.render("#ff-host", faulty, { interactive: true });
+      var status = qs("#ff-status"), solved = false;
+      h.onLineClick(function (n) {
+        if (solved) return;
+        if (n === badLine) {
+          h.select(n); solved = true;
+          status.innerHTML = "✓ Riktig! Den skal være <span class='mono'>for j ← i + 1 to n − 1 do</span>. " +
+            "Med <span class='mono'>n − 2</span> ser den indre løkka aldri på det siste elementet, så ligger det minste gjenværende tallet helt bakerst, blir det aldri valgt – og arrayet ender usortert.";
+        } else {
+          status.textContent = "Ikke den linja – prøv igjen.";
+        }
+      });
+    })();
+
+    /* ---- Skriveguide før/etter ---- */
+    IN.pseudo.render("#sg-bad", {
+      name: "Finn", params: "A, x", input: "", output: "",
+      lines: [
+        { code: "gå gjennom A og let etter x", indent: 1 },
+        { code: "hvis du finner den, si fra", indent: 1 }
+      ]
+    }, { head: false });
+    IN.pseudo.render("#sg-good", {
+      name: "Finn", params: "A, x",
+      input: "Et array A med n elementer og et element x",
+      output: "Indeksen til x, eller −1",
+      lines: [
+        { code: "for i ← 0 to n − 1 do", indent: 1 },
+        { code: "if A[i] = x then", indent: 2 },
+        { code: "return i", indent: 3 },
+        { code: "return −1", indent: 1 }
+      ]
+    });
+  })();
+  </script>
+</body>
+</html>

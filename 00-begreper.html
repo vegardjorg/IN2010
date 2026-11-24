@@ -1,0 +1,391 @@
+<!doctype html>
+<html lang="nb">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Blokk 0 · Begreper · IN2010</title>
+  <meta name="description" content="Grunnbegreper i IN2010: algoritme, datastruktur, Big-O, stabil/in-place, ADT, rekursjon.">
+  <script>(function(){try{var d=document.documentElement;var t=localStorage.getItem('in-theme');if(t&&t!=='system')d.setAttribute('data-theme',t);var l=localStorage.getItem('in-level')||'normal';d.setAttribute('data-level',l);}catch(e){document.documentElement.setAttribute('data-level','normal');}})();</script>
+  <link rel="stylesheet" href="assets/css/styles.css">
+</head>
+<body data-page="begreper">
+  <a class="skip-link" href="#main">Hopp til innhold</a>
+  <header id="topnav"></header>
+
+  <main id="main" class="wrap">
+    <div class="pagehead">
+      <h1>Blokk 0 · Begreper</h1>
+      <p class="lead">Fundamentet: hva en algoritme og en datastruktur er, kjøretid og Big-O,
+        stabil/in-place, ADT vs. datastruktur, og rekursjon.</p>
+      <div class="badges">
+        <span class="badge" data-go="algoritme"><b>Oppvarming</b> · alle år · <span class="pts">2p</span></span>
+      </div>
+    </div>
+
+    <div class="tabs" role="tablist" aria-label="Underemner">
+      <button data-tab="algoritme">Algoritme &amp; datastruktur</button>
+      <button data-tab="bigo">Kjøretid &amp; Big-O</button>
+      <button data-tab="stabil">Stabil &amp; in-place</button>
+      <button data-tab="adt">ADT vs. datastruktur</button>
+      <button data-tab="rekursjon">Rekursjon</button>
+    </div>
+
+    <!-- ALGORITME -->
+    <section data-panel="algoritme">
+      <div class="callout begrep"><span class="lbl">Begrep</span>
+        <b>Algoritme:</b> en presis, endelig oppskrift med steg som løser et problem.
+        <b>Datastruktur:</b> en måte å organisere og lagre data på, slik at operasjonene vi trenger blir effektive.</div>
+
+      <h3>Forklaring</h3>
+      <div id="ex-algoritme"></div>
+
+      <div class="callout eksempel"><span class="lbl">Eksempel på svar (maks fire setninger)</span>
+        <p><b>Algoritme:</b> «En algoritme er en entydig, endelig sekvens av steg som tar et input og
+          produserer et output som løser et bestemt problem. Et eksempel er binærsøk, som finner et tall i
+          et sortert array.»</p>
+        <p><b>Datastruktur:</b> «En datastruktur organiserer data i minnet slik at visse operasjoner blir
+          raske. For eksempel gir en heap rask tilgang til det minste elementet.»</p></div>
+
+      <div class="callout sensor"><span class="lbl">Sensortips</span>
+        «Vi er ikke ute etter et fasitsvar – alle rimelige svar gir full uttelling.» Få med: entydig/presis,
+        endelig, input→output for algoritme; organisering + effektive operasjoner for datastruktur.</div>
+
+      <h3>Sjekk deg selv</h3>
+      <div id="quiz-algoritme"></div>
+    </section>
+
+    <!-- BIG-O -->
+    <section data-panel="bigo">
+      <div class="callout begrep"><span class="lbl">Begrep</span>
+        <b>Big-O</b> beskriver hvordan kjøretiden vokser når input n blir stor – vi ser bort fra konstanter
+        og lavordensledd og bryr oss bare om veksttakten. De vanlige klassene er O(1), O(log n), O(n),
+        O(n log n), O(n²) og O(2ⁿ).
+        <b>Merk:</b> veksttakt og tilfelle (beste/verste/snitt) er to forskjellige spørsmål. Tilfellet sier
+        <i>hvilken</i> input vi ser på; Big-O sier hvor raskt kjøretiden vokser i <i>det</i> tilfellet. Derfor
+        gir vi gjerne én kjøretid for beste tilfelle (f.eks. O(n)) og en annen for verste (f.eks. O(n²)).</div>
+
+      <h3>Forklaring</h3>
+      <div id="ex-bigo"></div>
+
+      <h3>Voksehierarki – lek med n</h3>
+      <p class="muted small">Dra i n og se hvor ulikt klassene vokser. Skru på logaritmisk skala når
+        n² og 2ⁿ stikker av.</p>
+      <div class="card">
+        <div class="btn-row">
+          <label class="fld">n = <input type="range" id="bo-n" min="1" max="40" value="8"></label>
+          <span class="pill"><span class="k">n</span> <span id="bo-nval">8</span></span>
+          <label class="fld"><input type="checkbox" id="bo-log"> logaritmisk skala</label>
+        </div>
+        <div id="bo-bars" class="bars" style="min-height:170px"></div>
+        <div class="legend"><span class="muted small">Antall operasjoner (anslag) for hver kompleksitetsklasse ved valgt n.</span></div>
+      </div>
+
+      <div class="callout uni"><span class="lbl">Universitetsnivå</span>
+        Rekkefølgen er <span class="mono">1 &lt; log n &lt; n &lt; n log n &lt; n² &lt; 2ⁿ</span>. En O(n log n)-sortering
+        på n = 1 000 000 gjør ~20 millioner steg; en O(n²) gjør ~10¹². Derfor står det på eksamen at
+        «lavere kjøretidskompleksitet foretrekkes».</div>
+
+      <h3>Tell operasjoner</h3>
+      <div id="quiz-bigo"></div>
+    </section>
+
+    <!-- STABIL & IN-PLACE -->
+    <section data-panel="stabil">
+      <div class="callout begrep"><span class="lbl">Begrep</span>
+        <b>Stabil:</b> like elementer beholder sin innbyrdes rekkefølge etter sortering.
+        <b>In-place:</b> algoritmen bruker bare O(1) ekstra minne (sorterer «i selve arrayet»).</div>
+
+      <h3>Forklaring</h3>
+      <div id="ex-stabil"></div>
+
+      <h3>Stabil vs. ustabil – samme nøkkel, ulik farge</h3>
+      <p class="muted small">Vi sorterer på <b>tallet</b>. Bokstaven viser opprinnelig rekkefølge blant like tall.
+        En stabil sortering holder A før B når begge er «2».</p>
+      <div class="grid cols-2">
+        <div class="card"><h4 style="margin-top:.2rem">Før</h4><div id="st-before" class="chips"></div></div>
+        <div class="card">
+          <h4 style="margin-top:.2rem">Etter</h4>
+          <div class="btn-row">
+            <button class="btn sm primary" type="button" id="st-stable">Stabil</button>
+            <button class="btn sm" type="button" id="st-unstable">Ustabil</button>
+          </div>
+          <div id="st-after" class="chips"></div>
+          <p id="st-note" class="muted small"></p>
+        </div>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Algoritme</th><th>Stabil</th><th>In-place</th><th>Verst</th></tr></thead>
+          <tbody>
+            <tr><td>Selection</td><td>Nei</td><td>Ja</td><td class="mono">O(n²)</td></tr>
+            <tr><td>Bubble</td><td>Ja</td><td>Ja</td><td class="mono">O(n²)</td></tr>
+            <tr><td>Insertion</td><td>Ja</td><td>Ja</td><td class="mono">O(n²)</td></tr>
+            <tr><td>Merge</td><td>Ja</td><td>Nei (O(n))</td><td class="mono">O(n log n)</td></tr>
+            <tr><td>Quick</td><td>Nei</td><td>Ja*</td><td class="mono">O(n²)</td></tr>
+            <tr><td>Heapsort</td><td>Nei</td><td>Ja</td><td class="mono">O(n log n)</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="muted small">*Quicksort bruker O(log n) stakkplass til rekursjonen i forventning, men O(n) i verste fall
+        (maksimalt skjeve partisjoner).</p>
+    </section>
+
+    <!-- ADT -->
+    <section data-panel="adt">
+      <div class="callout begrep"><span class="lbl">Begrep</span>
+        En <b>abstrakt datatype (ADT)</b> sier HVA du kan gjøre (operasjonene), ikke HVORDAN. En
+        <b>datastruktur</b> er en konkret implementasjon. Samme ADT kan ha flere datastrukturer.</div>
+
+      <h3>Forklaring</h3>
+      <div id="ex-adt"></div>
+
+      <div class="grid cols-2">
+        <div class="card"><h4 style="margin-top:.2rem">ADT (hva)</h4>
+          <ul class="muted"><li>Liste</li><li>Stakk (LIFO)</li><li>Kø (FIFO)</li><li>Prioritetskø</li><li>Mengde</li><li>Ordbok / map</li></ul></div>
+        <div class="card"><h4 style="margin-top:.2rem">Datastruktur (hvordan)</h4>
+          <ul class="muted"><li>Array / dynamisk array</li><li>Lenket liste</li><li>Heap (binær)</li><li>Hashtabell</li><li>Binært søketre / AVL</li></ul></div>
+      </div>
+
+      <h3>Match ADT med en vanlig datastruktur</h3>
+      <div id="quiz-adt"></div>
+    </section>
+
+    <!-- REKURSJON -->
+    <section data-panel="rekursjon">
+      <div class="callout begrep"><span class="lbl">Begrep</span>
+        En <b>rekursiv</b> algoritme kaller seg selv på et mindre problem. Den trenger et <b>basistilfelle</b>
+        (som stopper) og et <b>rekursivt steg</b> (som nærmer seg basis).</div>
+
+      <h3>Forklaring</h3>
+      <div id="ex-rekursjon"></div>
+
+      <h3>Kallstakk – fakultet n!</h3>
+      <p class="muted small">Se hvordan kallene legger seg oppå hverandre til basis, og «foldes» tilbake.</p>
+      <div class="grid cols-2">
+        <div><div id="rk-player"></div></div>
+        <div><div id="rk-pseudo"></div></div>
+      </div>
+
+      <div class="callout uni"><span class="lbl">Universitetsnivå</span>
+        Rekurrensen <span class="mono">T(n) = 2·T(n/2) + n</span> (del i to, gjør O(n) arbeid per nivå) har
+        <span class="mono">log n</span> nivåer med O(n) arbeid hver → <span class="mono">O(n log n)</span>.
+        Dette er mønsteret bak merge sort.</div>
+    </section>
+  </main>
+
+  <footer class="footer">IN2010-guide · Blokk 0 · Begreper</footer>
+
+  <script src="assets/js/core.js"></script>
+  <script src="assets/js/pseudocode.js"></script>
+  <script src="assets/js/stepplayer.js"></script>
+  <script src="assets/js/viz-bars.js"></script>
+  <script>
+  (function () {
+    var IN = window.IN, el = IN.el, qs = IN.qs;
+
+    // badge -> fane
+    IN.qsa(".badge[data-go]").forEach(function (b) {
+      b.addEventListener("click", function () { location.hash = "fane=" + b.getAttribute("data-go"); });
+    });
+
+    /* ---- Nivådelte forklaringer ---- */
+    IN.explain("#ex-algoritme", {
+      eli5: "<p>En <b>algoritme</b> er en oppskrift: gjør dette, så dette, så dette – og da får du svaret. En <b>datastruktur</b> er som en smart skuff der du legger tingene dine slik at du finner dem kjapt.</p>",
+      normal: "<p>En <b>algoritme</b> er en presis, endelig steg-for-steg-prosedyre fra input til output. En <b>datastruktur</b> organiserer data slik at operasjonene vi bryr oss om (søk, innsetting, sletting, finn-minste …) blir effektive.</p>",
+      teknisk: "<p>En <b>algoritme</b> er en veldefinert beregningsprosedyre som for et gyldig input terminerer med korrekt output; vi måler den i tid/plass som funksjon av inputstørrelsen. En <b>datastruktur</b> er en konkret organisering av data med et sett operasjoner og tilhørende kjøretidsgarantier (f.eks. heap: finn-min O(1), innsetting O(log n)).</p>"
+    }, { label: "Nivå:" });
+
+    IN.explain("#ex-bigo", {
+      eli5: "<p>Big-O svarer på: «Når det blir dobbelt så mange ting, hvor mye mer jobb blir det?» O(n) betyr dobbelt så mye jobb. O(n²) betyr fire ganger så mye. 2ⁿ betyr … mye verre!</p>",
+      normal: "<p>Big-O beskriver veksttakten til kjøretiden når n vokser, uten konstanter og lavordensledd – vi skriver f.eks. O(n) eller O(n²) etter hvor raskt arbeidet vokser. Legg merke til at dette er noe annet enn beste/verste/snitt-tilfelle: tilfellet velger <i>hvilken</i> situasjon vi analyserer, mens Big-O sier hvor fort kjøretiden vokser der. Derfor kan vi gi én kjøretid for beste tilfelle (ofte O(n)) og en annen for verste (ofte O(n²)).</p>",
+      teknisk: "<p>Formelt: f(n) = O(g(n)) betyr at f til slutt holder seg under g bortsett fra en konstant faktor – det finnes konstanter c &gt; 0 og n₀ slik at f(n) ≤ c·g(n) for alle n ≥ n₀. Grunnen til at vi dropper konstanter og lavordensledd er at for store n er det det dominerende leddet som avgjør: en O(n²)-algoritme taper for en O(n log n)-algoritme uansett hvor god konstanten er. Og husk at veksttakt (Big-O) og tilfelle (beste/verste/snitt) er to uavhengige valg – vi kan gi en Big-O for hvilket som helst tilfelle.</p>"
+    }, { label: "Nivå:" });
+
+    IN.explain("#ex-stabil", {
+      eli5: "<p><b>Stabil</b>: hvis to kort har samme tall, holder de samme rekkefølge som før. <b>In-place</b>: vi rydder i selve bunken uten en ekstra stor bunke ved siden av.</p>",
+      normal: "<p><b>Stabil</b> sortering bevarer rekkefølgen mellom like nøkler – viktig når du sorterer på flere nøkler etter hverandre. <b>In-place</b> bruker bare O(1) ekstra minne.</p>",
+      teknisk: "<p>Stabilitet: for like nøkler bevares den relative inputrekkefølgen i outputen. Avgjørende for radix/flernøkkel-sortering (sorter minst viktig nøkkel først, stabilt). In-place: O(1) hjelpeminne utover inputen (rekursjonsstakk teller som plass).</p>"
+    }, { label: "Nivå:" });
+
+    IN.explain("#ex-adt", {
+      eli5: "<p>En ADT er «hva du kan be om» (legg på, ta av). Datastrukturen er «hvordan det er bygd inni». En stakk kan være bygd av et array ELLER en lenket liste – begge gir samme LIFO-oppførsel.</p>",
+      normal: "<p>ADT = grensesnittet (operasjonene og hva de gjør). Datastruktur = implementasjonen. Én ADT kan realiseres av flere datastrukturer med ulike kjøretider.</p>",
+      teknisk: "<p>En ADT spesifiserer operasjoner og deres semantikk uavhengig av representasjon. Ordbok-ADT kan implementeres med balansert BST (O(log n) garantert) eller hashtabell (O(1) forventet). Valget avgjør kjøretidsprofil og egenskaper (ordnet iterasjon vs. ikke).</p>"
+    }, { label: "Nivå:" });
+
+    IN.explain("#ex-rekursjon", {
+      eli5: "<p>Rekursjon er som russiske dukker: for å åpne den store må du åpne den litt mindre inni, helt til den minste som ikke kan åpnes (basis). Så setter du alt sammen igjen.</p>",
+      normal: "<p>En rekursiv funksjon løser et problem ved å kalle seg selv på en mindre del, og kombinere svarene. Den må ha et basistilfelle for å stoppe.</p>",
+      teknisk: "<p>Rekursjon realiseres via kallstakken: hvert kall får en ramme med egne lokale variabler. Dybden styrer plassforbruket (O(dybde)). Kjøretiden analyseres med rekurrenser, f.eks. fakultet: T(n)=T(n−1)+O(1)=O(n).</p>"
+    }, { label: "Nivå:" });
+
+    /* ---- Quiz: algoritme ---- */
+    IN.quiz("#quiz-algoritme", [
+      { q: "Hva er den viktigste forskjellen på en algoritme og en datastruktur?",
+        options: ["Algoritme = hvordan vi gjør noe (steg); datastruktur = hvordan vi lagrer data",
+          "De er det samme", "Algoritmer er raskere enn datastrukturer", "Datastrukturer kjører, algoritmer lagrer"],
+        answer: 0, explain: "Algoritme = prosedyre/oppskrift. Datastruktur = organisering av data." },
+      { q: "Hvilket er IKKE et krav til en algoritme?",
+        options: ["Den må være endelig (stoppe)", "Stegene må være entydige", "Den må være skrevet i Java", "Den tar input og gir output"],
+        answer: 2, explain: "Algoritmer er språkuavhengige – pseudokode holder." }
+    ]);
+
+    /* ---- Big-O demo ---- */
+    var slider = qs("#bo-n"), nval = qs("#bo-nval"), logc = qs("#bo-log"), host = qs("#bo-bars");
+    var CLASSES = [
+      { name: "1", f: function () { return 1; }, color: "var(--c-sorted)" },
+      { name: "log n", f: function (n) { return Math.max(1, Math.log2(n)); }, color: "var(--c-target)" },
+      { name: "n", f: function (n) { return n; }, color: "var(--c-default)" },
+      { name: "n log n", f: function (n) { return n * Math.max(1, Math.log2(n)); }, color: "var(--c-compare)" },
+      { name: "n²", f: function (n) { return n * n; }, color: "var(--c-min)" },
+      { name: "2ⁿ", f: function (n) { return Math.pow(2, n); }, color: "var(--c-swap)" }
+    ];
+    function fmt(v) {
+      if (v < 1000) return String(Math.round(v));
+      if (v < 1e6) return (v / 1e3).toFixed(1) + "k";
+      if (v < 1e9) return (v / 1e6).toFixed(1) + "M";
+      if (v < 1e12) return (v / 1e9).toFixed(1) + "G";
+      return v.toExponential(1);
+    }
+    function drawBigO() {
+      var n = +slider.value; nval.textContent = n;
+      var vals = CLASSES.map(function (c) { return c.f(n); });
+      var useLog = logc.checked;
+      var disp = vals.map(function (v) { return useLog ? Math.log10(v + 1) : v; });
+      var max = Math.max.apply(null, disp.concat([1]));
+      IN.clear(host);
+      CLASSES.forEach(function (c, i) {
+        var col = el("div", { class: "bar-col" });
+        var h = Math.round(22 + (disp[i] / max) * 130);
+        var bar = el("div", { class: "bar", style: "height:" + h + "px;background:" + c.color });
+        bar.appendChild(el("span", { class: "val", text: fmt(vals[i]) }));
+        col.appendChild(bar);
+        col.appendChild(el("div", { class: "bar-idx", html: '<span class="mono">' + c.name + "</span>" }));
+        host.appendChild(col);
+      });
+    }
+    slider.addEventListener("input", drawBigO);
+    logc.addEventListener("change", drawBigO);
+    drawBigO();
+
+    IN.quiz("#quiz-bigo", [
+      { q: "Hva er kjøretiden til denne løkka?<br><span class='mono'>for i ← 0 to n−1 do &nbsp; sum ← sum + A[i]</span>",
+        options: ["O(1)", "O(log n)", "O(n)", "O(n²)"], answer: 2, explain: "Én enkel løkke over n elementer → O(n)." },
+      { q: "Og denne?<br><span class='mono'>for i ← 0 to n−1 do &nbsp; for j ← 0 to n−1 do &nbsp; …</span>",
+        options: ["O(n)", "O(n log n)", "O(n²)", "O(2ⁿ)"], answer: 2, explain: "Nøstet løkke, n·n = O(n²)." },
+      { q: "En løkke som halverer n hver runde (<span class='mono'>n → n/2 → n/4 …</span>) kjører …",
+        options: ["O(log n) ganger", "O(n) ganger", "O(√n) ganger", "O(1) ganger"], answer: 0,
+        explain: "Halvering gir ca. log₂ n runder – som binærsøk." }
+    ]);
+
+    /* ---- Stabil demo ---- */
+    var DATA = [{ k: 3, t: "A" }, { k: 1, t: "B" }, { k: 2, t: "C" }, { k: 2, t: "D" }, { k: 1, t: "E" }, { k: 3, t: "F" }];
+    var palette = { 1: "var(--c-target)", 2: "var(--c-compare)", 3: "var(--c-min)" };
+    function chips(host, arr) {
+      IN.clear(host);
+      arr.forEach(function (x) {
+        host.appendChild(el("span", { class: "chip", style: "background:" + palette[x.k],
+          html: '<b>' + x.k + '</b><small>' + x.t + '</small>' }));
+      });
+    }
+    chips(qs("#st-before"), DATA);
+    function stableSort() { return DATA.slice().sort(function (a, b) { return a.k - b.k; }); } // JS sort er stabil
+    function unstableSort() {
+      // simuler ustabil: sorter på nøkkel, men snu like grupper
+      var s = DATA.slice().sort(function (a, b) { return a.k - b.k; });
+      var out = [], i = 0;
+      while (i < s.length) { var j = i; while (j < s.length && s[j].k === s[i].k) j++; out = out.concat(s.slice(i, j).reverse()); i = j; }
+      return out;
+    }
+    function showStable() {
+      chips(qs("#st-after"), stableSort());
+      qs("#st-note").innerHTML = "A står fortsatt før F (begge «3»), B før E (begge «1»), C før D (begge «2»). Rekkefølgen er bevart.";
+      qs("#st-stable").classList.add("primary"); qs("#st-unstable").classList.remove("primary");
+    }
+    function showUnstable() {
+      chips(qs("#st-after"), unstableSort());
+      qs("#st-note").innerHTML = "Se «1»-ene: nå kommer E før B – rekkefølgen mellom like elementer er ødelagt. Det er ustabilt.";
+      qs("#st-unstable").classList.add("primary"); qs("#st-stable").classList.remove("primary");
+    }
+    qs("#st-stable").addEventListener("click", showStable);
+    qs("#st-unstable").addEventListener("click", showUnstable);
+    showStable();
+
+    /* ---- ADT matching-quiz ---- */
+    IN.quiz("#quiz-adt", [
+      { q: "Hvilken datastruktur gir en <b>prioritetskø</b> med O(log n) innsetting og finn-minste?",
+        options: ["Binær heap", "Lenket liste", "Hashtabell", "Array uten orden"], answer: 0,
+        explain: "En binær heap gir finn-min O(1), innsetting/fjern-min O(log n)." },
+      { q: "Hvilken datastruktur passer best for ADT-en <b>ordbok</b> når vi vil ha O(1) forventet oppslag?",
+        options: ["Hashtabell", "Binær heap", "Stakk", "Kø"], answer: 0,
+        explain: "Hashtabell gir O(1) forventet. Balansert BST gir O(log n) garantert og ordnet iterasjon." },
+      { q: "En <b>stakk</b> (LIFO) kan implementeres med …",
+        options: ["Array ELLER lenket liste", "Bare en heap", "Bare et søketre", "Bare en hashtabell"], answer: 0,
+        explain: "Samme ADT, flere datastrukturer. Begge gir O(1) push/pop." }
+    ]);
+
+    /* ---- Rekursjon: kallstakk fakultet ---- */
+    var factAlgo = {
+      name: "Fakultet", params: "n",
+      input: "Et heltall n ≥ 0", output: "n!",
+      lines: [
+        { code: "if n ≤ 1 then", indent: 1 },
+        { code: "return 1", indent: 2 },
+        { code: "return n · Fakultet(n − 1)", indent: 1 }
+      ]
+    };
+    var rkHandle = IN.pseudo.render("#rk-pseudo", factAlgo, {});
+    function genFact(input) {
+      var n = Array.isArray(input) ? (input[0] || 4) : input;
+      n = Math.max(1, Math.min(7, n));
+      var steps = [], stack = [];
+      function t(a, b, c) { return { eli5: a, normal: b, teknisk: c }; }
+      function snap(line, text, tag) { steps.push({ line: line, stack: stack.slice(), text: text, tag: tag }); }
+      (function down(k) {
+        stack.push({ n: k, state: "kaller" });
+        var res;
+        if (k <= 1) {
+          stack[stack.length - 1].state = "=1"; stack[stack.length - 1].val = 1;
+          snap(3, t("Fakultet(" + k + ") er basis: svaret er 1. Nå snur vi og folder tilbake.",
+            "Basistilfelle n ≤ 1 → returnerer 1.", "Basis: return 1."), "Basis");
+          res = 1;
+        } else {
+          snap(4, t("For å regne " + k + "! må vi først vite (" + (k - 1) + ")!. Rammen for " + k + " venter mens vi kaller videre.",
+            "Kaller Fakultet(" + (k - 1) + "); rammen for " + k + " legges på stakken.",
+            "Push ramme n=" + k + "; rekursivt kall Fakultet(n−1)."), "Kaller " + (k - 1));
+          var r = down(k - 1);
+          res = k * r;
+          stack[stack.length - 1].state = "=" + res; stack[stack.length - 1].val = res;
+          snap(4, t("Nå vet vi (" + (k - 1) + ")! = " + r + ". Da er " + k + "! = " + k + " · " + r + " = " + res + ". Rammen tas av stakken.",
+            "Fakultet(" + (k - 1) + ")=" + r + " → " + k + "·" + r + "=" + res + "; pop ramme.",
+            "Fold tilbake: " + k + "·" + r + "=" + res + "; pop."), "Folder " + res);
+        }
+        stack.pop();
+        return res;
+      })(n);
+      steps.push({ line: null, stack: [], text: t("Ferdig! " + n + "! er regnet ut.", "Ferdig – stakken er tom.", "Terminert; alle rammer er poppet."), tag: "Ferdig" });
+      return steps;
+    }
+    IN.stepPlayer("#rk-player", {
+      generate: genFact,
+      presets: { "4!": [4], "5!": [5], "3!": [3], "6!": [6] },
+      render: function (step, ctx) {
+        var stage = ctx.stage; IN.clear(stage);
+        var wrap = el("div", { class: "callstack" });
+        // tegn stakken nedenfra og opp (eldste nederst)
+        step.stack.slice().reverse().forEach(function (fr) {
+          var cls = "frame" + (fr.state && fr.state.charAt(0) === "=" ? " ret" : "");
+          wrap.appendChild(el("div", { class: cls,
+            html: '<span class="mono">Fakultet(' + fr.n + ')</span> <span class="muted">' + (fr.state || "") + '</span>' }));
+        });
+        if (!step.stack.length) wrap.appendChild(el("div", { class: "muted", text: "(stakken er tom – ferdig)" }));
+        stage.appendChild(wrap);
+      },
+      pseudo: rkHandle,
+      initial: [4]
+    });
+  })();
+  </script>
+</body>
+</html>
