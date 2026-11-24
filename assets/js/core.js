@@ -519,6 +519,55 @@
     arr.forEach(function (d) { IN.examTask(host, d); });
   };
 
+  /* ---------- Generelle tooltips: alle elementer med data-tip ----------
+     Deler den flytende boksen #pc-tip med pseudokodelinjene, så bare én vises om gangen.
+     Desktop: hover/fokus. Mobil (ingen hover): trykk for å vise, trykk igjen, utenfor
+     eller scroll for å lukke. Teksten settes som ren tekst (textContent). */
+  IN.tips = function (root) {
+    var tip = document.getElementById("pc-tip");
+    if (!tip) {
+      tip = el("div", { id: "pc-tip", class: "pc-tip", role: "tooltip" });
+      tip.hidden = true;
+      document.body.appendChild(tip);
+    }
+    var st = IN.tips._st || (IN.tips._st = { current: null, shownAt: 0 });
+    function show(t) {
+      tip.textContent = t.getAttribute("data-tip");
+      tip.hidden = false;
+      var r = t.getBoundingClientRect();
+      var tw = tip.getBoundingClientRect().width;
+      var vw = document.documentElement.clientWidth;
+      var left = window.pageXOffset + r.left;
+      var maxLeft = window.pageXOffset + vw - tw - 10;
+      if (left > maxLeft) left = Math.max(window.pageXOffset + 8, maxLeft);
+      tip.style.left = left + "px";
+      tip.style.top = (window.pageYOffset + r.bottom + 6) + "px";
+      st.current = t; st.shownAt = Date.now();
+    }
+    function hide() { tip.hidden = true; st.current = null; }
+    qsa("[data-tip]", root || document).forEach(function (t) {
+      if (t._tipBound) return;
+      t._tipBound = true;
+      t.classList.add("has-tip");
+      if (!t.hasAttribute("tabindex")) t.setAttribute("tabindex", "0");
+      t.addEventListener("mouseenter", function () { show(t); });
+      t.addEventListener("mouseleave", hide);
+      t.addEventListener("focus", function () { show(t); });
+      t.addEventListener("blur", hide);
+      // På touch kommer mouseenter rett før click – ikke lukk det som nettopp åpnet seg.
+      t.addEventListener("click", function () {
+        if (st.current === t && Date.now() - st.shownAt > 400) hide(); else show(t);
+      });
+    });
+    if (!st.docBound) {
+      st.docBound = true;
+      document.addEventListener("click", function (e) {
+        if (st.current && !st.current.contains(e.target)) hide();
+      });
+      window.addEventListener("scroll", function () { if (st.current) hide(); }, { passive: true });
+    }
+  };
+
   /* ---------- Småverktøy ---------- */
   IN.store = {
     get: function (k, d) { try { var v = localStorage.getItem(k); return v == null ? d : v; } catch (e) { return d; } },

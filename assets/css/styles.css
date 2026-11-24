@@ -250,6 +250,16 @@ code { font-family: var(--font-mono); font-size: .92em; }
   box-shadow: 0 6px 22px rgba(0, 0, 0, .22); pointer-events: none;
 }
 .pc-tip[hidden] { display: none; }
+/* Sammenligningstabellen: kompleksiteter («n log n») skal aldri brytes over flere linjer –
+   heller la tabellen scrolle vannrett i .table-wrap på smal skjerm. */
+.cmp-table td, .cmp-table th { white-space: nowrap; }
+/* Generelle [data-tip]-tooltips (f.eks. sammenligningstabellen) */
+td.has-tip, th.has-tip { cursor: help; }
+td.has-tip:hover, td.has-tip:focus-visible, th.has-tip:hover, th.has-tip:focus-visible {
+  background-image: linear-gradient(var(--state-hover), var(--state-hover));
+}
+th.has-tip { text-decoration: underline dotted; text-underline-offset: 3px;
+  text-decoration-color: color-mix(in srgb, var(--color-on-surface) 40%, transparent); }
 
 /* ---------- Eksamensoppgave (utvidbart kort) ---------- */
 .examtask {

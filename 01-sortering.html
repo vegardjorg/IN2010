@@ -50,18 +50,73 @@
       </div>
 
       <h3>Sammenlign algoritmene</h3>
+      <p class="muted small">Alle tider er O(…). Hold musa over – eller trykk på – en overskrift eller celle for å se <i>hvorfor</i>.</p>
       <div class="table-wrap">
-        <table>
-          <thead><tr><th>Algoritme</th><th>Best</th><th>Snitt</th><th>Verst</th><th>Minne</th><th>Stabil</th><th>In-place</th></tr></thead>
+        <table class="cmp-table">
+          <thead><tr><th>Algoritme</th>
+            <th data-tip="Kjøretiden for den gunstigste inputen algoritmen kan få – ofte et array som allerede er sortert.">Best</th>
+            <th data-tip="Kjøretiden i gjennomsnitt over tilfeldig input.">Snitt</th>
+            <th data-tip="Kjøretiden for den mest ugunstige inputen. Står det bare «kjøretid» i en oppgave, er det som regel denne som menes.">Verst</th>
+            <th data-tip="Ekstra minne utover selve arrayet: hjelpearrayer, bøtter og rekursjonsstakk.">Minne</th>
+            <th data-tip="Stabil = like elementer beholder rekkefølgen de hadde i input. Viktig når man sorterer på flere nøkler etter hverandre.">Stabil</th>
+            <th data-tip="In-place = sorterer ved å flytte elementer inne i selve arrayet, uten å lage en kopi av det.">In-place</th></tr></thead>
           <tbody>
-            <tr><td><a href="#fane=selection">Selection</a></td><td class="mono">n²</td><td class="mono">n²</td><td class="mono">n²</td><td class="mono">1</td><td>Nei</td><td>Ja</td></tr>
-            <tr><td><a href="#fane=bubble">Bubble</a></td><td class="mono">n</td><td class="mono">n²</td><td class="mono">n²</td><td class="mono">1</td><td>Ja</td><td>Ja</td></tr>
-            <tr><td><a href="#fane=insertion">Insertion</a></td><td class="mono">n</td><td class="mono">n²</td><td class="mono">n²</td><td class="mono">1</td><td>Ja</td><td>Ja</td></tr>
-            <tr><td><a href="#fane=gnome">Gnome</a></td><td class="mono">n</td><td class="mono">n²</td><td class="mono">n²</td><td class="mono">1</td><td>Ja</td><td>Ja</td></tr>
-            <tr><td><a href="#fane=merge">Merge</a></td><td class="mono">n log n</td><td class="mono">n log n</td><td class="mono">n log n</td><td class="mono">n</td><td>Ja</td><td>Nei</td></tr>
-            <tr><td><a href="#fane=quick">Quick</a></td><td class="mono">n log n</td><td class="mono">n log n</td><td class="mono">n²</td><td class="mono">log n</td><td>Nei</td><td>Ja</td></tr>
-            <tr><td><a href="#fane=bucket">Bøtte</a></td><td class="mono">n+k</td><td class="mono">n+k</td><td class="mono">n²</td><td class="mono">n+k</td><td>Ja</td><td>Nei</td></tr>
-            <tr><td><a href="#fane=heap">Heapsort</a></td><td class="mono">n log n</td><td class="mono">n log n</td><td class="mono">n log n</td><td class="mono">1</td><td>Nei</td><td>Ja</td></tr>
+            <tr><td><a href="#fane=selection">Selection</a></td>
+              <td class="mono" data-tip="Selection skanner alltid hele resten for å finne minste – også når input allerede er sortert. Ingen tidlig stopp.">n²</td>
+              <td class="mono" data-tip="Samme arbeid uansett input: (n−1) + (n−2) + … + 1 ≈ n²/2 sammenligninger.">n²</td>
+              <td class="mono" data-tip="Som best og snitt: antall sammenligninger avhenger ikke av hvordan tallene ligger.">n²</td>
+              <td class="mono" data-tip="Bare noen få variabler (i, j, k) – O(1) ekstra.">1</td>
+              <td data-tip="Langdistanse-byttet kan hoppe et element forbi en lik verdi. Eks: [2a, 2b, 1] → 1 byttes med 2a → [1, 2b, 2a].">Nei</td>
+              <td data-tip="Bytter elementer inne i arrayet; ingen kopi.">Ja</td></tr>
+            <tr><td><a href="#fane=bubble">Bubble</a></td>
+              <td class="mono" data-tip="Med swapped-flagget: én runde uten bytter på sortert input, og så stopper den – O(n).">n</td>
+              <td class="mono" data-tip="Tilfeldig input har rundt n²/4 inversjoner (par i feil rekkefølge), og hvert nabobytte fjerner bare én.">n²</td>
+              <td class="mono" data-tip="Omvendt sortert input har n(n−1)/2 inversjoner – og like mange nabobytter.">n²</td>
+              <td class="mono" data-tip="Bare løkkevariabler og swapped-flagget.">1</td>
+              <td data-tip="Bytter bare når venstre nabo er strengt større (>), så like naboer byttes aldri.">Ja</td>
+              <td data-tip="Nabobytter inne i arrayet; ingen kopi.">Ja</td></tr>
+            <tr><td><a href="#fane=insertion">Insertion</a></td>
+              <td class="mono" data-tip="Sortert input: hvert nytt element står allerede rett, så det blir én sammenligning per element – O(n).">n</td>
+              <td class="mono" data-tip="I snitt må hvert element skyves forbi omtrent halvparten av den sorterte delen.">n²</td>
+              <td class="mono" data-tip="Omvendt sortert: hvert element skyves helt til start – 1 + 2 + … + (n−1) forskyvninger.">n²</td>
+              <td class="mono" data-tip="Bare key, i og j.">1</td>
+              <td data-tip="Skyver bare forbi elementer som er strengt større (>), så like elementer beholder rekkefølgen.">Ja</td>
+              <td data-tip="Forskyver elementer inne i arrayet; ingen kopi.">Ja</td></tr>
+            <tr><td><a href="#fane=gnome">Gnome</a></td>
+              <td class="mono" data-tip="Sortert input: nissen går rett fram uten et eneste bytte – n−1 sammenligninger.">n</td>
+              <td class="mono" data-tip="Som insertion, men hvert skritt tilbake er et bytte – omtrent dobbelt så mange sammenligninger.">n²</td>
+              <td class="mono" data-tip="Omvendt sortert: hvert element må byttes helt tilbake til start.">n²</td>
+              <td class="mono" data-tip="Bare pekeren i.">1</td>
+              <td data-tip="Bytter bare naboer når venstre er strengt større (>), så like elementer bytter aldri plass.">Ja</td>
+              <td data-tip="Nabobytter inne i arrayet; ingen kopi.">Ja</td></tr>
+            <tr><td><a href="#fane=merge">Merge</a></td>
+              <td class="mono" data-tip="Delingen skjer uansett input: log n nivåer, og på hvert nivå flettes alle n elementene.">n log n</td>
+              <td class="mono" data-tip="Samme struktur hver gang – inputen endrer ikke antall nivåer.">n log n</td>
+              <td class="mono" data-tip="Flettingen er alltid O(n) per nivå, så også verste input gir O(n log n). Garantert!">n log n</td>
+              <td class="mono" data-tip="Flettingen trenger hjelpearrayer (L og R) med til sammen n plasser.">n</td>
+              <td data-tip="Ved like verdier tas elementet fra venstre halvdel først (≤), så rekkefølgen bevares.">Ja</td>
+              <td data-tip="Trenger O(n) hjelpeminne til flettingen, så den sorterer ikke i selve arrayet alene.">Nei</td></tr>
+            <tr><td><a href="#fane=quick">Quick</a></td>
+              <td class="mono" data-tip="Pivot havner midt i hver gang: to like halvdeler gir log n nivåer à O(n).">n log n</td>
+              <td class="mono" data-tip="Med tilfeldig input blir partisjonene i snitt balanserte nok til O(n log n).">n log n</td>
+              <td class="mono" data-tip="Pivot blir stadig minst eller størst (f.eks. sortert input når siste element er pivot): biten krymper bare med 1, så det blir n nivåer.">n²</td>
+              <td class="mono" data-tip="Rekursjonsstakken: O(log n) dyp i forventning – men O(n) i verste fall.">log n</td>
+              <td data-tip="Partisjoneringen bytter elementer over lange avstander, så like verdier kan bytte rekkefølge.">Nei</td>
+              <td data-tip="Partisjonerer inne i selve arrayet uten kopi. Rekursjonsstakken kommer i tillegg, men quicksort regnes likevel som in-place.">Ja</td></tr>
+            <tr><td><a href="#fane=bucket">Bøtte</a></td>
+              <td class="mono" data-tip="Elementene fordeler seg jevnt: n elementer i k bøtter, med svært få i hver bøtte.">n+k</td>
+              <td class="mono" data-tip="Ved jevn fordeling er hver bøtte liten, så sorteringen inne i bøttene blir billig.">n+k</td>
+              <td class="mono" data-tip="Alt havner i samme bøtte – da er det like ille som å sortere hele arrayet med en kvadratisk metode som insertion.">n²</td>
+              <td class="mono" data-tip="k bøtter pluss plass til alle n elementene.">n+k</td>
+              <td data-tip="Stabil så lenge elementene legges bakerst i bøtta og bøttene tømmes i rekkefølge.">Ja</td>
+              <td data-tip="Elementene kopieres ut i bøtter, så den sorterer ikke i selve arrayet.">Nei</td></tr>
+            <tr><td><a href="#fane=heap">Heapsort</a></td>
+              <td class="mono" data-tip="Også sortert input krever n uttak, og hvert uttak kan synke ned log n nivåer.">n log n</td>
+              <td class="mono" data-tip="buildHeap er O(n), deretter n uttak à O(log n) = O(n log n).">n log n</td>
+              <td class="mono" data-tip="Garantert O(n log n) – et trygt valg når verste tilfelle teller og minnet er knapt.">n log n</td>
+              <td class="mono" data-tip="Heapen bygges inne i selve arrayet – O(1) ekstra.">1</td>
+              <td data-tip="Hvert uttak bytter roten med siste element – lange hopp som kan stokke om like verdier.">Nei</td>
+              <td data-tip="Både bygging og uttak skjer inne i arrayet.">Ja</td></tr>
           </tbody>
         </table>
       </div>
@@ -301,6 +356,9 @@
       normal: "<p>Sortering er grunnverktøyet som gjør andre problemer lette: å gruppere like elementer, å matche to lister i én gjennomgang, og å kunne bruke binærsøk.</p>",
       teknisk: "<p>Mange problemer reduseres til sortering: partisjonering/gruppering, sammenligning av sekvenser i lineær tid, og prekondisjon for binærsøk (O(log n)). Derfor er valg av sorteringsalgoritme og kjøretid et tilbakevendende eksamenstema.</p>"
     }, { label: "Nivå:" });
+
+    // Forklaringer i sammenligningstabellen (hover på desktop, trykk på mobil)
+    IN.tips(IN.qs(".cmp-table"));
 
     var LEGEND = [
       { cls: "compare", label: "sammenlignes / aktivt område" },
