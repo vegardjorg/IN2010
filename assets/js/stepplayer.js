@@ -65,20 +65,21 @@
     }
 
     var stage = el("div", { class: "sp-stage", tabindex: "0", role: "group", "aria-label": "Visualisering" });
-    wrap.appendChild(stage);
+    // Rammen rundt scenen har en diskret bunnlinje: hurtigtaster til venstre, «Steg x av y» til høyre.
+    var counter = el("span", { class: "sp-counter", "aria-live": "polite" });
+    var hint = el("span", { class: "sp-hint",
+      html: (window.matchMedia && matchMedia("(hover: none)").matches)
+        ? "Trykk «Neste» og «Forrige» for å gå steg for steg."
+        : "Hold musa over demoen: <span class=\"kbd\">←</span> <span class=\"kbd\">→</span> for steg · <span class=\"kbd\">mellomrom</span> spill/pause" });
+    wrap.appendChild(el("div", { class: "sp-frame" }, [stage, el("div", { class: "sp-foot" }, [hint, counter])]));
 
     // Kontroller
     var bPrev = el("button", { class: "btn sm", type: "button", html: "← Forrige", onclick: function () { step(-1); } });
     var bPlay = el("button", { class: "btn primary sm", type: "button", text: "▶ Spill av", onclick: togglePlay });
     var bNext = el("button", { class: "btn sm", type: "button", html: "Neste →", onclick: function () { step(1); } });
     var bReset = el("button", { class: "btn sm", type: "button", text: "↺ Nullstill", onclick: function () { goto(0); } });
-    var counter = el("span", { class: "sp-counter", "aria-live": "polite" });
     var scope = IN.levelScope({ initial: opts.initial_level || null });
-    wrap.appendChild(el("div", { class: "sp-controls" }, [bPrev, bPlay, bNext, bReset, scope.el, counter]));
-    wrap.appendChild(el("div", { class: "sp-hint muted small",
-      html: (window.matchMedia && matchMedia("(hover: none)").matches)
-        ? "Trykk «Neste» og «Forrige» for å gå steg for steg."
-        : "Hold musa over demoen: <span class=\"kbd\">←</span> <span class=\"kbd\">→</span> for steg · <span class=\"kbd\">mellomrom</span> spill/pause" }));
+    wrap.appendChild(el("div", { class: "sp-controls" }, [bPrev, bPlay, bNext, bReset, scope.el]));
 
     var explain = el("div", { class: "sp-explain" });
     wrap.appendChild(explain);
@@ -136,6 +137,7 @@
       var txt = IN.level.pick(s.text, scope.get());
       if (s.tag) explain.appendChild(el("span", { class: "tagline", text: s.tag }));
       explain.appendChild(el("span", { html: txt || "" }));
+      if (IN.symbolTips) IN.symbolTips(explain);
     }
 
     function togglePlay() {

@@ -177,7 +177,7 @@
   var mHeap = {
     id: "mock-heap-removemin", tema: "heap", operasjon: "RemoveMin i min-heap (array)",
     sannsynlighet: "høy",
-    begrunnelse: "RemoveMin står i forelesning 04_prioritetskoer, ukesoppgaver 04_prioritetskoeer (bubbleDown) og innlevering 3, og foreleseren gjennomgår boblingen nedover i detalj. Den ble spurt i Del 1 H2021 (6p), men aldri som standardoppgave. Heap-innsetting var standardoppgaven H2023, så speilbildet er et naturlig neste valg.",
+    begrunnelse: "RemoveMin står i forelesning 04_prioritetskoer, ukesoppgaver 04_prioritetskoeer (bubbleDown), og foreleseren gjennomgår boblingen nedover i detalj. Den ble spurt i Del 1 H2021 (6p), men aldri som standardoppgave. Heap-innsetting var standardoppgaven H2023, så speilbildet er et naturlig neste valg. Innlevering 3 bruker en ferdig prioritetskø fra biblioteket, så der skriver du ikke RemoveMin selv.",
     year: "Mock", title: "RemoveMin i en min-heap", points: 10, oppgave_nr: "Oppgave 1 (mock)",
     oppgave:
       "<p>En min-heap med n = 10 elementer er lagret i et array (0-indeksert):</p>" +
@@ -242,7 +242,7 @@
   var mProbe = {
     id: "mock-probing-slett", tema: "hashing", operasjon: "Linear probing: sletting som tetter hullet",
     sannsynlighet: "høy",
-    begrunnelse: "Begge slettestrategiene (markér som slettet, og tett hullet) står i forelesning 08_hashing og notatet Hashing.html, og innlevering 3 ber om Linear probing. Innsetting med probing var standardoppgaven H2022, og H2025 tok Separate chaining. Sletting er den delen som ennå ikke er spurt, og den er lett å lage poeng av.",
+    begrunnelse: "Begge slettestrategiene (markér som slettet, og tett hullet) står i forelesning 08_hashing. Notatet Hashing.html viser bare den som tetter hullet, og i innlevering 3 kan du velge Linear probing eller Separate chaining. Innsetting med probing var standardoppgaven H2022, og H2025 tok Separate chaining. Sletting er den delen som ennå ikke er spurt, og den er lett å lage poeng av.",
     year: "Mock", title: "Linear probing: sletting", points: 10, oppgave_nr: "Oppgave 1 (mock)",
     oppgave:
       "<p>En hashtabell bruker Linear probing med N = 10 plasser og hashfunksjon h(k) = k mod 10. Tabellen er tom, og vi setter inn nøklene 31, 42, 11, 23, 51, 19, 29, 70 i denne rekkefølgen (ingen rehashing).</p>" +
@@ -321,7 +321,7 @@
   var mAvl = {
     id: "mock-avl", tema: "traer", operasjon: "AVL-tre: innsetting og sletting med rotasjoner",
     sannsynlighet: "høy",
-    begrunnelse: "AVL er hovedtemaet i forelesning 03_balanserte_soketraer og ukesoppgaver 03_balanserte_soeketraer, og innlevering 3 bruker det. Det har kommet hvert år (H2020 9p innsetting, H2022 Del 1 6p, H2025 Anti-AVL), men aldri som standardoppgaven. Sletting med rebalansering er ikke spurt.",
+    begrunnelse: "AVL er hovedtemaet i forelesning 03_balanserte_soketraer, og innlevering 3 bruker det. (Ukesoppgavene om balanserte søketrær har ingen AVL-oppgave.) Det har kommet hvert år (H2020 9p innsetting, H2022 Del 1 6p, H2025 Anti-AVL), men aldri som standardoppgaven. Sletting med rebalansering er ikke spurt.",
     year: "Mock", title: "AVL-tre: innsetting og sletting", points: 10, oppgave_nr: "Oppgave 1 (mock)",
     oppgave:
       "<p>Sett inn 5, 9, 14, 3, 7, 6, 4 i denne rekkefølgen i et tomt AVL-tre. Bruk kursets definisjoner: høyden til en løvnode er 0, høyden til null er −1, og balansefaktoren er høyden til venstre subtre minus høyden til høyre subtre.</p>" +
@@ -389,7 +389,7 @@
   var mBst = {
     id: "mock-bst-remove", tema: "traer", operasjon: "Binært søketre: Remove (løvnode, ett barn, to barn)",
     sannsynlighet: "høy",
-    begrunnelse: "Remove med de tre tilfellene gjennomgås i forelesning 03_balanserte_soketraer, og ukesoppgaver 03_balanserte_soeketraer ber om sletting. Det er grunnlaget for AVL-sletting og har aldri vært standardoppgave. Rekursiv trepseudokode gir poeng hvert år.",
+    begrunnelse: "Remove med de tre tilfellene gjennomgås i forelesning 03_balanserte_soketraer, og ukesoppgaver 03_balanserte_soeketraer ber om hjelpeprosedyren FindMin som sletting bruker. Det er grunnlaget for AVL-sletting og har aldri vært standardoppgave. Rekursiv trepseudokode gir poeng hvert år.",
     year: "Mock", title: "Sletting i binært søketre", points: 10, oppgave_nr: "Oppgave 1 (mock)",
     oppgave:
       "<p>Sett inn 50, 30, 80, 20, 40, 60, 90, 35, 70, 65 i denne rekkefølgen i et tomt binært søketre (uten balansering).</p>" +
@@ -462,7 +462,7 @@
   var mHs = {
     id: "mock-buildheap-heapsort", tema: "heap", operasjon: "BuildMaxHeap og Heapsort for hånd",
     sannsynlighet: "middels",
-    begrunnelse: "BubbleDown, BuildMaxHeap og HeapSort er pensum med egen pseudokode i forelesning 09_litt_mer_sortering. Heapsort har bare kommet som sant/usant og kjøretidsspørsmål, aldri som håndkjøring. Det kombinerer heap og sortering i én oppgave, men den finnes ikke i ukesoppgavene, så den står svakere enn RemoveMin.",
+    begrunnelse: "BubbleDown, BuildMaxHeap og HeapSort er pensum med egen pseudokode i forelesning 09_litt_mer_sortering. Heapsort er aldri spurt for hånd. Nærmest kommer BuildHeap O(n) i H2022 og sensorveiledningen H2023, som nevner Heapsort som et godt sorteringsvalg. Ukesoppgavene sammenligner Heapsort med Selection sort, men har ingen håndkjøring. Oppgaven kombinerer heap og sortering, men står svakere enn RemoveMin.",
     year: "Mock", title: "BuildMaxHeap og Heapsort", points: 10, oppgave_nr: "Oppgave 1 (mock)",
     oppgave:
       "<p>Vi skal sortere arrayet A = [4, 10, 3, 5, 1, 8, 9, 2] (n = 8) stigende med kursets Heapsort, som først bygger en max-heap.</p>" +
@@ -698,7 +698,7 @@
   var mTop = {
     id: "mock-topsort", tema: "grafer", operasjon: "Topologisk sortering (TopSort med inngrad og stakk)",
     sannsynlighet: "middels",
-    begrunnelse: "TopSort med inngrad og stakk står i forelesning 05_grafer, og ukesoppgaver 05_grafer og 07_sammenhengende_grafer bruker den. Den har kommet som del av grafoppgaven (avhengigheter), men aldri som ren håndkjøring. Den er kort og passer godt som standardoppgave.",
+    begrunnelse: "TopSort med inngrad og stakk står i forelesning 05_grafer, og ukesoppgaver 05_grafer bruker den. (Ukesoppgaver 07_sammenhengende_grafer bruker DFS-varianten.) Den har kommet som del av grafoppgaven (avhengigheter), men aldri som ren håndkjøring. Den er kort og passer godt som standardoppgave.",
     year: "Mock", title: "Topologisk sortering", points: 10, oppgave_nr: "Oppgave 1 (mock)",
     oppgave:
       "<p>Gitt den rettede grafen under med V = {A, B, C, D, E, F, G}. Nodene gås gjennom i alfabetisk rekkefølge.</p>" +
@@ -798,33 +798,31 @@
           ["D–E", 8, "nei", "sykel"],
           ["D–F", 9, "nei", "sykel"]
         ]),
-      "<b>(b)</b> Prim fra A legger alltid til den letteste kanten fra treet til en node utenfor." +
-        tab(["steg", "tatt ut og kastet (begge ender i treet)", "tatt ut og brukt", "node lagt til", "nye kanter i køen"], [
-          [1, "", "start", "A", "A–B 6, A–C 3"],
-          [2, "", "A–C 3", "C", "C–B 4, C–D 5, C–E 7"],
-          [3, "", "C–B 4", "B", "B–D 2"],
-          [4, "", "B–D 2", "D", "D–E 8, D–F 9"],
-          [5, "C–D 5, A–B 6", "C–E 7", "E", "E–F 1"],
-          [6, "", "E–F 1", "F", "ingen (alle naboene er i treet)"]
+      "<b>(b)</b> Prim fra A legger alltid til den letteste kanten fra treet til en node utenfor. I kursets variant legges <i>alle</i> kantene fra den nye noden i køen, også de som går tilbake inn i treet. De kastes når de tas ut (linja «if u ∉ parents»). Ved lik vekt tas den eldste ut først." +
+        tab(["steg", "tatt ut og kastet (enden er alt i treet)", "tatt ut og brukt", "node lagt til", "nye kanter i køen"], [
+          [1, "", "start (null, A)", "A", "A–B 6, A–C 3"],
+          [2, "", "A–C 3", "C", "C–A 3, C–B 4, C–D 5, C–E 7"],
+          [3, "C–A 3", "C–B 4", "B", "B–A 6, B–C 4, B–D 2"],
+          [4, "", "B–D 2", "D", "D–B 2, D–C 5, D–E 8, D–F 9"],
+          [5, "D–B 2, B–C 4, C–D 5, D–C 5, A–B 6, B–A 6", "C–E 7", "E", "E–C 7, E–D 8, E–F 1"],
+          [6, "", "E–F 1", "F", "F–D 9, F–E 1"]
         ]) +
-        "<p>Til slutt tas D–E 8 og D–F 9 ut og kastes, og køen er tom.</p>" +
+        "<p>Til slutt tas F–E 1, E–C 7, D–E 8, E–D 8, D–F 9 og F–D 9 ut og kastes, og køen er tom.</p>" +
         "<p>Prim og Kruskal gir samme tre her, fordi alle vektene er forskjellige.</p>",
       "<b>(c)</b> Kantene er A–C, B–C, B–D, C–E og E–F, med totalvekt 3 + 4 + 2 + 7 + 1 = 17." +
         fig(graph({ w: 370, h: 190, nodes: MN, edges: ME, hl: ["A-C", "B-C", "B-D", "C-E", "E-F"], label: "Det minimale spenntreet" }), "Uthevet: det minimale spenntreet (5 = |V| − 1 kanter)."),
       "<b>(d)</b> t = 7, som er den største kanten i det minimale spenntreet. Med bare kanter ≤ 6 er {E, F} skilt fra resten. Et minimalt spenntre minimerer også den største kanten.",
       "<b>(e)</b> Pseudokode for Prim:" +
-        pc("Prim(G, s)", "En sammenhengende, urettet, vektet graf G = (V, E) og en startnode s", "Et minimalt spenntre gitt ved foreldrene parents", [
-          "Q ← new PriorityQueue",
-          "parents ← new Map",
-          "Insert(Q, (null, s), 0)",
-          "while Q is not empty do",
-          "  (p, u) ← RemoveMin(Q)",
-          "  if u ∈ parents then",
-          "    continue",
-          "  parents[u] ← p",
-          "  for each (u, v) ∈ E do",
-          "    if v ∉ parents then",
-          "      Insert(Q, (u, v), w(u, v))",
+        pc("Prim(G)", "En sammenhengende, urettet, vektet graf G = (V, E)", "Et minimalt spenntre gitt ved foreldrene parents", [
+          "queue ← empty priority queue",
+          "parents ← empty map",
+          "Insert(queue, (null, s)) with priority 0, for an arbitrary s ∈ V",
+          "while queue is not empty do",
+          "  (p, u) ← RemoveMin(queue)",
+          "  if u ∉ parents then",
+          "    parents[u] ← p",
+          "    for (u, v) ∈ E do",
+          "      Insert(queue, (u, v)) with priority w(u, v)",
           "return parents"
         ]) +
         "<p>Kjøretid: O(|E| · log(|V|)). Hver kant gir høyst to innsettinger i køen, og hver køoperasjon koster O(log(|E|)) = O(log(|V|)), fordi |E| ≤ |V|².</p>"
@@ -842,7 +840,7 @@
       "<b>Felle:</b> å bruke Dijkstra-avstand i Prim. Prim ser bare på vekten til selve kanten, ikke avstanden fra starten.",
       "<b>Felle:</b> å forkaste en kant fordi en av nodene allerede er med. Det er bare galt når <i>begge</i> allerede henger sammen.",
       "<b>Felle:</b> å kalle det et minimalt spenntre for en rettet graf. Prim og Kruskal er for urettede grafer.",
-      "<b>Husk:</b> Kruskal er bare pensum som idé. Du trenger ikke union-find; si at du sjekker om det finnes en vei mellom endepunktene."
+      "<b>Husk:</b> Forelesningen gir Kruskal som idé, uten egen pseudokode og uten union-find. Det holder å si at du sjekker om det finnes en vei mellom endepunktene."
     ],
     eli5: "5-åring: Vi skal koble alle husene med så lite tau som mulig, så vi bruker alltid den korteste tausnutten som ikke lager en ring.",
     side: { page: "06-grafer.html", fane: "mst" }
@@ -854,7 +852,7 @@
   var mQs = {
     id: "mock-quicksort", tema: "sortering", operasjon: "Quicksort: Partition og rekursjon for hånd",
     sannsynlighet: "middels",
-    begrunnelse: "Partition med to pekere og ChoosePivot står i forelesning 09_litt_mer_sortering, og ukesoppgaver 09_litt_mer_sortering bruker den. Quicksort er spurt som sant/usant og kjøretid (verste tilfelle), aldri som håndkjøring. Sortering har tapt plass på de siste eksamenene, så sannsynligheten er middels.",
+    begrunnelse: "Partition med to pekere og ChoosePivot står i forelesning 09_litt_mer_sortering, og ukesoppgaver 09_litt_mer_sortering spør om høyden til rekursjonstreet i verste fall. Quicksort er aldri spurt for hånd. Sensorveiledningene H2023 og H2025 nevner den som mulig sorteringsvalg, med O(n²) i verste tilfelle. Sortering har tapt plass på de siste eksamenene, så sannsynligheten er middels.",
     year: "Mock", title: "Quicksort med Partition", points: 10, oppgave_nr: "Oppgave 1 (mock)",
     oppgave:
       "<p>Sorter A = [7, 2, 9, 4, 3, 8, 6, 1, 5] med kursets Quicksort. ChoosePivot velger alltid siste element i delen som sorteres (indeks high).</p>" +
@@ -907,7 +905,7 @@
           "Quicksort(A, p + 1, high)",
           "return A"
         ]),
-      "<b>(d)</b> O(n²) i verste tilfelle. Med siste element som pivot skjer det når arrayet allerede er sortert (eller sortert baklengs): hver Partition skiller bare ut ett element, så det blir n nivåer med O(n) arbeid. Typisk kjøretid er O(n log n). Derfor velger ChoosePivot i kurset tilfeldig eller medianen av første, midterste og siste."
+      "<b>(d)</b> O(n²) i verste tilfelle. Med siste element som pivot skjer det når arrayet allerede er sortert (eller sortert baklengs): hver Partition skiller bare ut ett element, så det blir n nivåer med O(n) arbeid. Typisk kjøretid er O(n log n). Forelesningen nevner derfor andre vanlige måter å velge pivot på, for eksempel tilfeldig eller medianen av første, midterste og siste."
     ],
     kjerne:
       "<p><b>Kjernen:</b> Partition flytter pivoten bakerst, lar left og right møtes mens små og store elementer byttes, og setter pivoten på plass der left stoppet. Etter ett kall står pivoten på sin endelige plass.</p>" +
@@ -1001,7 +999,7 @@
   var mSep = {
     id: "mock-separasjonsnoder", tema: "grafer", operasjon: "Separasjonsnoder med depth og low (DFS)",
     sannsynlighet: "lav",
-    begrunnelse: "SeparationVertices med depth og low står i forelesning 07_sammenhengende_grafer og notatet Utvalgte_grafalgoritmer, og ukesoppgaver 07_sammenhengende_grafer bruker den. H2025 spurte om separasjonsnoder som bruk i grafoppgaven, ikke som håndkjøring. Den er krevende å rette, så den er lite sannsynlig som standardoppgave, men nyttig øving for grafdelen.",
+    begrunnelse: "SeparationVertices med depth og low står i forelesning 07_sammenhengende_grafer og notatet Utvalgte_grafalgoritmer, Ukesoppgaver 07_sammenhengende_grafer tar separasjonsnoder bare som begrep, uten depth og low. H2025 spurte om separasjonsnoder som bruk i grafoppgaven, ikke som håndkjøring. Den er krevende å rette, så den er lite sannsynlig som standardoppgave, men nyttig øving for grafdelen.",
     year: "Mock", title: "Separasjonsnoder", points: 10, oppgave_nr: "Oppgave 1 (mock)",
     oppgave:
       "<p>Gitt den urettede grafen under. Naboene behandles i alfabetisk rekkefølge.</p>" +
@@ -1072,9 +1070,210 @@
       "<b>Felle:</b> å blande sammen DFS-treet og grafen. C er nabo til A, men barn av B i DFS-treet.",
       "<b>Husk:</b> en graf uten separasjonsnoder er 2-sammenhengende."
     ],
-    eli5: "5-åring: En separasjonsnode er en bro alle må gå over. Fjerner vi den, kommer ikke de på andre siden hjem lenger.",
+    eli5: "5-åring: En separasjonsnode er som det eneste krysset mellom to bydeler. Stenger vi krysset, kommer ikke de på den ene siden over til den andre lenger.",
     side: { page: "06-grafer.html", fane: "sammenheng" }
   };
+
+  /* ======================================================================
+     Kortfelt (plan/gjennomgang/wp0-format.md): key, kilde og steg-demoer.
+     - key: "MOCK-<id>" → IN.PERFEKT[key] i assets/js/perfekt/mock.js (type "mock").
+     - kilde: false. Mockene er laget for guiden og har ingen eksamenskilde.
+     - demo: kjører kursets generatorer (IN.gen) på mockens egen input. Generatorene og
+       pseudokoden hentes først når demoen åpnes, så fila avhenger fortsatt ikke av lasterekkefølgen.
+       svar(siste steg) gjør sluttilstanden om til tekst, og fasit er sluttsvaret i løsningen.
+       Alle sluttilstander er kontrollert ved å kjøre generatorene i node.
+     ====================================================================== */
+  function gn(o) { return Object.keys(o).map(function (k) { return { id: k, x: o[k][0], y: o[k][1] }; }); }
+  function gr(nodes, edges, dir) { return { directed: !!dir, nodes: gn(nodes), edges: edges.map(function (e) { return e.slice(); }) }; }
+  function insOps(keys) { return keys.map(function (k) { return { op: "ins", k: k }; }); }
+  function cellsTxt(c) { return (c || []).map(function (x) { return x == null ? "_" : x.tomb ? "×" : String(x.k); }).join(", "); }
+  function lastProbe(s) { var p = s && s.parts; return p && p.length ? cellsTxt(p[p.length - 1].cells) : null; }
+  function preTxt(v) { var out = []; (function w(n) { if (n) { out.push(n.k); w(n.l); w(n.r); } })(v); return out.join(", "); }
+  function panelItems(s, i) { return s && s.panel && s.panel[i] ? s.panel[i].items.slice() : []; }
+  var DASH = "transparent;border:2px dashed var(--c-compare);box-sizing:border-box";
+  var RING = "transparent;border:3px solid var(--c-target);box-sizing:border-box";
+  var PATHC = "color-mix(in srgb, var(--c-target) 22%, transparent);border:3px solid var(--c-target)";
+  var DELC = "color-mix(in srgb, var(--c-swap) 25%, transparent);border:3px dashed var(--c-swap)";
+  var LEG = {
+    rm: [{ cls: "min", label: "minste (roten, x)" }, { color: "var(--vf-teal)", label: "kopieres (siste → roten)" },
+      { cls: "target", label: "elementet som synker (i)" }, { cls: "compare", label: "barna som sammenlignes" }, { cls: "swap", label: "byttes" }],
+    hs: [{ cls: "target", label: "plass i / noden som synker" }, { cls: "compare", label: "sammenlignes" }, { cls: "swap", label: "byttes" }, { cls: "sorted", label: "sortert hale" }],
+    hash: [{ cls: "compare", label: "Plassen vi ser på" }, { cls: "sorted", label: "Prøvd (kollisjon)" }, { cls: "min", label: "Satt inn / flyttet" },
+      { cls: "target", label: "Funnet" }, { cls: "swap", label: "Hull / ikke funnet" }],
+    avl: [{ cls: "compare", label: "Gjeldende node" }, { color: PATHC, label: "Sti / kall i gang" }, { cls: "min", label: "Ny node" }, { cls: "swap", label: "Roteres / ubalansert" }, { cls: "sorted", label: "Ferdig" }],
+    rem: [{ cls: "compare", label: "Gjeldende node" }, { color: PATHC, label: "Sti / kall i gang" }, { color: DELC, label: "Fjernes" }, { cls: "target", label: "Etterfølger / erstatter" }],
+    dij: [{ cls: "compare", label: "Nå / kanten vi relakserer" }, { color: DASH, label: "I køen" }, { cls: "sorted", label: "Ferdig (visited)" }, { cls: "target", label: "Beste kjente vei" }],
+    top: [{ cls: "compare", label: "Nå" }, { color: DASH, label: "På stakken" }, { cls: "sorted", label: "I output" }, { cls: "swap", label: "Kom aldri med (sykel)" }],
+    mst: [{ cls: "compare", label: "Kanten vi ser på" }, { cls: "sorted", label: "Med i treet" }, { cls: "target", label: "Kant i spenntreet" }],
+    kru: [{ cls: "compare", label: "Kanten vi ser på" }, { cls: "target", label: "Valgt kant" },
+      { label: "Tre 1 (samme farge = samme tre)", color: "var(--gv-c0)" }, { label: "Tre 2", color: "var(--gv-c1)" }],
+    qs: [{ cls: "min", label: "pivot" }, { cls: "compare", label: "left / right ser på" }, { cls: "swap", label: "byttes" }, { cls: "sorted", label: "pivot på endelig plass" }],
+    sep: [{ cls: "compare", label: "Nå (u) / kanten vi ser på" }, { color: RING, label: "På kallstakken" }, { cls: "sorted", label: "Ferdig" },
+      { cls: "target", label: "Kant i DFS-treet" }, { cls: "swap", label: "Kant tilbake / separasjonsnode" }]
+  };
+
+  /* ---------- Separasjonsnoder: steggenerator (kursets SeparationVertices + Visit) ----------
+     input: [graf, startnode]. Linjekoder (scheme "group"): 2–7 = SeparationVertices,
+     102–110 = Visit (calls { 1: 5 } lyser opp kallet Visit(G, r) i den ytre prosedyren).
+     Naboene behandles i alfabetisk rekkefølge, som i oppgaven. */
+  function tt(e, n, k) { return { eli5: e, normal: n, teknisk: k }; }
+  function genSep(inp) {
+    var g = inp[0], V = g.nodes.map(function (n) { return n.id; }), A = {}, steps = [];
+    V.forEach(function (v) { A[v] = []; });
+    g.edges.forEach(function (e) { A[e[0]].push(e[1]); if (!g.directed) A[e[1]].push(e[0]); });
+    V.forEach(function (v) { A[v].sort(); });
+    var r = inp[1] || V[0], depth = {}, low = {}, seps = [], stack = [], fin = {}, tree = {}, back = {}, cur = null, hot = null;
+    function ek(u, v) { return u + ">" + v; }
+    function isTree(u, v) { return tree[ek(u, v)] || tree[ek(v, u)]; }
+    function has(o, k) { return Object.prototype.hasOwnProperty.call(o, k); }
+    function f(x) { return x == null ? "–" : String(x); }
+    function snap(line, text, tag) {
+      var nodes = {}, edges = {};
+      V.forEach(function (v) { if (fin[v]) nodes[v] = "done"; else if (has(depth, v)) nodes[v] = "seen"; });
+      seps.forEach(function (v) { nodes[v] = "warn"; });
+      if (cur) nodes[cur] = "cur";
+      Object.keys(tree).forEach(function (k) { edges[k] = "tree"; });
+      Object.keys(back).forEach(function (k) { edges[k] = "back"; });
+      if (hot) edges[hot] = "hot";
+      steps.push({ line: line, g: g, nodes: nodes, edges: edges, text: text, tag: tag,
+        panel: [{ label: "Kallstakk (bunn → topp):", items: stack.slice(), kind: "stack" },
+          { label: "seps:", items: seps.slice(), kind: "set" }],
+        table: { head: [""].concat(V), hi: cur ? V.indexOf(cur) + 1 : null,
+          rows: [["depth"].concat(V.map(function (v) { return f(depth[v]); })), ["low"].concat(V.map(function (v) { return f(low[v]); }))] } });
+    }
+    function visit(u) {
+      stack.push(u); cur = u; hot = null;
+      low[u] = depth[u];
+      snap(102, tt("Nå er vi hos " + u + ". Foreløpig kommer vi ikke høyere opp enn der vi står, så low[" + u + "] er " + depth[u] + ".",
+        "Visit for " + u + ": low[" + u + "] ← depth[" + u + "] = " + depth[u] + ".",
+        "Visit for " + u + ": low[" + u + "] ← " + depth[u] + ". Ingen kant ut fra " + u + " er sett ennå."), "Visit(" + u + ")");
+      A[u].forEach(function (v) {
+        cur = u; hot = ek(u, v);
+        snap(103, tt("Vi ser på kanten mellom " + u + " og " + v + ".", "Kanten (" + u + ", " + v + ").", "(u, v) = (" + u + ", " + v + ")."), u + "–" + v);
+        if (has(depth, v)) {
+          var old = low[u];
+          low[u] = Math.min(low[u], depth[v]);
+          if (!isTree(u, v)) back[ek(u, v)] = 1;
+          var ch = low[u] < old;
+          snap(105, ch
+            ? tt(v + " har vi besøkt før, og " + v + " ligger høyere opp (dybde " + depth[v] + "). Via denne kanten kommer " + u + " opp dit, så low[" + u + "] blir " + low[u] + ".",
+                v + " ∈ depth (linje 4). low[" + u + "] ← Min(" + old + ", depth[" + v + "] = " + depth[v] + ") = " + low[u] + ".",
+                v + " er besøkt. low[" + u + "] ← Min(" + old + ", " + depth[v] + ") = " + low[u] + (isTree(u, v) ? ". Kurset sjekker ikke om v er forelderen, så også kanten opp til forelderen teller." : "."))
+            : tt(v + " har vi besøkt før, men det hjelper ikke: " + u + " kommer allerede like høyt opp (low = " + low[u] + ").",
+                v + " ∈ depth (linje 4). low[" + u + "] ← Min(" + old + ", " + depth[v] + ") = " + low[u] + ", uendret.",
+                "Min(" + old + ", " + depth[v] + ") = " + low[u] + ": ingen endring" + (depth[v] > depth[u] ? " (" + v + " ligger lenger ned og er allerede ferdig)." : ".")),
+            ch ? "low[" + u + "] = " + low[u] : "Ingen endring");
+        } else {
+          depth[v] = depth[u] + 1; tree[ek(u, v)] = 1;
+          snap(107, tt(v + " er ny. Den blir et barn av " + u + " og ligger ett hakk lenger ned: dybde " + depth[v] + ".",
+            v + " ∉ depth (else). depth[" + v + "] ← depth[" + u + "] + 1 = " + depth[v] + ". Kanten blir en kant i DFS-treet.",
+            "depth[" + v + "] ← " + depth[v] + ". {" + u + ", " + v + "} blir en kant i DFS-treet, og Visit kalles for " + v + " (linje 8)."), "depth[" + v + "] = " + depth[v]);
+          visit(v);
+          cur = u; hot = ek(u, v);
+          var old2 = low[u];
+          low[u] = Math.min(low[u], low[v]);
+          snap(109, tt("Tilbake hos " + u + ". Det " + v + " kunne nå (dybde " + low[v] + "), kan " + u + " også nå. low[" + u + "] blir " + low[u] + ".",
+            "Tilbake fra Visit for " + v + ". low[" + u + "] ← Min(" + old2 + ", low[" + v + "] = " + low[v] + ") = " + low[u] + ".",
+            "low[" + u + "] ← Min(" + old2 + ", " + low[v] + ") = " + low[u] + ". low arves oppover i DFS-treet."), "Tilbake i " + u);
+          var root = depth[u] === 0, cond = !root && depth[u] <= low[v];
+          if (cond && seps.indexOf(u) < 0) seps.push(u);
+          snap(110, root
+            ? tt(u + " er roten. Den sjekker vi på en egen måte helt til slutt.", "depth[" + u + "] = 0: testen hoppes over for roten.", "depth[u] ≠ 0 er usann. Roten avgjøres i linje 6 i SeparationVertices.")
+            : cond
+              ? tt("Fra " + v + " og nedover kommer ingen høyere opp enn " + u + ". Fjerner vi " + u + ", faller " + v + " av. Da er " + u + " en separasjonsnode!",
+                  "depth[" + u + "] = " + depth[u] + " ≤ low[" + v + "] = " + low[v] + ": " + u + " legges i seps.",
+                  depth[u] + " ≤ " + low[v] + ": subtreet til " + v + " når ikke forbi " + u + ", så " + u + " ∈ seps.")
+              : tt(v + " eller noen under " + v + " kommer seg høyere opp enn " + u + ". Da henger de fast i grafen uten " + u + ".",
+                  "depth[" + u + "] = " + depth[u] + " ≤ low[" + v + "] = " + low[v] + " er usann: ingen ny separasjonsnode.",
+                  depth[u] + " > " + low[v] + ": subtreet til " + v + " har en kant tilbake over " + u + "."),
+            cond ? u + " er separasjonsnode" : "Test");
+        }
+      });
+      fin[u] = true; stack.pop(); cur = null; hot = null;
+    }
+    snap(2, tt("Vi gjør klar tre lister: hvor dypt hver node ligger (depth), hvor høyt den kan klatre (low), og separasjonsnodene vi finner (seps).",
+      "depth, low og seps starter tomme. Naboene tas i alfabetisk rekkefølge.",
+      "Delte variabler for alle kallene. depth fungerer også som visited."), "Start");
+    snap(3, tt("Vi starter i " + r + ". Den blir roten i DFS-treet.", "r ← " + r + ".", "r ← " + r + ", roten i DFS-treet."), "Rot " + r);
+    depth[r] = 0;
+    snap(4, tt(r + " ligger øverst, på dybde 0.", "depth[" + r + "] ← 0.", "depth[" + r + "] ← 0. Nå er " + r + " besøkt."), "depth[" + r + "] = 0");
+    visit(r);
+    var kids = Object.keys(tree).filter(function (k) { return k.split(">")[0] === r; }).length;
+    if (kids > 1 && seps.indexOf(r) < 0) seps.push(r);
+    snap(6, kids > 1
+      ? tt(r + " har " + kids + " grener i DFS-treet. Fjerner vi " + r + ", faller de fra hverandre, så " + r + " er en separasjonsnode.",
+          "Roten " + r + " har " + kids + " barn i DFS-treet: " + r + " legges i seps.", kids + " barn: ingen kant går mellom subtrærne deres, så " + r + " ∈ seps.")
+      : tt(r + " har bare én gren i DFS-treet. Resten henger sammen uten " + r + ", så " + r + " er ikke en separasjonsnode.",
+          "Roten " + r + " har " + kids + " barn i DFS-treet, så den er ikke en separasjonsnode.", "Ett barn: alle de andre nodene ligger i samme subtre, og det henger sammen uten roten."), "Roten");
+    snap(7, tt("Ferdig! Separasjonsnodene er " + (seps.length ? seps.slice().sort().join(", ") : "ingen") + ".",
+      "return seps = {" + seps.slice().sort().join(", ") + "} (funnet i rekkefølgen " + (seps.join(", ") || "–") + ").",
+      "Ett DFS: O(|V| + |E|). seps = {" + seps.slice().sort().join(", ") + "}."), "Ferdig");
+    return steps;
+  }
+
+  function setKey(m) { m.key = "MOCK-" + m.id.replace(/^mock-/, ""); m.kilde = false; }
+  [mHeap, mProbe, mAvl, mBst, mHs, mRehash, mDijk, mTop, mMst, mQs, mRadix, mSep].forEach(setKey);
+
+  mHeap.demo = { engine: "heap", gen: "removeMin", input: H0.slice(), inputNavn: "Mockens heap", presets: false,
+    pseudo: "removeMin", legend: LEG.rm, label: "Kjør RemoveMin tre ganger på mockens heap", del: "(b)",
+    fasit: "5, 6, 7, 9, 12, 10, 8" };
+  var PROBE_OPS = insOps([31, 42, 11, 23, 51, 19, 29, 70]);
+  mProbe.demo = { engine: "hash", gen: "hsProbeOps", inputNavn: "(a)–(c): sett inn, slett 31, slett 19",
+    input: [{ N: 10, ops: PROBE_OPS.concat([{ op: "del", k: 31 }, { op: "del", k: 19 }]) }],
+    presets: { "(a) bare innsettingene": [{ N: 10, ops: PROBE_OPS.slice() }], "Slett 31, så søk etter 11": [{ N: 10, ops: PROBE_OPS.concat([{ op: "del", k: 31 }, { op: "get", k: 11 }]) }] },
+    pseudo: ["hsProbeInsert", "hsProbeGet", "hsProbeRemove"], legend: LEG.hash, del: "(c)",
+    label: "Kjør innsettingene og de to slettingene (kursets LinearProbingRemove)",
+    svar: lastProbe, fasit: "70, 11, 42, 23, 51, _, _, _, _, 29" };
+  mAvl.demo = { engine: "tree", gen: "avlInsert", input: [5, 9, 14, 3, 7, 6, 4], inputNavn: "Mockens nøkler", presets: false,
+    pseudo: "avlInsert", legend: LEG.avl, del: "(a)", label: "Kjør AVL-innsettingen av 5, 9, 14, 3, 7, 6, 4",
+    svar: function (s) { return s && s.tree ? preTxt(s.tree) : null; }, fasit: "7, 5, 3, 4, 6, 9, 14" };
+  var BST_RUNS = [
+    ["Slett 35 (løvnode)", [50, 30, 80, 20, 40, 60, 90, 35, 70, 65], 35, "50, 30, 20, 40, 80, 60, 70, 65, 90"],
+    ["Slett 70 (ett barn)", [50, 30, 80, 20, 40, 60, 90, 70, 65], 70, "50, 30, 20, 40, 80, 60, 65, 90"],
+    ["Slett 50 (to barn)", [50, 30, 80, 20, 40, 60, 90, 65], 50, "60, 30, 20, 40, 80, 65, 90"],
+    ["Slett 30 (to barn)", [60, 30, 80, 20, 40, 65, 90], 30, "60, 40, 20, 80, 65, 90"]
+  ];
+  mBst.demoLabel = "Se Remove kjøre, én sletting om gangen";
+  mBst.demo = BST_RUNS.map(function (r) {
+    return { engine: "tree", gen: "bstRemove", input: [{ keys: r[1], x: r[2] }], inputNavn: r[0], presets: false, tab: r[0],
+      pseudo: "bstRemove", legend: LEG.rem, del: "(b)", label: r[0],
+      svar: function (s) { return s && s.tree ? preTxt(s.tree) : null; }, fasit: r[3] };
+  });
+  mHs.demo = { engine: "heap", gen: "heapSort", input: [4, 10, 3, 5, 1, 8, 9, 2], inputNavn: "Mockens array", presets: false,
+    pseudo: ["heapSort", "buildMaxHeap", "heapBubbleDown"], legend: LEG.hs, del: "(b)",
+    label: "Kjør Heapsort (BuildMaxHeap og så løkka)", fasit: "1, 2, 3, 4, 5, 8, 9, 10" };
+  mRehash.demo = { engine: "hash", gen: "hsRehashOps", input: [{ N: 4, keys: [6, 13, 9, 21, 17, 30, 14] }], inputNavn: "Mockens nøkler, N = 4", presets: false,
+    pseudo: ["hsInsertRehash", "hsRehash"], callLine: { 2: 103 }, legend: LEG.hash, del: "(c)",
+    label: "Kjør innsettingene med rehashing", svar: lastProbe, fasit: "_, 17, _, _, _, 21, 6, _, _, 9, _, _, _, 13, 30, 14" };
+  mDijk.demo = { engine: "graph", gen: "grDijkstra", input: [gr(DN, DE), "A"], inputNavn: "Mockens graf, start A", presets: false,
+    pseudo: "dijkstra", legend: LEG.dij, del: "(a)", label: "Kjør Dijkstra fra A",
+    svar: function (s) { return s && s.lab ? Object.keys(s.lab).map(function (v) { return v + " " + s.lab[v]; }).join(", ") : null; },
+    fasit: "A 0, B 3, C 1, D 8, E 10, F 13" };
+  mTop.demo = { engine: "graph", gen: "grTopSort", input: [gr(TN, TE, true)], inputNavn: "(a) Mockens graf",
+    presets: { "(c) med kanten (G, B)": [gr(TN, TE.concat([["G", "B"]]), true)] },
+    pseudo: "topSort", legend: LEG.top, del: "(a)", label: "Kjør TopSort (inngrad og stakk)",
+    svar: function (s) { return panelItems(s, 1).join(", ") || null; }, fasit: "B, D, F, A, C, E, G" };
+  mMst.demoLabel = "Se Kruskal og Prim kjøre på grafen";
+  mMst.demo = [
+    { engine: "graph", gen: "grKruskal", input: [gr(MN, ME)], inputNavn: "Mockens graf", presets: false, tab: "(a) Kruskal",
+      pseudo: "kruskal", legend: LEG.kru, del: "(a)", label: "Kjør Kruskal",
+      svar: function (s) { return panelItems(s, 0).filter(function (x) { return x.indexOf("✓") >= 0; }).map(function (x) { return x.replace(/\s+\d+\s*✓.*$/, ""); }).join(", ") || null; },
+      fasit: "E–F, B–D, A–C, B–C, C–E" },
+    { engine: "graph", gen: "grPrim", input: [gr(MN, ME), "A"], inputNavn: "Mockens graf, start A", presets: false, tab: "(b) Prim",
+      pseudo: "prim", legend: LEG.mst, del: "(b)", label: "Kjør Prim fra A",
+      svar: function (s) { return panelItems(s, 1).join(", ") || null; }, fasit: "A, C, B, D, E, F" }
+  ];
+  mQs.demo = { engine: "bars", gen: "quickSort", input: [7, 2, 9, 4, 3, 8, 6, 1, 5], inputNavn: "Mockens array", presets: false,
+    pseudo: ["quickSort", "partition"], legend: LEG.qs, del: "(b)",
+    label: "Kjør Quicksort med siste element som pivot", fasit: "1, 2, 3, 4, 5, 6, 7, 8, 9" };
+  mRadix.demo = { engine: "buckets", gen: "radixSort", input: [512, 87, 230, 415, 98, 302, 147, 85], inputNavn: "Mockens tall", presets: false,
+    pseudo: "radixSort", del: "(a)", label: "Kjør Radix sort, ett siffer om gangen",
+    svar: function (s) { return s && s.A ? s.A.map(function (x) { return x.v; }).join(", ") : null; }, fasit: "85, 87, 98, 147, 230, 302, 415, 512" };
+  mSep.demo = { engine: "graph", gen: genSep, input: [gr(SN, SE), "A"], inputNavn: "(a)–(b) Mockens graf",
+    presets: { "(c) med kanten {E, G}": [gr(SN, SE.concat([["E", "G"]])), "A"] },
+    pseudo: ["sepVertices", "sepVisit"], scheme: "group", calls: { 1: 5 }, legend: LEG.sep, del: "(b)",
+    label: "Kjør SeparationVertices med DFS fra A",
+    svar: function (s) { return s ? panelItems(s, 1).sort().join(", ") || "ingen" : null; }, fasit: "C, D, F" };
 
   IN.MOCK = [mHeap, mProbe, mAvl, mBst, mHs, mRehash, mDijk, mTop, mMst, mQs, mRadix, mSep];
 })();

@@ -13,6 +13,7 @@
        src?: i,         // plassen i A elementet kommer fra (utheves også når den er falmet)
        hideUnwritten?: true, // samlefasen: plasser i A som ikke er skrevet ennå, vises tomme
        digit?: p,       // radix: posisjon fra høyre (0 = enerplass) som skal utheves
+       vars?: [{ name, value, idx?, where?: "A"|"B" }], varsPrev?,  // variabellinja (varline.js)
        text, tag }
    item: { v: number|string, key: number, tag?: "a"|"b"|… (viser opprinnelig rekkefølge) }
    ============================================================ */
@@ -48,9 +49,29 @@
     return c;
   }
 
+  /* Prikken i variabellinja: samme markering som cella i A (aktiv = gul, skrevet tilbake = grønn,
+     fordelt = falmet) eller bøtta (i fokus = gul). */
+  function dotState(s, v) {
+    if (v.where === "B") {
+      if (v.idx < 0 || v.idx >= (s.B || []).length) return null;
+      return (s.bucket === v.idx || (s.active && s.active.where === "B" && s.active.k === v.idx)) ? "compare" : "default";
+    }
+    if (v.idx < 0 || v.idx >= s.A.length) return null;
+    if (s.src === v.idx || (s.active && s.active.where === "A" && s.active.i === v.idx)) return "compare";
+    if ((s.written || []).indexOf(v.idx) >= 0) return "sorted";
+    if ((s.done || []).indexOf(v.idx) >= 0) return "used";
+    return "default";
+  }
+
   IN.vizBuckets = function (stage, s, opts) {
     opts = opts || {};
-    clear(stage);
+    if (s && s.A && s.vars && IN.varLine) {
+      IN.varLine.attach(stage).update(s.vars, s.varsPrev, { frame: s.frame, dot: function (v) { return dotState(s, v); } });
+      IN.varLine.clearStage(stage);
+    } else {
+      if (IN.varLine) IN.varLine.detach(stage);
+      clear(stage);
+    }
     if (!s || !s.A) return;
     var root = el("div", { class: "bk" + (opts.compact ? " bk-compact" : "") });
     var done = {}, written = {};

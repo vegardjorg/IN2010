@@ -204,8 +204,13 @@ code { font-family: var(--font-mono); font-size: .92em; }
 }
 .nav-inner::-webkit-scrollbar { display: none; }
 .nav-brand {
+  flex: none;                                   /* står fast utenfor den rullbare lenkeraden */
   font-weight: 600; font-size: var(--text-md); letter-spacing: .2px;
-  margin-right: var(--d-sm); white-space: nowrap; color: var(--color-on-surface);
+  margin-right: var(--d-xs); white-space: nowrap; color: var(--color-on-surface);
+}
+/* Mellombredde (laptop): strammere lenker, så hele menyen får plass uten rulling */
+@media (max-width: 1320px) {
+  #topnav .nav-inner a.navlink { padding: 0 7px; }
 }
 .nav-brand span { color: var(--color-primary); }
 #topnav a.navlink {
@@ -403,7 +408,7 @@ th.has-tip { text-decoration: underline dotted; text-underline-offset: 3px;
 /* ---------- Layout ---------- */
 .wrap { max-width: var(--maxw); margin: 0 auto; padding: var(--d-lg) var(--d-md) 4rem; }
 .pagehead { margin: .5rem 0 1.25rem; }
-.pagehead .lead { color: var(--color-on-surface-variant); font-size: 1.05rem; margin: .3rem 0 .8rem; max-width: 70ch; }
+.pagehead .lead { color: var(--color-on-surface-variant); font-size: 1.05rem; margin: .3rem 0 .8rem; }
 .badges { display: flex; flex-wrap: wrap; gap: var(--d-xs); }
 .badge {
   display: inline-flex; align-items: center; gap: var(--d-xs);
@@ -767,16 +772,23 @@ h2, h3, h4, section[id], .card[id], .panel[id], main { scroll-margin-top: 68px; 
   h1 { font-size: 1.55rem; }
   .grid.cols-2, .grid.cols-3, .grid.cols-2.demo-wide { grid-template-columns: 1fr; }
   .pc-explainer { grid-template-columns: 1fr; }
-  .sp-counter { margin-left: 0; width: 100%; }
   .wrap { padding: var(--d-md) var(--d-sm) 3rem; }
   /* Søyledemoen skal få plass på smal skjerm (ellers scroller scenen vannrett) */
   .bars { gap: 7px; }
   .bar-col { width: 34px; }
-  /* Hint om at menyen kan dras vannrett – kun når lenkene faktisk er bredere enn skjermen */
-  .nav-inner.scroll-x {
-    -webkit-mask-image: linear-gradient(90deg, #000 0, #000 calc(100% - 20px), transparent 100%);
-            mask-image: linear-gradient(90deg, #000 0, #000 calc(100% - 20px), transparent 100%);
-  }
+}
+/* Hint om at menyen kan dras vannrett: uttoning på den siden der det finnes flere lenker (alle bredder) */
+.nav-inner.fade-r {
+  -webkit-mask-image: linear-gradient(90deg, #000 0, #000 calc(100% - 24px), transparent 100%);
+          mask-image: linear-gradient(90deg, #000 0, #000 calc(100% - 24px), transparent 100%);
+}
+.nav-inner.fade-l {
+  -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 24px, #000 100%);
+          mask-image: linear-gradient(90deg, transparent 0, #000 24px, #000 100%);
+}
+.nav-inner.fade-l.fade-r {
+  -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 24px, #000 calc(100% - 24px), transparent 100%);
+          mask-image: linear-gradient(90deg, transparent 0, #000 24px, #000 calc(100% - 24px), transparent 100%);
 }
 @media (max-width: 560px) {
   .bars { gap: 5px; }
@@ -984,7 +996,7 @@ html:has(body[data-page="index"]) { scroll-padding-top: 7rem; }
 .a4-head { display: flex; justify-content: space-between; align-items: flex-end; gap: .8rem 1.5rem;
   padding-bottom: .75rem; border-bottom: 2px solid var(--a4-ink); }
 .a4-head h1 { font-size: 1.6rem; line-height: 1.15; letter-spacing: -.01em; }
-.a4-lead { color: var(--a4-soft); margin-top: .3rem !important; max-width: 58ch; }
+.a4-lead { color: var(--a4-soft); margin-top: .3rem !important; }
 .a4-facts { display: grid; grid-template-columns: auto auto; gap: 0 .7rem; margin: 0; flex: none;
   font-size: 12.5px; padding: .35rem .6rem; border: 1px solid var(--color-outline); border-radius: 2px; }
 .a4-facts dt { color: var(--a4-soft); }
@@ -1916,3 +1928,318 @@ body.has-crash-ret{padding-bottom:64px}
 }
 /* Etiketter kan inneholde kode (i + 1, left →), så de vises med vanlige bokstaver. */
 .sp-explain .tagline { text-transform: none; letter-spacing: .02em; }
+
+/* ===== Hovedøkta: steg-teller og hurtigtaster inne i demoboksen ===== */
+/* Rammen (.sp-frame) bærer kanten. Scenen ligger inni uten egen kant, og bunnlinja (.sp-foot)
+   viser hurtigtastene til venstre og «Steg x av y» til høyre. */
+.sp-frame {
+  background: var(--color-surface); border: 1px solid var(--color-outline-variant); border-radius: var(--radius-lg);
+}
+.sp-frame > .sp-stage { border: 0; border-radius: var(--radius-lg) var(--radius-lg) 0 0; background: transparent; }
+.sp-frame > .sp-stage:focus-visible { outline-offset: -2px; }
+.sp-foot {
+  display: flex; justify-content: space-between; align-items: baseline; gap: .4rem .8rem; flex-wrap: wrap;
+  padding: .1rem var(--d-md) .35rem; font-size: 11px; line-height: 1.35; color: var(--color-on-surface-variant);
+}
+.sp-foot .sp-hint { margin: 0; opacity: .85; min-width: 0; }
+.sp-foot .sp-hint .kbd { font-size: .9em; padding: 0 .3em; }
+.sp-foot .sp-counter { margin-left: auto; font-size: 11px; white-space: nowrap; }
+@media (max-width: 760px) { .sp-foot { padding: .1rem var(--d-sm) .3rem; } }
+
+/* ===== Eksamenskort: kilde, avvik, perfekt svar, demo ===== */
+/* Kildelinje øverst i «Oppgaven»: diskret, men lesbar. */
+.et-kilde {
+  margin: 0 0 .45rem; font-size: var(--text-xs); line-height: 1.4; color: var(--color-on-surface-variant);
+  overflow-wrap: anywhere;
+}
+.et-kilde-ark { font-weight: 600; color: var(--color-on-surface); }
+.et-kilde-mode {
+  display: inline-block; padding: 0 .4em; border-radius: var(--radius);
+  background: var(--color-surface-container-high); font-weight: 600; letter-spacing: .2px;
+}
+.et-fn { margin: .45rem 0 0; font-size: var(--text-xs); color: var(--color-on-surface-variant); }
+/* Avvik fra eksamensarket: varselboks rett under oppgaven */
+.et-sec.avvik {
+  border-left-color: var(--color-on-tone-warn); background: var(--color-tone-warn); color: var(--color-on-tone-warn);
+  padding: .45rem .7rem; border-radius: 0 var(--radius-md) var(--radius-md) 0;
+}
+.et-sec.avvik .et-lbl { color: var(--color-on-tone-warn); }
+.et-sec.avvik .et-lbl::before { content: "⚠ "; }
+.et-sec.avvik .et-content { color: var(--color-on-tone-warn); }
+/* Steg-demo og perfekt svar: lukkede <details> som åpnes ved behov */
+.et-sec.demo { border-left-color: var(--c-target); }
+.et-sec.perfekt { border-left-color: var(--c-sorted); }
+.et-demo, .et-perfekt {
+  border: 1px solid var(--color-outline-variant); border-radius: var(--radius-lg);
+  background: var(--color-surface-container-lowest); min-width: 0;
+}
+.et-demo > summary, .et-perfekt > summary {
+  cursor: pointer; padding: .45rem .7rem; font-weight: 600; font-size: var(--text-sm);
+  color: var(--color-primary); list-style: none; border-radius: var(--radius-lg);
+}
+.et-demo > summary::-webkit-details-marker, .et-perfekt > summary::-webkit-details-marker { display: none; }
+.et-demo > summary:hover, .et-perfekt > summary:hover { background-image: linear-gradient(var(--state-hover), var(--state-hover)); }
+.et-demo > summary:focus-visible, .et-perfekt > summary:focus-visible { outline: var(--focus); outline-offset: -2px; }
+.et-perfekt > summary::before { content: "＋ "; }
+.et-perfekt[open] > summary::before { content: "− "; }
+.et-demo-ico { font-size: .8em; }
+.et-demo[open] > summary, .et-perfekt[open] > summary { border-bottom: 1px solid var(--color-outline-variant); border-radius: var(--radius-lg) var(--radius-lg) 0 0; }
+.et-demo-body, .et-pf-body { padding: .6rem .7rem .7rem; min-width: 0; }
+.et-demo-body .et-demo-grid { gap: .8rem; }
+.et-demo-left, .et-demo-pc { min-width: 0; }
+.et-demo-h { margin: .2rem 0 .4rem; font-size: var(--text-sm); }
+.et-demo-lines { margin-top: .6rem; }
+.et-demo-tabs { display: flex; flex-wrap: wrap; gap: var(--d-xs); margin-bottom: .6rem; }
+.et-demo-tabs .btn[aria-pressed="true"] { background: var(--color-primary); color: var(--color-on-primary, #fff); border-color: var(--color-primary); }
+.et-demo-check {
+  margin: .5rem 0 0; padding: .3rem .6rem; border-radius: var(--radius-md); font-size: var(--text-sm); font-weight: 600;
+  background: var(--color-tone-ok); color: var(--color-on-tone-ok); overflow-wrap: anywhere;
+}
+.et-demo-check[hidden] { display: none; }
+.et-demo-err { margin: 0; }
+.et-bars-host .sp-stage { overflow-x: auto; }
+/* Perfekt svar, lag 1: vårt eget fullpoengssvar */
+.et-pf-title { margin: 0 0 .4rem; font-size: var(--text-sm); color: var(--color-on-tone-ok); }
+.et-pf-note {
+  margin: 0 0 .6rem; padding: .35rem .6rem; border-radius: var(--radius-md); font-size: var(--text-xs);
+  background: var(--color-tone-info); color: var(--color-on-tone-info);
+}
+.et-pf-intro { margin-bottom: .5rem; }
+.et-pf-del { display: grid; grid-template-columns: 2.2rem minmax(0, 1fr); gap: 0 .4rem; margin: .7rem 0 0; }
+.et-pf-del:first-of-type { margin-top: .2rem; }
+.et-pf-dl { font-weight: 700; color: var(--color-primary); text-align: right; }
+.et-pf-main { min-width: 0; }
+.et-pf-main > * + * { margin-top: .4rem; }
+.et-pf-code { min-width: 0; overflow-x: auto; }
+.et-pf-code .pseudo { margin: 0; }
+.et-pf-pre {
+  margin: 0; padding: .5rem .7rem; border-radius: var(--radius-md); background: var(--color-surface-container-low);
+  font-family: var(--font-mono); font-size: var(--text-xs); white-space: pre-wrap; overflow-wrap: anywhere;
+}
+.et-pf-fig { max-width: min(100%, 26rem); }
+.et-pf-kt, .et-pf-poeng { margin: .35rem 0 0; }
+.et-pf-poeng { font-size: var(--text-xs); color: var(--color-on-surface-variant); }
+.et-pf-why .explain-block { margin: .5rem 0 0; }
+.et-pf-anslag {
+  margin-top: .7rem; padding: .45rem .7rem; border-radius: var(--radius-md);
+  background: var(--color-tone-heavy); color: var(--color-on-tone-heavy);
+}
+.et-pf-anslag-lbl { font-size: var(--text-xs); font-weight: 700; letter-spacing: .4px; text-transform: uppercase; margin-bottom: .2rem; }
+.et-pf-anslag ul { margin: .2rem 0 0; padding-left: 1.2rem; }
+/* Perfekt svar, lag 2: sensorveiledningen ordrett, med kildelinje */
+.et-pf-sensor { margin-top: .9rem; border-top: 1px dashed var(--color-outline-variant); padding-top: .5rem; }
+.et-pf-sensor > summary { cursor: pointer; font-weight: 600; font-size: var(--text-sm); color: var(--color-on-tone-warn); }
+.et-pf-sensor > summary:focus-visible { outline: var(--focus); outline-offset: 2px; }
+.et-pf-src { margin: .35rem 0 .3rem; font-size: var(--text-xs); color: var(--color-on-surface-variant); overflow-wrap: anywhere; }
+blockquote.sensor {
+  margin: 0; padding: .5rem .8rem; border-left: 4px solid var(--color-on-tone-warn);
+  border-radius: 0 var(--radius-md) var(--radius-md) 0; background: var(--color-tone-warn); color: var(--color-on-tone-warn);
+  min-width: 0; overflow-wrap: anywhere;
+}
+blockquote.sensor p { margin: .3rem 0; }
+blockquote.sensor ul { margin: .3rem 0; padding-left: 1.2rem; }
+blockquote.sensor .et-pf-code { margin: .4rem 0; }
+blockquote.sensor .et-sv-krit, blockquote.sensor .et-sv-fasit + .et-sv-fasit { margin-top: .5rem; }
+blockquote.sensor .pseudo { background: var(--color-surface); color: var(--color-on-surface); }
+.et-sv-del + .et-sv-del { margin-top: .7rem; padding-top: .5rem; border-top: 1px solid color-mix(in srgb, var(--color-on-tone-warn) 25%, transparent); }
+.et-sv-dl { font-weight: 700; }
+.et-sv-seq { font-family: var(--font-mono); font-size: var(--text-xs); line-height: 1.5; white-space: pre-wrap; margin: .3rem 0; }
+.et-pf-merknad { margin: .45rem 0 0; font-size: var(--text-xs); color: var(--color-on-surface-variant); }
+/* Kildelinje under forklaringen i sant/usant og flervalg */
+.qz-kilde { margin: .35rem 0 0; font-size: var(--text-xs); color: var(--color-on-surface-variant); overflow-wrap: anywhere; }
+.qz-kilde span[title] { text-decoration: underline dotted; text-underline-offset: 2px; cursor: help; }
+.qz-kilde-fn { margin: .6rem 0 0; font-size: var(--text-xs); color: var(--color-on-surface-variant); }
+@media (max-width: 480px) {
+  .et-demo-body, .et-pf-body { padding: .5rem .5rem .6rem; }
+  .et-pf-del { grid-template-columns: 1.9rem minmax(0, 1fr); }
+  blockquote.sensor { padding: .45rem .6rem; }
+}
+
+/* ===== Variabellinje ===== */
+/* varline.js: én diskret rad øverst i demofeltet med variablene i pseudokoden (i = 3 · j = 2 · n = 8).
+   Prikken har samme farge som søyla/cella variabelen peker på. Knappen «Variabler» skjuler linja
+   og løkkespennene i alle demoer (localStorage in2010:vis-variabler). */
+.sp-stage:has(> .vl) { flex-direction: column; align-items: stretch; height: auto; min-height: 300px; }
+.sp-stage:has(> .vl) > .vl + * { margin-top: auto; }
+.hs-host .sp-stage:has(> .vl), .ls-host .sp-stage:has(> .vl) { min-height: 220px; }
+.gv-host .sp-stage:has(> .vl), .tv-host .sp-stage:has(> .vl) { min-height: 240px; }
+.vl {
+  position: sticky; left: 0; align-self: stretch; z-index: 1; min-width: 0;
+  display: flex; flex-wrap: wrap; align-items: center; gap: .15rem .5rem; margin: -.3rem 0 .45rem;
+  font-size: 11px; line-height: 1.45; color: var(--color-on-surface-variant); font-variant-numeric: tabular-nums;
+}
+.vl-tog {
+  flex: none; min-height: 24px; padding: 0 .45rem; border: 1px solid var(--color-outline-variant); border-radius: var(--radius);
+  background: transparent; color: inherit; font: inherit; cursor: pointer;
+}
+.vl-tog:hover { color: var(--color-on-surface); background: var(--color-surface-container); }
+.vl-tog:focus-visible { outline: 2px solid var(--color-primary); outline-offset: 1px; }
+.vl-body { display: contents; } /* elementene brytes sammen med knappen, ikke som egen blokk */
+.vl.is-off .vl-body { display: none; }
+.vl-frame { font-family: var(--font-mono); font-weight: 600; padding: 0 .35rem; border-radius: var(--radius); background: var(--color-surface-container-high); }
+.vl-item { white-space: nowrap; }
+.vl-item:not(:last-child)::after { content: "·"; margin-left: .5rem; opacity: .6; } /* prikken henger på slutten, aldri først på en ny rad */
+.vl-n, .vl-v { font-family: var(--font-mono); }
+.vl-v { font-weight: 600; color: var(--color-on-surface); }
+.vl-item.is-changed .vl-v {
+  font-weight: 800; text-decoration: underline 2px color-mix(in srgb, var(--color-primary) 65%, transparent); text-underline-offset: 2px;
+}
+.vl-dot {
+  display: inline-block; width: 7px; height: 7px; border-radius: 50%; margin-right: .25rem;
+  position: relative; top: -1px; background: var(--c-default);
+}
+.vl-dot.is-compare { background: var(--c-compare); }
+.vl-dot.is-min     { background: var(--c-min); }
+.vl-dot.is-swap    { background: var(--c-swap); }
+.vl-dot.is-sorted  { background: var(--c-sorted); }
+.vl-dot.is-target  { background: var(--c-target); }
+.vl-dot.is-part    { background: repeating-linear-gradient(135deg, var(--c-sorted) 0 2px, color-mix(in srgb, var(--c-sorted) 35%, var(--color-surface)) 2px 4px); }
+.vl-dot.is-stale   { background: transparent; box-shadow: inset 0 0 0 1.5px var(--c-default); }
+.vl-dot.is-used    { background: transparent; box-shadow: inset 0 0 0 1.5px var(--c-default); opacity: .5; }
+
+/* Løkkespenn under søylene (viz-bars: step.ranges): ┌ j ─────┐ fra kant til kant av cellene.
+   Heltrukket = for-løkke, stiplet = while-løkke, tykk = kallets område. Plassen regnes ut i JS. */
+.vr { position: relative; align-self: stretch; margin-top: -.2rem; }
+.vb > .vr { margin-top: -.4rem; }
+.vr-row { position: relative; height: 12px; }
+.vr-br {
+  position: absolute; top: 4px; height: 5px; box-sizing: border-box;
+  border: 1px solid var(--color-placeholder); border-bottom: 0;
+}
+.vr-br.is-dashed { border-top-style: dashed; }
+.vr-br.is-call { border-top-width: 2px; border-color: var(--color-on-surface-variant); }
+.vr-lbl {
+  position: absolute; left: 3px; top: -6px; padding: 0 2px; background: var(--color-surface);
+  font: 600 10px/12px var(--font-mono); color: var(--color-on-surface-variant); white-space: nowrap;
+}
+.vr-br.is-call .vr-lbl { top: -7px; }
+/* Spennet er smalere enn navnet: navnet står utenfor, på den siden det er plass */
+.vr-lbl.is-right { left: calc(100% + 3px); }
+.vr-lbl.is-left { left: auto; right: calc(100% + 3px); }
+.vr-lbl .vl-dot { width: 6px; height: 6px; margin-right: 2px; }
+.sp-stage:has(> .vl.is-off) .vr { display: none; }
+.vl-dot.is-occ { background: color-mix(in srgb, var(--c-sorted) 30%, var(--color-surface)); box-shadow: inset 0 0 0 1.5px var(--c-sorted); } /* hashing: forbi-probet plass */
+/* Søyler tilpasset scenebredden (viz-bars.js fitBars setter --bw/--bg når standardbredden ikke får plass) */
+.bars.is-fit { gap: var(--bg); }
+.bars.is-fit .bar-col { width: var(--bw); }
+.bars.is-small .bar .val { font-size: 10px; top: -.95rem; }
+.bars.is-small .bar-idx { font-size: 10px; }
+.bars.is-small .ptr { font-size: 9px; padding: 0 2px; }
+/* Svært smale søyler: verdien vises bare på søyler som er i spill, og ved pek/fokus */
+.bars.is-tiny .bar .val { font-size: 9px; letter-spacing: -.03em; opacity: 0; }
+.bars.is-tiny .bar:is(.is-compare, .is-swap, .is-min, .is-target) .val,
+.bars.is-tiny .bar-col:hover .val { opacity: 1; }
+.bars.is-tiny .bar-idx { font-size: 9px; letter-spacing: -.03em; }
+/* Søylene får nå plass selv, så søkeboksen trenger ikke være bredere enn scenen
+   (ellers gjorde en lang rad i hashmapet H hele scenen bred) */
+.sok-viz { width: auto; }
+/* Bøtte-/radix-demoen: ti bøtter får ikke plass på smal skjerm – radene brytes i stedet for å scrolle */
+.bk { width: auto; }
+.bk-buckets, .bk-cells { flex-wrap: wrap; justify-content: center; row-gap: .6rem; }
+/* Grafer: prikken følger nodetilstanden (ring = besøkt, stiplet ring = i køen) eller komponentfargen */
+.vl-dot.is-seen   { background: transparent; box-shadow: inset 0 0 0 2px var(--c-target); }
+.vl-dot.is-queued { background: transparent; border: 1.5px dashed var(--c-compare); box-sizing: border-box; }
+.vl-dot.is-k0 { background: var(--gv-c0); } .vl-dot.is-k1 { background: var(--gv-c1); } .vl-dot.is-k2 { background: var(--gv-c2); }
+.vl-dot.is-k3 { background: var(--gv-c3); } .vl-dot.is-k4 { background: var(--gv-c4); } .vl-dot.is-k5 { background: var(--gv-c5); }
+
+/* ===== Crash course: start og fast fremdriftslinje ===== */
+/* Grønn hovedknapp (Start/Fortsett). Lys: hvit tekst på #2e7d32 (5,1:1). Mørk: mørk tekst på #81c784 (ca. 9:1). */
+:root { --cr-go-bg: var(--c-sorted); --cr-go-on: #ffffff; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --cr-go-on: #0f1a10; } }
+:root[data-theme="dark"] { --cr-go-on: #0f1a10; }
+.btn.cr-go { background: var(--cr-go-bg); border-color: var(--cr-go-bg); color: var(--cr-go-on); font-weight: 700; text-decoration: none; }
+.btn.cr-go:hover:not(:disabled) { text-decoration: none;
+  background-image: linear-gradient(color-mix(in srgb, var(--cr-go-on) 14%, transparent), color-mix(in srgb, var(--cr-go-on) 14%, transparent)); }
+.btn.cr-go:focus-visible { outline: 2px solid var(--color-on-surface); outline-offset: 2px; }
+.btn.cr-go-lg { font-size: var(--text-md); padding: 12px 20px; min-height: 48px; line-height: 1.3; }
+.cr-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+/* Toppkortet: før start «Velg lengde → Start løypa», etter start «Fortsett» først, så lengden */
+.cr-start-hint { margin: 0 0 .5rem; font-weight: 600; }
+.cr-top.is-started .cr-start-hint { font-weight: 400; font-size: var(--text-sm); color: var(--color-on-surface-variant); margin-top: .6rem; order: 2; }
+.cr-top { display: flex; flex-direction: column; }
+.cr-top > .cr-go-row { order: 1; }
+.cr-top > #cr-fortsett-txt, .cr-top > .cr-len-note { order: 3; }
+.cr-go-row { display: flex; flex-direction: column; gap: .7rem; }
+.cr-len-col { min-width: 0; }
+.cr-len-col .cr-len-txt { margin: .4rem 0 0; }
+.cr-top.is-started .cr-actions { order: -1; }
+.cr-top .cr-actions .btn.cr-go-lg { text-align: left; }
+.cr-top.is-fresh .cr-actions .btn.cr-go-lg { width: 100%; justify-content: center; text-align: center; }
+@media (min-width: 720px) {
+  .cr-top.is-fresh .cr-go-row { flex-direction: row; align-items: flex-start; gap: 1rem; }
+  .cr-top.is-fresh .cr-len-col { flex: 1 1 auto; }
+  .cr-top.is-fresh .cr-actions { flex: none; }
+  .cr-top.is-fresh .cr-actions .btn.cr-go-lg { width: auto; min-height: 52px; padding: 12px 26px; }
+}
+#cr-fortsett-txt { margin: .5rem 0 0; }
+#cr-fortsett-txt:empty, .cr-len-note:empty { display: none; }
+.cr-len-note { margin: .5rem 0 0; color: var(--color-on-tone-ok); font-weight: 600; }
+
+/* Den faste linja: rett under menyen (og nivålinja når den står fast). top settes fra JS. */
+.cr-stick { position: sticky; top: 52px; z-index: 48;
+  background: var(--color-surface-container-lowest); border-bottom: 1px solid var(--color-outline-variant); }
+.cr-stick-in { max-width: var(--maxw); margin: 0 auto; display: flex; align-items: center; gap: .5rem;
+  padding: 4px var(--d-md); min-height: 40px; box-sizing: border-box; }
+.cr-stick-prog { flex: 1 1 auto; min-width: 0; display: flex; align-items: center; gap: .45rem; }
+.cr-stick-prog .cr-bar { min-width: 28px; height: 6px; }
+.cr-stick-pct { font-size: var(--text-xs); font-weight: 700; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.cr-stick-ab { font-size: var(--text-xs); white-space: nowrap; }
+.cr-stick .btn.sm { flex: none; white-space: nowrap; min-height: 30px; }
+.cr-stick-go[hidden] { display: none; }
+.cr-stick-go.is-away { visibility: hidden; }
+.cr-stick-len { flex: none; max-width: 7.5rem; min-height: 30px; padding: 3px 6px; font: inherit; font-size: var(--text-xs); font-weight: 600;
+  border: 1px solid var(--color-outline); border-radius: var(--radius-md);
+  background: var(--color-surface-container-lowest); color: var(--color-on-surface); cursor: pointer; }
+.cr-stick-note { position: absolute; top: 100%; right: var(--d-md); margin: 4px 0 0; padding: .3rem .6rem; max-width: calc(100% - 2 * var(--d-md));
+  background: var(--color-tone-ok); color: var(--color-on-tone-ok); border: 1px solid color-mix(in srgb, var(--color-on-tone-ok) 30%, transparent);
+  border-radius: var(--radius-md); box-shadow: var(--elevation); pointer-events: none;
+  opacity: 0; transform: translateY(-4px); transition: opacity .2s ease, transform .2s ease; }
+.cr-stick-note.on { opacity: 1; transform: none; }
+.cr-stick-note:empty { display: none; }
+@media (max-width: 520px) {
+  .cr-stick-in { padding: 4px 12px; gap: .4rem; }
+  .cr-stick-ab { display: none; }
+  .cr-stick-note { right: 12px; max-width: calc(100% - 24px); }
+}
+@media (prefers-reduced-motion: reduce) { .cr-stick-note { transition: none; } }
+/* Dyplenker og tastaturfokus havner under alle de faste linjene (--cr-stick-off settes fra JS) */
+html:has(body[data-page="crash"]) { scroll-padding-top: var(--cr-stick-off, 9rem); }
+body[data-page="crash"] .cr-step { scroll-margin-top: 0; }
+@media print { .cr-stick { display: none; } }
+.cr-queue > h2:first-child { margin-top: 0; }
+
+/* Forsiden: liten crash course-boks, én setning + én grønn knapp, samme grønntone som «Grafhistorien» */
+.crash-box.crash-box-mini { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: .4rem 1rem;
+  margin: 0; padding: .45rem .75rem; border: 0; border-radius: 2px; box-shadow: none;
+  background: color-mix(in srgb, var(--c-sorted) 9%, var(--a4-paper, var(--color-surface-container-lowest))); }
+.crash-box-mini .crash-box-txt { margin: 0; flex: 1 1 18rem; min-width: 0; }
+.crash-box-mini .btn.cr-go { flex: none; }
+
+/* ===== Symbolforklaringer ===== */
+/* ⌊x⌋, ∈, |V|, |E| … i pseudokode og forklaringer (IN.symbolTips i core.js, ordliste i symboler.js).
+   Bare en prikket understrek: ingen padding/margin, så ingenting flytter seg. */
+.sym { cursor: help; text-decoration: underline dotted; text-decoration-thickness: 1px; text-underline-offset: 3px;
+  text-decoration-color: color-mix(in srgb, currentColor 45%, transparent); -webkit-tap-highlight-color: transparent; }
+.sym .sym { text-decoration: none; }
+.sym:hover { text-decoration-color: currentColor; background-image: linear-gradient(var(--state-hover), var(--state-hover)); border-radius: 2px; }
+.sym:focus { outline: none; }
+.sym:focus-visible { outline: 2px solid var(--color-primary); outline-offset: 1px; border-radius: 2px; }
+.sym-tip { max-width: min(17rem, calc(100vw - 16px)); z-index: 210; font-family: var(--font); white-space: normal; overflow-wrap: break-word; }
+.sym-tip > span { display: block; }
+.sym-tip-h { font-weight: 600; margin-bottom: .15rem; }
+.sym-tip-h b { font-family: var(--font-mono); font-weight: 700; color: var(--color-primary); }
+.sym-tip-e { margin-top: .25rem; color: var(--color-on-surface-variant); font-size: var(--text-xs, .8rem); }
+@media print { .sym { text-decoration: none; } .sym-tip { display: none; } }
+
+/* ===== Tema trær ===== */
+/* Nedtonede noder/kanter i trevisningen (marks.dim, f.eks. subtrær InRange hopper over) */
+.tv-node.is-dim { opacity: .35; }
+.tv-edge.dim { opacity: .3; stroke-dasharray: 4 4; }
+/* Rekke med små trær (rotasjonssekvenser i perfekt svar, perfekt/traer.js) */
+.tr-rekke { display: flex; flex-wrap: wrap; gap: .75rem 1rem; align-items: flex-end; }
+.tr-rekke-celle { display: flex; flex-direction: column; align-items: center; min-width: 0; max-width: 100%; }
+.tr-rekke-lbl { font-weight: 600; text-align: center; margin-bottom: .2rem; }
+/* Hashmap-tabellen i H2022-9: lang, men smal; ruller sidelengs inne i boksen ved behov */
+.tr-hashtab { max-width: 100%; overflow-x: auto; }
+.tr-hashtab .et-tab td, .tr-hashtab .et-tab th { white-space: nowrap; }

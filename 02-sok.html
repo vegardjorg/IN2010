@@ -5,8 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Blokk 2 · Søk · IN2010</title>
   <meta name="description" content="Søk i IN2010: rett-frem søk, binærsøk med varianter, sorter-én-gang-avveiningen, finn duplikat, finn k minste og array-triks med hashing – med stegvise demoer og kjøretid.">
-  <script>(function(){try{var d=document.documentElement;var t=localStorage.getItem('in-theme');if(t&&t!=='system')d.setAttribute('data-theme',t);var l=localStorage.getItem('in-level')||'normal';d.setAttribute('data-level',l);}catch(e){document.documentElement.setAttribute('data-level','normal');}})();</script>
-  <link rel="stylesheet" href="assets/css/styles.css">
+  <script>(function(){try{var d=document.documentElement;var t=localStorage.getItem('in-theme')||'light';if(t!=='system')d.setAttribute('data-theme',t);var l=localStorage.getItem('in-level')||'normal';d.setAttribute('data-level',l);}catch(e){document.documentElement.setAttribute('data-theme','light');document.documentElement.setAttribute('data-level','normal');}})();</script>
+  <link rel="stylesheet" href="assets/css/styles.css?v=20261125a">
 </head>
 <body data-page="sok">
   <a class="skip-link" href="#main">Hopp til innhold</a>
@@ -399,13 +399,15 @@
   </main>
   <footer class="footer">IN2010-guide · Blokk 2 · Søk</footer>
 
-  <script src="assets/js/core.js"></script>
-  <script src="assets/js/data-tf.js"></script>
-  <script src="assets/js/pseudocode.js"></script>
-  <script src="assets/js/stepplayer.js"></script>
-  <script src="assets/js/viz-bars.js"></script>
-  <script src="assets/js/data-algos.js"></script>
-  <script src="assets/js/data-sok.js"></script>
+  <script src="assets/js/core.js?v=20261125a"></script>
+  <script src="assets/js/symboler.js?v=20261125a"></script>
+  <script src="assets/js/data-tf.js?v=20261125a"></script>
+  <script src="assets/js/pseudocode.js?v=20261125a"></script>
+  <script src="assets/js/stepplayer.js?v=20261125a"></script>
+  <script src="assets/js/varline.js?v=20261125a"></script>
+  <script src="assets/js/viz-bars.js?v=20261125a"></script>
+  <script src="assets/js/data-algos.js?v=20261125a"></script>
+  <script src="assets/js/data-sok.js?v=20261125a"></script>
   <script>
   (function () {
     "use strict";
@@ -417,7 +419,9 @@
 
     /* ---------- Felles tegning: søyler + info + bleking utenfor søkeområdet ---------- */
     function renderSearch(s, ctx) {
-      var stage = ctx.stage; IN.clear(stage);
+      // Variabellinja ligger øverst i scenen og gjenbrukes mellom stegene (varline.js)
+      var stage = ctx.stage, vl = s.vars && IN.varLine ? IN.varLine.attach(stage) : null;
+      if (vl) IN.varLine.clearStage(stage); else { if (IN.varLine) IN.varLine.detach(stage); IN.clear(stage); }
       var box = el("div", { class: "sok-viz" });
       if (s.info && s.info.length) {
         var row = el("div", { class: "sok-info" });
@@ -432,7 +436,7 @@
       }
       var bh = el("div"); box.appendChild(bh);
       stage.appendChild(box);
-      IN.vizBars(bh, s);
+      IN.vizBars(bh, s, { varHost: stage });
       var cols = IN.qsa(".bar-col", bh);
       if (s.range) cols.forEach(function (c, i) { if (i < s.range[0] || i > s.range[1]) c.classList.add("sok-out"); });
       if (s.dim) s.dim.forEach(function (i) { if (cols[i]) cols[i].classList.add("sok-out"); });
@@ -457,6 +461,10 @@
       };
     }
 
+    // Løkkespennene under søylene (heltrukket = for, stiplet = while, tykk = kallets område)
+    var SPENN = { linearSearch: ["for"], binarySearch: ["while"], binarySearchFirst: ["while"], binarySearchRec: ["call"],
+      findDupSorted: ["while"], findDupScan: ["for"], findDupHash: ["for"], findMinKSelect: ["for"], findSummandsSorted: ["while"] };
+
     /* Bygg én demo: pseudokode + steg-spiller + kompakt kjøretidskort under pseudokoden */
     function demo(id, algoKey, opts) {
       var algo = IN.algos[algoKey];
@@ -466,7 +474,7 @@
         presets: opts.presets,
         render: opts.render || renderSearch,
         pseudo: pc,
-        legend: opts.legend || LEG_SEARCH
+        legend: (opts.legend || LEG_SEARCH).concat(IN.varLine ? IN.varLine.legend(SPENN[algoKey]) : [])
       };
       if (opts.parseInput) conf.parseInput = opts.parseInput;
       if (opts.inputLabel) conf.inputLabel = opts.inputLabel;

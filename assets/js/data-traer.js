@@ -23,6 +23,9 @@
     obj[key] = val;
   }
   function neg(n) { return n < 0 ? "−" + (-n) : String(n); }   // ekte minustegn
+  // Tom linje i en pseudokode, slik at linjenumrene blir de samme som på eksamensarket.
+  var BLANK = { code: "", indent: 1, eli5: "Tom linje, som på eksamensarket.", normal: "Tom linje (står slik på eksamensarket).", teknisk: "Tom linje. Den er med så linjenumrene blir de samme som på arket." };
+  var GAP = { code: "", indent: 0, eli5: "Tom linje mellom de to prosedyrene.", normal: "Tom linje mellom de to prosedyrene.", teknisk: "Tom linje. Neste linje starter en ny prosedyre." };
 
   /* ---------------- Trehjelpere ----------------
      Binær node: { id, k, l, r, h }   (h = lagret høyde, løvnode 0)
@@ -315,6 +318,35 @@
              "Hver node legges i køen og tas ut nøyaktig én gang. Køen kan inneholde et helt nivå, og det nederste nivået kan ha rundt halvparten av nodene.",
              "n Enqueue og n Dequeue à O(1) gir O(n). Køen holder høyst bredden av treet. I et komplett binærtre er det nederste nivået omtrent n/2 noder, så minnet er O(n).") }
   });
+
+  /* H2025 oppgave 5 b: samme kø-algoritme, men den returnerer elementene i en liste. */
+  (function () {
+    var L = IN.algos.levelOrder.lines;
+    function cp(l) { var c = {}; for (var k in l) c[k] = l[k]; return c; }
+    reg(IN.algos, "levelOrderBST", {
+      title: "Level-order av et binært søketre (H2025 b)",
+      name: "LevelOrderBST", params: "v",
+      input: "Roten v av et binært søketre med n noder",
+      output: "En liste med elementene i søketreet i level-order",
+      lines: [
+        { code: "L ← empty list", indent: 1,
+          eli5: "Vi lager en tom liste. Der skriver vi opp tallene i den rekkefølgen vi møter dem.",
+          normal: "Resultatlista starter tom.",
+          teknisk: "Lista bygges ved å legge til bakerst, O(1) per element." },
+        cp(L[0]), cp(L[1]), cp(L[2]), cp(L[3]),
+        { code: "append u.element to L", indent: 2,
+          eli5: "Vi skriver tallet i noden bakerst på lista.",
+          normal: "Legg u.element bakerst i resultatlista.",
+          teknisk: "Dette er «besøket». Rekkefølgen i L er rekkefølgen nodene tas ut av køen." },
+        cp(L[5]), cp(L[6]),
+        { code: "return L", indent: 1,
+          eli5: "Køen er tom, og lista er ferdig.",
+          normal: "Returner lista. Den har elementene nivå for nivå, fra venstre mot høyre.",
+          teknisk: "Alle n elementene er lagt til én gang hver: O(n)." }
+      ],
+      bigO: IN.algos.levelOrder.bigO
+    });
+  })();
 
   /* ============================================================
      ITERATIVE TRAVERSERINGER (egen stakk i stedet for kallstakken)
@@ -675,7 +707,7 @@
         grense: { q: "Hvorfor ≤ og ≥, og ikke bare streng ulikhet?",
           a: t("Treet har bare ulike tall. Er et tall likt grensen, er det et duplikat, og det er ikke lov.",
                "Tallene er unike, og et søketre krever venstre < v < høyre. En verdi lik grensen betyr at den er lik en forfeder, og det bryter regelen. Derfor regnes likhet som feil.",
-               "Intervallet (low, high) er åpent. Tillater kurset duplikater på én side, må den siden ha et lukket endepunkt.") } },
+               "Intervallet (low, high) er åpent. Sensorløsningen i H2022 starter i stedet med grensene FindMin(v) og FindMax(v) og forkaster bare verdier som er < low eller > high. Med unike tall gir begge variantene samme svar.") } },
       { code: "return CheckBST(v.left, low, v.element) and CheckBST(v.right, v.element, high)", indent: 1,
         eli5: "Til venstre må alt være mindre enn dette tallet, til høyre må alt være større. Vi sender med de nye grensene.",
         normal: "Venstre subtre får v.element som ny øvre grense, høyre subtre får den som ny nedre grense.",
@@ -690,6 +722,44 @@
              "Hver node sjekkes én gang mot to grenser. Det er O(n). Å kalle FindMin og FindMax for hver node ville gitt O(n²).",
              "Kjøretiden er O(n): én konstant sjekk per node. Kallstakken er O(h). Alternativet med inorder til en liste og sjekk av at lista er sortert er også O(n), men bruker O(n) ekstra minne.") }
   });
+
+  /* Samme løsning med signaturen fra eksamen H2022: CheckBST(v) med én parameter,
+     og grensene i en hjelpeprosedyre. Linje 5–8 er kroppen. */
+  (function () {
+    var base = IN.algos.checkBST;
+    if (!base) return;
+    var L = base.lines;
+    function cp(l, code) { var c = {}; for (var k in l) c[k] = l[k]; c.code = code; return c; }
+    reg(IN.algos, "checkBSTArk", {
+      title: "Er binærtreet et søketre? (H2022 a)",
+      name: "CheckBST", params: "v",
+      input: "Roten v til et binærtre med unike heltall",
+      output: "true hvis treet er et binært søketre, ellers false",
+      lines: [
+        { code: "return CheckBSTHelper(v, −∞, ∞)", indent: 1,
+          eli5: "Roten kan ha hvilket som helst tall. Vi starter derfor uten grenser.",
+          normal: "Start med grensene −∞ og ∞: roten har ingen forfedre som begrenser den.",
+          teknisk: "Hjelpeprosedyren bærer med seg det åpne intervallet (low, high) som alle nodene i subtreet må ligge i." },
+        GAP,
+        { code: "Procedure CheckBSTHelper(v, low, high)", indent: 0,
+          eli5: "Hjelperen sjekker ett subtre. Den får vite hvilke tall som er lov der.",
+          normal: "Hjelpeprosedyren sjekker subtreet med rot v. Alle tallene der må ligge mellom low og high.",
+          teknisk: "Invariant: kallet returnerer true hvis og bare hvis subtreet er et søketre med alle verdier i (low, high)." },
+        cp(L[0], "if v = null then return true"),
+        cp(L[1], "if v.element ≤ low or v.element ≥ high then return false"),
+        { code: "if not CheckBSTHelper(v.left, low, v.element) then return false", indent: 1,
+          eli5: "Til venstre må alt være mindre enn dette tallet. Er noe der galt, er hele treet galt.",
+          normal: "Venstre subtre får v.element som ny øvre grense. Feiler det, svarer vi false med en gang.",
+          teknisk: "Venstre subtre sjekkes mot (low, v.element). Tidlig retur ved første feil.",
+          grense: L[2].grense },
+        { code: "return CheckBSTHelper(v.right, v.element, high)", indent: 1,
+          eli5: "Til høyre må alt være større enn dette tallet. Svaret derfra er svaret vårt.",
+          normal: "Høyre subtre får v.element som ny nedre grense. Svaret derfra er svaret for hele subtreet.",
+          teknisk: "Hver node sjekkes én gang med O(1) arbeid, så totalt O(n)." }
+      ],
+      bigO: base.bigO
+    });
+  })();
 
   reg(IN.algos, "inRange", {
     title: "Skriv ut verdiene i [a, b] (H2021)",
@@ -772,6 +842,40 @@
              "Kjøretiden er O(n): hvert kall gjør O(1) arbeid utover de to rekursive kallene, og det er O(n) kall (ett per node og ett per tomt barn). Kallstakken er O(h). Den naive versjonen bruker O(n) for hver av n noder i verste fall, altså O(n²).") }
   });
 
+  /* Samme løsning skrevet slik eksamen spør: Diameter(v) returnerer bare d.
+     Hjelpeprosedyren DiameterPair gjør jobben (linje 5–11). */
+  (function () {
+    var base = IN.algos.treDiameter;
+    if (!base) return;
+    var body = base.lines.map(function (l) {
+      var c = {}; for (var k in l) c[k] = l[k];
+      c.code = l.code.replace(/Diameter\(/g, "DiameterPair(");
+      return c;
+    });
+    reg(IN.algos, "diameterArk", {
+      title: "Diameteren til et binærtre (H2023 c)",
+      name: "Diameter", params: "v",
+      input: "Rotnoden v til et binærtre",
+      output: "Diameteren til treet",
+      lines: [
+        { code: "(h, d) ← DiameterPair(v)", indent: 1,
+          eli5: "Vi spør hjelperen om to svar på én gang: høyden og den lengste stien.",
+          normal: "Hjelpeprosedyren gir både høyde og diameter. Vi trenger høyden underveis, men svarer bare med d.",
+          teknisk: "Å returnere et par er trikset som gjør løsningen lineær: høyden regnes ut i samme gjennomgang." },
+        { code: "return d", indent: 1,
+          eli5: "Den lengste stien er svaret.",
+          normal: "Svaret på oppgaven er diameteren d.",
+          teknisk: "Høyden h var bare et hjelpetall." },
+        GAP,
+        { code: "Procedure DiameterPair(v)", indent: 0,
+          eli5: "Her starter hjelperen. Den svarer med to tall: (høyde, lengste sti).",
+          normal: "Hjelpeprosedyren returnerer paret (h, d) for subtreet med rot v.",
+          teknisk: "Rekursiv postorder som returnerer (høyde, diameter)." }
+      ].concat(body),
+      bigO: base.bigO
+    });
+  })();
+
   /* ============================================================
      LAVESTE FELLES FORFEDER (H2024)
      ============================================================ */
@@ -836,6 +940,24 @@
              "Vi følger én sti fra roten til splittpunktet: O(h). Det er O(n) for en kjede og O(log n) for et balansert tre.",
              "Som Search: ett kall per nivå. Halerekursjonen kan skrives som en løkke med O(1) minne.") }
   });
+
+  /* Samme algoritmer med prosedyrenavnene fra eksamensarket H2024 (LowestCommonAncestor / …BST).
+     Linjene er de samme, så generatorene kan brukes med begge navnene. */
+  function renamedAlgo(key, from, name, extra) {
+    var a = IN.algos[from];
+    if (!a) return;
+    var re = new RegExp("\\b" + a.name + "\\(", "g");
+    reg(IN.algos, key, {
+      title: extra.title, name: name, params: a.params,
+      input: extra.input || a.input, output: extra.output || a.output,
+      lines: a.lines.map(function (l) { var c = {}; for (var k in l) c[k] = l[k]; c.code = l.code.replace(re, name + "("); return c; }),
+      bigO: a.bigO
+    });
+  }
+  renamedAlgo("lowestCommonAncestor", "lca", "LowestCommonAncestor", { title: "Laveste felles forfeder (H2024 b)",
+    input: "To noder u og v. Hver node har bare v.parent, v.children og v.depth", output: "Laveste felles forfeder av u og v" });
+  renamedAlgo("lowestCommonAncestorBST", "lcaBST", "LowestCommonAncestorBST", { title: "Laveste felles forfeder i et binært søketre (H2024 c)",
+    input: "En node v, og to verdier x og y der x < y", output: "Laveste felles forfeder av nodene som har elementene x og y" });
 
   /* ============================================================
      AVL
@@ -1112,24 +1234,26 @@
   /* ============================================================
      ANTI-AVL (H2025)
      ============================================================ */
+  // Linjene er som på eksamensarket H2025 oppgave 4, også de tomme linjene 8 og 11, så linjenumrene stemmer.
   reg(IN.algos, "insertAntiAVL", {
     title: "Innsetting i Anti-AVL (H2025)",
     name: "InsertAntiAVL", params: "v, x",
-    input: "Roten v til et Anti-AVL-tre (kan være null) og en verdi x",
-    output: "Roten til treet etter innsetting",
+    input: "Rotnoden v av et Anti-AVL-tre B og et element x",
+    output: "Et Anti-AVL-tre med x satt inn",
     lines: [
       { code: "if v = null then", indent: 1,
         eli5: "Tom plass? Her skal tallet stå.", normal: "Tom plass funnet.", teknisk: "Som i et BST." },
-      { code: "return new Node(x)", indent: 2,
-        eli5: "Lag en ny node.", normal: "Ny løvnode.", teknisk: "Den nye noden har ingen barn." },
-      { code: "if x < v.element then", indent: 1,
+      { code: "v ← new Node(x)", indent: 2,
+        eli5: "Lag en ny node.", normal: "Ny løvnode. Den har ikke noe venstre barn, så linje 9 slår ikke til, og linje 12 returnerer den.", teknisk: "Den nye noden har ingen barn. Kallet ender i return v på linje 12." },
+      { code: "else if x < v.element then", indent: 1,
         eli5: "Mindre? Til venstre.", normal: "x er mindre: sett inn til venstre.", teknisk: "Vanlig BST-veivalg." },
       { code: "v.left ← InsertAntiAVL(v.left, x)", indent: 2,
         eli5: "Fortsett til venstre.", normal: "Sett inn i venstre subtre.", teknisk: "Etter denne har v et venstre barn." },
       { code: "else if x > v.element then", indent: 1,
-        eli5: "Større? Til høyre.", normal: "x er større: sett inn til høyre.", teknisk: "Duplikater ignoreres." },
+        eli5: "Større? Til høyre.", normal: "x er større: sett inn til høyre.", teknisk: "Er x lik v.element, skjer ingenting: duplikater settes ikke inn." },
       { code: "v.right ← InsertAntiAVL(v.right, x)", indent: 2,
         eli5: "Fortsett til høyre.", normal: "Sett inn i høyre subtre.", teknisk: "Det som kommer tilbake, er en høyrekjede uten venstre barn." },
+      BLANK,
       { code: "if v.left ≠ null then", indent: 1,
         eli5: "Har noden fått et barn på venstre side? Det liker ikke Anti-AVL!",
         normal: "Har v et venstre barn, skal det roteres bort.",
@@ -1141,7 +1265,8 @@
       { code: "return RightRotate(v)", indent: 2,
         eli5: "Vi vrir til høyre, så det venstre barnet blir toppen.",
         normal: "Høyrerotasjon: venstre barn blir ny rot i subtreet, og v blir høyre barn.",
-        teknisk: "Rotasjonen bevarer søketre-egenskapen. RightRotate oppdaterer høyder, men Anti-AVL bruker dem ikke." },
+        teknisk: "Rotasjonen bevarer søketre-egenskapen. RightRotate på arket flytter bare pekere. Ingen høyder lagres eller brukes." },
+      BLANK,
       { code: "return v", indent: 1,
         eli5: "Ellers blir alt stående.", normal: "Ingen rotasjon nødvendig.", teknisk: "Vanlig tilfelle når x gikk til høyre." }
     ],
@@ -1149,6 +1274,23 @@
       why: t("Vi går ned til riktig plass som i et vanlig søketre, og vrir høyst én gang på veien opp. Men treet er en lang stige, så skal vi helt ned, må vi forbi alle nodene.",
              "Anti-AVL-treet er alltid en høyrekjede, så høyden er n − 1. Innsetting av et stort tall går gjennom hele kjeden: O(n). Et tall mindre enn roten settes inn på ett skritt: O(1).",
              "h = n − 1 gir O(n) for innsetting og oppslag i verste fall. Rekursjonsstakken blir like dyp.") }
+  });
+  // RightRotate slik den står på eksamensarket H2025 oppgave 4 (uten SetHeight, med tomme linjer 4 og 7).
+  reg(IN.algos, "rightRotateAntiAVL", {
+    title: "Høyrerotasjon (H2025, Anti-AVL)",
+    name: "RightRotate", params: "z",
+    input: "En node z",
+    output: "Roten til det høyreroterte treet",
+    lines: [
+      { code: "y ← z.left", indent: 1, eli5: "Barnet til venstre skal bli den nye toppen.", normal: "y er venstre barn av z og blir ny rot i subtreet.", teknisk: "Rotasjonen løfter y ett nivå opp og senker z ett nivå ned." },
+      { code: "T2 ← y.right", indent: 1, eli5: "Vi tar vare på grenen som må flytte.", normal: "T2 er subtreet som må bytte forelder.", teknisk: "Alle verdier i T2 ligger mellom y og z." },
+      BLANK,
+      { code: "y.right ← z", indent: 1, eli5: "Den gamle toppen blir høyre barn av den nye.", normal: "z blir høyre barn av y.", teknisk: "z er større enn y, så søketre-egenskapen holder." },
+      { code: "z.left ← T2", indent: 1, eli5: "Grenen vi tok vare på, henger vi på den gamle toppen.", normal: "T2 henges på den ledige venstre plassen hos z.", teknisk: "Inorder-rekkefølgen er uendret." },
+      BLANK,
+      { code: "return y", indent: 1, eli5: "Den nye toppen gis tilbake.", normal: "Returner den nye roten i subtreet.", teknisk: "Kalleren kobler den på, derfor return RightRotate(v) i InsertAntiAVL." }
+    ],
+    bigO: ROTBIGO
   });
 
   /* ============================================================
@@ -1311,41 +1453,54 @@
   reg(IN.gen, "inorder", travGen("in"));
   reg(IN.gen, "postorder", travGen("post"));
 
-  reg(IN.gen, "levelOrder", function (input) {
+  /* cfg.list: H2025-varianten LevelOrderBST med resultatliste L (alle linjer én ned, return L på linje 10). */
+  function levelGen(cfg) {
+    var O = cfg.list ? 1 : 0;
+    return function (input) {
     var o = norm(input), root = treeOf(o), steps = [], visited = [], Q = [];
-    function snap(line, cur, text, tag) {
-      steps.push({ line: line, tree: cl(root), text: text, tag: tag,
+    function snap(line, cur, text, tag, extra) {
+      var s = { line: line, tree: cl(root), text: text, tag: tag,
         info: [{ label: "Kø (front → bak)", items: Q.map(function (v) { return v.k; }), kind: "queue" },
-               { label: "Besøkt", items: visited.map(function (v) { return v.k; }) }],
-        marks: { cur: cur ? cur.id : null, queued: Q.map(function (v) { return v.id; }), done: visited.map(function (v) { return v.id; }) } });
+               { label: cfg.list ? "L" : "Besøkt", items: visited.map(function (v) { return v.k; }) }],
+        marks: { cur: cur ? cur.id : null, queued: Q.map(function (v) { return v.id; }), done: visited.map(function (v) { return v.id; }) } };
+      if (extra) for (var k in extra) s[k] = extra[k];
+      steps.push(s);
     }
-    snap(2, null, t("Vi lager en tom kø.", "Tom kø Q.", "Q ← tom FIFO-kø."), "Start");
+    if (cfg.list) snap(2, null, t("Input er treet med rot " + (root ? root.k : "null") + ". Vi lager en tom liste L til svaret.",
+      "Input: treet med rot " + (root ? root.k : "null") + ". L ← tom liste.", "Input: rotnoden " + (root ? root.k : "null") + ". L ← tom liste for resultatet."), "Start");
+    snap(2 + O, null, t("Vi lager en tom kø.", "Tom kø Q.", "Q ← tom FIFO-kø."), cfg.list ? "Tom kø" : "Start");
     if (root) {
       Q.push(root);
-      snap(3, null, t("Roten " + root.k + " stiller seg i køen.", "Roten " + root.k + " legges i køen.", "Enqueue(rot)."), "Rot i køen");
+      snap(3 + O, null, t("Roten " + root.k + " stiller seg i køen.", "Roten " + root.k + " legges i køen.", "Enqueue(rot)."), "Rot i køen");
     }
     while (Q.length) {
       var u = Q.shift();
-      snap(5, u, t(u.k + " står først i køen og får komme fram.", "Dequeue: u = " + u.k + ".", "u ← " + u.k + " (dybde-orden bevares av FIFO)."), "Ta ut " + u.k);
+      snap(5 + O, u, t(u.k + " står først i køen og får komme fram.", "Dequeue: u = " + u.k + ".", "u ← " + u.k + " (dybde-orden bevares av FIFO)."), "Ta ut " + u.k);
       visited.push(u);
       var leaf = !u.l && !u.r;
-      snap(6, u, t("Vi hilser på " + u.k + "." + (leaf ? " Den har ingen barn." : ""),
+      if (cfg.list) snap(7, u, t(u.k + " skrives bakerst på lista." + (leaf ? " Den har ingen barn." : ""),
+        "append " + u.k + " to L." + (leaf ? " Ingen barn å legge i køen." : ""),
+        "L = [" + visited.map(function (v) { return v.k; }).join(", ") + "]." + (leaf ? " Begge null-sjekkene feiler." : "")), "Legg til " + u.k);
+      else snap(6, u, t("Vi hilser på " + u.k + "." + (leaf ? " Den har ingen barn." : ""),
         "Besøk " + u.k + "." + (leaf ? " Ingen barn å legge i køen." : ""),
         "Visit(" + u.k + ")." + (leaf ? " Begge null-sjekkene feiler." : "")), "Besøk " + u.k);
       if (!leaf) {
         var add = [];
         if (u.l) { Q.push(u.l); add.push(u.l.k); }
         if (u.r) { Q.push(u.r); add.push(u.r.k); }
-        snap(u.r ? 8 : 7, u, t("Barna til " + u.k + " (" + add.join(" og ") + ") stiller seg bakerst i køen.",
+        snap((u.r ? 8 : 7) + O, u, t("Barna til " + u.k + " (" + add.join(" og ") + ") stiller seg bakerst i køen.",
           "Legg " + add.join(" og ") + " bakerst i køen.",
           "Enqueue " + add.join(", ") + ". De besøkes etter alt som allerede står i køen."), "I køen");
       }
     }
     var seq = visited.map(function (v) { return v.k; }).join(", ");
-    snap(null, null, t("Køen er tom. Vi tok ett nivå om gangen: " + seq + ".", "Ferdig. Level-order: " + seq + ".",
-      "Level-order = [" + seq + "]. n Enqueue + n Dequeue: O(n)."), "Ferdig");
+    snap(cfg.list ? 10 : null, null, t("Køen er tom. Vi tok ett nivå om gangen: " + seq + ".", "Ferdig. Level-order: " + seq + ".",
+      (cfg.list ? "return L = [" : "Level-order = [") + seq + "]. n Enqueue + n Dequeue: O(n)."), "Ferdig", { svar: seq });
     return steps;
-  });
+    };
+  }
+  reg(IN.gen, "levelOrder", levelGen({}));
+  reg(IN.gen, "levelOrderBST", levelGen({ list: true }));
 
   /* ---------- Iterative traverseringer: egen stakk ----------
      Ekstra stegfelt (tegnes av sidens renderIter):
@@ -1693,21 +1848,30 @@
   });
 
   /* ---------- Diameter ---------- */
-  reg(IN.gen, "treDiameter", function (input) {
+  /* Diameter: siden bruker én prosedyre Diameter(v) som returnerer (h, d) (linje 2–7).
+     Eksamenskortet bruker samme kropp som hjelpeprosedyren DiameterPair (linje 6–11) med
+     Diameter(v) på linje 1–3 rundt. cfg.off = hvor mye linjenumrene i kroppen er forskjøvet. */
+  function diameterGen(cfg) {
+    var NAME = cfg.name, OFF = cfg.off, L5 = 5 + OFF, L6 = 6 + OFF;
+    return function (input) {
     var o = norm(input), root = treeOf(o), steps = [], lab = {}, done = [], stack = [];
-    var res = {};   // id → {h, d, deep:[ids ned til dypeste], best:[ids]}
-    function snap(line, marks, text, tag, edges) {
+    function snap(line, marks, text, tag, edges, extra) {
       var L = {}; Object.keys(lab).forEach(function (k) { L[k] = lab[k]; });
       marks.done = done.slice(); marks.path = stack.map(function (v) { return v.id; });
-      steps.push({ line: line, tree: cl(root), marks: marks, lab: L, text: text, tag: tag, edges: edges || null,
-        info: [{ label: "Kallstakk", kind: "frames", items: stack.map(function (v, i) {
-          var top = i === stack.length - 1;
-          return { name: "Diameter(" + v.k + ")", note: top ? "har regnet ut " + (lab[v.id] || "(h, d)") : "venter på Diameter(" + stack[i + 1].k + ")", ret: false };
-        }) }] });
+      var items = stack.map(function (v, i) {
+        var top = i === stack.length - 1;
+        return { name: NAME + "(" + v.k + ")", note: top ? "har regnet ut " + (lab[v.id] || "(h, d)") : "venter på " + NAME + "(" + stack[i + 1].k + ")", ret: false };
+      });
+      if (cfg.outer) items.unshift({ name: "Diameter(" + (root ? root.k : "null") + ")", note: stack.length ? "venter på " + NAME + "(" + (root ? root.k : "null") + ")" : (extra && extra.svar != null ? "returnerer " + extra.svar + " ↩" : ""), ret: !!(extra && extra.svar != null) });
+      var s = { line: line, tree: cl(root), marks: marks, lab: L, text: text, tag: tag, edges: edges || null,
+        info: [{ label: "Kallstakk", kind: "frames", items: items }] };
+      if (extra) for (var k in extra) s[k] = extra[k];
+      steps.push(s);
     }
-    snap(null, {}, t("Vi spør hver node om to ting: hvor høy er du, og hvor lang er den lengste stien hos deg? Svarene står under nodene som (h, d). Vi viser bare øyeblikket der hver node har fått svar fra barna sine.",
-      "Postorder: hver node får (h, d) fra barna og regner ut sin egen. Merket under noden er (h, d). Forløpet er forkortet: vi viser ett steg per node, når h og d er regnet ut (linje 5–6). Kallene ned og null-kallene (som gir (−1, 0)) er hoppet over.",
-      "Én gjennomgang nedenfra og opp. Etiketten under hver node er paret (h, d) som returneres. Forkortet forløp: ett steg per kall, når h og d er klare (linje 5–6), rett før return. Null-kallene returnerer (−1, 0) på linje 2 og vises ikke."), "Start");
+    var rng = "linje " + L5 + "–" + L6, nullL = "linje " + (2 + OFF);
+    snap(cfg.outer ? 2 : null, {}, t("Vi spør hver node om to ting: hvor høy er du, og hvor lang er den lengste stien hos deg? Svarene står under nodene som (h, d). Vi viser bare øyeblikket der hver node har fått svar fra barna sine.",
+      (cfg.outer ? "Diameter(" + (root ? root.k : "null") + ") kaller " + NAME + " på roten. " : "") + "Postorder: hver node får (h, d) fra barna og regner ut sin egen. Merket under noden er (h, d). Forløpet er forkortet: vi viser ett steg per node, når h og d er regnet ut (" + rng + "). Kallene ned og null-kallene (som gir (−1, 0)) er hoppet over.",
+      "Input: treet med rot " + (root ? root.k : "null") + ". Én gjennomgang nedenfra og opp. Etiketten under hver node er paret (h, d) som returneres. Forkortet forløp: ett steg per kall, når h og d er klare (" + rng + "), rett før return. Null-kallene returnerer (−1, 0) på " + nullL + " og vises ikke."), "Start");
     function rec(v) {
       if (!v) return { h: -1, d: 0, deep: [], best: [] };
       stack.push(v);
@@ -1721,7 +1885,7 @@
       lab[v.id] = "(" + h + ", " + d + ")"; done.push(v.id);
       var leaf = !v.l && !v.r;
       var edges = pathEdges(best);
-      snap(6, { cur: v.id }, leaf
+      snap(L6, { cur: v.id }, leaf
         ? t(v.k + " har ingen barn. Høyde 0, og ingen sti å gå: (0, 0).", "Løvnode " + v.k + ": begge null-kallene ga (−1, 0), så hL = hR = −1. Da blir h = 0 og d = −1 + (−1) + 2 = 0.", "Løvnode: h = 1 + Max(−1, −1) = 0, hL + hR + 2 = 0.")
         : t("Hos " + v.k + ": venstre side er " + neg(A.h) + " høy, høyre side " + neg(B.h) + ". En sti gjennom " + v.k + " blir " + through + " lang. Den lengste stien så langt er " + d + ".",
             v.k + ": hL = " + neg(A.h) + ", hR = " + neg(B.h) + ". h = " + h + ". Gjennom " + v.k + ": " + par(A.h) + " + " + par(B.h) + " + 2 = " + through + ". d = Max(" + through + ", " + A.d + ", " + B.d + ") = " + d + (src === "gjennom" ? " (gjennom " + v.k + ")." : " (ligger i " + src + " subtre)."),
@@ -1731,83 +1895,123 @@
     }
     var R = rec(root);
     var viaRoot = root && R.best.indexOf(root.id) >= 0;
-    snap(7, { found: root ? root.id : null }, t("Ferdig! Den lengste stien er " + R.d + " kanter lang (markert)." + (viaRoot ? "" : " Legg merke til at den ikke går gjennom roten!"),
+    snap(cfg.outer ? 3 : 7, { found: root ? root.id : null }, t("Ferdig! Den lengste stien er " + R.d + " kanter lang (markert)." + (viaRoot ? "" : " Legg merke til at den ikke går gjennom roten!"),
       "Diameter = " + R.d + ". Stien er markert." + (viaRoot ? " Her går den gjennom roten." : " Den går ikke gjennom roten (jf. H2023 b)."),
-      "Diameter(rot) = (" + R.h + ", " + R.d + "). Lineær tid: hver node ga ett kall." + (viaRoot ? "" : " Den lengste stien ligger helt i et subtre.")), "Diameter " + R.d, pathEdges(R.best));
+      NAME + "(rot) = (" + R.h + ", " + R.d + ")" + (cfg.outer ? ", og Diameter returnerer d = " + R.d : "") + ". Lineær tid: hver node ga ett kall." + (viaRoot ? "" : " Den lengste stien ligger helt i et subtre.")), "Diameter " + R.d, pathEdges(R.best), { svar: String(R.d) });
     return steps;
-  });
+    };
+  }
+  reg(IN.gen, "treDiameter", diameterGen({ name: "Diameter", off: 0 }));
+  reg(IN.gen, "diameterArk", diameterGen({ name: "DiameterPair", off: 4, outer: true }));
   function par(n) { return n < 0 ? "(" + neg(n) + ")" : String(n); }   // «0 + (−1) + 2»
   function pathEdges(p) { var e = []; for (var i = 0; i + 1 < p.length; i++) e.push([p[i], p[i + 1]]); return e; }
 
   /* ---------- LCA (generelt tre med parent/depth) ---------- */
-  reg(IN.gen, "lca", function (input) {
-    var o = norm(input), root = genFrom(o.tree || TR.LCATRE), steps = [];
-    var parent = {}, depth = {}, byKey = {};
-    (function walk(v, p, d) { parent[v.id] = p; depth[v.id] = d; byKey[v.k] = v; v.ch.forEach(function (c) { walk(c, v, d + 1); }); })(root, null, 0);
-    var lab = {}; Object.keys(depth).forEach(function (id) { lab[id] = "d=" + depth[id]; });
-    var u = byKey[o.u], v = byKey[o.v];
-    if (!u || !v) {
-      steps.push({ line: null, tree: root, marks: {}, lab: lab, text: t("Finner ikke begge nodene i treet.", "Ukjent node. Bruk navn fra treet (a–j).", "Ukjent node."), tag: "Feil" });
-      return steps;
-    }
-    var trail = [];
-    function snap(line, marks, text, tag) { marks.path = trail.slice(); steps.push({ line: line, tree: root, marks: marks, lab: lab, text: text, tag: tag }); }
-    snap(null, { cur: u.id, alt: v.id }, t("To klatrere står i " + u.k + " og " + v.k + ". De skal klatre opp til de møtes.",
-      "LCA(" + u.k + ", " + v.k + "). Dybdene står under nodene.", "Hver node kjenner parent og depth. Vi løfter den dypeste til de møtes."), "Start");
-    var guard = 0;
-    while (u !== v && guard++ < 40) {
-      if (depth[u.id] < depth[v.id]) {
-        trail.push(v.id); var nv = parent[v.id];
-        snap(4, { cur: u.id, alt: nv.id }, t(v.k + " står lengst nede (dybde " + depth[v.id] + "), så " + v.k + " klatrer opp til " + nv.k + ".",
-          "u = " + u.k + " (d=" + depth[u.id] + "), v = " + v.k + " (d=" + depth[v.id] + "): ulike, v er dypest. v ← " + nv.k + ".",
-          "depth(u) < depth(v): LCA(u, v.parent) med v.parent = " + nv.k + "."), "Løft v");
-        v = nv;
-      } else {
-        trail.push(u.id); var nu = parent[u.id];
-        snap(5, { cur: nu.id, alt: v.id }, t(u.k + " står minst like langt nede (dybde " + depth[u.id] + "), så " + u.k + " klatrer opp til " + nu.k + ".",
-          "u = " + u.k + " (d=" + depth[u.id] + "), v = " + v.k + " (d=" + depth[v.id] + "): ulike, u er minst like dyp. u ← " + nu.k + ".",
-          "depth(u) ≥ depth(v): LCA(u.parent, v) med u.parent = " + nu.k + "."), "Løft u");
-        u = nu;
-      }
-    }
-    snap(2, { found: u.id }, t("Klatrerne møttes i " + u.k + "! Det er den laveste felles forfederen.", "u = v = " + u.k + ": LCA = " + u.k + ".", "u = v: returner " + u.k + ". Antall kall var " + (trail.length + 1) + "."), "LCA = " + u.k);
-    return steps;
-  });
-
-  /* ---------- LCA i BST ---------- */
-  reg(IN.gen, "lcaBST", function (input) {
-    var o = norm(input), x = Math.min(o.x, o.y), y = Math.max(o.x, o.y), root = bstFrom(o.keys), steps = [], path = [];
-    var alts = [];
-    each(root, function (n) { if (n.k === x || n.k === y) alts.push(n.id); });
-    function snap(line, marks, text, tag) { marks.path = path.slice(); marks.alt = alts; steps.push({ line: line, tree: cl(root), marks: marks, text: text, tag: tag }); }
-    snap(null, {}, t("Vi leter etter stedet der veiene til " + x + " og " + y + " skilles.", "LCABST(rot, " + x + ", " + y + "). x og y er markert.", "Følg søketre-ordningen til splittpunktet."), "Start");
-    var v = root;
-    while (v) {
-      path.push(v.id);
-      if (x <= v.k && v.k <= y) {
-        snap(2, { found: v.id }, t(v.k + " ligger mellom " + x + " og " + y + ". Her skilles veiene, så " + v.k + " er svaret!",
-          x + " ≤ " + v.k + " ≤ " + y + ": splittpunkt. LCA = " + v.k + ".", "Splittpunkt funnet etter " + path.length + " noder: O(h)."), "LCA = " + v.k);
+  function lcaGen(NAME) {
+    return function (input) {
+      var o = norm(input), root = genFrom(o.tree || TR.LCATRE), steps = [];
+      var parent = {}, depth = {}, byKey = {};
+      (function walk(v, p, d) { parent[v.id] = p; depth[v.id] = d; byKey[v.k] = v; v.ch.forEach(function (c) { walk(c, v, d + 1); }); })(root, null, 0);
+      var lab = {}; Object.keys(depth).forEach(function (id) { lab[id] = "d=" + depth[id]; });
+      var u = byKey[o.u], v = byKey[o.v];
+      if (!u || !v) {
+        steps.push({ line: null, tree: root, marks: {}, lab: lab, text: t("Finner ikke begge nodene i treet.", "Ukjent node. Bruk navn fra treet (a–j).", "Ukjent node."), tag: "Feil" });
         return steps;
       }
-      if (y < v.k) { snap(3, { cur: v.id }, t("Begge tallene er mindre enn " + v.k + ". Svaret ligger til venstre.", y + " < " + v.k + ": begge til venstre.", "y < v.element ⇒ x < v.element."), "Venstre"); v = v.l; }
-      else { snap(4, { cur: v.id }, t("Begge tallene er større enn " + v.k + ". Svaret ligger til høyre.", x + " > " + v.k + ": begge til høyre.", "x > v.element ⇒ y > v.element."), "Høyre"); v = v.r; }
-    }
-    snap(null, {}, t("Fant ikke tallene.", "x eller y finnes ikke i treet.", "Forutsetningen om at begge finnes er brutt."), "Feil");
-    return steps;
-  });
+      var trail = [], frames = [];
+      function fr(a, b) { return NAME + "(" + a.k + ", " + b.k + ")"; }
+      function snap(line, marks, text, tag, extra) {
+        marks.path = trail.slice();
+        var s = { line: line, tree: root, marks: marks, lab: lab, text: text, tag: tag,
+          info: [{ label: "Kallstakk", kind: "frames", items: frames.map(function (f, i) {
+            return { name: f.name, note: f.note || (i < frames.length - 1 ? "venter på svar" : ""), ret: !!f.ret }; }) }] };
+        if (extra) for (var k in extra) s[k] = extra[k];
+        steps.push(s);
+      }
+      frames.push({ name: fr(u, v) });
+      snap(null, { cur: u.id, alt: v.id }, t("To klatrere står i " + u.k + " og " + v.k + ". De skal klatre opp til de møtes.",
+        NAME + "(" + u.k + ", " + v.k + "). Dybdene står under nodene.",
+        "Input: u = " + u.k + " (dybde " + depth[u.id] + ") og v = " + v.k + " (dybde " + depth[v.id] + "). Vi løfter den dypeste til de møtes."), "Start");
+      var guard = 0;
+      while (u !== v && guard++ < 40) {
+        if (depth[u.id] < depth[v.id]) {
+          trail.push(v.id); var nv = parent[v.id];
+          snap(4, { cur: u.id, alt: nv.id }, t(v.k + " står lengst nede (dybde " + depth[v.id] + "), så " + v.k + " klatrer opp til " + nv.k + ".",
+            "u = " + u.k + " (d=" + depth[u.id] + "), v = " + v.k + " (d=" + depth[v.id] + "): ulike, v er dypest. Nytt kall med v.parent = " + nv.k + ".",
+            "depth(u) < depth(v): return " + NAME + "(u, v.parent) med v.parent = " + nv.k + "."), "Løft v");
+          v = nv;
+        } else {
+          trail.push(u.id); var nu = parent[u.id];
+          snap(5, { cur: nu.id, alt: v.id }, t(u.k + " står minst like langt nede (dybde " + depth[u.id] + "), så " + u.k + " klatrer opp til " + nu.k + ".",
+            "u = " + u.k + " (d=" + depth[u.id] + "), v = " + v.k + " (d=" + depth[v.id] + "): ulike, u er minst like dyp. Nytt kall med u.parent = " + nu.k + ".",
+            "depth(u) ≥ depth(v): return " + NAME + "(u.parent, v) med u.parent = " + nu.k + "."), "Løft u");
+          u = nu;
+        }
+        frames.push({ name: fr(u, v) });
+      }
+      frames.forEach(function (f) { f.ret = true; f.note = "returnerer " + u.k + " ↩"; });
+      snap(2, { found: u.id }, t("Klatrerne møttes i " + u.k + "! Det er den laveste felles forfederen.",
+        "u = v = " + u.k + ": return " + u.k + ". Svaret sendes uendret ned gjennom alle kallene på stakken.",
+        "u = v: returner " + u.k + ". Antall kall var " + frames.length + ", høyst dybde(u) + dybde(v) + 1."), "LCA = " + u.k, { svar: String(u.k) });
+      return steps;
+    };
+  }
+  reg(IN.gen, "lca", lcaGen("LCA"));
+  reg(IN.gen, "lowestCommonAncestor", lcaGen("LowestCommonAncestor"));
+
+  /* ---------- LCA i BST ---------- */
+  function lcaBSTGen(NAME) {
+    return function (input) {
+      var o = norm(input), x = Math.min(o.x, o.y), y = Math.max(o.x, o.y), root = o.tree ? treeOf(o) : bstFrom(o.keys), steps = [], path = [], frames = [];
+      var alts = [];
+      each(root, function (n) { if (n.k === x || n.k === y) alts.push(n.id); });
+      function snap(line, marks, text, tag, extra) {
+        marks.path = path.slice(); marks.alt = alts;
+        var s = { line: line, tree: cl(root), marks: marks, text: text, tag: tag,
+          info: [{ label: "Kallstakk", kind: "frames", items: frames.map(function (f, i) {
+            return { name: f.name, note: f.note || (i < frames.length - 1 ? "venter på svar" : ""), ret: !!f.ret }; }) }] };
+        if (extra) for (var k in extra) s[k] = extra[k];
+        steps.push(s);
+      }
+      snap(null, {}, t("Vi leter etter stedet der veiene til " + x + " og " + y + " skilles.",
+        NAME + "(" + (root ? root.k : "null") + ", " + x + ", " + y + "). x og y er markert.",
+        "Input: roten " + (root ? root.k : "null") + ", x = " + x + " og y = " + y + ". Vi følger søketre-ordningen til splittpunktet."), "Start");
+      var v = root;
+      while (v) {
+        path.push(v.id);
+        frames.push({ name: NAME + "(" + v.k + ", " + x + ", " + y + ")" });
+        if (x <= v.k && v.k <= y) {
+          var ans = v.k;
+          frames.forEach(function (f) { f.ret = true; f.note = "returnerer " + ans + " ↩"; });
+          snap(2, { found: v.id }, t(v.k + " ligger mellom " + x + " og " + y + ". Her skilles veiene, så " + v.k + " er svaret!",
+            x + " ≤ " + v.k + " ≤ " + y + ": splittpunkt. return " + v.k + ".", "Splittpunkt funnet etter " + path.length + " noder: O(h)."), "LCA = " + v.k, { svar: String(v.k) });
+          return steps;
+        }
+        if (y < v.k) { snap(3, { cur: v.id }, t("Begge tallene er mindre enn " + v.k + ". Svaret ligger til venstre.", y + " < " + v.k + ": begge til venstre.", "y < v.element ⇒ x < v.element. return " + NAME + "(v.left, x, y)."), "Venstre"); v = v.l; }
+        else { snap(4, { cur: v.id }, t("Begge tallene er større enn " + v.k + ". Svaret ligger til høyre.", x + " > " + v.k + ": begge til høyre.", "x > v.element ⇒ y > v.element. return " + NAME + "(v.right, x, y)."), "Høyre"); v = v.r; }
+      }
+      snap(null, {}, t("Fant ikke tallene.", "x eller y finnes ikke i treet.", "Forutsetningen om at begge finnes er brutt."), "Feil");
+      return steps;
+    };
+  }
+  reg(IN.gen, "lcaBST", lcaBSTGen("LCABST"));
+  reg(IN.gen, "lowestCommonAncestorBST", lcaBSTGen("LowestCommonAncestorBST"));
 
   /* ---------- AVL-innsetting ---------- */
   reg(IN.gen, "avlInsert", function (input) {
     var o = norm(input), root = o.base ? bstFrom(o.base) : null, steps = [], rots = 0;
     // pending: forfedre til den nye noden som ennå ikke har kjørt SetHeight. Høyden over dem er den gamle,
     // så b vises som «b=?» og de farges ikke røde før Balance faktisk sjekker dem.
-    var pending = {};
-    function snap(line, marks, text, tag) {
+    var pending = {}, frames = [];
+    function snap(line, marks, text, tag, extra) {
       var L = avlLabels(root), warn = (marks.warn || []).slice();
       Object.keys(pending).forEach(function (id) { if (L.lab[id] != null) L.lab[id] = "b=?"; });
       L.warn.forEach(function (id) { if (!pending[id] && warn.indexOf(id) < 0) warn.push(id); });
       marks.warn = warn;
-      steps.push({ line: line, tree: cl(root), marks: marks, lab: L.lab, sup: L.sup, text: text, tag: tag, counter: "Rotasjoner: " + rots });
+      var s = { line: line, tree: cl(root), marks: marks, lab: L.lab, sup: L.sup, text: text, tag: tag, counter: "Rotasjoner: " + rots,
+        info: [{ label: "Kallstakk", kind: "frames", items: frames.map(function (f) { return { name: f.name, note: f.note, ret: !!f.ret }; }) }] };
+      if (extra) for (var k in extra) s[k] = extra[k];
+      steps.push(s);
     }
     snap(null, {}, o.base
       ? t("Vi starter med et tre som er en lang stige (" + o.base.join("–") + "). Nå setter vi inn " + o.keys.join(", ") + " på AVL-måten.",
@@ -1848,7 +2052,13 @@
       return v;
     }
     function ins(v, x, attach, path) {
+      var fr = { name: "Insert(" + (v ? v.k : "null") + ", " + x + ")", note: "", ret: false };
+      frames.push(fr);
+      try { return ins0(v, x, attach, path, fr); } finally { frames.pop(); }
+    }
+    function ins0(v, x, attach, path, fr) {
       if (!v) {
+        fr.note = "ny node ↩"; fr.ret = true;
         var nn = mk(x); attach(nn);
         path.forEach(function (id) { pending[id] = 1; });
         var up = path.length > 0;
@@ -1859,9 +2069,11 @@
       }
       path.push(v.id);
       if (x < v.k) {
+        fr.note = "venter på venstre";
         snap(5, { cur: v.id, path: path.slice() }, t(x + " er mindre enn " + v.k + ": til venstre.", x + " < " + v.k + ": gå til venstre.", "Insert(v.left, " + x + ")."), "Venstre");
         ins(v.l, x, function (s) { v.l = s; }, path);
       } else if (x > v.k) {
+        fr.note = "venter på høyre";
         snap(7, { cur: v.id, path: path.slice() }, t(x + " er større enn " + v.k + ": til høyre.", x + " > " + v.k + ": gå til høyre.", "Insert(v.right, " + x + ")."), "Høyre");
         ins(v.r, x, function (s) { v.r = s; }, path);
       } else {
@@ -1872,7 +2084,9 @@
       path.pop();
       var oldH = v.h; setH(v); delete pending[v.id];
       var b = bf(v);
+      fr.note = "Balance(" + v.k + ")";
       if (Math.abs(b) <= 1) {
+        fr.ret = true; fr.note = "returnerer " + v.k + " ↩";
         snap(8, { cur: v.id, path: path.slice() }, t("Tilbake i " + v.k + ": høyden er " + v.h + ", og b = " + neg(b) + ". Det er innenfor, så vi lar den stå.",
           "SetHeight(" + v.k + "): h = " + v.h + (oldH !== v.h ? " (var " + oldH + ")" : "") + ". b = " + neg(b) + " ∈ [−1, 1]: Balance gjør ingenting.",
           "h(" + v.k + ") = " + v.h + ", b = " + neg(b) + ". Invarianten holder her."), "Sjekk " + v.k);
@@ -1894,54 +2108,243 @@
     });
     snap(null, { done: ids(root) }, t("Ferdig! Treet er i balanse overalt. Vi vred " + rots + " gang" + (rots === 1 ? "" : "er") + ".",
       "Ferdig. Rot: " + (root ? root.k : "–") + ", høyde " + hOf(root) + ". " + rots + " enkle rotasjoner totalt (en dobbel teller som to).",
-      "AVL-tre med h = " + hOf(root) + " og n = " + ids(root).length + ". Rotasjoner: " + rots + "."), "Ferdig");
+      "AVL-tre med h = " + hOf(root) + " og n = " + ids(root).length + ". Rotasjoner: " + rots + "."), "Ferdig",
+      { svar: "rot " + (root ? root.k : "–") + ", " + rots + " rotasjon" + (rots === 1 ? "" : "er") });
     return steps;
   });
 
   /* ---------- Anti-AVL (H2025) ---------- */
   reg(IN.gen, "insertAntiAVL", function (input) {
-    var o = norm(input), root = null, steps = [], rots = 0;
-    function snap(line, marks, text, tag) { fixH(root); steps.push({ line: line, tree: cl(root), marks: marks, text: text, tag: tag, counter: "Rotasjoner: " + rots }); }
+    var o = norm(input), root = null, steps = [], rots = 0, frames = [];
+    // frames: bunn → topp, { name, note, ret }
+    function info() { return [{ label: "Kallstakk", kind: "frames", items: frames.map(function (f) { return { name: f.name, note: f.note, ret: !!f.ret }; }) }]; }
+    function snap(line, marks, text, tag, extra) {
+      fixH(root);
+      var s = { line: line, tree: cl(root), marks: marks, text: text, tag: tag, counter: "Rotasjoner: " + rots, info: info() };
+      if (extra) for (var k in extra) s[k] = extra[k];
+      steps.push(s);
+    }
+    function call(v, x) { return "InsertAntiAVL(" + (v ? v.k : "null") + ", " + x + ")"; }
     snap(null, {}, t("Vi setter inn " + o.keys.join(", ") + " med Anti-AVL-regelen: dukker det opp et venstre barn, vrir vi det bort.",
-      "InsertAntiAVL av " + o.keys.join(", ") + ". Høyrerotasjon hver gang en node på veien har venstre barn.",
-      "Regel: etter rekursjonen, hvis v.left ≠ null, returner RightRotate(v)."), "Start");
-    function ins(v, x, attach, path) {
+      "InsertAntiAVL av " + o.keys.join(", ") + " i et tomt tre. Høyrerotasjon hver gang en node på veien har venstre barn. Kallstakken viser kallene som er i gang.",
+      "Input: tallene " + o.keys.join(", ") + ", satt inn ett om gangen fra et tomt tre. Regel: etter rekursjonen, hvis v.left ≠ null, returner RightRotate(v)."), "Start");
+    function ins(v, x, attach, path, par) {
+      var fr = { name: call(v, x), note: "", ret: false };
+      frames.push(fr);
       if (!v) {
         var nn = mk(x); attach(nn);
-        snap(3, { fresh: nn.id, path: path.slice() }, t(x + " blir en ny node.", "Ny løvnode " + x + ".", "new Node(" + x + ")."), "Ny node " + x);
+        fr.note = "ny node ↩"; fr.ret = true;
+        snap(3, { fresh: nn.id, path: path.slice() }, t("Her er det tomt, så " + x + " blir en ny node.",
+          "v = null: ny løvnode " + x + ". Kallet returnerer den nye noden" + (par ? " til " + par.k + "." : ", og den blir roten."),
+          "Linje 2–3: v = null, så v ← new Node(" + x + "). Rammen returnerer noden."), "Ny node " + x);
+        frames.pop();
         return nn;
       }
       path.push(v.id);
       if (x < v.k) {
-        snap(5, { cur: v.id, path: path.slice() }, t(x + " er mindre enn " + v.k + ": til venstre.", x + " < " + v.k + ": gå til venstre.", "InsertAntiAVL(v.left, " + x + ")."), "Venstre");
-        ins(v.l, x, function (s) { v.l = s; }, path);
+        fr.note = "venter på venstre";
+        snap(5, { cur: v.id, path: path.slice() }, t(x + " er mindre enn " + v.k + ": til venstre.", x + " < " + v.k + ": gå til venstre.", "v.left ← InsertAntiAVL(v.left, " + x + "). Rammen for " + v.k + " venter."), "Venstre");
+        ins(v.l, x, function (s) { v.l = s; }, path, v);
       } else if (x > v.k) {
-        snap(7, { cur: v.id, path: path.slice() }, t(x + " er større enn " + v.k + ": til høyre.", x + " > " + v.k + ": gå til høyre.", "InsertAntiAVL(v.right, " + x + ")."), "Høyre");
-        ins(v.r, x, function (s) { v.r = s; }, path);
-      } else { path.pop(); return v; }
+        fr.note = "venter på høyre";
+        snap(7, { cur: v.id, path: path.slice() }, t(x + " er større enn " + v.k + ": til høyre.", x + " > " + v.k + ": gå til høyre.", "v.right ← InsertAntiAVL(v.right, " + x + "). Rammen for " + v.k + " venter."), "Høyre");
+        ins(v.r, x, function (s) { v.r = s; }, path, v);
+      } else { path.pop(); frames.pop(); return v; }
       path.pop();
       if (v.l) {
         var y = v.l;
-        snap(8, { cur: v.id, warn: [v.id], path: path.slice() }, t(v.k + " har fått et barn til venstre (" + y.k + "). Det er ikke lov i Anti-AVL!",
-          v.k + ".left = " + y.k + " ≠ null: høyrerotasjon.", "v.left ≠ null ⇒ RightRotate(" + v.k + ")."), "Venstre barn!");
+        fr.note = "v.left ≠ null";
+        snap(9, { cur: v.id, warn: [v.id], path: path.slice() }, t(v.k + " har et barn til venstre (" + y.k + "). Det er ikke lov i et Anti-AVL-tre, så vi må vri!",
+          "Tilbake i " + v.k + ". Linje 9: " + v.k + ".left = " + y.k + " ≠ null, så vi høyreroterer.", "Linje 9: v.left ≠ null ⇒ linje 10, return RightRotate(" + v.k + ")."), "Venstre barn!");
         var nv = rotR(v, false); attach(nv); rots++;
-        snap(9, { rot: [v.id, y.id], path: path.slice() }, t("Vi vrir til høyre: " + y.k + " blir toppen, og " + v.k + " henger til høyre for den.",
-          "RightRotate(" + v.k + "): " + y.k + " opp, " + v.k + " blir høyre barn.", "Rotasjon nr. " + rots + ". Søketre-egenskapen er bevart."), "Høyrerotasjon");
+        fr.note = "returnerer " + y.k + " ↩"; fr.ret = true;
+        snap(10, { rot: [v.id, y.id], path: path.slice() }, t("Vi vrir til høyre: " + y.k + " blir toppen, og " + v.k + " henger til høyre for den.",
+          "RightRotate(" + v.k + "): " + y.k + " opp, " + v.k + " blir høyre barn. Kallet returnerer " + y.k + (par ? " til " + par.k + "." : ", som blir ny rot."),
+          "Rotasjon nr. " + rots + ". Søketre-egenskapen er bevart. Ny subtrerot " + y.k + " returneres."), "Høyrerotasjon");
+        frames.pop();
         return nv;
       }
-      snap(10, { cur: v.id, path: path.slice() }, t(v.k + " har ikke noe barn til venstre, så her trenger vi ikke vri. " + v.k + " blir stående.",
-        v.k + ".left = null, så linje 8 slår ikke til: ingen rotasjon. return " + v.k + ".",
-        "v.left = null: betingelsen på linje 8 er usann, og subtreet er allerede en høyrekjede. return v."), "Ingen rotasjon");
+      fr.note = "returnerer " + v.k + " ↩"; fr.ret = true;
+      snap(12, { cur: v.id, path: path.slice() }, t(v.k + " har ikke noe barn til venstre, så her trenger vi ikke vri. " + v.k + " blir stående.",
+        "Tilbake i " + v.k + ". " + v.k + ".left = null, så linje 9 slår ikke til: ingen rotasjon. return " + v.k + ".",
+        "v.left = null: betingelsen på linje 9 er usann, og subtreet er allerede en høyrekjede. return v."), "Ingen rotasjon");
+      frames.pop();
       return v;
     }
     o.keys.forEach(function (x) {
       snap(null, {}, t("Neste tall: " + x + ".", "InsertAntiAVL(rot, " + x + ").", "Sett inn " + x + "."), "Sett inn " + x);
-      ins(root, x, function (s) { root = s; }, []);
+      ins(root, x, function (s) { root = s; }, [], null);
     });
     var io = inorder(root, []).join(" → ");
     snap(null, { done: ids(root) }, t("Ferdig! Treet ble en lang stige mot høyre: " + io + ". Vi vred " + rots + " gang" + (rots === 1 ? "" : "er") + ".",
       "Ferdig. Høyrekjede " + io + ", høyde " + hOf(root) + ". Totalt " + rots + " rotasjoner.",
-      "Resultatet er en sortert høyrekjede med h = n − 1 = " + hOf(root) + ". Oppslag blir derfor O(n). Rotasjoner: " + rots + "."), "Ferdig");
+      "Resultatet er en sortert høyrekjede med h = n − 1 = " + hOf(root) + ". Oppslag blir derfor O(n). Rotasjoner: " + rots + "."), "Ferdig",
+      { svar: io + " (" + rots + " rotasjon" + (rots === 1 ? "" : "er") + ")" });
+    return steps;
+  });
+
+  /* ---------- InRange (H2021): skriv ut verdiene i [a, b] ----------
+     Input: [{ tree:[nøstet] | keys:[...], a, b }]. Subtrær som hoppes over, tones ned (dim). */
+  reg(IN.gen, "inRange", function (input) {
+    var o = norm(input), root = treeOf(o), a = o.a, b = o.b, steps = [], frames = [], printed = [], dim = [];
+    function call(v) { return "InRange(" + (v ? v.k : "null") + ", " + a + ", " + b + ")"; }
+    function snap(line, marks, text, tag, extra) {
+      marks.path = frames.filter(function (f) { return f.v; }).map(function (f) { return f.v.id; });
+      marks.done = printed.map(function (v) { return v.id; });
+      marks.dim = dim.slice();
+      var s = { line: line, tree: cl(root), marks: marks, text: text, tag: tag,
+        info: [{ label: "Kallstakk", kind: "frames", items: frames.map(function (f, i) {
+                 var top = i === frames.length - 1;
+                 return { name: call(f.v), note: !f.v ? "v = null → return ↩" : (f.ret ? "ferdig ↩" : (!top ? "venter på " + f.wait : f.note || "")), ret: !f.v || !!f.ret };
+               }) },
+               { label: "Utskrift", items: printed.map(function (v) { return v.k; }) }] };
+      if (extra) for (var k in extra) s[k] = extra[k];
+      steps.push(s);
+    }
+    function prune(v) { each(v, function (n) { dim.push(n.id); }); }
+    snap(null, {}, t("Vi skal skrive ut alle tallene fra " + a + " til " + b + ", i stigende rekkefølge. Vi går bare inn i greiner der det kan finnes slike tall.",
+      "Input: treet med rot " + (root ? root.k : "null") + ", a = " + a + " og b = " + b + ". Vi kaller " + call(root) + ". Subtrær som ikke kan ha treff, tones ned.",
+      "Input: rot " + (root ? root.k : "null") + ", intervallet [" + a + ", " + b + "]. Inorder med beskjæring: et subtre besøkes bare hvis søketre-ordningen sier at det kan ha treff."), "Start");
+    function rec(v, par, side) {
+      var fr = { v: v, wait: null, ret: false, note: "" };
+      frames.push(fr);
+      if (!v) {
+        snap(2, { cur: par ? par.id : null }, t(par ? par.k + " har ikke noe barn til " + side + ". Der er det tomt, så vi snur." : "Treet er tomt.",
+          call(null) + ": v = null, så kallet returnerer med en gang.", "Basistilfellet: tomt subtre, O(1)."), "null-kall");
+        frames.pop();
+        return;
+      }
+      fr.note = "v ≠ null";
+      snap(2, { cur: v.id }, t("Vi står i " + v.k + ".", call(v) + " kalles. Linje 2: v ≠ null, så vi går videre.", "Ny ramme " + call(v) + ". Basistilfellet slår ikke til."), "Kall " + v.k);
+      if (a < v.k) {
+        fr.wait = call(v.l); fr.note = "kaller venstre";
+        snap(3, { cur: v.id }, t(a + " er mindre enn " + v.k + ", så det kan finnes treff til venstre. Vi går dit.",
+          "Linje 3: " + a + " < " + v.k + ", så InRange(v.left, a, b) kalles.", "a < v.element: venstre subtre kan ha verdier ≥ a. Rekursivt kall."), "Venstre");
+        rec(v.l, v, "venstre");
+        fr.wait = null;
+      } else {
+        prune(v.l);
+        snap(3, { cur: v.id }, t(a + " er ikke mindre enn " + v.k + ". Alt til venstre er mindre enn " + v.k + ", og dermed for lite. Vi hopper over det." + (v.l ? "" : " (Det er ingenting der uansett.)"),
+          "Linje 3: " + a + " < " + v.k + " er usant. " + (v.l ? "Hele venstre subtre er < " + v.k + " ≤ " + a + " og hoppes over (tonet ned)." : "Vi kaller ikke på venstre side."),
+          "Beskjæring: v.element ≤ a ⇒ alle i v.left er < a." + (v.l ? " Subtreet besøkes ikke." : "")), "Hopp over venstre");
+      }
+      if (a <= v.k && v.k <= b) {
+        printed.push(v); fr.note = "skrev " + v.k;
+        snap(4, { cur: v.id }, t(v.k + " ligger mellom " + a + " og " + b + ". Vi skriver det ut!",
+          "Linje 4: " + a + " ≤ " + v.k + " ≤ " + b + ", så Print(" + v.k + "). Utskrift så langt: " + printed.map(function (n) { return n.k; }).join(", ") + ".",
+          "Print mellom de to kallene: inorder, så utskriften blir sortert."), "Skriv " + v.k);
+      } else {
+        snap(4, { cur: v.id }, t(v.k + " ligger ikke mellom " + a + " og " + b + ", så vi skriver det ikke ut.",
+          "Linje 4: " + v.k + " er ikke i [" + a + ", " + b + "]. Ingen utskrift.", "Testen på linje 4 er usann."), "Ikke med");
+      }
+      if (v.k < b) {
+        fr.wait = call(v.r); fr.note = "kaller høyre";
+        snap(5, { cur: v.id }, t(v.k + " er mindre enn " + b + ", så det kan finnes treff til høyre. Vi går dit.",
+          "Linje 5: " + v.k + " < " + b + ", så InRange(v.right, a, b) kalles.", "v.element < b: høyre subtre kan ha verdier ≤ b. Rekursivt kall."), "Høyre");
+        rec(v.r, v, "høyre");
+        fr.wait = null;
+      } else {
+        prune(v.r);
+        snap(5, { cur: v.id }, t(v.k + " er ikke mindre enn " + b + ". Alt til høyre er større enn " + v.k + ", og dermed for stort. Vi hopper over det." + (v.r ? "" : " (Det er ingenting der uansett.)"),
+          "Linje 5: " + v.k + " < " + b + " er usant. " + (v.r ? "Hele høyre subtre er > " + v.k + " ≥ " + b + " og hoppes over (tonet ned)." : "Vi kaller ikke på høyre side."),
+          "Beskjæring: v.element ≥ b ⇒ alle i v.right er > b." + (v.r ? " Subtreet besøkes ikke." : "")), "Hopp over høyre");
+      }
+      fr.ret = true;
+      snap(5, { cur: v.id }, t("Ferdig med " + v.k + ". " + (par ? "Vi går tilbake til " + par.k + "." : "Det var det første kallet."),
+        call(v) + " er ferdig og returnerer" + (par ? " til " + call(par) + "." : "."), "Rammen " + call(v) + " fjernes fra kallstakken."), "Retur " + v.k);
+      frames.pop();
+    }
+    rec(root, null, "");
+    var out = printed.map(function (v) { return v.k; }).join(", ");
+    snap(null, {}, t("Ferdig! Vi skrev ut: " + (out || "ingenting") + ". De nedtonede nodene trengte vi aldri å se på.",
+      "Ferdig. Utskrift: " + (out || "ingen") + ". " + dim.length + " node" + (dim.length === 1 ? "" : "r") + " ble hoppet over.",
+      "Utskrift: " + (out || "ingen") + ". Besøkte noder: " + (ids(root).length - dim.length) + " av " + ids(root).length + ". Kjøretid O(h + k), der k er antall treff."), "Ferdig", { svar: out });
+    return steps;
+  });
+
+  /* ---------- CheckBST med hjelpeprosedyre (H2022) ----------
+     Input: [{ tree:[nøstet] }]. Etiketten under noden er intervallet (low, high) den ble sjekket mot. */
+  reg(IN.gen, "checkBSTArk", function (input) {
+    var o = norm(input), root = treeOf(o), steps = [], frames = [], lab = {}, done = [], warn = [];
+    function num(x) { return x === -Infinity ? "−∞" : x === Infinity ? "∞" : neg(x); }
+    function call(v, lo, hi) { return "CheckBSTHelper(" + (v ? v.k : "null") + ", " + num(lo) + ", " + num(hi) + ")"; }
+    function snap(line, marks, text, tag, extra) {
+      var L = {}; Object.keys(lab).forEach(function (k) { L[k] = lab[k]; });
+      marks.path = frames.filter(function (f) { return f.v; }).map(function (f) { return f.v.id; });
+      marks.done = done.slice(); marks.warn = warn.slice();
+      var s = { line: line, tree: cl(root), marks: marks, lab: L, text: text, tag: tag,
+        info: [{ label: "Kallstakk", kind: "frames", items: frames.map(function (f, i) {
+          var top = i === frames.length - 1;
+          return { name: f.name, note: f.ret ? "returnerer " + f.res + " ↩" : (!top ? "venter" : f.note || ""), ret: !!f.ret };
+        }) }] };
+      if (extra) for (var k in extra) s[k] = extra[k];
+      steps.push(s);
+    }
+    var outer = { name: "CheckBST(" + (root ? root.k : "null") + ")", note: "" };
+    snap(null, {}, t("Er dette et binært søketre? Vi sjekker hver node mot grensene den får fra nodene over seg.",
+      "Input: binærtreet med rot " + (root ? root.k : "null") + ". Under hver node vi sjekker, står intervallet (low, high) som tallet må ligge strengt innenfor.",
+      "Input: treet med rot " + (root ? root.k : "null") + ". Etiketten (low, high) er det åpne intervallet noden sjekkes mot."), "Start");
+    frames.push(outer);
+    outer.note = "kaller hjelperen";
+    snap(2, {}, t("Roten kan ha hvilket som helst tall. Vi starter uten grenser: fra minus uendelig til uendelig.",
+      "CheckBST kaller " + call(root, -Infinity, Infinity) + ".", "Linje 2: start med det åpne intervallet (−∞, ∞)."), "Start hjelper");
+    function nullChild(v, side, line) {
+      snap(line, { cur: v.id }, t(v.k + " har ikke noe barn til " + side + ". Et tomt tre er alltid i orden.",
+        "Linje " + line + ": v." + (side === "venstre" ? "left" : "right") + " = null, så kallet treffer linje 5 og gir true med en gang.",
+        "Null-barn: CheckBSTHelper(null, …) returnerer true (linje 5)."), "null → true");
+    }
+    function rec(v, lo, hi) {
+      var fr = { v: v, name: call(v, lo, hi), note: "", ret: false, res: null };
+      frames.push(fr);
+      lab[v.id] = "(" + num(lo) + ", " + num(hi) + ")";
+      function ret(r) { fr.ret = true; fr.res = r; }
+      if (!(lo < v.k && v.k < hi)) {
+        warn.push(v.id); ret(false);
+        snap(6, { cur: v.id }, t(v.k + " skulle ligget mellom " + num(lo) + " og " + num(hi) + ", men gjør det ikke. Treet er ikke et søketre!",
+          "Linje 6: " + v.k + " ligger ikke strengt mellom " + num(lo) + " og " + num(hi) + ". return false.",
+          "Invarianten er brutt: " + v.k + " ∉ (" + num(lo) + ", " + num(hi) + "). Grensene kommer fra forfedrene, ikke bare fra forelderen."), "Feil i " + v.k);
+        frames.pop();
+        return false;
+      }
+      fr.note = "i intervallet";
+      snap(6, { cur: v.id }, t(v.k + " ligger mellom " + num(lo) + " og " + num(hi) + ". Så langt er alt i orden.",
+        "Linje 5–6: v ≠ null, og " + num(lo) + " < " + v.k + " < " + num(hi) + ". Vi sjekker barna.",
+        "v.element ∈ (" + num(lo) + ", " + num(hi) + "). Videre til subtrærne."), "Sjekk " + v.k);
+      if (v.l) {
+        fr.note = "sjekker venstre";
+        snap(7, { cur: v.id }, t("Til venstre for " + v.k + " må alt være mindre enn " + v.k + ".",
+          "Linje 7: " + call(v.l, lo, v.k) + ". Øvre grense blir " + v.k + ".", "Venstre subtre: intervallet (" + num(lo) + ", " + v.k + ")."), "Venstre");
+        if (!rec(v.l, lo, v.k)) {
+          ret(false);
+          snap(7, { cur: v.id }, t("Det var feil der nede, så " + v.k + " svarer også nei.",
+            "Venstre kall ga false, så linje 7 returnerer false.", "Tidlig retur: false sendes rett oppover."), "false opp");
+          frames.pop();
+          return false;
+        }
+      } else nullChild(v, "venstre", 7);
+      if (v.r) {
+        fr.note = "sjekker høyre";
+        snap(8, { cur: v.id }, t("Til høyre for " + v.k + " må alt være større enn " + v.k + ".",
+          "Linje 8: return " + call(v.r, v.k, hi) + ". Nedre grense blir " + v.k + ".", "Høyre subtre: intervallet (" + v.k + ", " + num(hi) + ")."), "Høyre");
+        var r = rec(v.r, v.k, hi);
+        ret(r);
+        if (r) done.push(v.id);
+        snap(8, { cur: v.id }, r ? t("Alt under " + v.k + " er i orden.", "Høyre kall ga true, så " + call(v, lo, hi) + " returnerer true.", "Subtreet med rot " + v.k + " er et søketre innenfor (" + num(lo) + ", " + num(hi) + ").")
+          : t("Det var feil til høyre, så " + v.k + " svarer også nei.", "Høyre kall ga false, så kallet returnerer false.", "false sendes rett oppover."), r ? "true opp" : "false opp");
+        frames.pop();
+        return r;
+      }
+      nullChild(v, "høyre", 8);
+      ret(true); done.push(v.id);
+      snap(8, { cur: v.id }, t("Alt under " + v.k + " er i orden.", call(v, lo, hi) + " returnerer true.", "Subtreet med rot " + v.k + " er et søketre."), "true opp");
+      frames.pop();
+      return true;
+    }
+    var res = root ? rec(root, -Infinity, Infinity) : true;
+    outer.ret = true; outer.res = res;
+    snap(2, res ? { found: root ? root.id : null } : {}, res
+      ? t("Ferdig! Hver node lå innenfor grensene sine. Treet er et binært søketre.", "CheckBST returnerer true.", "Alle n noder lå i intervallet sitt: true, etter O(n) arbeid.")
+      : t("Ferdig! En node lå på feil side av en node høyere opp. Treet er ikke et binært søketre.", "CheckBST returnerer false.", "Én node brøt invarianten, og false ble sendt helt opp."), res ? "true" : "false", { svar: String(res) });
     return steps;
   });
 
@@ -1958,9 +2361,11 @@
       list.forEach(function (r) { (function w(v) { if (!v) return; if (v.sym !== undefined) L[v.id] = String(v.f); w(v.l); w(v.r); })(r); });
       return L;
     }
-    function snap(line, forest, marks, text, tag, info) {
-      steps.push({ line: line, forest: forest.map(cl), marks: marks, lab: labs(forest), text: text, tag: tag, bits: true,
-        info: info || [{ label: "Kø (minst først)", items: Q.map(item), kind: "queue" }] });
+    function snap(line, forest, marks, text, tag, info, svar) {
+      var s = { line: line, forest: forest.map(cl), marks: marks, lab: labs(forest), text: text, tag: tag, bits: true,
+        info: info || [{ label: "Kø (minst først)", items: Q.map(item), kind: "queue" }] };
+      if (svar != null) s.svar = svar;
+      steps.push(s);
     }
     pairs.forEach(function (p) { Q.push({ id: "L" + p[0], k: p[0], sym: p[0], f: p[1], l: null, r: null, h: 0, seq: seq++ }); });
     sortQ();
@@ -2003,7 +2408,8 @@
       : t("Bare ett tre igjen: det er Huffman-treet! Følg kantene fra toppen ned til en bokstav for å få koden. Bokstaver som brukes lite, havner langt nede og får lange koder.",
           "Ferdig. Kodene leses langs stien fra roten: venstre = 0, høyre = 1. Sjeldne symboler havner dypest og får lengst kode.",
           "Roten returneres. Kodelengde = dybden til løvnoden." + (ties ? " Med et annet valg ved lik frekvens kan enkelte koder bli annerledes, men den totale lengden blir den samme." : "")), "Ferdig",
-      [{ label: "Koder (lengde)", items: rows }]);
+      [{ label: "Koder (lengde)", items: rows }],
+      pairs.map(function (p) { return p[0] + " = " + H.codes[p[0]].length; }).join(", "));
     return steps;
   });
 })();

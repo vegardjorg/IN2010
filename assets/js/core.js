@@ -62,14 +62,16 @@
     var active = document.body.getAttribute("data-page");
     var row = el("div", { class: "nav-row" });
     var inner = el("div", { class: "nav-inner" });
-    inner.appendChild(el("a", { class: "nav-brand", href: "index.html",
+    // Merket står utenfor den rullbare lenkeraden, så det aldri rulles ut av syne når aktiv side sentreres.
+    row.appendChild(el("a", { class: "nav-brand", href: "index.html",
       html: 'IN<span>2010</span>' }));
     IN.PAGES.forEach(function (p) {
       if (p.id === "index") return; // merket forside = brand
       var cls = "navlink" + (p.id === active ? " active" : "") + (p.ready ? "" : " kommer");
       inner.appendChild(el("a", {
         class: cls, href: p.ready ? p.href : null,
-        "aria-current": p.id === active ? "page" : null, text: p.label
+        // Menyen viser bare navnet («Sortering»), ikke blokknummeret – kortere og nok til å finne fram.
+        "aria-current": p.id === active ? "page" : null, text: String(p.label).replace(/^\d+\s*·\s*/, "")
       }));
     });
     // Temaknapp ligger helt ute til siden (utenfor lenkeraden), med luft, så den ikke er i veien for menyen.
@@ -80,15 +82,25 @@
 
     // Vis vannrett scroll-hint (uttoning) på menyen bare når lenkene faktisk er bredere enn plassen.
     function syncNavScroll() {
-      inner.classList.toggle("scroll-x", inner.scrollWidth > inner.clientWidth + 2);
+      var over = inner.scrollWidth > inner.clientWidth + 2;
+      inner.classList.toggle("scroll-x", over);
+      // Uttoning bare på den siden der det finnes flere lenker
+      inner.classList.toggle("fade-l", over && inner.scrollLeft > 2);
+      inner.classList.toggle("fade-r", over && inner.scrollLeft + inner.clientWidth < inner.scrollWidth - 2);
     }
     syncNavScroll();
     // Mobil: rull aktiv side inn i menyen, så man ser hvor man er
     var act = qs(".navlink.active", inner);
-    if (act && inner.scrollWidth > inner.clientWidth) {
+    // Kjøres på nytt når skrift og layout er ferdig lastet – ellers kan aktiv lenke havne delvis utenfor.
+    function centerActive() {
+      if (!act || inner.scrollWidth <= inner.clientWidth) return;
       var ar = act.getBoundingClientRect(), ir = inner.getBoundingClientRect();
       inner.scrollLeft += (ar.left - ir.left) - (inner.clientWidth - ar.width) / 2;
+      syncNavScroll();
     }
+    centerActive();
+    if (document.readyState !== "complete") window.addEventListener("load", centerActive);
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(centerActive);
     window.addEventListener("resize", syncNavScroll);
     inner.addEventListener("scroll", syncNavScroll);
   }
@@ -105,9 +117,10 @@
     return "Tema: " + (mode === "dark" ? "mørkt" : mode === "light" ? "lyst" : "som systemet") + ". Trykk for å bytte.";
   }
   function buildThemeToggle() {
-    var modes = ["system", "light", "dark"];
+    // Lyst er standard (settes i <head> på hver side). Mørkt og «som systemet» velges aktivt.
+    var modes = ["light", "dark", "system"];
     var btn = el("button", {
-      class: "theme-toggle", type: "button", title: "Bytt tema (system → lys → mørk)",
+      class: "theme-toggle", type: "button", title: "Bytt tema (lys → mørk → som systemet)",
       "aria-label": themeLabel(currentTheme()), text: themeIcon(currentTheme())
     });
     btn.addEventListener("click", function () {
@@ -206,6 +219,7 @@
       if (v == null || v === "") { bodyEl.appendChild(el("p", { class: "muted small", text: "(ingen forklaring på dette nivået)" })); return; }
       if (v && v.nodeType) bodyEl.appendChild(v);
       else bodyEl.innerHTML = String(v);
+      IN.symbolTips(bodyEl);
     }
     scope.onChange(paint); paint();
     clear(host); host.appendChild(block);
@@ -315,18 +329,27 @@
     var start = (fromHash && ids.indexOf(fromHash) >= 0) ? fromHash : ids[0];
     activate(start, false);
 
-    // Dyplenke til en eksamensoppgave: #fane=<fane>&oppg=<element-id>.
+    // Dyplenke til en eksamensoppgave: #fane=<fane>&oppg=<element-id eller kanonisk nøkkel, f.eks. H2023-2>.
+    // &demo=1 åpner også steg-demoen i kortet, &perfekt=1 (eller &svar=1) åpner «Perfekt svar».
     // Oppgavekortene bygges av sidens eget skript, så vi venter til siden er lastet,
     // åpner kortet og ruller dit.
     function reveal() {
       var m = location.hash.match(/oppg=([\w-]+)/);
       if (!m) return;
+      var wantDemo = /[#&]demo=1\b/.test(location.hash), wantSvar = /[#&](svar|perfekt)=1\b/.test(location.hash);
       try { history.scrollRestoration = "manual"; } catch (e) {}
       var go = function () {
-        var t = document.getElementById(m[1]);
+        var t = document.getElementById(m[1]) || qs('details.examtask[data-key="' + m[1] + '"]');
         if (!t) return;
+        // Uten fane= i lenken (eller med feil fane): bytt til fanen som faktisk inneholder kortet.
+        var pan = t.closest && t.closest("[data-panel]");
+        if (pan && pan.hidden && panels.indexOf(pan) >= 0) activate(pan.getAttribute("data-panel"), false);
         var card = t.matches && t.matches("details") ? t : t.querySelector("details.examtask");
-        if (card) card.open = true;
+        if (card) {
+          card.open = true;
+          var dd = wantDemo && qs("details.et-demo", card); if (dd && !dd.open) dd.open = true;
+          var pd = wantSvar && qs("details.et-perfekt", card); if (pd && !pd.open) pd.open = true;
+        }
         var top = t.getBoundingClientRect().top + window.pageYOffset - IN.stickyH(); // under de faste linjene
         window.scrollTo({ top: Math.max(0, top), behavior: "instant" });
       };
@@ -366,9 +389,48 @@
   window.addEventListener("storage", function (e) { if (e.key === STRAKS_KEY) straksEvent(e.newValue === "1"); });
   function plain(html) { var d = document.createElement("div"); d.innerHTML = html; return (d.textContent || "").trim(); }
 
+  /* ---------- Kildehenvisning på et punkt (sant/usant, flervalg) ----------
+     kilde: { ref: "Forelesning 3 (Sortering 1), lysark 14", egneOrd: true, kort?: "…" } eller en array av slike.
+     Vises som «Kilde: Forelesning 3, lysark 14 *» under forklaringen. Parenteser i ref tas bort i visningen
+     (full ref står i title), med mindre kort er satt. egneOrd: false (ordrett fra eksamen) gir ingen stjerne.
+     Et felt «sitat» blir ALDRI vist: det slettes her. Ordrette sitater fra forelesninger, ukesoppgaver og
+     lærebok skal ikke ligge i repoet i det hele tatt. */
+  function stripSitat(o, depth) {
+    if (!o || typeof o !== "object" || o.nodeType || (depth || 0) > 6) return o;
+    if (Array.isArray(o)) { o.forEach(function (x) { stripSitat(x, (depth || 0) + 1); }); return o; }
+    if (Object.prototype.hasOwnProperty.call(o, "sitat")) delete o.sitat;
+    Object.keys(o).forEach(function (k) { var v = o[k]; if (v && typeof v === "object" && !v.nodeType) stripSitat(v, (depth || 0) + 1); });
+    return o;
+  }
+  IN.stripSitat = stripSitat;
+  function kildeRefs(k) {
+    if (!k || typeof k !== "object") return null;          // streng/false = eksamensmerke i tfTest, ikke kildelinje
+    var out = [];
+    (Array.isArray(k) ? k : [k]).forEach(function (r) {
+      if (typeof r === "string") r = { ref: r };
+      if (!r || typeof r !== "object") return;
+      stripSitat(r);
+      if (!r.ref) return;
+      var ref = String(r.ref);
+      var vis = r.kort ? String(r.kort) : ref.replace(/\s*\([^)]*\)/g, "").replace(/\s{2,}/g, " ").trim();
+      out.push({ ref: ref, vis: vis || ref, egneOrd: r.egneOrd !== false, eksamen: r.eksamen });
+    });
+    return out.length ? out : null;
+  }
+  function kildeLineEl(refs) {
+    var p = el("p", { class: "qz-kilde" }, "Kilde: ");
+    refs.forEach(function (r, i) {
+      if (i) p.appendChild(document.createTextNode("; "));
+      p.appendChild(el("span", { title: r.vis !== r.ref ? r.ref : null, text: r.vis + (r.egneOrd ? " *" : "") }));
+    });
+    return p;
+  }
+  IN.kildeRefs = kildeRefs;
+
   /* spec: { kind: "tf"|"mc", storeKey, progressId,
              items: [{ id, prompt (html), tag?: {text, cls, title}, render?: fn(node),
-                       choices: [{ label (html), value }], key, keyLabel (html), explain: html | fn(node) }] }
+                       choices: [{ label (html), value }], key, keyLabel (html), explain: html | fn(node),
+                       src?: [{ ref, vis, egneOrd }] (kildelinje, se kildeRefs) }] }
      opts: se IN.tfTest / IN.quiz */
   function answerSet(host, spec, o) {
     if (host._qzOff) host._qzOff();
@@ -459,6 +521,8 @@
       r.exp.appendChild(el("p", { class: "qz-key", html: "Riktig svar: <b>" + r.it.keyLabel + "</b>" }));
       if (typeof r.it.explain === "function") { var h = el("div"); r.exp.appendChild(h); r.it.explain(h); }
       else if (r.it.explain) r.exp.appendChild(el("div", { class: "qz-exp-txt", html: r.it.explain }));
+      if (r.it.src) r.exp.appendChild(kildeLineEl(r.it.src));
+      IN.symbolTips(r.exp);
     }
     function paintItem(r) {
       var it = r.it, st = state(it), sel = has(it.id) ? answers[it.id] : null, locked = !!(o.lock && checked);
@@ -555,7 +619,10 @@
         el("button", { class: "btn", type: "button", text: "Neste →", onclick: function () { go(cur + 1); } })]);
     }
 
-    [head, dotRow, list, pnav, foot, res, live].forEach(function (x) { if (x) wrap.appendChild(x); });
+    // Én fotnote per sett når minst ett punkt har en kilde formulert med egne ord
+    var fn = items.some(function (it) { return it.src && it.src.some(function (r) { return r.egneOrd; }); })
+      ? el("p", { class: "qz-kilde-fn", text: "* formulert med egne ord" }) : null;
+    [head, dotRow, list, pnav, foot, res, fn, live].forEach(function (x) { if (x) wrap.appendChild(x); });
     host.appendChild(wrap);
     if (checked) rows.forEach(function (r) { open[r.it.id] = state(r.it) === "wrong"; });
     function onPref() { if (!wrap.isConnected) { host._qzOff && host._qzOff(); return; } paint(); }
@@ -567,7 +634,8 @@
 
   /* ---------- Flervalg ----------
      IN.quiz(host, questions, opts?)
-     questions: [{ q (html), options: [html…], answer: idx, explain: html | fn(node), render?: fn(node) }]
+     questions: [{ q (html), options: [html…], answer: idx, explain: html | fn(node), render?: fn(node),
+                   kilde?: { ref, egneOrd } | [...] (kildelinje under forklaringen, se kildeRefs) }]
      opts: { id?, pager?: én om gangen med prikker, inline?: alternativene på rad, cls? }
      Fremdrift: quiz:<side>:<id>. Svar lagres i in-quiz:<side>:<id> når quizen har id. */
   IN.quiz = function (host, questions, opts) {
@@ -583,7 +651,8 @@
       qid = pre + "quiz" + IN.quiz._n[pre];
     }
     var items = questions.map(function (item, i) {
-      return { id: i, prompt: item.q, render: item.render || null, explain: item.explain || "",
+      if (item && item.sitat) delete item.sitat;
+      return { id: i, prompt: item.q, render: item.render || null, explain: item.explain || "", src: kildeRefs(item.kilde),
         choices: item.options.map(function (opt, oi) { return { label: opt, value: oi }; }),
         key: item.answer, keyLabel: item.options[item.answer] };
     });
@@ -596,6 +665,9 @@
      IN.tfTest(host, items, opts?)
      items: [{ s: "påstand (html)", answer: true|false, explain: "html", blokk?, tema?, kilde? }]
        kilde: eksamen påstanden er fra (ellers årstallet i teksten, f.eks. «(H2022)»; false = aldri merke).
+       kilde kan også være et kildeobjekt { ref, egneOrd, eksamen? } eller en array av dem: da vises
+       «Kilde: …» under forklaringen, og eksamensmerket hentes fra eksamen (streng | false) eller fra
+       et årstall i ref («Eksamen H2021, oppgave 3»). Teksten i påstanden brukes da ikke til merket.
        Påstander fra eksamen sorteres først.
      opts: { id?: lagringsnøkkel in-tf:<id> og fremdrift tf:<side>:<id>, shuffle?,
              blank?: egen «Blankt»-knapp, og blankt teller som galt ved sjekk,
@@ -608,18 +680,27 @@
     if (typeof host === "string") host = qs(host);
     if (!host || !items || !items.length) return;
     opts = opts || {};
-    function kildeOf(it) {
+    function kildeOf(it, refs) {
+      if (refs) {
+        for (var a = 0; a < refs.length; a++) if (refs[a].eksamen !== undefined) return refs[a].eksamen || null;
+        for (var b = 0; b < refs.length; b++) { var mr = /\b([HV]20\d\d)\b/.exec(refs[b].ref); if (mr) return mr[1]; }
+        return null;
+      }
       if (it.kilde !== undefined) return it.kilde || null;   // kilde: false = aldri eksamensmerke
       var m = /\b([HV]20\d\d)\b/.exec((it.s || "") + " " + (it.explain || ""));
       return m ? m[1] : null;
     }
-    var norm = items.map(function (it, i) { return { s: it.s, answer: !!it.answer, explain: it.explain || "", blokk: it.blokk || null, tema: it.tema || null, kilde: kildeOf(it), _id: i }; });
+    var norm = items.map(function (it, i) {
+      if (it && it.sitat) delete it.sitat;
+      var refs = kildeRefs(it.kilde);
+      return { s: it.s, answer: !!it.answer, explain: it.explain || "", blokk: it.blokk || null, tema: it.tema || null, kilde: kildeOf(it, refs), src: refs, _id: i };
+    });
     var order = norm.filter(function (it) { return it.kilde; }).concat(norm.filter(function (it) { return !it.kilde; }));
     if (opts.shuffle) for (var i = order.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)), t = order[i]; order[i] = order[j]; order[j] = t; }
     var choices = [{ label: "Sant", value: true }, { label: "Usant", value: false }];
     if (opts.blank) choices.push({ label: "Blankt", value: null });
     var list = order.map(function (it) {
-      return { id: it._id, prompt: it.s, explain: it.explain, choices: choices, key: it.answer, keyLabel: it.answer ? "Sant" : "Usant",
+      return { id: it._id, prompt: it.s, explain: it.explain, src: it.src, choices: choices, key: it.answer, keyLabel: it.answer ? "Sant" : "Usant",
         tag: it.kilde ? { text: it.kilde, cls: "tf-eks", title: "Fra eksamen " + it.kilde } :
           it.tema ? { text: it.tema } : it.blokk ? { text: "Blokk " + it.blokk } : null };
     });
@@ -630,7 +711,7 @@
   /* ---------- Eksamensoppgave (utvidbart kort) ----------
      data: {
        year: "H2023", title: "Gnome sort", points: 10, oppgave_nr: "Oppgave 5",
-       oppgave:  html,                      // parafrasert oppgavetekst
+       oppgave:  html,                      // oppgavetekst (ordrett fra arket når ordrett: true)
        losning:  html | [ "steg", ... ],    // løsningsgjennomgang (sensorveiledning, parafrasert)
        kjerne:   html,                      // kjernepoeng / hvorfor (valgfritt)
        tips:     html | [ "tips", ... ],    // eksamenstips
@@ -662,9 +743,11 @@
     sum.appendChild(el("span", { class: "et-chev", "aria-hidden": "true" }));
     card.appendChild(sum);
 
+    if (d.key) card.dataset.key = d.key;
+
     var body = el("div", { class: "examtask-body" });
     function section(label, cls, content) {
-      if (content == null || content === "") return;
+      if (content == null || content === "") return null;
       var sec = el("div", { class: "et-sec " + cls });
       sec.appendChild(el("div", { class: "et-lbl", text: label }));
       var c = el("div", { class: "et-content" });
@@ -672,16 +755,433 @@
       else c.innerHTML = String(content);
       sec.appendChild(c);
       body.appendChild(sec);
+      return c;
     }
-    section("Oppgaven", "oppgave", htmlFromListish(d.oppgave, false));
+    var oc = section("Oppgaven", "oppgave", htmlFromListish(d.oppgave, false));
+    if (oc) {
+      var kl = kildeLinje(d);
+      if (kl) oc.insertBefore(kl, oc.firstChild);
+      if (d.poengkilde === "sv") {
+        var stars = qsa(".et-p", oc);
+        stars.forEach(function (p) { p.textContent = p.textContent.replace(/p\)\s*$/, "p*)"); });
+        if (stars.length) oc.appendChild(el("p", { class: "et-fn", text: "* Poengene per deloppgave er hentet fra sensorveiledningen. Eksamensarket viser bare totalen." }));
+      }
+    }
+    if (d.avvik) section("Avvik fra eksamensarket", "avvik", proseHTML(d.avvik));
     section("Løsningsgjennomgang", "losning", htmlFromListish(d.losning, true));
     if (d.kjerne) section("Kjernepoeng", "kjerne", htmlFromListish(d.kjerne, false));
     section("Eksamenstips", "tips", htmlFromListish(d.tips, false));
+
+    var pf = d.perfekt || (d.key && IN.PERFEKT[d.key]) || null;
+    if (pf) stripSitat(pf);
+    var demos = d.demo ? (Array.isArray(d.demo) ? d.demo : [d.demo]) : [];
+    if (d.deler) demos = demos.filter(function (x) { return !x.del || d.deler.indexOf(x.del) >= 0; });
+    if (demos.length) body.appendChild(demoSection(d, demos, pf));
+    if (pf) { var ps = perfektSection(d, pf); if (ps) body.appendChild(ps); }
+
+    IN.symbolTips(body);
     body.appendChild(selfAssess(card, d));
     card.appendChild(body);
     host.appendChild(card);
     return card;
   };
+
+  /* ---------- Eksamenskort: kildelinje, avvik, steg-demo, perfekt svar ----------
+     Nye (valgfrie) felt på IN.examTask (se plan/gjennomgang/wp0-format.md):
+       key: "H2023-2"            kanonisk nøkkel → data-key på kortet, IN.PERFEKT[key], dyplenke #oppg=H2023-2
+       kilde: "…" | false        egen kildelinje (streng) / ingen kildelinje (false). Standard: «Oppgavetekst: UiO, IN2010, H2023, oppgave 2»
+       ark: "Innsetting i heap"  oppgavens tittel på eksamensarket
+       ordrett: true | false     oppgaveteksten er ordrett fra arket / omskrevet
+       avvik: html | [html]      «Avvik fra eksamensarket: … fordi …», rett under oppgaven
+       poengkilde: "sv"          deloppgavepoengene kommer fra sensorveiledningen (stjerne + fotnote)
+       demo: {…} | [{…}]         innebygd steg-demo med eksamensinputen, se IN.mountExamDemo
+       perfekt: {…}              «Perfekt svar» (ellers IN.PERFEKT[key])
+       deler: ["(a)", "(b)"]     vis bare disse deloppgavene i demo og perfekt svar */
+  IN.PERFEKT = IN.PERFEKT || {};
+  function oppgNr(d) {
+    var m = String(d.oppgave_nr || "").match(/\d+/);
+    if (m) return m[0];
+    m = String(d.key || "").match(/-(\d+)/);
+    return m ? m[1] : null;
+  }
+  function examYear(d) {
+    var y = d.year || String(d.key || "").split("-")[0];
+    return /^[HV]20\d\d$/.test(y || "") ? y : null;
+  }
+  function kildeLinje(d) {
+    if (d.kilde === false) return null;
+    var hasNew = typeof d.kilde === "string" || d.ark || d.ordrett != null || d.key;
+    if (!hasNew) return null;
+    var txt = typeof d.kilde === "string" ? d.kilde : null;
+    if (!txt) {
+      var y = examYear(d), nr = oppgNr(d);
+      if (y) txt = "Oppgavetekst: UiO, IN2010, " + y + (nr ? ", oppgave " + nr : "");
+    }
+    var bits = [];
+    if (txt) bits.push(el("span", { class: "et-kilde-src", text: txt }));
+    if (d.ark) bits.push(el("span", { class: "et-kilde-ark", text: "«" + d.ark + "»" }));
+    if (d.ordrett != null) bits.push(el("span", { class: "et-kilde-mode", text: d.ordrett ? "ordrett" : "omskrevet" }));
+    if (!bits.length) return null;
+    var p = el("p", { class: "et-kilde" });
+    bits.forEach(function (b, i) { if (i) p.appendChild(document.createTextNode(" · ")); p.appendChild(b); });
+    return p;
+  }
+  // Streng/array → HTML med avsnitt (ren tekst får <p>)
+  function proseHTML(v) {
+    if (v == null) return "";
+    if (v.nodeType) return v;
+    if (Array.isArray(v)) return v.length ? "<ul>" + v.map(function (x) { return "<li>" + x + "</li>"; }).join("") + "</ul>" : "";
+    var s = String(v);
+    return /^\s*</.test(s) ? s : "<p>" + s + "</p>";
+  }
+  function setContent(node, v) {
+    if (v == null) return node;
+    if (v.nodeType) node.appendChild(v); else node.innerHTML = String(v);
+    return node;
+  }
+  function etSec(label, cls) {
+    var sec = el("div", { class: "et-sec " + cls });
+    sec.appendChild(el("div", { class: "et-lbl", text: label }));
+    var c = el("div", { class: "et-content" });
+    sec.appendChild(c);
+    return { sec: sec, c: c };
+  }
+  function normAns(v) { return String(v == null ? "" : v).replace(/\s+/g, " ").replace(/\s*,\s*/g, ", ").trim(); }
+  function demoWant(demo, pf) {
+    if (demo.fasit != null) return String(demo.fasit);
+    if (!pf || !pf.svar) return null;
+    var s = pf.svar.filter(function (x) { return x.fasitVerdi != null && (!demo.del || x.del === demo.del); })[0];
+    return s ? String(s.fasitVerdi) : null;
+  }
+
+  /* Seksjon «Steg for steg»: lukket <details>, demoen monteres først når den åpnes. */
+  function demoSection(d, demos, pf) {
+    var s = etSec("Steg for steg", "demo");
+    var multi = demos.length > 1;
+    var det = el("details", { class: "et-demo" });
+    var label = multi ? (d.demoLabel || "Se algoritmen kjøre på oppgavens input") : (demos[0].label || "Kjør algoritmen på oppgavens input");
+    det.appendChild(el("summary", { html: "<span class=\"et-demo-ico\" aria-hidden=\"true\">▶</span> " + label }));
+    var inner = el("div", { class: "et-demo-body" });
+    det.appendChild(inner);
+    var mounted = false;
+    det.addEventListener("toggle", function () {
+      if (!det.open || mounted) return;
+      mounted = true;
+      if (!multi) { IN.mountExamDemo(inner, demos[0], { perfekt: pf }); return; }
+      var tabs = el("div", { class: "et-demo-tabs", role: "group", "aria-label": "Velg demo" });
+      var panes = demos.map(function (dm, i) {
+        var pane = el("div", { class: "et-demo-pane" }); pane.hidden = i > 0;
+        var done = false;
+        var b = el("button", { class: "btn sm", type: "button", "aria-pressed": i === 0 ? "true" : "false",
+          text: dm.tab || dm.label || dm.del || ("Demo " + (i + 1)) });
+        b.addEventListener("click", function () {
+          IN.qsa("button", tabs).forEach(function (x) { x.setAttribute("aria-pressed", x === b ? "true" : "false"); });
+          panes.forEach(function (p) { p.el.hidden = p.el !== pane; });
+          if (!done) { done = true; IN.mountExamDemo(pane, dm, { perfekt: pf }); }
+        });
+        tabs.appendChild(b);
+        var o = { el: pane, mount: function () { if (!done) { done = true; IN.mountExamDemo(pane, dm, { perfekt: pf }); } } };
+        return o;
+      });
+      inner.appendChild(tabs);
+      panes.forEach(function (p) { inner.appendChild(p.el); });
+      panes[0].mount();
+    });
+    s.c.appendChild(det);
+    return s.sec;
+  }
+
+  /* Seksjon «Perfekt svar»: vårt fullpoengssvar + (eksamen/skjønn) sensorveiledningen ordrett. */
+  function perfektSection(d, pf) {
+    var type = pf.type || "eksamen";
+    if (["eksamen", "skjonn", "mock"].indexOf(type) < 0) { if (window.console) console.warn("perfekt: ukjent type", type, d.key); type = "eksamen"; }
+    var s = etSec("Perfekt svar", "perfekt");
+    var det = el("details", { class: "et-perfekt" });
+    det.appendChild(el("summary", { text: type === "mock" ? "Vis vårt fullpoengssvar (anslag)" : "Vis perfekt svar" }));
+    var inner = el("div", { class: "et-pf-body" });
+    det.appendChild(inner);
+    var built = false;
+    function build() {
+      if (built) return; built = true;
+      try { buildPerfekt(inner, d, pf, type); IN.symbolTips(inner); }
+      catch (e) { inner.appendChild(el("p", { class: "muted small", text: "Kunne ikke vise svaret." })); if (window.console) console.error(e); }
+    }
+    det.addEventListener("toggle", function () { if (det.open) build(); });
+    s.c.appendChild(det);
+    return s.sec;
+  }
+  function algoOf(k) {
+    if (!k) return null;
+    if (typeof k === "string") return (IN.algos && IN.algos[k]) || null;
+    return k.lines ? k : null;
+  }
+  function codeBlock(host, k, opts) {
+    var algo = algoOf(k);
+    if (algo && IN.pseudo && IN.pseudo.render) { IN.pseudo.render(host, algo, opts || { tooltips: false }); return; }
+    if (typeof k === "string") { host.appendChild(el("pre", { class: "et-pf-pre", text: k })); return; }
+    if (algo) host.appendChild(el("pre", { class: "et-pf-pre", text: ["Procedure " + algo.name + "(" + (algo.params || "") + ")"].concat(algo.lines.map(function (l) { return new Array((l.indent || 0) + 1).join("  ") + l.code; })).join("\n") }));
+  }
+  function listOrText(v, cls) {
+    if (v == null || v === "") return null;
+    if (Array.isArray(v)) return el("ul", { class: cls || null }, v.map(function (x) { return el("li", { html: String(x) }); }));
+    return el("div", { class: cls || null, html: proseHTML(v) });
+  }
+  function filterDeler(arr, deler) {
+    if (!arr) return [];
+    if (!deler) return arr;
+    return arr.filter(function (x) { return !x.del || deler.indexOf(x.del) >= 0; });
+  }
+  function buildPerfekt(host, d, pf, type) {
+    var deler = d.deler || pf.deler || null;
+    var ours = el("div", { class: "et-pf-ours" });
+    var title = type === "skjonn" ? "Vårt forslag til et fullpoengssvar" : type === "mock" ? "Vårt fullpoengssvar (anslag)" : "Vårt fullpoengssvar";
+    ours.appendChild(el("h5", { class: "et-pf-title", text: title }));
+    if (type === "skjonn") ours.appendChild(el("p", { class: "et-pf-note", text: "Sensor vurderer denne oppgaven etter skjønn. Det finnes ikke ett fasitsvar, så dette er ett eksempel på et svar som dekker kriteriene." }));
+    if (type === "mock") ours.appendChild(el("p", { class: "et-pf-note", text: "Dette er en øvingsoppgave laget for guiden, ikke en eksamensoppgave. Svaret og poengfordelingen er vårt eget anslag, ikke en sensorveiledning." }));
+    if (pf.intro) ours.appendChild(el("div", { class: "et-pf-intro", html: proseHTML(pf.intro) }));
+    filterDeler(pf.svar, deler).forEach(function (sv) {
+      var box = el("div", { class: "et-pf-del" });
+      if (sv.del) box.appendChild(el("div", { class: "et-pf-dl", text: sv.del }));
+      var main = el("div", { class: "et-pf-main" });
+      if (sv.tekst) main.appendChild(el("div", { class: "et-pf-txt", html: proseHTML(sv.tekst) }));
+      if (sv.kode) { var ch = el("div", { class: "et-pf-code" }); main.appendChild(ch); codeBlock(ch, sv.kode); }
+      if (sv.fig) {
+        var fig = el("figure", { class: "exam-fig et-pf-fig" }), fh = el("div", { class: "exam-fig-h" });
+        fig.appendChild(fh);
+        var draw = typeof sv.fig === "function" ? sv.fig : sv.fig.draw;
+        if (sv.fig.cap) fig.appendChild(el("figcaption", { html: sv.fig.cap }));
+        main.appendChild(fig);
+        try { draw(fh); } catch (e) { if (window.console) console.error(e); }
+      }
+      if (sv.etter) main.appendChild(el("div", { class: "et-pf-txt", html: proseHTML(sv.etter) }));
+      if (sv.kjoretid) main.appendChild(el("p", { class: "et-pf-kt", html: "<b>Kjøretid:</b> " + sv.kjoretid }));
+      if (sv.poeng) main.appendChild(el("p", { class: "et-pf-poeng", html: "<b>Gir poeng for:</b> " + (Array.isArray(sv.poeng) ? sv.poeng.join("; ") : sv.poeng) }));
+      if (sv.hvorfor) { var hh = el("div", { class: "et-pf-why" }); main.appendChild(hh); IN.explain(hh, sv.hvorfor, { label: "Hvorfor dette gir full pott:" }); }
+      box.appendChild(main);
+      ours.appendChild(box);
+    });
+    if (pf.hvorfor) { var wh = el("div", { class: "et-pf-why" }); ours.appendChild(wh); IN.explain(wh, pf.hvorfor, { label: "Hvorfor dette gir full pott:" }); }
+    if (type === "mock" && pf.anslag) {
+      var an = el("div", { class: "et-pf-anslag" }, [el("div", { class: "et-pf-anslag-lbl", text: "Vårt anslag over poengfordelingen" })]);
+      var al = listOrText(pf.anslag); if (al) an.appendChild(al);
+      ours.appendChild(an);
+    }
+    host.appendChild(ours);
+
+    if (type === "mock") {
+      if (pf.sensor && window.console) console.warn("perfekt: «sensor» ignoreres på mock-oppgaver (" + (d.key || d.title) + ")");
+      return;
+    }
+    var sv = pf.sensor;
+    if (!sv) return;
+    var sdet = el("details", { class: "et-pf-sensor" });
+    sdet.appendChild(el("summary", { text: "Sensorveiledningen sier (ordrett)" }));
+    var y = examYear(d), nr = oppgNr(d);
+    var src = sv.kilde || ("Kilde: sensorveiledning IN2010" + (y ? " " + y : "") + (nr ? ", oppgave " + nr : ""));
+    sdet.appendChild(el("p", { class: "et-pf-src", text: src }));
+    var bq = el("blockquote", { class: "sensor" });
+    function sensorPart(p) {
+      var w = el("div", { class: "et-sv-del" });
+      if (p.del) w.appendChild(el("div", { class: "et-sv-dl", text: p.del }));
+      if (type !== "skjonn" && p.fasit) w.appendChild(el("div", { class: "et-sv-fasit", html: proseHTML(p.fasit) }));
+      if (type !== "skjonn" && p.kode) { var ch = el("div", { class: "et-pf-code" }); w.appendChild(ch); codeBlock(ch, p.kode, { tooltips: false }); }
+      if (type !== "skjonn" && p.etter) w.appendChild(el("div", { class: "et-sv-fasit", html: proseHTML(p.etter) }));
+      var kr = listOrText(p.kriterier, "et-sv-krit"); if (kr) w.appendChild(kr);
+      return w;
+    }
+    if (sv.deler && sv.deler.length) filterDeler(sv.deler, deler).forEach(function (p) { bq.appendChild(sensorPart(p)); });
+    else bq.appendChild(sensorPart(sv));
+    sdet.appendChild(bq);
+    if (sv.merknad) sdet.appendChild(el("p", { class: "et-pf-merknad", html: "<b>Merk:</b> " + sv.merknad }));
+    host.appendChild(sdet);
+  }
+
+  /* ---------- Motorer for innebygde demoer ----------
+     IN.registerEngine(navn, {
+       viz: "vizHeap",            navnet på IN-funksjonen som tegner ett steg (slås opp når demoen monteres)
+       file: "assets/js/…",       filen som definerer viz (brukes i feilmeldingen)
+       host: "heapviz",           klasse på spillerens vert (sidens CSS for scenen)
+       render(s, ctx, demo),      valgfri egen tegnefunksjon (ellers IN[viz](ctx.stage, s))
+       scheme: "group" | "ops",   linjekoder når demoen har flere pseudokoder (se mountExamDemo)
+       customInput, parseInput,   standard for «Eget:»-feltet
+       answer(lastStep) → tekst   sluttilstanden som sammenlignes med fullpoengssvaret
+     }) */
+  IN.ENGINES = IN.ENGINES || {};
+  IN.registerEngine = function (name, def) { IN.ENGINES[name] = def; return def; };
+  function joinArr(a) { return (a || []).map(String).join(", "); }
+  IN.registerEngine("bars", { viz: "vizBars", file: "assets/js/viz-bars.js", host: "et-bars-host", answer: function (s) { return s && s.array ? joinArr(s.array) : null; } });
+  IN.registerEngine("search", {
+    viz: "vizBars", file: "assets/js/viz-bars.js", host: "et-bars-host",
+    render: function (s, ctx) {
+      var stage = ctx.stage; clear(stage);
+      var box = el("div", { class: "sok-viz" });
+      if (s.info && s.info.length) {
+        var row = el("div", { class: "sok-info" });
+        s.info.forEach(function (p) { row.appendChild(el("span", { class: "pill" }, [el("span", { class: "k", text: p[0] + ": " }), el("b", { text: String(p[1]) })])); });
+        box.appendChild(row);
+      }
+      if (s.map) {
+        var mrow = el("div", { class: "sok-map", "aria-label": "Innholdet i hashmapet H" }, [el("span", { class: "lbl", text: "H:" })]);
+        if (!s.map.length) mrow.appendChild(el("span", { class: "muted small", text: "(tomt)" }));
+        s.map.forEach(function (kv) { mrow.appendChild(el("span", { class: "sok-chip" + (kv[0] === s.mapNew ? " is-new" : ""), text: kv[0] + " → " + kv[1] })); });
+        box.appendChild(mrow);
+      }
+      var bh = el("div"); box.appendChild(bh);
+      stage.appendChild(box);
+      IN.vizBars(bh, s);
+      var cols = qsa(".bar-col", bh);
+      if (s.range) cols.forEach(function (c, i) { if (i < s.range[0] || i > s.range[1]) c.classList.add("sok-out"); });
+      if (s.dim) s.dim.forEach(function (i) { if (cols[i]) cols[i].classList.add("sok-out"); });
+    }
+  });
+  IN.registerEngine("buckets", { viz: "vizBuckets", file: "assets/js/viz-buckets.js", host: "et-bars-host", answer: function (s) { return s && s.array ? joinArr(s.array) : null; } });
+  IN.registerEngine("heap", {
+    viz: "vizHeap", file: "assets/js/data-heap.js", host: "heapviz",
+    answer: function (s) {
+      if (!s || !s.array) return null;
+      var n = s.size > 0 ? s.size : s.array.length;
+      return joinArr(s.array.slice(0, n));
+    }
+  });
+  IN.registerEngine("median", { viz: "vizMedian", file: "assets/js/data-heap.js", host: "heapviz" });
+  IN.registerEngine("tree", { viz: "vizTree", file: "assets/js/viz-tree.js", host: "tv-host", customInput: false });
+  IN.registerEngine("hash", { viz: "vizHash", file: "assets/js/viz-hash.js", host: "hs-host", scheme: "ops", customInput: false });
+  IN.registerEngine("graph", { viz: "vizGraph", file: "assets/js/viz-graph.js", host: "gv-host", customInput: false });
+  IN.registerEngine("list", { viz: "vizList", file: "assets/js/viz-list.js", host: "ls-host", scheme: "ops", customInput: false });
+
+  function resolveGen(g) {
+    if (typeof g === "function") return g;
+    if (typeof g !== "string") return null;
+    if (g.indexOf(".") < 0) return (IN.gen && IN.gen[g]) || null;
+    var o = IN; g.split(".").forEach(function (p) { o = o && o[p]; });
+    return typeof o === "function" ? o : null;
+  }
+  function lastOf(steps) { return steps && steps.length ? steps[steps.length - 1] : null; }
+  function demoAnswer(demo, eng, last) {
+    if (!last) return null;
+    if (typeof demo.svar === "function") return demo.svar(last);
+    if (last.svar != null) return last.svar;
+    return eng && eng.answer ? eng.answer(last) : null;
+  }
+  /* Sjekk at demoens sluttilstand på eksamensinputen er lik fullpoengssvaret. → { ok, got, want } | null */
+  IN.checkExamDemo = function (demo, pf) {
+    var eng = IN.ENGINES[demo.engine], gen = resolveGen(demo.gen), want = demoWant(demo, pf);
+    if (!gen || want == null || demo.input == null) return null;
+    var got = demoAnswer(demo, eng, lastOf(gen(demo.input.slice ? demo.input.slice() : demo.input)));
+    if (got == null) return null;
+    return { ok: normAns(got) === normAns(want), got: normAns(got), want: normAns(want) };
+  };
+
+  /* IN.mountExamDemo(host, demo, { perfekt })
+     demo: {
+       engine: "heap",                 navn i IN.ENGINES
+       gen: "heapInsert" | "heapGen.median" | fn,   generator (IN.gen[navn], sti i IN, eller funksjon)
+       input: [3, 5, 10, 8, 4, 2, 7],  eksamensinputen (array, slik stepPlayer krever)
+       inputNavn: "H2023 (a)",         navn på eksempelknappen (standard «Oppgavens input»)
+       presets: { navn: input } | false,
+       pseudo: "heapInsert" | algo | ["a", "b"],   pseudokode(r) som følger demoen
+       calls / callLine,               kall-linjer for flere pseudokoder (group: calls[k] = kode; ops: callLine[a] = kode)
+       scheme: "group" | "ops",        linjekoder ved flere pseudokoder (standard fra motoren, ellers group)
+       legend, label, del: "(a)",      fargeforklaring, tittel, deloppgaven demoen hører til
+       fasit: "2, 4, 3, …", svar: fn(lastStep),   overstyr sammenligningen (ellers perfekt.svar[del].fasitVerdi)
+       customInput, parseInput, inputLabel, countControl
+     } */
+  IN.mountExamDemo = function (host, demo, ctx) {
+    if (typeof host === "string") host = qs(host);
+    if (!host || !demo) return null;
+    ctx = ctx || {};
+    function fail(msg) { host.appendChild(el("p", { class: "muted small et-demo-err", text: msg })); return null; }
+    try {
+      if (!IN.stepPlayer) return fail("Steg-demoen kan ikke vises: stepplayer.js er ikke lastet på denne siden.");
+      var eng = IN.ENGINES[demo.engine];
+      if (!eng) return fail("Steg-demoen kan ikke vises: ukjent motor «" + demo.engine + "».");
+      if (eng.viz && typeof IN[eng.viz] !== "function") return fail("Steg-demoen kan ikke vises: " + (eng.file || eng.viz) + " er ikke lastet på denne siden.");
+      var gen = resolveGen(demo.gen);
+      if (!gen) return fail("Steg-demoen kan ikke vises: fant ikke generatoren «" + demo.gen + "».");
+      var draw = eng.render ? function (s, c) { eng.render(s, c, demo); } : function (s, c) { IN[eng.viz](c.stage, s); };
+
+      var keys = demo.pseudo == null ? [] : (Array.isArray(demo.pseudo) ? demo.pseudo : [demo.pseudo]);
+      var algos = keys.map(algoOf).filter(Boolean);
+      var multi = algos.length > 1, scheme = demo.scheme || eng.scheme || "group";
+
+      var playerEl = el("div", { class: eng.host || "" });
+      var check = el("p", { class: "et-demo-check", role: "status" }); check.hidden = true;
+      var left = el("div", { class: "et-demo-left" }, [playerEl, check]);
+      var right = el("div", { class: "et-demo-pc" + (multi ? " hs-pcs" : "") }, [el("h4", { class: "et-demo-h", text: "Pseudokode (følger demoen)" })]);
+      var handle = null;
+      var det = null;
+      if (algos.length && IN.pseudo && IN.pseudo.render) {
+        det = el("details", { class: "card et-demo-lines" }, [el("summary", { html: "<b>Koden, linje for linje</b> (" + algos.map(function (a) { return plainEsc(a.name); }).join(", ") + ")" })]);
+        var hs = algos.map(function (a) {
+          var box = el("div", { class: "hs-pc" }), pc = el("div");
+          if (multi) box.appendChild(el("h5", { class: "hs-pc-title", text: a.title || a.name }));
+          box.appendChild(pc); right.appendChild(box);
+          var hd = IN.pseudo.render(pc, a, { head: !multi });
+          var bo = IN.pseudo.bigO && IN.pseudo.bigO(a, { compact: true }); if (bo) box.appendChild(bo);
+          var ex = el("div");
+          if (multi) det.appendChild(el("h5", { style: "margin:.8rem 0 .3rem", text: a.title || a.name }));
+          det.appendChild(ex);
+          if (IN.pseudo.explainer) IN.pseudo.explainer(ex, a, {});
+          return { box: box, hd: hd };
+        });
+        if (!multi) handle = hs[0].hd;
+        else {
+          var calls = demo.calls || {}, callLine = demo.callLine || {};
+          var on = function (i, l) { if (hs[i]) { hs[i].hd.highlight(l); hs[i].box.classList.add("on"); } };
+          var off = function () { hs.forEach(function (h) { h.hd.clear(); h.box.classList.remove("on"); }); };
+          handle = {
+            highlight: function (code) {
+              off(); right.classList.add("has-on");
+              if (scheme === "ops") {
+                var a = Math.floor(code / 100) - 1; on(a, code % 100);
+                var cl = callLine[a + 1]; if (cl) on(Math.floor(cl / 100) - 1, cl % 100);
+              } else {
+                var caller = Math.floor(code / 1000), c = code % 1000, k = Math.floor(c / 100);
+                on(k, c % 100);
+                var cc = caller || calls[k]; if (cc != null && cc !== 0) on(Math.floor(cc / 100), cc % 100);
+              }
+            },
+            clear: function () { off(); right.classList.remove("has-on"); }
+          };
+        }
+      }
+      host.appendChild(el("div", { class: "grid cols-2 et-demo-grid" }, algos.length ? [left, right] : [left]));
+      if (det) host.appendChild(det);
+
+      var want = demoWant(demo, ctx.perfekt), cur = null;
+      var inputKey = JSON.stringify(demo.input);
+      function paintCheck(s, c) {
+        if (want == null) return;
+        var atEnd = c.index === c.total - 1 && JSON.stringify(cur) === inputKey;
+        var got = atEnd ? demoAnswer(demo, eng, s) : null;
+        var ok = got != null && normAns(got) === normAns(want);
+        check.hidden = !ok;
+        if (ok) check.textContent = "✓ Samme sluttilstand som i fullpoengssvaret" + (demo.del ? " " + demo.del : "") + ": " + normAns(want);
+      }
+      var presets = null;
+      if (demo.presets !== false) {
+        presets = {};
+        presets[demo.inputNavn || "Oppgavens input"] = demo.input;
+        if (demo.presets) for (var pk in demo.presets) presets[pk] = demo.presets[pk];
+      }
+      var custom = demo.customInput != null ? demo.customInput : (demo.parseInput ? true : (eng.customInput != null ? eng.customInput : true));
+      var player = IN.stepPlayer(playerEl, {
+        generate: function (inp) { cur = inp; return gen(inp); },
+        presets: presets, initial: demo.input,
+        render: function (s, c) { draw(s, c); paintCheck(s, c); },
+        pseudo: handle, legend: demo.legend || eng.legend || null,
+        customInput: custom, parseInput: demo.parseInput || eng.parseInput, inputLabel: demo.inputLabel,
+        countControl: demo.countControl || null
+      });
+      var res = IN.checkExamDemo(demo, ctx.perfekt);
+      if (res && !res.ok && window.console) console.error("Eksamensdemo (" + (demo.label || demo.gen) + "): sluttilstanden «" + res.got + "» er ikke lik fullpoengssvaret «" + res.want + "».");
+      return player;
+    } catch (e) {
+      if (window.console) console.error(e);
+      return fail("Steg-demoen kunne ikke startes.");
+    }
+  };
+  function plainEsc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
 
   /* Egenvurdering nederst i hvert eksamenskort → kort:<side>:<id> {status:"ok"|"ovmer"}.
      Id-en hentes når den trengs: kortets egen id, ellers nærmeste forelder med id. */
@@ -808,6 +1308,101 @@
     }
   };
 
+  /* ---------- Symbolforklaringer: ⌊x⌋, ∈, |V|, |E| … (ordlista ligger i symboler.js) ----------
+     IN.symbolTips(root) pakker symboler i forklaringstekst inn i <span class="sym" data-sym="…">.
+     Går bare gjennom TEKSTNODER (aldri innerHTML), og hopper over kode, kbd, knapper, lenker,
+     skjemafelt, SVG og alt som alt er pakket. Pseudokode pakkes av tokenizeren (pseudocode.js).
+     Ett felles tips (#sym-tip) med delegerte lyttere på document, så ingen lyttere per symbol:
+     hover (mus), fokus (tastatur: første forekomst av hvert symbol per boks får tabindex), trykk (touch).
+     Tipset legges OVER symbolet, så det ikke kolliderer med linjetipset (#pc-tip) under pseudokodelinja. */
+  var SYM_BOX = ".sp-explain, .callout, .explain-body, .et-content, .et-pf-body, .qz-exp, .qz-prompt, .pc-exp-body, .bigo-why";
+  var SYM_SKIP = "code, kbd, pre, samp, a, button, input, textarea, select, label, svg, script, style, .sym, .pseudo, .parsons, .kbd, .tagline, [contenteditable]";
+  var symSt = { tip: null, cur: null, at: 0, ptr: "mouse", bound: false };
+  IN.symbolTips = function (root) {
+    var SY = IN.SYMBOLER;
+    if (!SY || !root) return;
+    symTipBind();
+    if (symSt.cur && !symSt.cur.isConnected) symHide();      // steget ble tegnet på nytt under tipset
+    var inBox = root.nodeType === 1 && (root.matches(SYM_BOX) || root.closest(SYM_BOX));
+    var boxes = inBox ? [root] : qsa(SYM_BOX, root);
+    boxes.forEach(function (box) {
+      var seen = {}, todo = [], n;
+      qsa(".sym[tabindex]", box).forEach(function (s) { seen[s.getAttribute("data-sym") + (s.getAttribute("data-arg") || "")] = 1; });
+      var w = document.createTreeWalker(box, NodeFilter.SHOW_TEXT, null);
+      while ((n = w.nextNode())) {
+        var hits = SY.scan(n.nodeValue);
+        if (hits.length && !(n.parentNode.closest && n.parentNode.closest(SYM_SKIP))) todo.push([n, hits]);
+      }
+      todo.forEach(function (t) {
+        var tn = t[0], text = tn.nodeValue, frag = document.createDocumentFragment(), pos = 0;
+        t[1].forEach(function (h) {
+          if (h.i > pos) frag.appendChild(document.createTextNode(text.slice(pos, h.i)));
+          var s = el("span", { class: "sym", "data-sym": h.id, "data-arg": h.arg || null, text: text.substr(h.i, h.n) });
+          var k = h.id + (h.arg || "");
+          if (!seen[k]) { seen[k] = 1; s.tabIndex = 0; }
+          frag.appendChild(s);
+          pos = h.i + h.n;
+        });
+        if (pos < text.length) frag.appendChild(document.createTextNode(text.slice(pos)));
+        tn.parentNode.replaceChild(frag, tn);
+      });
+    });
+  };
+  function symShow(s) {
+    var e = IN.SYMBOLER && IN.SYMBOLER.entry(s.getAttribute("data-sym"), s.getAttribute("data-arg"));
+    if (!e) return;
+    var t = symSt.tip;
+    if (!t) { t = symSt.tip = el("div", { id: "sym-tip", class: "pc-tip sym-tip", role: "tooltip" }); document.body.appendChild(t); }
+    clear(t);
+    t.appendChild(el("span", { class: "sym-tip-h" }, [el("b", { text: e.vis }), " – " + e.navn]));
+    t.appendChild(el("span", { class: "sym-tip-t", text: e.txt }));
+    if (e.eks) t.appendChild(el("span", { class: "sym-tip-e", text: "Eksempel: " + e.eks }));
+    t.hidden = false;
+    if (symSt.cur && symSt.cur !== s) symSt.cur.removeAttribute("aria-describedby");
+    symSt.cur = s; symSt.at = Date.now();
+    s.setAttribute("aria-describedby", "sym-tip");
+    // Plassering: sentrert over symbolet, holdt innenfor skjermen; under hvis det ikke er plass over.
+    t.style.left = "0px"; t.style.top = "0px";
+    var r = s.getBoundingClientRect(), tr = t.getBoundingClientRect(), vw = document.documentElement.clientWidth;
+    var left = Math.max(8, Math.min(r.left + r.width / 2 - tr.width / 2, vw - tr.width - 8));
+    var top = r.top - tr.height - 6;
+    if (top < IN.stickyH()) top = r.bottom + 6;
+    t.style.left = (window.pageXOffset + left) + "px";
+    t.style.top = (window.pageYOffset + top) + "px";
+  }
+  function symHide() {
+    if (symSt.tip) symSt.tip.hidden = true;
+    if (symSt.cur) symSt.cur.removeAttribute("aria-describedby");
+    symSt.cur = null;
+  }
+  function symTipBind() {
+    if (symSt.bound) return;
+    symSt.bound = true;
+    function symOf(e) { var x = e.target; return x && x.closest ? x.closest(".sym") : null; }
+    document.addEventListener("pointerdown", function (e) { symSt.ptr = e.pointerType || "mouse"; }, true);
+    document.addEventListener("pointerover", function (e) {
+      if (e.pointerType !== "mouse") return;
+      var s = symOf(e); if (s && s !== symSt.cur) symShow(s);
+    });
+    document.addEventListener("pointerout", function (e) {
+      if (e.pointerType !== "mouse") return;
+      var s = symOf(e);
+      if (s && s === symSt.cur && !(e.relatedTarget && s.contains(e.relatedTarget))) symHide();
+    });
+    document.addEventListener("focusin", function (e) { var s = symOf(e); if (s) symShow(s); else if (symSt.cur) symHide(); });
+    document.addEventListener("focusout", function (e) { var s = symOf(e); if (s && s === symSt.cur) symHide(); });
+    // Touch: trykk viser, nytt trykk (eller trykk utenfor / scroll) skjuler. Mus: klikk viser.
+    document.addEventListener("click", function (e) {
+      var s = symOf(e);
+      if (!s) { if (symSt.cur) symHide(); return; }
+      if (symSt.ptr !== "mouse" && symSt.cur === s && Date.now() - symSt.at > 400) symHide(); else symShow(s);
+    });
+    document.addEventListener("keydown", function (e) { if (e.key === "Escape" && symSt.cur) symHide(); });
+    document.addEventListener("dragstart", symHide);
+    window.addEventListener("scroll", function () { if (symSt.cur) symHide(); }, { passive: true });
+    window.addEventListener("resize", function () { if (symSt.cur) symHide(); });
+  }
+
   /* ---------- Småverktøy ---------- */
   IN.store = {
     get: function (k, d) { try { var v = localStorage.getItem(k); return v == null ? d : v; } catch (e) { return d; } },
@@ -861,7 +1456,8 @@
   /* Høyden på de faste linjene øverst (meny + ev. nivålinje) når de står fast, + litt luft */
   IN.stickyH = function () {
     var h = 0;
-    [qs("#topnav"), qs("#levelbar")].forEach(function (n) {
+    // Faste linjer: toppmenyen, nivålinja og sidelokale linjer merket med data-sticky (f.eks. crash-sidens fremdriftslinje)
+    [qs("#topnav"), qs("#levelbar")].concat(qsa("[data-sticky]")).forEach(function (n) {
       if (!n) return;
       var cs = getComputedStyle(n);
       if (cs.position === "sticky" || cs.position === "fixed") h = Math.max(h, (parseFloat(cs.top) || 0) + n.offsetHeight);
@@ -930,6 +1526,9 @@
       var items = IN.TF_GEN && IN.TF_GEN[sek];
       if (items && items.length) IN.tfTest(host, items, { id: "gen-" + sek });
     });
+    // Symbolforklaringer i statisk tekst (.callout o.l.) og det sidens egne skript har tegnet ved oppstart
+    setTimeout(function () { IN.symbolTips(document); }, 0);
+    window.addEventListener("load", function () { IN.symbolTips(document); });
   }
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", boot);
   else boot();

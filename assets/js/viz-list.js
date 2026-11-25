@@ -55,7 +55,7 @@
       if (nd.cur) cls += " is-cur";
       if (nd.found) cls += " is-found";
       if (nd.gone) cls += " gone";
-      var b = el("div", { class: cls, role: "listitem" });
+      var b = el("div", { class: cls, role: "listitem", "data-id": nd.id });
       var pl = ptrs[nd.id]; if (p.first && k === 0 && !nd.sentinel) pl = [p.first].concat(pl ? [].concat(pl) : []);
       if (pl) b.appendChild(el("span", { class: "ls-ptr", text: [].concat(pl).join(", ") }));
       b.appendChild(el("span", { class: "ls-elem", text: nd.sentinel ? nd.v : String(nd.v) }));
@@ -151,12 +151,32 @@
 
   var DRAW = { array: drawArray, linked: drawLinked, stack: drawStack, queue: drawQueue, tags: drawTags, map: drawMap };
 
+  /* Prikken i variabellinja får fargen til cella/noden/taggen variabelen peker på.
+     v.idx = plass (array, tagger) eller node-id (lenkede noder), v.part = hvilken del (standard 0). */
+  var DOT = [["is-bad", "swap"], ["is-hole", "swap"], ["is-cur", "compare"], ["is-found", "target"], ["is-fresh", "min"],
+    ["is-moved", "min"], ["gone", "stale"], ["done", "sorted"]];
+  function dotOf(partEls, v) {
+    var pe = partEls[v.part || 0];
+    if (!pe) return null;
+    var cell = null;
+    if (typeof v.idx === "string") {
+      var all = pe.querySelectorAll(".ls-node");
+      for (var z = 0; z < all.length; z++) if (all[z].getAttribute("data-id") === v.idx) { cell = all[z]; break; }
+    } else cell = pe.querySelectorAll(".ls-cell, .ls-tag")[v.idx];
+    if (!cell) return null;
+    for (var k = 0; k < DOT.length; k++) if (cell.classList.contains(DOT[k][0])) return DOT[k][1];
+    return "default";
+  }
+
   IN.vizList = function (host, step, opts) {
     if (typeof host === "string") host = IN.qs(host);
     opts = opts || {};
-    clear(host);
+    var vl = !opts.compact && step && step.vars && IN.varLine ? IN.varLine.attach(host) : null;
+    if (vl) IN.varLine.clearStage(host);
+    else { if (IN.varLine && !opts.compact) IN.varLine.detach(host); clear(host); }
     var v = el("div", { class: "ls-viz" + (opts.compact ? " compact" : "") + (step && step.side ? " side" : "") });
-    ((step && step.parts) || []).forEach(function (p) { var f = DRAW[p.type]; if (f) v.appendChild(f(p)); });
+    var partEls = [];
+    ((step && step.parts) || []).forEach(function (p) { var f = DRAW[p.type]; var pe = f ? f(p) : null; partEls.push(pe); if (pe) v.appendChild(pe); });
     if (step && step.info && step.info.length) {
       var inf = el("div", { class: "hs-info ls-info" });
       step.info.forEach(function (r) {
@@ -165,6 +185,7 @@
       v.appendChild(inf);
     }
     host.appendChild(v);
+    if (vl) vl.update(step.vars, step.varsPrev, { frame: step.frame, dot: function (x) { return dotOf(partEls, x); } });
     return v;
   };
   IN.vizList.esc = esc;

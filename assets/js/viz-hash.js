@@ -160,13 +160,36 @@
 
   var PARTS = { probe: probePart, chain: chainPart, entries: entriesPart, arr: arrPart, map: mapPart };
 
+  /* Prikken i variabellinja får fargen til cella/bøtta/noden variabelen peker på.
+     v.idx = plass (probe/arr/entries) eller bøtte (chain), v.at = [r, j] for en node i bøtte r,
+     v.part = hvilken del av steget (standard 0). Leser klassene fra den ferdig tegnede cella. */
+  var DOT = [["is-cur", "compare"], ["is-row", "compare"], ["is-found", "target"], ["is-fresh", "min"], ["is-moved", "min"],
+    ["is-repl", "min"], ["is-hole", "swap"], ["is-miss", "swap"], ["is-occ", "occ"]];
+  function dotOf(partEls, v) {
+    var pe = partEls[v.part || 0];
+    if (!pe) return null;
+    var cell = null;
+    if (v.at) {
+      var row = pe.querySelectorAll(".hs-crow")[v.at[0]];
+      cell = row ? row.querySelectorAll(".hs-node")[v.at[1]] : null;
+    } else {
+      var cells = pe.querySelectorAll(".hs-cell, .hs-crow, .hs-acell, .hs-entry");
+      cell = cells[v.idx];
+    }
+    if (!cell) return null;
+    for (var z = 0; z < DOT.length; z++) if (cell.classList.contains(DOT[z][0])) return DOT[z][1];
+    return "default";
+  }
+
   IN.vizHash = function (stage, step, opts) {
     opts = opts || {};
     step = step || {};
+    var vl = !opts.compact && step.vars && IN.varLine ? IN.varLine.attach(stage) : null;
     var v = el("div", { class: "hs-viz" + (opts.compact ? " compact" : "") });
+    var partEls = [];
     (step.parts || []).forEach(function (p) {
-      if (p.type === "note") { v.appendChild(el("div", { class: "hs-note small", html: p.html })); return; }
-      var f = PARTS[p.type]; if (f) v.appendChild(f(p));
+      if (p.type === "note") { var nt = el("div", { class: "hs-note small", html: p.html }); v.appendChild(nt); partEls.push(nt); return; }
+      var f = PARTS[p.type]; var pe = f ? f(p) : null; partEls.push(pe); if (pe) v.appendChild(pe);
     });
     if (step.info && step.info.length) {
       var inf = el("div", { class: "hs-info" });
@@ -175,8 +198,15 @@
       });
       v.appendChild(inf);
     }
-    IN.clear(stage);
-    stage.appendChild(v);
+    if (vl) {
+      IN.varLine.clearStage(stage);
+      stage.appendChild(v);
+      vl.update(step.vars, step.varsPrev, { frame: step.frame, dot: function (x) { return dotOf(partEls, x); } });
+    } else {
+      if (IN.varLine && !opts.compact) IN.varLine.detach(stage);
+      IN.clear(stage);
+      stage.appendChild(v);
+    }
     return v;
   };
 })();

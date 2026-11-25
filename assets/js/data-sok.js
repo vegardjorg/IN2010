@@ -29,6 +29,11 @@
   function split(input, tail) {
     return { A: input.slice(0, Math.max(0, input.length - tail)), p: input.slice(input.length - tail) };
   }
+  /* Variabellinja (varline.js): ix peker på en plass i A (prikk i søylas farge), vv er en ren verdi.
+     undefined vises som «–». Parametre som ikke endres (x, k, n) står sist. Tellere som ikke er
+     variabler i pseudokoden (runde, sammenligninger) står fortsatt som piller (info). */
+  function ix(name, v) { return { name: name, value: v, idx: v }; }
+  function vv(name, v) { return { name: name, value: v }; }
   function maxRounds(n) { return n > 0 ? Math.floor(Math.log(n) / Math.LN2) + 1 : 0; }
 
   /* ===================== RETT-FREM SØK ===================== */
@@ -70,7 +75,8 @@
     var s = split(input, 1), A = s.A, x = s.p[0], n = A.length, steps = [], cmp = 0;
     function snap(line, marks, ptrs, dim, text, tag) {
       steps.push({ line: line, array: clone(A), marks: marks, ptrs: ptrs, dim: dim,
-        info: [["x", x], ["sammenligninger", cmp]], text: text, tag: tag });
+        vars: [ix("i", ptrs.i), vv("x", x), vv("n", n)],
+        info: [["sammenligninger", cmp]], text: text, tag: tag });
     }
     snap(2, {}, { i: 0 }, [], t("Vi leter etter " + x + ". Vi starter helt til venstre.",
       "Søker etter x = " + x + ". Starter med i = 0.",
@@ -97,10 +103,12 @@
     var A = clone(raw).sort(num), n = A.length, steps = [];
     var sortedNote = raw.join(",") !== A.join(",");
     var low = 0, high = n - 1, mid = null, round = 0, cmp = 0, M = maxRounds(n);
-    function info() { return [["x", x], ["runde", round + " av maks " + M], ["sammenligninger", cmp]]; }
-    function ptrs() { var p = {}; if (low < n) p.low = low; if (high >= 0) p.high = high; if (mid != null) p.mid = mid; return p; }
+    function info() { return [["runde", round + " av maks " + M], ["sammenligninger", cmp]]; }
+    // Linje 2 (low ← 0) kjører før high settes: da vises verken high-pekeren eller verdien.
+    function ptrs(line) { var p = {}; if (low < n) p.low = low; if (high >= 0 && line !== 2) p.high = high; if (mid != null) p.mid = mid; return p; }
     function snap(line, marks, text, tag, noRange) {
-      steps.push({ line: line, array: clone(A), marks: marks, ptrs: ptrs(), range: noRange ? null : [low, high],
+      steps.push({ line: line, array: clone(A), marks: marks, ptrs: ptrs(line), range: noRange ? null : [low, high],
+        vars: [ix("low", low), ix("high", line === 2 ? undefined : high), ix("mid", mid == null ? undefined : mid), vv("x", x)],
         info: info(), text: text, tag: tag });
     }
     var pre = sortedNote ? " (Vi sorterte arrayet først – binærsøk virker bare på sortert input.)" : "";
@@ -194,11 +202,14 @@
   IN.gen.binarySearchFirst = IN.gen.binarySearchFirst || function (input) {
     var s = split(input, 1), A = clone(s.A).sort(num), x = s.p[0], n = A.length, steps = [];
     var low = 0, high = n - 1, mid = null, ans = -1, round = 0;
-    function ptrs() { var p = {}; if (low < n) p.low = low; if (high >= 0) p.high = high; if (mid != null) p.mid = mid; return p; }
+    // Linje 2 og 3 kjører før henholdsvis high og ans er satt.
+    function ptrs(line) { var p = {}; if (low < n) p.low = low; if (high >= 0 && line !== 2) p.high = high; if (mid != null) p.mid = mid; return p; }
     function snap(line, marks, text, tag, noRange) {
       var m = marks || {}; if (ans >= 0 && m.found == null) m.found = ans;
-      steps.push({ line: line, array: clone(A), marks: m, ptrs: ptrs(), range: noRange ? null : [low, high],
-        info: [["x", x], ["ans", ans], ["runde", round]], text: text, tag: tag });
+      steps.push({ line: line, array: clone(A), marks: m, ptrs: ptrs(line), range: noRange ? null : [low, high],
+        vars: [ix("low", low), ix("high", line === 2 ? undefined : high), ix("ans", line === 2 || line === 3 ? undefined : ans),
+               ix("mid", mid == null ? undefined : mid), vv("x", x)],
+        info: [["runde", round]], text: text, tag: tag });
     }
     snap(2, {}, t("Vi leter etter den FØRSTE plassen der " + x + " står.", "x = " + x + ", low ← 0.", "x = " + x + ". Mål: minste indeks med A[i] = x."), "Start", true);
     snap(3, {}, t("Hele arrayet er med.", "high ← " + high + ".", "Intervall [0, " + high + "]."), "Start");
@@ -264,13 +275,15 @@
   // input: [...A, x, low, high]. Sorterer IKKE (for å kunne vise at et usortert område gir feil svar).
   IN.gen.binarySearchRec = IN.gen.binarySearchRec || function (input) {
     var s = split(input, 3), A = s.A, x = s.p[0], L0 = s.p[1], H0 = s.p[2], n = A.length, steps = [];
-    var calls = 0, depth = 0;
+    var calls = 0, depth = 0, fr = {};
+    // Rammen er kallet vi står i: low og high er parametrene, mid settes på linje 4.
     function snap(line, marks, p, rg, text, tag) {
-      steps.push({ line: line, array: clone(A), marks: marks, ptrs: p, range: rg,
-        info: [["x", x], ["kalldybde", depth], ["kall totalt", calls]], text: text, tag: tag });
+      steps.push({ line: line, array: clone(A), marks: marks, ptrs: p, range: rg, frame: "BinarySearchRec",
+        vars: [ix("low", fr.low), ix("high", fr.high), ix("mid", fr.mid), vv("x", x)],
+        info: [["kalldybde", depth], ["kall totalt", calls]], text: text, tag: tag });
     }
     function call(low, high) {
-      calls++; depth++;
+      calls++; depth++; fr = { low: low, high: high };
       var p = {}; if (low >= 0 && low < n) p.low = low; if (high >= 0 && high < n) p.high = high;
       var head = "BinarySearchRec(A, " + x + ", " + low + ", " + high + ")";
       if (low > high) {
@@ -279,7 +292,7 @@
         depth--; return -1;
       }
       snap(2, {}, p, [low, high], t("Nytt kall: vi leter fra plass " + low + " til " + high + ".", head + ": low ≤ high.", head + ": intervallet har " + nn(high - low + 1, "element", "elementer") + "."), "Kall " + calls);
-      var mid = Math.floor((low + high) / 2); p.mid = mid;
+      var mid = Math.floor((low + high) / 2); p.mid = mid; fr.mid = mid;
       snap(4, { compare: [mid] }, p, [low, high], t("Midten er plass " + mid + " med " + A[mid] + ".", "mid = " + mid + ", A[mid] = " + A[mid] + ".", "mid ← ⌊(" + low + " + " + high + ") / 2⌋ = " + mid + "."), "Midten");
       if (A[mid] === x) {
         snap(6, { found: mid }, p, [low, high], t("Funnet på plass " + mid + "!", "return " + mid + ".", "Treff: return " + mid + "."), "Funnet");
@@ -302,7 +315,8 @@
     var inRange = []; for (var z = L0; z <= H0; z++) if (A[z] === x) inRange.push(z);
     var miss = res < 0 && inRange.length > 0;
     steps.push({ line: null, array: clone(A), marks: mk, ptrs: {}, range: [L0, H0],
-      info: [["x", x], ["svar", res], ["kall totalt", calls]],
+      vars: [ix("low"), ix("high"), ix("mid"), vv("x", x)],
+      info: [["svar", res], ["kall totalt", calls]],
       text: miss
         ? t("Oi! " + x + " står faktisk på plass " + inRange[0] + ", men vi fant det ikke. Området vi lette i var ikke sortert, så halveringen kastet feil halvdel.",
             "Feil svar: x finnes på indeks " + inRange[0] + ", men søket returnerte −1. Området var ikke sortert.",
@@ -354,8 +368,12 @@
   IN.gen.findDupSorted = IN.gen.findDupSorted || function (input) {
     var s = split(input, 1), A = clone(s.A).sort(num), x = s.p[0], n = A.length, steps = [];
     var low = 0, high = n - 1, round = 0, i = -1;
+    // Under søket står vi inne i BinarySearch (low, high, mid). Etterpå: i og x i hovedprosedyren.
     function snap(line, marks, p, rg, text, tag) {
-      steps.push({ line: line, array: clone(A), marks: marks, ptrs: p, range: rg, info: [["x", x], ["runde i søket", round]], text: text, tag: tag });
+      var inSearch = line === 2;
+      steps.push({ line: line, array: clone(A), marks: marks, ptrs: p, range: rg, frame: inSearch ? "BinarySearch" : null,
+        vars: inSearch ? [ix("low", p.low), ix("high", p.high), ix("mid", p.mid), vv("x", x)] : [ix("i", i), vv("x", x)],
+        info: [["runde i søket", round]], text: text, tag: tag });
     }
     snap(2, {}, { low: low, high: high }, [low, high], t("Vi binærsøker etter " + x + " i hele arrayet.", "Binærsøk etter x = " + x + ".", "BinarySearch(A, " + x + ") med indeks som svar."), "Binærsøk");
     while (low <= high) {
@@ -370,7 +388,7 @@
       if (A[mid] < x) low = mid + 1; else high = mid - 1;
     }
     if (i < 0) {
-      steps.push({ line: null, array: clone(A), marks: {}, ptrs: {}, info: [["x", x]], text: t(x + " finnes ikke her – oppgaven lover at det gjør det.", "x finnes ikke (bryter forutsetningen).", "Forutsetningen i oppgaven er brutt: x finnes ikke."), tag: "Ikke funnet" });
+      steps.push({ line: null, array: clone(A), marks: {}, ptrs: {}, vars: [ix("i"), vv("x", x)], info: [["runde i søket", round]], text: t(x + " finnes ikke her – oppgaven lover at det gjør det.", "x finnes ikke (bryter forutsetningen).", "Forutsetningen i oppgaven er brutt: x finnes ikke."), tag: "Ikke funnet" });
       return steps;
     }
     var left = i > 0 && A[i - 1] === x;
@@ -419,7 +437,7 @@
 
   IN.gen.findDupScan = IN.gen.findDupScan || function (arr) {
     var A = clone(arr).sort(num), n = A.length, steps = [], cmp = 0;
-    function snap(line, marks, p, text, tag) { steps.push({ line: line, array: clone(A), marks: marks, ptrs: p, dim: range(0, (p.i == null ? n : p.i) - 1), info: [["sammenligninger", cmp]], text: text, tag: tag }); }
+    function snap(line, marks, p, text, tag) { steps.push({ line: line, array: clone(A), marks: marks, ptrs: p, dim: range(0, (p.i == null ? n : p.i) - 1), vars: [ix("i", p.i), vv("n", n)], info: [["sammenligninger", cmp]], text: text, tag: tag }); }
     for (var i = 0; i <= n - 2; i++) {
       cmp++;
       var eq = A[i] === A[i + 1];
@@ -429,7 +447,7 @@
         return steps;
       }
     }
-    steps.push({ line: null, array: clone(A), marks: {}, ptrs: {}, info: [["sammenligninger", cmp]], text: t("Ingen like naboer – da finnes det ikke noe duplikat.", "Ingen duplikat funnet.", "Ingen like nabopar: forutsetningen i oppgaven gjelder ikke for dette arrayet."), tag: "Ingen" });
+    steps.push({ line: null, array: clone(A), marks: {}, ptrs: {}, vars: [ix("i"), vv("n", n)], info: [["sammenligninger", cmp]], text: t("Ingen like naboer – da finnes det ikke noe duplikat.", "Ingen duplikat funnet.", "Ingen like nabopar: forutsetningen i oppgaven gjelder ikke for dette arrayet."), tag: "Ingen" });
     return steps;
   };
 
@@ -479,7 +497,7 @@
     function mapView() { return order.map(function (v) { return [v, H[v]]; }); }
     function snap(line, marks, p, text, tag, newKey) {
       steps.push({ line: line, array: clone(A), marks: marks, ptrs: p, dim: range(0, (p.i == null ? n : p.i) - 1),
-        map: mapView(), mapNew: newKey, info: [["oppslag + innsettinger", ops]], text: text, tag: tag });
+        map: mapView(), mapNew: newKey, vars: [ix("i", p.i), vv("n", n)], info: [["oppslag + innsettinger", ops]], text: text, tag: tag });
     }
     snap(2, {}, {}, t("Notatboka er tom.", "H er tomt.", "H ← tomt hashmap."), "Start");
     for (var i = 0; i < n; i++) {
@@ -493,7 +511,7 @@
       ops++; H[v] = i; order.push(v);
       snap(7, { target: i }, { i: i }, t("Vi skriver «" + v + " → plass " + i + "» i notatboka.", "H[" + v + "] ← " + i + ".", "Innsetting " + v + " → " + i + "."), "Husk", v);
     }
-    steps.push({ line: null, array: clone(A), marks: {}, ptrs: {}, map: mapView(), info: [["oppslag + innsettinger", ops]], text: t("Ingen tall kom igjen.", "Ingen duplikat.", "Ingen duplikat: forutsetningen gjelder ikke."), tag: "Ingen" });
+    steps.push({ line: null, array: clone(A), marks: {}, ptrs: {}, map: mapView(), vars: [ix("i"), vv("n", n)], info: [["oppslag + innsettinger", ops]], text: t("Ingen tall kom igjen.", "Ingen duplikat.", "Ingen duplikat: forutsetningen gjelder ikke."), tag: "Ingen" });
     return steps;
   };
 
@@ -547,18 +565,23 @@
 
   IN.gen.findMinKSelect = IN.gen.findMinKSelect || function (input) {
     var s = split(input, 1), A = clone(s.A), n = A.length, k = Math.max(1, Math.min(n, s.p[0])), steps = [], cmp = 0;
-    function snap(line, marks, p, text, tag, rnd) { steps.push({ line: line, array: clone(A), marks: marks, ptrs: p, info: [["k", k], ["runde", rnd], ["sammenligninger", cmp]], text: text, tag: tag }); }
+    var mv; // m slik den står nå (settes på linje 2 i hver runde)
+    function snap(line, marks, p, text, tag, rnd) {
+      steps.push({ line: line, array: clone(A), marks: marks, ptrs: p,
+        vars: [ix("i", p.i), ix("m", p.i == null ? undefined : mv), ix("j", p.j), vv("k", k), vv("n", n)],
+        info: [["runde", rnd], ["sammenligninger", cmp]], text: text, tag: tag });
+    }
     snap(null, {}, {}, t("Her er tallene: " + A.join(", ") + ". Vi skal finne " + (k === 1 ? "det minste" : "de " + k + " minste") + ".",
       "Input: A = [" + A.join(", ") + "], k = " + k + ". Vi gjør k runder med Selection-idéen.",
       "Input A = [" + A.join(", ") + "], n = " + n + ", k = " + k + ". k runder, runde i skanner A[i..n − 1]."), "Start", 0);
     for (var i = 0; i < k; i++) {
-      var m = i, done = range(0, i - 1);
+      var m = i, done = range(0, i - 1); mv = m;
       snap(3, { sorted: done, min: m }, { i: i }, t("Runde " + (i + 1) + ": vi later som " + A[i] + " er minst av dem som er igjen.", "m ← " + i + " (A[m] = " + A[m] + ").", "Runde " + (i + 1) + " av " + k + ": skann A[" + i + ".." + (n - 1) + "]."), "Runde " + (i + 1), i + 1);
       for (var j = i + 1; j < n; j++) {
         cmp++;
         var less = A[j] < A[m];
         snap(5, { sorted: done, min: m, compare: [j] }, { i: i, j: j }, t("Er " + A[j] + " mindre enn " + A[m] + "?" + (less ? " Ja." : " Nei."), "A[" + j + "] &lt; A[m]? " + (less ? "Ja." : "Nei."), "Sammenligning nr. " + cmp + "."), "Sammenlign", i + 1);
-        if (less) { m = j; snap(6, { sorted: done, min: m }, { i: i, j: j }, t("Nå er " + A[m] + " det minste vi har sett.", "m ← " + j + ".", "Ny kandidat m = " + j + "."), "Ny minste", i + 1); }
+        if (less) { m = j; mv = m; snap(6, { sorted: done, min: m }, { i: i, j: j }, t("Nå er " + A[m] + " det minste vi har sett.", "m ← " + j + ".", "Ny kandidat m = " + j + "."), "Ny minste", i + 1); }
       }
       if (m === i) {
         snap(7, { sorted: done, target: i }, { i: i }, t(A[i] + " var minst av dem som var igjen, og står allerede på plass " + i + ". Ingen bytte trengs.", "m = i = " + i + ": swap A[" + i + "] and A[" + i + "] endrer ingenting.", "m = i, så byttet er med seg selv. A[" + i + "] = " + A[i] + " er det " + (i + 1) + ". minste."), "Allerede på plass", i + 1);
@@ -567,7 +590,7 @@
         snap(7, { sorted: done, swap: [i, m] }, { i: i }, t("Vi har byttet: " + A[i] + " er flyttet fram til plass " + i + ", og " + A[m] + " tok plassen den kom fra.", "Byttet A[" + i + "] og A[" + m + "]: nå er A[" + i + "] = " + A[i] + ".", "swap A[" + i + "], A[" + m + "] utført. A[" + i + "] = " + A[i] + " er det " + (i + 1) + ". minste."), "Byttet", i + 1);
       }
     }
-    steps.push({ line: 8, array: clone(A), marks: { sorted: range(0, k - 1) }, ptrs: {}, info: [["k", k], ["sammenligninger", cmp]],
+    steps.push({ line: 8, array: clone(A), marks: { sorted: range(0, k - 1) }, ptrs: {}, vars: [ix("i"), ix("m", mv), ix("j"), vv("k", k), vv("n", n)], info: [["sammenligninger", cmp]],
       text: t("De " + k + " minste tallene står nå først: " + A.slice(0, k).join(", ") + ".", "return A[0.." + (k - 1) + "] = " + A.slice(0, k).join(", ") + ".", "Ferdig etter " + nn(cmp, "sammenligning", "sammenligninger") + ", omtrent k·n = " + (k * n) + "."), tag: "Ferdig" });
     return steps;
   };
@@ -670,6 +693,69 @@
     return { select: a, merge: b, heapK: c1, buildHeap: c, buildOnly: build };
   };
 
+  /* Løkkespenn (step.ranges, tegnes av viz-bars.js): grensene nøyaktig som i pseudokoden, inklusive.
+     Heltrukket = for-løkke (bare mens løkka går), stiplet = while-løkke, tykt = kallets [low, high].
+     Et intervall-spenn («low..high», «i..j») tegnes bare mens løkkebetingelsen holder. */
+  function val(s, name) {
+    var vs = s.vars || [];
+    for (var z = 0; z < vs.length; z++) if (vs[z] && vs[z].name === name) return typeof vs[z].value === "number" ? vs[z].value : null;
+    return null;
+  }
+  function F(name, from, to) { return { name: name, from: from, to: to }; }
+  function W(name, from, to) { return { name: name, from: from, to: to, dashed: true }; }
+  function C(name, from, to) { return { name: name, from: from, to: to, call: true }; }
+  function lohi(s, a, b) { var lo = val(s, "low"), hi = val(s, "high"); return lo != null && hi != null && lo <= hi && s.line >= a && s.line <= b ? [W("low..high", lo, hi)] : []; }
+  var RANGES = {
+    // for i ← 0 to n − 1 (linje 2–4)
+    linearSearch: function (s, n) { return val(s, "i") != null && s.line >= 2 && s.line <= 4 ? [F("i", 0, n - 1)] : []; },
+    // while low ≤ high (linje 4–11)
+    binarySearchTrace: function (s) { return lohi(s, 4, 11); },
+    // while low ≤ high (linje 5–13)
+    binarySearchFirst: function (s) { return lohi(s, 5, 13); },
+    // Ingen løkke: rekursjonen. Spennet er kallets [low, high] (low > high: tomt, ingen strek).
+    binarySearchRec: function (s) {
+      var lo = val(s, "low"), hi = val(s, "high");
+      return s.frame && lo != null && hi != null ? [C("low..high", lo, hi)] : [];
+    },
+    // i ← BinarySearch(A, x): while low ≤ high inne i BinarySearch (linje 2)
+    findDupSorted: function (s) { return s.frame === "BinarySearch" ? lohi(s, 2, 2) : []; },
+    // for i ← 0 to n − 2
+    findDupScan: function (s, n) { return val(s, "i") != null ? [F("i", 0, n - 2)] : []; },
+    // for i ← 0 to n − 1
+    findDupHash: function (s, n) { return val(s, "i") != null ? [F("i", 0, n - 1)] : []; },
+    // for i ← 0 to k − 1 / for j ← i + 1 to n − 1
+    findMinKSelect: function (s, n) {
+      var r = [], i = val(s, "i"), j = val(s, "j"), k = val(s, "k");
+      if (i != null) r.push(F("i", 0, k - 1));
+      if (i != null && j != null) r.push(F("j", i + 1, n - 1));
+      return r;
+    },
+    // while i < j (linje 4–12)
+    findSummandsSorted: function (s) {
+      var i = val(s, "i"), j = val(s, "j");
+      return i != null && j != null && i < j && s.line >= 4 && s.line <= 12 ? [W("i..j", i, j)] : [];
+    }
+  };
+
+  /* Variabellinja: hvert steg får varsPrev (variablene i steget før), så endrede verdier kan utheves.
+     Samtidig får stegene ranges (løkkespenn). */
+  function linkGen(key) {
+    var g = IN.gen[key];
+    if (!g || g.__vlLinked) return;
+    var R = RANGES[key];
+    var w = function (input) {
+      var steps = g(input) || [];
+      for (var z = 0; z < steps.length; z++) {
+        steps[z].varsPrev = z ? (steps[z - 1].vars || null) : null;
+        if (R) steps[z].ranges = R(steps[z], (steps[z].array || []).length);
+      }
+      return steps;
+    };
+    w.__vlLinked = true;
+    IN.gen[key] = w;
+  }
+  ["linearSearch", "binarySearchTrace", "binarySearchFirst", "binarySearchRec", "findDupSorted", "findDupScan", "findDupHash", "findMinKSelect"].forEach(linkGen);
+
   /* ===================== ARRAY-TRIKS ===================== */
   reg(IN.algos, "algos", "findSummandsSorted", {
     title: "Par med sum x – sortert (to pekere)",
@@ -703,16 +789,18 @@
   IN.gen.findSummandsSorted = IN.gen.findSummandsSorted || function (input) {
     var s = split(input, 1), x = s.p[0];
     var A = clone(s.A).sort(num).filter(function (v, z, a) { return z === 0 || v !== a[z - 1]; });
-    var n = A.length, steps = [], pairs = [], found = [], rounds = 0;
+    var n = A.length, steps = [], pairs = [], found = [], rounds = 0, y;
     function snap(line, marks, p, text, tag) {
       var m = marks || {}; m.sorted = found.slice();
-      steps.push({ line: line, array: clone(A), marks: m, ptrs: p, info: [["x", x], ["runder", rounds], ["par", pairs.length ? pairs.join(" ") : "–"]], text: text, tag: tag });
+      steps.push({ line: line, array: clone(A), marks: m, ptrs: p,
+        vars: [ix("i", i), ix("j", j), vv("y", y), vv("x", x), vv("n", n)],
+        info: [["runder", rounds], ["par", pairs.length ? pairs.join(" ") : "–"]], text: text, tag: tag });
     }
     var i = 0, j = n - 1;
     snap(3, {}, { i: i, j: j }, t("Én finger på hver ende. Vi leter etter par som blir " + x + " til sammen.", "i ← 0, j ← " + j + ". Mål: sum x = " + x + ".", "To pekere i hver sin ende av det sorterte arrayet. x = " + x + "."), "Start");
     while (i < j) {
       rounds++;
-      var y = A[i] + A[j];
+      y = A[i] + A[j];
       snap(5, { compare: [i, j] }, { i: i, j: j }, t(A[i] + " + " + A[j] + " = " + y + ".", "y = " + A[i] + " + " + A[j] + " = " + y + ".", "Runde " + rounds + ": y = " + y + (y < x ? " &lt; " : y > x ? " &gt; " : " = ") + "x."), "Sum");
       if (y < x) { i++; snap(7, {}, { i: i, j: j }, t("For lite! Venstre finger flytter til et større tall.", "y &lt; x → i ← " + i + ".", "y &lt; x: A[" + (i - 1) + "] kan ikke inngå i noe par, så i øker."), "For lite"); }
       else if (y > x) { j--; snap(9, {}, { i: i, j: j }, t("For mye! Høyre finger flytter til et mindre tall.", "y &gt; x → j ← " + j + ".", "y &gt; x: A[" + (j + 1) + "] kan ikke inngå i noe par, så j minker."), "For mye"); }
@@ -723,9 +811,12 @@
         snap(12, {}, { i: i, j: j }, t("Vi går videre for å se etter flere par.", "i ← " + i + ".", "Flytter i for å fortsette."), "Videre");
       }
     }
-    snap(4, {}, {}, t("Fingrene har møttes. Vi fant " + pairs.length + " par.", "i ≥ j → ferdig. " + pairs.length + " par.", "Ferdig etter " + nn(rounds, "runde", "runder") + " (høyst n − 1 = " + (n - 1) + ")."), "Ferdig");
+    var endP = {}; if (i >= 0 && i < n) endP.i = i; if (j >= 0 && j < n) endP.j = j;
+    snap(4, {}, endP, t("Fingrene har møttes. Vi fant " + pairs.length + " par.", "i ≥ j → ferdig. " + pairs.length + " par.", "Ferdig etter " + nn(rounds, "runde", "runder") + " (høyst n − 1 = " + (n - 1) + ")."), "Ferdig");
     return steps;
   };
+
+  linkGen("findSummandsSorted");
 
   reg(IN.algos, "algos", "findSummandsHash", {
     title: "Par med sum x – usortert (hashset)",

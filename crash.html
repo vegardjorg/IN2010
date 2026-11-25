@@ -5,34 +5,53 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Crash course · IN2010</title>
   <meta name="description" content="Crash course i IN2010: en løype i eksamensrekkefølge, vektet etter forventede eksamenspoeng. Velg Ekspress, Standard eller Grundig, og følg stegene med kjerne, oppskrift, eksempel, eksamenskort og sjekk.">
-  <script>(function(){try{var d=document.documentElement;var t=localStorage.getItem('in-theme');if(t&&t!=='system')d.setAttribute('data-theme',t);var l=localStorage.getItem('in-level')||'normal';d.setAttribute('data-level',l);}catch(e){document.documentElement.setAttribute('data-level','normal');}})();</script>
-  <link rel="stylesheet" href="assets/css/styles.css">
+  <script>(function(){try{var d=document.documentElement;var t=localStorage.getItem('in-theme')||'light';if(t!=='system')d.setAttribute('data-theme',t);var l=localStorage.getItem('in-level')||'normal';d.setAttribute('data-level',l);}catch(e){document.documentElement.setAttribute('data-theme','light');document.documentElement.setAttribute('data-level','normal');}})();</script>
+  <link rel="stylesheet" href="assets/css/styles.css?v=20261125a">
 </head>
 <body data-page="crash">
   <a class="skip-link" href="#main">Hopp til innhold</a>
   <header id="topnav"></header>
 
+  <!-- Fast fremdriftslinje: vises når toppkortet (#cr-top) er rullet ut av syne -->
+  <div class="cr-stick" id="cr-stick" data-sticky role="region" aria-label="Fremdrift i løypa">
+    <div class="cr-stick-in">
+      <div class="cr-stick-prog">
+        <div class="cr-bar" id="cr-stick-bar" role="progressbar" aria-label="Fremdrift i valgt lengde" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span id="cr-stick-fill"></span></div>
+        <span class="cr-stick-pct" id="cr-stick-pct">0 %</span>
+        <span class="cr-stick-ab small muted" id="cr-stick-ab"></span>
+      </div>
+      <button class="btn sm cr-go cr-stick-go" type="button" id="cr-stick-go">Fortsett →</button>
+      <a class="btn sm ghost cr-stick-ov" href="#cr-top" id="cr-stick-ov">Oversikt</a>
+      <label class="cr-sr" for="cr-stick-len">Lengde på løypa</label>
+      <select class="cr-stick-len" id="cr-stick-len"></select>
+    </div>
+    <p class="cr-stick-note small" id="cr-stick-note" role="status" aria-live="polite"></p>
+  </div>
+
   <main id="main" class="wrap">
     <div class="pagehead">
       <h1>Crash course</h1>
-      <p class="lead">En løype gjennom pensum i samme rekkefølge som eksamen, vektet etter hvor mange poeng hvert tema
-        pleier å gi. Velg hvor lang tid du har, og følg stegene ett for ett. Hvert steg har samme oppbygning:
-        hvorfor det er viktig, kjernen på to minutter, oppskriften sensor ser etter, et gjennomgått eksempel,
-        eksamensoppgaver, en kort sjekk og fellene som koster poeng.</p>
+      <p class="lead">En løype gjennom pensum, i samme rekkefølge som eksamen. Du velger hvor grundig:
+        <b>Ekspress</b> (ca. <span data-cr-timer="E">3</span> timer, det viktigste),
+        <b>Standard</b> (ca. <span data-cr-timer="S">11</span> timer, alle oppgavetypene) eller
+        <b>Grundig</b> (ca. <span data-cr-timer="G">20</span> timer, alt). Du kan bytte underveis uten å miste noe.
+        Hvert steg forklarer kort, viser hvordan svaret skal se ut, og lar deg øve på gamle eksamensoppgaver.</p>
     </div>
 
-    <section class="card cr-top" id="cr-top" aria-label="Din fremdrift">
-      <p class="cr-headline" id="cr-headline" aria-live="polite"></p>
-      <div class="cr-bar big" aria-hidden="true"><span id="cr-bar-fill"></span></div>
-      <p class="cr-sub small muted" id="cr-sub"></p>
+    <section class="card cr-top is-fresh" id="cr-top" aria-label="Start og lengde">
+      <p class="cr-start-hint" id="cr-start-hint">Velg lengde, så starter du her.</p>
 
-      <div class="cr-len" role="radiogroup" aria-label="Lengde på løypa" id="cr-len"></div>
-      <p class="small muted cr-len-txt" id="cr-len-txt"></p>
-
-      <div class="cr-actions">
-        <button class="btn primary" type="button" id="cr-fortsett">Fortsett der du slapp</button>
+      <div class="cr-go-row">
+        <div class="cr-len-col">
+          <div class="cr-len" role="radiogroup" aria-label="Lengde på løypa" id="cr-len"></div>
+          <p class="small muted cr-len-txt" id="cr-len-txt"></p>
+        </div>
+        <div class="cr-actions">
+          <button class="btn cr-go cr-go-lg" type="button" id="cr-fortsett">Start løypa →</button>
+        </div>
       </div>
       <p class="small muted" id="cr-fortsett-txt"></p>
+      <p class="small cr-len-note" id="cr-len-note" role="status" aria-live="polite"></p>
     </section>
 
     <section class="card cr-queue" id="cr-queue" aria-labelledby="cr-queue-h">
@@ -72,12 +91,29 @@
 
   <footer class="footer">IN2010-guide · Crash course</footer>
 
-  <script src="assets/js/core.js"></script>
-  <script src="assets/js/data-tf.js"></script>
-  <script src="assets/js/pseudocode.js"></script>
-  <script src="assets/js/data-algos.js"></script>
-  <script src="assets/js/data-mock.js"></script>
-  <script src="assets/js/data-crash.js"></script>
+  <script src="assets/js/core.js?v=20261125a"></script>
+  <script src="assets/js/symboler.js?v=20261125a"></script>
+  <script src="assets/js/data-tf.js?v=20261125a"></script>
+  <script src="assets/js/pseudocode.js?v=20261125a"></script>
+  <!-- Steg-demoer i mock-kortene (IN.mountExamDemo): spiller, alle visualiseringer og generatorene -->
+  <script src="assets/js/stepplayer.js?v=20261125a"></script>
+  <script src="assets/js/viz-bars.js?v=20261125a"></script>
+  <script src="assets/js/viz-buckets.js?v=20261125a"></script>
+  <script src="assets/js/viz-tree.js?v=20261125a"></script>
+  <script src="assets/js/viz-hash.js?v=20261125a"></script>
+  <script src="assets/js/viz-graph.js?v=20261125a"></script>
+  <script src="assets/js/viz-list.js?v=20261125a"></script>
+  <script src="assets/js/data-algos.js?v=20261125a"></script>
+  <script src="assets/js/data-heap.js?v=20261125a"></script>
+  <script src="assets/js/data-sok.js?v=20261125a"></script>
+  <script src="assets/js/data-traer.js?v=20261125a"></script>
+  <script src="assets/js/data-hashing.js?v=20261125a"></script>
+  <script src="assets/js/data-grafer.js?v=20261125a"></script>
+  <script src="assets/js/data-lister.js?v=20261125a"></script>
+  <script src="assets/js/data-strategi.js?v=20261125a"></script>
+  <script src="assets/js/perfekt/mock.js?v=20261125a"></script>
+  <script src="assets/js/data-mock.js?v=20261125a"></script>
+  <script src="assets/js/data-crash.js?v=20261125a"></script>
   <script>
   (function () {
     "use strict";
@@ -117,7 +153,7 @@
         var mins = stepsIn(L.id).reduce(function (a, s) { return a + minutes(s, L.id); }, 0);
         var b = el("button", { class: "seg-btn cr-len-btn", type: "button", role: "radio", "data-len": L.id,
           html: "<b>" + L.navn + "</b><span>" + L.omtrent + " · ≈ " + fmtTid(mins) + "</span>" });
-        b.addEventListener("click", function () { setState({ lengde: L.id }); render(); });
+        b.addEventListener("click", function () { setLength(L.id, "top"); });
         host.appendChild(b);
       });
       host.addEventListener("keydown", function (ev) {
@@ -126,33 +162,140 @@
         ev.preventDefault();
         var ids = C.lengder.map(function (L) { return L.id; });
         var ni = (ids.indexOf(state().lengde) + dir + ids.length) % ids.length;
-        setState({ lengde: ids[ni] }); render();
+        setLength(ids[ni], "top");
         qsa(".cr-len-btn", host)[ni].focus();
+      });
+      // Tidene i innledningen regnes ut fra stegdataene (hele timer)
+      qsa("[data-cr-timer]").forEach(function (sp) {
+        var L = sp.getAttribute("data-cr-timer");
+        if (!LEN[L]) return;
+        var mins = stepsIn(L).reduce(function (a, s) { return a + minutes(s, L); }, 0);
+        sp.textContent = String(Math.max(1, Math.round(mins / 60)));
       });
     }
 
+    /* Bytte lengde (toppkortet og den faste linja bruker samme vei).
+       Fremdriften lagres per steg, så et bytte endrer bare hvilke steg som telles med. */
+    var noteTimer = null;
+    function setLength(L, src) {
+      if (!LEN[L]) return;
+      var changed = state().lengde !== L;
+      if (changed) setState({ lengde: L });
+      render();
+      if (!changed) return;
+      var pr = CP(L), txt;
+      if (!pr.startet) txt = LEN[L].navn + ": " + pr.antallSteg + " steg, ca. " + fmtTid(pr.minutter) + ".";
+      else txt = "Byttet til " + LEN[L].navn + ": " + pr.antallSteg + " steg, du har fullført " + pr.ferdigeSteg + " av dem." +
+        (pr.ferdigeUtenfor ? " " + pr.ferdigeUtenfor + " fullførte steg utenfor " + LEN[L].navn + " er lagret." : "");
+      var top = qs("#cr-len-note"), sn = qs("#cr-stick-note");
+      top.textContent = txt;
+      sn.textContent = src === "stick" ? txt : "";
+      sn.classList.toggle("on", src === "stick");
+      clearTimeout(noteTimer);
+      noteTimer = setTimeout(function () { top.textContent = ""; sn.textContent = ""; sn.classList.remove("on"); }, 7000);
+    }
+
+    /* Hovedhandlingen: «Start løypa» før start, «Fortsett: steg …» etterpå, repetisjonskøen når alt er dekket */
+    function goAction(pr) {
+      var f = pr.fortsett;
+      if (f) return { kind: "steg", id: f.id, long: pr.startet ? "Fortsett: steg " + f.id + " · " + f.tittel + " →" : "Start løypa →",
+        short: pr.startet ? "Fortsett →" : "Start →" };
+      if (pr.ko.length) return { kind: "ko", long: "Ta repetisjonskøen →", short: "Repeter →" };
+      return null;
+    }
+    function runAction(btn) {
+      var k = btn.dataset.kind;
+      if (k === "steg" && btn.dataset.go) openStep(btn.dataset.go, true);
+      else if (k === "ko") scrollToEl(qs("#cr-queue"), qs("#cr-qlist a"));
+    }
+
     function paintTop(pr) {
-      var L = pr.lengde;
-      qs("#cr-headline").innerHTML = "Du har dekket <b>" + pr.alle100 + "</b> av ~100 forventede eksamenspoeng.";
-      qs("#cr-bar-fill").style.width = pr.prosent + "%";
-      qs("#cr-sub").textContent = pr.lengdeNavn + "-løypa: " + pr.dekket + " av " + pr.total + " poeng (" + pr.prosent + " %), " +
-        pr.ferdigeSteg + " av " + pr.antallSteg + " steg. Løypa dekker " + pr.total + " av ~100 forventede poeng.";
+      var L = pr.lengde, top = qs("#cr-top");
+      top.classList.toggle("is-fresh", !pr.startet);
+      top.classList.toggle("is-started", pr.startet);
+      qs("#cr-start-hint").textContent = pr.startet
+        ? "Du er i gang. Du kan bytte lengde når som helst, uten å miste noe."
+        : "Velg lengde, så starter du her.";
       qsa(".cr-len-btn").forEach(function (b) {
         var on = b.getAttribute("data-len") === L;
         b.classList.toggle("on", on); b.setAttribute("aria-checked", on ? "true" : "false");
         b.setAttribute("tabindex", on ? "0" : "-1");
       });
       qs("#cr-len-txt").textContent = LEN[L].tekst;
-      var f = pr.fortsett, btn = qs("#cr-fortsett"), txt = qs("#cr-fortsett-txt");
-      if (f) {
-        btn.disabled = false; btn.dataset.go = f.id;
-        btn.textContent = (pr.sist ? "Fortsett: " : "Start: ") + "steg " + f.id + " · " + f.tittel;
-        txt.textContent = "";
-      } else {
-        btn.disabled = true; btn.dataset.go = "";
-        btn.textContent = "Alle stegene i " + pr.lengdeNavn + " er dekket";
-        txt.textContent = "Bra! Ta repetisjonskøen, eller velg en lengre løype.";
-      }
+      var a = goAction(pr), btn = qs("#cr-fortsett"), txt = qs("#cr-fortsett-txt");
+      btn.hidden = !a;
+      btn.dataset.kind = a ? a.kind : ""; btn.dataset.go = a && a.id ? a.id : "";
+      if (a) btn.textContent = a.long;
+      txt.textContent = pr.fortsett ? "" : "Alle stegene i " + pr.lengdeNavn + " er dekket. " +
+        (pr.ko.length ? "Ta repetisjonskøen, eller velg en lengre løype." : "Velg en lengre løype, eller ta stegene du vil friske opp.");
+    }
+
+    /* ---------- Fast fremdriftslinje (under menyen) ---------- */
+    var stick = null, mainBtnVisible = true;
+    function paintStick(pr) {
+      if (!stick) return;
+      var a = goAction(pr), go = qs("#cr-stick-go"), bar = qs("#cr-stick-bar");
+      qs("#cr-stick-fill").style.width = pr.prosent + "%";
+      qs("#cr-stick-pct").textContent = pr.prosent + " %";
+      qs("#cr-stick-ab").textContent = pr.ferdigeSteg + "/" + pr.antallSteg + " steg";
+      bar.setAttribute("aria-valuenow", String(pr.prosent));
+      bar.setAttribute("aria-valuetext", pr.prosent + " % av " + pr.lengdeNavn + "-løypa dekket, " + pr.ferdigeSteg + " av " + pr.antallSteg + " steg");
+      bar.title = pr.ferdigeSteg + " av " + pr.antallSteg + " steg i " + pr.lengdeNavn + " (prosenten vekter stegene etter hvor mye de pleier å telle på eksamen)";
+      go.dataset.kind = a ? a.kind : ""; go.dataset.go = a && a.id ? a.id : "";
+      if (a) go.textContent = a.short;
+      go.hidden = !a;
+      var sel = qs("#cr-stick-len");
+      if (sel.value !== pr.lengde) sel.value = pr.lengde;
+      syncStick();
+    }
+    /* Bare én grønn knapp i synsfeltet: linjas knapp skjules mens hovedknappen i toppkortet synes */
+    function syncStick() {
+      if (!stick) return;
+      var mb = qs("#cr-fortsett"), off = stickBottom();
+      if (mb.hidden) mainBtnVisible = false;
+      else { var r = mb.getBoundingClientRect(); mainBtnVisible = r.bottom > off && r.top < window.innerHeight; }
+      var go = qs("#cr-stick-go");
+      go.classList.toggle("is-away", mainBtnVisible);
+      go.setAttribute("aria-hidden", mainBtnVisible ? "true" : "false");
+      go.tabIndex = mainBtnVisible ? -1 : 0;
+    }
+    function placeStick() {
+      if (!stick) return;
+      var t = Math.max(0, IN.stickyH() - 8);           // under menyen (og nivålinja når den står fast)
+      stick.style.top = t + "px";
+      document.documentElement.style.setProperty("--cr-stick-off", (t + stick.offsetHeight + 8) + "px");
+    }
+    function stickBottom() { return stick ? stick.getBoundingClientRect().bottom : IN.stickyH(); }
+    /* Høyden på alt som står fast øverst, inkludert linja (IN.stickyH måler bare meny + nivålinje) */
+    function stickyOff() {
+      var h = IN.stickyH();
+      if (stick && getComputedStyle(stick).position === "sticky") h = Math.max(h, (parseFloat(stick.style.top) || 0) + stick.offsetHeight + 8);
+      return h;
+    }
+    function scrollToEl(target, focusEl) {
+      if (!target) return;
+      var top = target.getBoundingClientRect().top + window.pageYOffset - stickyOff();
+      window.scrollTo({ top: Math.max(0, top), behavior: "instant" });
+      if (focusEl) try { focusEl.focus({ preventScroll: true }); } catch (e) {}
+    }
+    function initStick() {
+      stick = qs("#cr-stick"); if (!stick) return;
+      var sel = qs("#cr-stick-len");
+      clear(sel);
+      C.lengder.forEach(function (L) { sel.appendChild(el("option", { value: L.id, text: L.navn })); });
+      sel.addEventListener("change", function () { setLength(sel.value, "stick"); });
+      qs("#cr-stick-go").addEventListener("click", function () { runAction(this); });
+      qs("#cr-stick-ov").addEventListener("click", function (e) {
+        e.preventDefault();
+        window.scrollTo({ top: 0, behavior: "instant" });
+        var mb = qs("#cr-fortsett");
+        try { (mb.hidden ? qs(".cr-len-btn.on") : mb).focus({ preventScroll: true }); } catch (er) {}
+      });
+      var raf = 0;
+      window.addEventListener("scroll", function () { if (raf) return; raf = requestAnimationFrame(function () { raf = 0; syncStick(); }); }, { passive: true });
+      window.addEventListener("resize", function () { placeStick(); syncStick(); });
+      placeStick();
+      setTimeout(placeStick, 300);   // nivålinja kan få endelig høyde litt etter oppstart
     }
 
     function paintQueue(pr) {
@@ -222,7 +365,7 @@
       d.appendChild(body);
       d.addEventListener("toggle", function () {
         if (!d.open) return;
-        if (!d._built) { d._built = true; buildBody(s, body); }
+        if (!d._built) { d._built = true; d._builtL = state().lengde; buildBody(s, body); }
         if (state().sist !== s.id) setState({ sist: s.id });
         try { history.replaceState(null, "", "#steg=" + s.id); } catch (e) {}
       });
@@ -564,12 +707,17 @@
           qs(".cr-sstat", d).textContent = ic.lbl;
           d.classList.toggle("is-done", x.done);
           qs(".cr-tid", d).textContent = minutes(s, L) + " min";
+          if (d._built && s.spesial === "mock" && d._builtL !== L) {
+            // Mock-lista deler kortene i «med» og «utenfor» etter lengden: bygg på nytt etter et bytte
+            var body = qs(".cr-sbody", d); clear(body); d._builtL = L; buildBody(s, body);
+          }
           if (d._built) { paintCards(d); paintChecks(s, d); paintMockKrav(s, d); }
         });
         var tog = qs(".cr-etog", sec);
         tog.hidden = !out; tog.style.display = out ? "" : "none";
         tog.textContent = showAll[e.nr] ? "Skjul steg utenfor " + LEN[L].navn : "Vis " + out + " steg utenfor " + LEN[L].navn;
       });
+      paintStick(pr);
     }
 
     /* ---------- Åpne steg (dyplenke #steg=…) ---------- */
@@ -582,7 +730,7 @@
       d.open = true;
       if (!scroll) return;
       var go = function () {
-        var top = d.getBoundingClientRect().top + window.pageYOffset - IN.stickyH();
+        var top = d.getBoundingClientRect().top + window.pageYOffset - stickyOff();
         window.scrollTo({ top: Math.max(0, top), behavior: "instant" });
       };
       setTimeout(go, 30); setTimeout(go, 350);
@@ -633,11 +781,10 @@
       if (!P) return;
       buildLenPicker();
       buildEtapper();
+      initStick();
       render();
       initTools();
-      qs("#cr-fortsett").addEventListener("click", function () {
-        var id = this.dataset.go; if (id) openStep(id, true);
-      });
+      qs("#cr-fortsett").addEventListener("click", function () { runAction(this); });
       document.addEventListener("click", function (e) {
         var a = e.target.closest && e.target.closest('a[href^="#steg="]');
         if (!a) return;

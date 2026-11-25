@@ -5,8 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>IN2010 · interaktiv eksamensguide</title>
   <meta name="description" content="Interaktiv eksamensguide for IN2010 – Algoritmer og datastrukturer. Slik ser eksamen ut, og alle eksamensoppgavene fra H2020 til H2025.">
-  <script>(function(){try{var d=document.documentElement;var t=localStorage.getItem('in-theme');if(t&&t!=='system')d.setAttribute('data-theme',t);var l=localStorage.getItem('in-level')||'normal';d.setAttribute('data-level',l);}catch(e){document.documentElement.setAttribute('data-level','normal');}})();</script>
-  <link rel="stylesheet" href="assets/css/styles.css">
+  <script>(function(){try{var d=document.documentElement;var t=localStorage.getItem('in-theme')||'light';if(t!=='system')d.setAttribute('data-theme',t);var l=localStorage.getItem('in-level')||'normal';d.setAttribute('data-level',l);}catch(e){document.documentElement.setAttribute('data-theme','light');document.documentElement.setAttribute('data-level','normal');}})();</script>
+  <link rel="stylesheet" href="assets/css/styles.css?v=20261125a">
 </head>
 <body data-page="index">
   <a class="skip-link" href="#main">Hopp til innhold</a>
@@ -95,36 +95,25 @@
     IN2010-guide · laget for eksamensøving · fungerer frakoblet (file://) og på GitHub Pages.
   </footer>
 
-  <script src="assets/js/core.js"></script>
-  <script src="assets/js/data-mock.js"></script>
-  <script src="assets/js/data-crash.js"></script>
+  <script src="assets/js/core.js?v=20261125a"></script>
+  <script src="assets/js/symboler.js?v=20261125a"></script>
+  <script src="assets/js/data-mock.js?v=20261125a"></script>
+  <script src="assets/js/data-crash.js?v=20261125a"></script>
   <script>
   /* Crash course-boksen øverst: samme utregning som løypesiden (IN.crashProgress) */
   (function () {
     var IN = window.IN, el = IN.el, host = IN.qs("#crash-box");
     if (!host || !IN.crashProgress) { if (host) host.hidden = true; return; }
+    /* Liten boks: én setning og én grønn knapp. Bare knappeteksten følger fremdriften (Start ↔ Fortsett). */
+    host.classList.add("crash-box-mini");
+    var btn = el("a", { class: "btn cr-go", href: "crash.html" });
+    host.appendChild(el("p", { class: "crash-box-txt", html: "<b>Crash course:</b> en løype gjennom pensum i samme rekkefølge som eksamen, for deg som har 3 timer, en dag eller en uke." }));
+    host.appendChild(btn);
     function paint() {
-      var P; try { P = IN.crashProgress(); } catch (e) { host.hidden = true; return; }
-      IN.clear(host);
-      var started = P.ferdigeSteg > 0 || P.ovmer > 0 || !!P.sist;
-      host.appendChild(el("div", { class: "crash-box-h" }, [
-        el("span", { class: "crash-box-t", text: "Crash course" }),
-        el("span", { class: "tag", text: P.lengdeNavn })
-      ]));
-      if (!started) {
-        host.appendChild(el("p", { html: "En vektet løype gjennom alt som er sannsynlig på eksamen, i samme rekkefølge som eksamen: kort forklaring, oppskrift for full pott, gamle eksamensoppgaver og mock-oppgaver. Velg <b>Ekspress</b> (~3 t), <b>Standard</b> (~1 dag) eller <b>Grundig</b> (~1 uke)." }));
-        host.appendChild(el("a", { class: "btn primary", href: "crash.html", text: "Start løypa →" }));
-        return;
-      }
-      host.appendChild(el("p", { class: "crash-box-num", html: "Du har dekket <b>" + P.dekket + " av " + P.total + "</b> forventede eksamenspoeng (" + P.prosent + " %) · " + P.ferdigeSteg + " av " + P.antallSteg + " steg" }));
-      var bar = el("div", { class: "crash-box-bar", role: "progressbar", "aria-valuemin": "0", "aria-valuemax": "100", "aria-valuenow": String(P.prosent), "aria-label": "Fremdrift i løypa" });
-      bar.appendChild(el("span", { style: "width:" + Math.max(0, Math.min(100, P.prosent)) + "%" }));
-      host.appendChild(bar);
-      var row = el("div", { class: "btn-row" });
-      if (P.fortsett) row.appendChild(el("a", { class: "btn primary", href: P.fortsett.href, text: "Fortsett: " + P.fortsett.tittel + " →" }));
-      else row.appendChild(el("a", { class: "btn primary", href: "crash.html", text: "Alt i løypa er dekket – åpne løypa →" }));
-      if (P.ovmer) row.appendChild(el("a", { class: "btn", href: "crash.html#cr-queue", text: "↻ " + P.ovmer + " i repetisjonskøen" }));
-      host.appendChild(row);
+      var P; try { P = IN.crashProgress(); } catch (e) { P = null; }
+      var go = P && P.startet;
+      btn.textContent = go ? "Fortsett →" : "Start løypa →";
+      btn.href = go && P.fortsett ? P.fortsett.href : "crash.html";
     }
     paint();
     document.addEventListener("in:progress", paint);

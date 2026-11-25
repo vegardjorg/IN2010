@@ -28,6 +28,14 @@
   var LS = (IN.ls = IN.ls || {});
   LS.esc = esc;
 
+  /* Variabellinja (varline.js): navnene er de samme som i pseudokoden.
+     idx = plass i et array / en tagg, eller id-en til en node (prikken får fargen til cella/noden). */
+  function sv(name, v) { return { name: name, value: v }; }
+  function iv(name, i, part) { return i == null ? { name: name, value: null } : { name: name, value: i, idx: i, part: part || 0 }; }
+  function ndv(name, id, label, part) { return id == null ? { name: name, value: null } : { name: name, value: label, idx: id, part: part || 0 }; }
+  function frameOf(line, names) { return line == null ? null : names[Math.floor(line / 100)] || names[0]; }
+  function linkVars(steps) { for (var z = 1; z < steps.length; z++) if (steps[z].vars) steps[z].varsPrev = steps[z - 1].vars || []; return steps; }
+
   /* ================================================================
      PSEUDOKODE
      ================================================================ */
@@ -382,13 +390,24 @@
       return [{ label: "D.n", html: String(n) }, { label: "|D.A|", html: String(A.length) },
         { label: "PushBack-er", html: String(pushes) }, { label: "kopieringer totalt", html: String(copies) }, { label: "2 · PushBack-er", html: String(2 * pushes) }];
     }
-    function snap(line, parts, text, tag) { steps.push({ line: line, parts: parts, info: info(), text: text, tag: tag }); }
+    var E = null, CI = null, PE = null;   // e i PushBack, i i EnsureCapacity, e i PopBack
+    function dpVars(line) {
+      if (line == null) return [];
+      var a = Math.floor(line / 100);
+      if (a === 1) return [sv("e", E)];
+      if (a === 2) return [line === 206 ? iv("i", CI) : line === 205 ? sv("i", "0 … " + (n - 1)) : sv("i", null)];
+      return [sv("e", PE)];
+    }
+    function snap(line, parts, text, tag) {
+      steps.push({ line: line, parts: parts, info: info(), text: text, tag: tag,
+        vars: dpVars(line), frame: frameOf(line, [null, "PushBack", "EnsureCapacity", "PopBack"]) });
+    }
     function main(marks, ptrs) { return [arrPart("D.A", A, n, marks, ptrs)]; }
     snap(null, main(), t("En tom hylle med " + c + (c === 1 ? " plass" : " plasser") + ". Ingenting ligger der ennå.",
       "Tomt dynamisk array: D.n = 0 og |D.A| = " + c + ".", "D.n = 0, |D.A| = " + c + "."), "Start");
     (cfg.ops || []).forEach(function (o) {
       if (o.op === "push") {
-        var e = o.v;
+        var e = o.v; E = e; CI = null;
         snap(102, main(), t("Vi skal legge " + e + " bakerst. Først: er det plass?", "PushBack(D, " + e + "): kall EnsureCapacity først.", "PushBack(D, " + e + ")."), "PushBack " + e);
         if (n < A.length) {
           snap(202, main(), t("Det er " + (A.length - n) + " ledig" + (A.length - n === 1 ? "" : "e") + " plass" + (A.length - n === 1 ? "" : "er") + ". Fint!",
@@ -401,7 +420,7 @@
             t("Vi lager en ny hylle med " + B.length + " plasser, dobbelt så lang.", "Nytt array med |D.A| · 2 = " + B.length + " plasser.", "Nytt array, kapasitet " + B.length + "."), "Doble");
           if (n <= 4) {
             for (var i = 0; i < n; i++) {
-              B[i] = A[i]; copies++;
+              B[i] = A[i]; copies++; CI = i;
               var pi = {}; pi[i] = "i";
               snap(206, [arrPart("D.A (gammelt)", A, n, { cur: i }, pi, true), arrPart("A (nytt)", B, i + 1, { fresh: i }, pi)],
                 t("Kopier " + A[i] + " over til plass " + i + " på den nye hylla.", "i = " + i + ": A[" + i + "] ← D.A[" + i + "] = " + A[i] + ".", "Kopi " + (i + 1) + " av " + n + "."), "Kopier");
@@ -413,7 +432,7 @@
             snap(205, [arrPart("D.A (gammelt)", A, n, { cur: all }, {}, true), arrPart("A (nytt)", B, n, { fresh: all })],
               t("Alle " + n + " tingene flyttes over, én etter én.", "Løkka går for i = 0 til D.n − 1 = " + (n - 1) + ": " + n + " kopieringer.", n + " kopieringer, O(D.n)."), "Kopier alle " + n);
           }
-          A = B;
+          A = B; CI = null;
           snap(207, main(), t("Nå bruker vi den nye hylla. Det er god plass igjen.", "D.A er nå det nye arrayet med " + A.length + " plasser.", "|D.A| = " + A.length + ". " + (A.length - n === 1 ? "Den neste PushBack-en er O(1)." : "De neste " + (A.length - n) + " PushBack-ene er O(1).")), "Byttet array");
         }
         A[n] = e;
@@ -422,7 +441,7 @@
         snap(104, main(), t("Nå ligger det " + n + (n === 1 ? " ting" : " ting") + " på hylla.", "D.n ← " + n + ".", "D.n = " + n + "."), "D.n + 1");
       } else if (o.op === "pop") {
         if (!n) { snap(null, main(), t("Hylla er tom, så det er ingenting å ta.", "PopBack krever at D ikke er tomt.", "Forutsetning brutt: D.n = 0."), "Tomt"); return; }
-        var val = A[n - 1];
+        var val = A[n - 1]; PE = val;
         snap(302, main({ cur: n - 1 }), t("Ta den siste tingen, " + val + ".", "e ← D.A[" + (n - 1) + "] = " + val + ".", "Les indeks D.n − 1 = " + (n - 1) + "."), "PopBack");
         A[n - 1] = null;
         snap(303, main({ hole: n - 1 }), t("Plassen er tom nå.", "D.A[" + (n - 1) + "] ← null.", "Tøm plassen."), "Tøm");
@@ -433,7 +452,7 @@
     snap(null, main(), t("Ferdig! Hylla ble større bare noen få ganger.",
       "Ferdig. " + pushes + " PushBack-er ga " + copies + " kopieringer. Med dobling er det alltid færre enn 2 · " + pushes + " = " + 2 * pushes + ".",
       "Ferdig. Totalt " + copies + " kopieringer for " + pushes + " PushBack-er: O(1) amortisert per innsetting."), "Ferdig");
-    return steps;
+    return linkVars(steps);
   });
 
   /* ---------- Dynamisk array: Add / Remove ----------
@@ -443,9 +462,13 @@
     var A = [], n = items.length, steps = [], moves = 0;
     for (var z = 0; z < c; z++) A.push(z < n ? items[z] : null);
     function ptr(map) { return map || {}; }
+    var VI = null, VE = null, VJ = null;   // i, e og j i Add / Remove
     function snap(line, marks, ptrs, text, tag) {
+      var add = line != null && line < 200;
       steps.push({ line: line, parts: [{ type: "array", label: "D.A", cells: A.slice(), n: n, marks: marks || {}, ptrs: ptr(ptrs) }],
-        info: [{ label: "D.n", html: String(n) }, { label: "|D.A|", html: String(A.length) }, { label: "flyttinger", html: String(moves) }], text: text, tag: tag });
+        info: [{ label: "D.n", html: String(n) }, { label: "|D.A|", html: String(A.length) }, { label: "flyttinger", html: String(moves) }], text: text, tag: tag,
+        vars: line == null ? [] : add ? [iv("i", VI), sv("e", VE), iv("j", VJ)] : [iv("i", VI), iv("j", VJ)],
+        frame: frameOf(line, [null, "Add", "Remove"]) });
     }
     function one(k, s) { var p = {}; p[k] = s; return p; }
     snap(null, {}, null, t("Hylla har " + n + " ting.", "D.n = " + n + ", |D.A| = " + A.length + ".", "D.n = " + n + "."), "Start");
@@ -453,6 +476,7 @@
       var moved = [];
       if (o.op === "add") {
         var i = Math.max(0, Math.min(n, o.i)), e = o.v;
+        VI = i; VE = e; VJ = null;
         snap(102, {}, one(i, "i"), t("Vi skal sette " + e + " inn på plass " + i + ". Først: er det plass?", "Add(D, " + i + ", " + e + "). EnsureCapacity sørger for en ledig plass.", "Add(D, " + i + ", " + e + ")."), "Add på " + i);
         if (n === A.length) {
           var B = []; for (var q = 0; q < 2 * A.length; q++) B.push(q < n ? A[q] : null);
@@ -461,31 +485,32 @@
         }
         if (n - 1 < i) snap(103, {}, one(i, "i"), t("Det er ingen ting etter plass " + i + ", så ingenting må flyttes.", "j starter på D.n − 1 = " + (n - 1) + ", som er mindre enn i = " + i + ": null runder.", "Null runder (i = D.n)."), "Ingen flytting");
         for (var j = n - 1; j >= i; j--) {
-          A[j + 1] = A[j]; moves++; moved.push(j + 1);
+          A[j + 1] = A[j]; moves++; moved.push(j + 1); VJ = j;
           var pp = one(j, "j"); if (j !== i) pp[i] = "i"; else pp[j] = "j = i";
           snap(104, { moved: [j + 1], cur: j }, pp, t("Kopier " + A[j] + " ett hakk til høyre, til plass " + (j + 1) + ".", "j = " + j + ": D.A[" + (j + 1) + "] ← D.A[" + j + "] = " + A[j] + ".", "Flytting " + (n - j) + " av " + (n - i) + "."), "Flytt høyre");
         }
-        A[i] = e;
+        A[i] = e; VJ = null;
         snap(105, { fresh: i }, one(i, "i"), t((i < n ? "Det som stod på plass " + i + ", er allerede kopiert ett hakk til høyre, så vi kan skrive over det." : "Plass " + i + " er ledig.") + " Legg " + e + " der.", "D.A[" + i + "] ← " + e + ".", "Skriv e."), "Sett inn");
         n++;
         snap(106, {}, null, t("Innsatt. Vi måtte flytte " + (n - 1 - i) + " ting.", "D.n ← " + n + ". " + (n - 1 - i) + (n - 1 - i === 1 ? " element ble flyttet." : " elementer ble flyttet."), "O(D.n − i) = " + (n - 1 - i) + " flyttinger."), "D.n + 1");
       } else if (o.op === "rem") {
         if (!n) return;
         var r = Math.max(0, Math.min(n - 1, o.i)), old = A[r];
+        VI = r; VE = null; VJ = null;
         snap(202, { hole: r }, one(r, "i"), t("Vi skal fjerne " + old + " på plass " + r + ". Tingene bak må tette hullet.", "Remove(D, " + r + "): løkka går for j = " + r + " til D.n − 2 = " + (n - 2) + ".", "Remove(D, " + r + ")."), "Remove på " + r);
         if (r > n - 2) snap(202, { hole: r }, one(r, "i"), t("Det er ingen ting bak, så ingenting må flyttes.", "i = D.n − 1, så løkka kjører null ganger.", "Null runder."), "Ingen flytting");
         for (var jj = r; jj <= n - 2; jj++) {
-          A[jj] = A[jj + 1]; moves++;
+          A[jj] = A[jj + 1]; moves++; VJ = jj;
           snap(203, { moved: [jj], cur: jj + 1 }, one(jj, "j"), t("Kopier " + A[jj] + " ett hakk til venstre, til plass " + jj + ".", "j = " + jj + ": D.A[" + jj + "] ← D.A[" + (jj + 1) + "] = " + A[jj] + ".", "Flytting " + (jj - r + 1) + " av " + (n - 1 - r) + "."), "Flytt venstre");
         }
-        A[n - 1] = null;
+        A[n - 1] = null; VJ = null;
         snap(204, { hole: n - 1 }, null, t("Den siste plassen tømmes.", "D.A[" + (n - 1) + "] ← null.", "Rydd bakerste plass."), "Tøm siste");
         n--;
         snap(205, {}, null, t("Fjernet. " + old + " er borte.", "D.n ← " + n + ". " + (n - r) + (n - r === 1 ? " element ble flyttet." : " elementer ble flyttet."), "O(D.n − i)."), "D.n − 1");
       }
     });
     snap(null, {}, null, t("Ferdig!", "Ferdig. Jo nærmere starten vi setter inn eller fjerner, jo flere elementer må flyttes.", "Totalt " + moves + " flyttinger. Add og Remove er O(n) i verste tilfelle."), "Ferdig");
-    return steps;
+    return linkVars(steps);
   });
 
   /* ---------- Enkeltlenket liste ----------
@@ -512,19 +537,29 @@
       if (mk2.j != null) inf.push({ label: "j", html: String(mk2.j) });
       if (mk2.ret != null) inf.push({ label: "returnert", html: esc(mk2.ret) });
       inf.push({ label: "pekersteg", html: String(steps0) });
-      steps.push({ line: line, parts: [{ type: "linked", label: "L", fields: true, nodes: list, first: "L.first", ptrs: mk2.ptrs || {}, hl: mk2.hl || {} }], info: inf, text: text, tag: tag });
+      var a = line == null ? 0 : Math.floor(line / 100);
+      steps.push({ line: line, parts: [{ type: "linked", label: "L", fields: true, nodes: list, first: "L.first", ptrs: mk2.ptrs || {}, hl: mk2.hl || {} }], info: inf, text: text, tag: tag,
+        vars: a === 1 ? [sv("i", V.i), ndv("it", V.it, lab(V.it)), sv("j", V.j)]
+          : a === 2 ? [ndv("v", V.v, lab(V.v)), sv("e", V.e), ndv("u", V.u, lab(V.u))]
+          : a === 3 ? [ndv("v", V.v, lab(V.v)), sv("e", V.e)] : [],
+        frame: frameOf(line, [null, "NodeAt", "InsertAfter", "RemoveAfter"]) });
     }
+    var V = {};   // variablene i rammen som kjører nå
+    function lab(id) { return id == null || !nodes[id] ? null : "Node(" + nodes[id].v + ")"; }
     function reach(id) { var x = first; while (x != null) { if (x === id) return true; x = nodes[x].next; } return false; }
     function nodeAt(i, L) {
       var it = first; steps0 = 0;
+      V = { i: i, it: it, j: null };
       var p = {}; p[it] = "it";
       snap(L + 2, { cur: it, ptrs: p, j: null }, t("Vi starter ved den første vogna.", "it ← L.first (elementet " + nodes[it].v + ").", "Start på node 0."), "NodeAt(L, " + i + ")");
       if (i === 0) snap(L + 3, { cur: it, ptrs: p }, t("Vi skal til plass 0, og der står vi allerede.", "i − 1 = −1, så løkka kjører null ganger.", "Null runder."), "Ingen steg");
       for (var j = 0; j <= i - 1; j++) {
+        V.j = j;
         snap(L + 3, { cur: it, ptrs: p, j: j }, t("Ett steg til (vi skal gå " + i + " steg totalt).", "j = " + j + " (løkka går til i − 1 = " + (i - 1) + ").", "Runde " + (j + 1) + " av " + i + "."), "j = " + j);
-        it = nodes[it].next; steps0++; p = {}; p[it] = "it";
+        it = nodes[it].next; steps0++; p = {}; p[it] = "it"; V.it = it;
         snap(L + 4, { cur: it, ptrs: p, j: j }, t("Hopp til neste vogn: " + nodes[it].v + ".", "it ← it.next. Nå står vi på node " + (j + 1) + " (" + nodes[it].v + ").", "Node " + (j + 1) + "."), "Følg next");
       }
+      V.j = null;
       snap(L + 5, { found: it, ptrs: p }, t("Her er vogn nummer " + i + ": " + nodes[it].v + ".", "return it: noden på plass " + i + " har elementet " + nodes[it].v + ". Det tok " + i + " pekersteg.", i + " steg: O(i)."), "Funnet");
       return it;
     }
@@ -537,6 +572,7 @@
       } else if (o.op === "insAfter") {
         var vv = nodeAt(o.i, 100), pv = {}; pv[vv] = "v";
         var u = mk(o.v); extra = { id: u, after: vv };
+        V = { v: vv, e: o.v, u: u };
         var pu = {}; pu[vv] = "v"; pu[u] = "u";
         snap(202, { ptrs: pu }, t("Lag en ny vogn med " + o.v + " i. Den er ikke koblet på ennå.", "u ← new Node(" + o.v + "). u.next er null.", "Ny node, ikke i lista ennå."), "Ny node");
         nodes[u].next = nodes[vv].next;
@@ -551,6 +587,7 @@
         if (nodes[w].next == null) { snap(null, {}, t("Det er ingen vogn etter denne.", "v.next = null, så RemoveAfter kan ikke brukes.", "Forutsetning brutt."), "Ingen å fjerne"); return; }
         var pw = {}; pw[w] = "v";
         var x = nodes[w].next, hlx = {}; pw[x] = "v.next";
+        V = { v: w, e: nodes[x].v };
         snap(302, { ptrs: pw, cur: x }, t("Vogna etter " + nodes[w].v + " har " + nodes[x].v + " i.", "e ← v.next.elem = " + nodes[x].v + ".", "Les elementet."), "RemoveAfter");
         nodes[w].next = nodes[x].next; gone = { id: x, after: w };
         hlx[w] = "next";
@@ -562,7 +599,7 @@
     snap(null, {}, t("Ferdig! Å koble om vogner går fort, men å finne riktig vogn tar tid.",
       "Ferdig. Innsetting og fjerning er O(1) når vi har noden, men å finne den med NodeAt er O(n).",
       "Ferdig. Get, Set, Add og Remove er O(n) på lenket liste, fordi de bruker NodeAt."), "Ferdig");
-    return steps;
+    return linkVars(steps);
   });
 
   /* ---------- Dobbeltlenket liste med hode og hale ----------
@@ -582,8 +619,13 @@
       var n = listOrder().length - 2;
       var inf = [{ label: "n", html: String(n) }];
       if (m.ret != null) inf.push({ label: "returnert", html: esc(m.ret) });
-      steps.push({ line: line, parts: [{ type: "linked", label: "L (med hode og hale)", double: true, fields: true, nodes: list, ptrs: m.ptrs || {}, hl: m.hl || {} }], info: inf, text: text, tag: tag });
+      var a = line == null ? 0 : Math.floor(line / 100);
+      steps.push({ line: line, parts: [{ type: "linked", label: "L (med hode og hale)", double: true, fields: true, nodes: list, ptrs: m.ptrs || {}, hl: m.hl || {} }], info: inf, text: text, tag: tag,
+        vars: a === 1 ? [ndv("v", V.v, lab(V.v)), sv("e", V.e), ndv("u", V.u, lab(V.u))] : a === 2 ? [ndv("v", V.v, lab(V.v))] : [],
+        frame: frameOf(line, [null, "InsertAfter", "RemoveNode"]) });
     }
+    var V = {};
+    function lab(id) { return id == null ? null : nodes[id].sentinel ? nodes[id].v : "Node(" + nodes[id].v + ")"; }
     function at(i) { var x = nodes[H].next, k = 0; while (x !== T && k < i) { x = nodes[x].next; k++; } return x; }
     function nm(id) { return nodes[id].sentinel ? nodes[id].v + "noden" : String(nodes[id].v); }
     snap(null, {}, t("Et tog der hver vogn vet både hvem som er foran og bak. Hode og hale er tomme endevogner som alltid er der.",
@@ -594,6 +636,7 @@
         var v = o.after < 0 ? H : at(o.after);
         if (v === T) v = nodes[T].prev;
         var u = mk(o.v), pv = {}; pv[v] = "v"; pv[u] = "u";
+        V = { v: v, e: o.v, u: u };
         row.splice(row.indexOf(v) + 1, 0, u);
         snap(102, { ptrs: pv, fresh: u }, t("Vi har en peker til " + nm(v) + ". Lag en ny vogn med " + o.v + " i.",
           "u ← new Node(" + o.v + "). Den står ved siden av v, men ingen pekere er satt ennå.", "Ny node, alle pekere null."), "Ny node etter " + nm(v));
@@ -609,6 +652,7 @@
         var x = o.last ? nodes[T].prev : at(o.i);
         if (x === T || x === H) return;
         var px = {}; px[x] = "v";
+        V = { v: x };
         snap(null, { ptrs: px, cur: x }, t(o.last ? "Vi vil fjerne den siste vogna. Den står rett foran halen, så vi finner den med en gang." : "Vi har en peker til vogna med " + nodes[x].v + ", og vil ta den ut.",
           o.last ? "v ← L.tail.prev (" + nodes[x].v + "). Det er O(1) takket være halenoden." : "RemoveNode(v) for noden med " + nodes[x].v + ".",
           o.last ? "Siste node via L.tail.prev, O(1)." : "RemoveNode(v)."), o.last ? "Fjern siste" : "RemoveNode");
@@ -624,7 +668,7 @@
     snap(null, {}, t("Ferdig! Fordi hver vogn kjenner begge naboene, går det fort å sette inn og ta ut hvor som helst.",
       "Ferdig. Med prev-pekere er både InsertAfter, InsertBefore og RemoveNode O(1) når vi har noden.",
       "Ferdig. Prisen er én ekstra peker per node og omtrent dobbelt så mange pekerendringer."), "Ferdig");
-    return steps;
+    return linkVars(steps);
   });
 
   /* ---------- Tagger: hjelpere ---------- */
@@ -645,6 +689,7 @@
     return out.length ? [{ tags: out }] : [];
   };
   function tagStr(tg) { return "\"" + esc(tg) + "\""; }
+  function tagVar(A, k) { return k == null ? { name: "tag", value: null } : { name: "tag", value: "\"" + A[k] + "\"", idx: k }; }
 
   /* ---------- GoodDivs: teller ---------- */
   reg(IN.gen, "lsDivs", function (input) {
@@ -652,7 +697,8 @@
     function snap(line, cur, text, tag, bad, ret) {
       var inf = [{ label: "i (åpne nå)", html: String(i), bad: i < 0 }];
       if (ret != null) inf.push({ label: "returnert", html: String(ret), bad: ret === false });
-      steps.push({ line: line, parts: [{ type: "tags", label: "A", items: A, cur: cur, bad: bad, allDone: cur == null && ret === true }], info: inf, text: text, tag: tag });
+      steps.push({ line: line, parts: [{ type: "tags", label: "A", items: A, cur: cur, bad: bad, allDone: cur == null && ret === true }], info: inf, text: text, tag: tag,
+        vars: [sv("i", i), tagVar(A, cur)], frame: "GoodDivs" });
     }
     snap(2, null, t("Ingen bokser er åpne ennå.", "i ← 0.", "Dybde 0."), "Start");
     for (var k = 0; k < A.length; k++) {
@@ -672,14 +718,14 @@
         snap(8, k, t(i < 0 ? "Vi har lukket flere enn vi åpnet." : "Ikke lukket for mange så langt.", "i < 0? " + (i < 0 ? "Ja." : "Nei."), i < 0 ? "i = " + i + " < 0." : "i ≥ 0."), "Sjekk i < 0", i < 0);
         if (i < 0) {
           snap(9, k, t("Feil! En boks ble lukket uten å være åpnet.", "return false: " + tagStr(tg) + " på plass " + k + " lukker noe som ikke er åpent.", "Tidlig retur på plass " + k + "."), "false", true, false);
-          return steps;
+          return linkVars(steps);
         }
       }
     }
     var ok = i === 0;
     snap(10, null, t(ok ? "Alle boksene er lukket. Riktig!" : (i === 1 ? "1 boks står fortsatt åpen. Feil!" : i + " bokser står fortsatt åpne. Feil!"),
       "return i = 0: i = " + i + ", så svaret er " + ok + ".", ok ? "Velformatert." : (i === 1 ? "1 åpen tagg er aldri lukket." : i + " åpne tagger er aldri lukket.")), String(ok), !ok, ok);
-    return steps;
+    return linkVars(steps);
   });
 
   /* ---------- GoodTags: stakk ---------- */
@@ -691,7 +737,8 @@
       if (o.cmp) inf.push({ label: "sammenligning", html: o.cmp, bad: o.bad });
       if (o.ret != null) inf.push({ label: "returnert", html: String(o.ret), bad: o.ret === false });
       steps.push({ line: line, parts: [{ type: "tags", label: "A", items: A, cur: cur, bad: o.bad, allDone: cur == null && o.ret === true },
-        { type: "stack", label: "s (stakken)", items: s.slice(), mark: { top: o.top }, out: o.out, outBad: o.bad, outLabel: "s.pop()" }], info: inf, text: text, tag: tag });
+        { type: "stack", label: "s (stakken)", items: s.slice(), mark: { top: o.top }, out: o.out, outBad: o.bad, outLabel: "s.pop()" }], info: inf, text: text, tag: tag,
+        vars: [tagVar(A, cur)], frame: "GoodTags" });
     }
     snap(2, null, t("En tom stabel. Her legger vi hver boks som åpnes.", "s ← tom stakk.", "Tom stakk."), "Start");
     for (var k = 0; k < A.length; k++) {
@@ -703,20 +750,20 @@
       } else if (!s.length) {
         snap(6, k, t("Den lukker, men stabelen er tom. Det finnes ingenting å lukke!", "Lukketagg og s er tom: betingelsen er sann (pop kalles ikke).", "Tom stakk, kortslutning i «or»."), "Tom stakk", { bad: true });
         snap(7, k, t("Feil!", "return false.", "Tidlig retur."), "false", { bad: true, ret: false });
-        return steps;
+        return linkVars(steps);
       } else {
         var top = s.pop(), same = tagType(top) === tagType(tg);
         snap(6, k, t(same ? "Den lukker. Øverst lå " + esc(top) + ", og det passer!" : "Den lukker en " + tagType(tg) + ", men øverst lå " + esc(top) + ". Det passer ikke!",
           "s.pop() = " + tagStr(top) + ". TagType: \"" + tagType(top) + "\" " + (same ? "=" : "≠") + " \"" + tagType(tg) + "\".",
           "pop, O(1). Typene er " + (same ? "like: fortsett." : "ulike: feil nøsting.")), same ? "pop, lik type" : "pop, ulik type",
           { out: top, bad: !same, cmp: esc(tagType(top)) + (same ? " = " : " ≠ ") + esc(tagType(tg)) });
-        if (!same) { snap(7, k, t("Feil! Taggene krysser hverandre.", "return false.", "Tidlig retur."), "false", { bad: true, ret: false, out: top }); return steps; }
+        if (!same) { snap(7, k, t("Feil! Taggene krysser hverandre.", "return false.", "Tidlig retur."), "false", { bad: true, ret: false, out: top }); return linkVars(steps); }
       }
     }
     var ok = !s.length;
     snap(8, null, t(ok ? "Stabelen er tom: alt som ble åpnet, ble lukket. Riktig!" : "Det ligger " + s.length + " igjen på stabelen. De ble aldri lukket. Feil!",
       "return s is empty: " + ok + ".", ok ? "Velformatert." : (s.length === 1 ? "1 åpen tagg igjen." : s.length + " åpne tagger igjen.")), String(ok), { ret: ok, bad: !ok });
-    return steps;
+    return linkVars(steps);
   });
 
   /* ---------- Nylige søk (LRU) ----------
@@ -741,13 +788,15 @@
       var ents = Object.keys(M).map(function (k) { return [k, "node"]; });
       if (m.chipGone) ents.push([m.chipGone, "node"]);
       steps.push({ line: line, parts: [{ type: "linked", label: "L (nyeste først)", double: true, nodes: nodes }, { type: "map", label: "M (nøkkel ↦ node i L)", entries: ents, cur: m.cur, fresh: m.fresh, gone: m.chipGone }],
-        info: [{ label: "|M|", html: String(Object.keys(M).length) }, { label: "N", html: String(N) }, { label: "nylige søk", html: order.length ? esc(order.join(", ")) : "(ingen)" }], text: text, tag: tag });
+        info: [{ label: "|M|", html: String(Object.keys(M).length) }, { label: "N", html: String(N) }, { label: "nylige søk", html: order.length ? esc(order.join(", ")) : "(ingen)" }], text: text, tag: tag,
+        vars: line == null ? [] : [sv("key", "\"" + KEY + "\""), ndv("w", W == null ? null : "k:" + W, W == null ? null : "Node(\"" + W + "\")")], frame: line == null ? null : "Update" });
     }
+    var KEY = null, W = null;
     snap(null, {}, t("Vi skal huske de " + N + " siste søkene, med det nyeste først.",
       "Kapasitet N = " + N + ". L holder nøklene med nyeste først, og M finner noden til en nøkkel på forventet O(1).",
       "N = " + N + ". Invariant: nøklene i L og M er de samme, og L er sortert etter siste bruk."), "Start");
     keys.forEach(function (key) {
-      key = String(key);
+      key = String(key); KEY = key; W = null;
       var hit = Object.prototype.hasOwnProperty.call(M, key);
       snap(2, { cur: hit ? key : null }, t("Noen søker på «" + esc(key) + "». Har vi det fra før? " + (hit ? "Ja!" : "Nei."),
         "M.get(«" + esc(key) + "») " + (hit ? "gir noden." : "= null."), "Oppslag i M, forventet O(1)."), "Update(" + esc(key) + ")");
@@ -757,7 +806,7 @@
       } else {
         snap(4, {}, t(Object.keys(M).length === N ? "Lista er full." : "Det er fortsatt plass.", "|M| = " + Object.keys(M).length + (Object.keys(M).length === N ? " = N." : " < N."), "|M| = " + Object.keys(M).length + "."), "Full?");
         if (Object.keys(M).length === N) {
-          var w = order[order.length - 1];
+          var w = order[order.length - 1]; W = w;
           snap(5, { cur: w }, t("Den eldste er «" + esc(w) + "», helt bakerst.", "w ← L.tail.prev («" + esc(w) + "»).", "Eldste via halenoden, O(1)."), "Eldste");
           order.pop();
           snap(6, { goneKey: w, goneAt: order.length, cur: w }, t("Ut med «" + esc(w) + "».", "RemoveNode(w).", "O(1)."), "RemoveNode(w)");
@@ -773,6 +822,6 @@
     snap(null, {}, t("Ferdig! De nyeste søkene står først, og det eldste faller ut når det blir fullt.",
       "Ferdig. " + ops + " kall på Update, hvert forventet O(1).",
       "Ferdig. Hashmap + dobbeltlenket liste: hvert kall er forventet O(1), uavhengig av N."), "Ferdig");
-    return steps;
+    return linkVars(steps);
   });
 })();

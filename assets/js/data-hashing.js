@@ -50,6 +50,11 @@
   function cycList(i, j, N) { var out = [], x = mod(i + 1, N), g = 0; while (g++ <= N) { out.push(x); if (x === j) break; x = mod(x + 1, N); } return out; }
   function tries(n) { return n + (n === 1 ? " prøvd plass" : " prøvde plasser"); }
   function fmt(x) { return String(Math.round(x * 100) / 100).replace(".", ","); }
+  /* Variabellinja (varline.js): verdi uten prikk, verdi som peker på en plass, første satte markering */
+  function kv(name, v) { return { name: name, value: isNum(v) || v == null ? v : show(v) }; }
+  function at(name, i, part) { return i == null ? { name: name, value: null } : { name: name, value: i, idx: i, part: part || 0 }; }
+  function linkVars(steps) { for (var z = 1; z < steps.length; z++) if (steps[z].vars) steps[z].varsPrev = steps[z - 1].vars || []; return steps; }
+  function pick(m, keys) { for (var z = 0; z < keys.length; z++) if (m[keys[z]] != null) return m[keys[z]]; return null; }
   HS.mod = mod; HS.h31 = h31; HS.h31Full = h31Full; HS.hSum = hSum; HS.hash = hash; HS.hText = hText;
   HS.inCyc = inCyc; HS.cycList = cycList; HS.fmt = fmt; HS.show = show;
 
@@ -436,10 +441,33 @@
       if (mark) out.push({ label: "Merker", html: String(c.m) });
       return out;
     }
+    // Variabellinja: navnene fra pseudokoden for operasjonen vi står i (OP), lest av markeringene
+    var OP = null;
+    var FRAMES = { ins: ["LinearProbingInsert", "InsertWithMarks"], get: ["LinearProbingGet", "GetWithMarks"], del: ["LinearProbingRemove", "RemoveWithMark"] };
+    function probeVars(line, m, extra) {
+      if (line == null || !OP) return { vars: [] };
+      var vars = [kv("k", OP.k)];
+      if (OP.op === "ins" && OP.v != null) vars.push({ name: "v", value: OP.v });
+      var r = line % 100;
+      if (OP.op === "del" && !mark && r >= 7) {
+        var iH = r === 9 ? m._i : m.hole;
+        vars.push(at("i", iH));
+        vars.push(at("j", r === 7 ? null : r === 13 ? m.hole : m.cur));
+      } else {
+        vars.push(at("i", pick(m, ["cur", "found", "fresh", "miss", "hole"])));
+        if (OP.op === "del" && !mark) vars.push(at("j", null));
+      }
+      if (OP.op === "ins" && mark) {
+        var pp = (Array.isArray(extra) ? extra : []).filter(function (x) { return x && x.label === "p"; })[0];
+        vars.push(pp ? (pp.html === "null" ? { name: "p", value: "null" } : at("p", +pp.html)) : { name: "p", value: null });
+      }
+      return { vars: vars, frame: FRAMES[OP.op][mark ? 1 : 0] };
+    }
     function snap(line, marks, text, tag, extra) {
       marks = marks || {};
       if (marks.occ) marks.occ = marks.occ.slice();   // øyeblikksbilde: seen vokser senere
-      steps.push({ line: line, parts: [{ type: "probe", N: N, cells: cloneCells(A), marks: marks, clusters: true }], info: info(extra), text: text, tag: tag });
+      var pv0 = probeVars(line, marks, extra);
+      steps.push({ line: line, parts: [{ type: "probe", N: N, cells: cloneCells(A), marks: marks, clusters: true }], info: info(extra), text: text, tag: tag, vars: pv0.vars, frame: pv0.frame });
     }
     // Innsetting med merker: h-pillen pluss en pille for p (husket merke)
     function withP(hx, p) { return [hx, { label: "p", html: p === null ? "null" : String(p) }]; }
@@ -457,6 +485,7 @@
     (cfg.ops || []).forEach(function (o) {
       var k = o.k, i = h(k), home = i, seen = [], g = 0, hx = { label: "h", html: hText(k, N, fixed) };
       var c = counts();
+      OP = o;
       if (o.op === "ins") {
         var L = 100;
         if (c.n + c.m >= N && !A.some(function (x) { return x && !x.tomb && x.k === k; })) {
@@ -590,16 +619,17 @@
           snap(Ld + 14, { hole: i, cur: nj2 }, t("Neste plass.", "j ← " + nj2 + ".", "j ← (" + j + " + 1) mod " + N + " = " + nj2 + "."), "Neste");
           j = nj2;
         }
-        snap(Ld + 9, { cur: j }, t("Tom plass: ingen lenger ut kan ha gått forbi hullet. Ferdig!",
+        snap(Ld + 9, { cur: j, _i: i }, t("Tom plass: ingen lenger ut kan ha gått forbi hullet. Ferdig!",
           "A[" + j + "] = null: segmentet er slutt. Alle gjenværende nøkler kan nås fra hjemmeplassen sin.",
           "Invarianten er gjenopprettet: ingen nøkkel har et hull mellom hjemmeplassen og plassen sin."), "Ferdig");
       }
     });
     var cc = counts();
+    OP = null;
     snap(null, {}, t("Ferdig! Hver nøkkel står på hjemmeplassen sin eller litt etter.",
       "Ferdig. Load factor er " + cc.n + "/" + N + ". Understreking viser segmenter av opptatte plasser uten hull.",
       "Ferdig. Lange segmenter uten hull (clustering) gir lengre probing for nøkler som hasher inn i dem."), "Ferdig");
-    return steps;
+    return linkVars(steps);
   });
 
   /* ---------- Separate chaining: insert / get ----------
@@ -608,15 +638,29 @@
     var cfg = cfgOf(input), N = cfg.N || 10, fixed = cfg.fixed;
     var A = emptyArr(N), steps = [], n = 0;
     function rows() { return A.map(function (B) { return B ? B.map(function (o) { return { k: o.k, v: o.v }; }) : null; }); }
+    var OP = null;
+    function chainVars(line, m) {
+      if (line == null || !OP) return { vars: [] };
+      var vars = [kv("k", OP.k)];
+      if (OP.op === "ins" && OP.v != null) vars.push({ name: "v", value: OP.v });
+      var pr = m.cur || m.found || m.repl || m.fresh;
+      vars.push(at("i", pick(m, ["row", "miss"]) != null ? pick(m, ["row", "miss"]) : pr ? pr[0] : null));
+      var r = line % 100, inLoop = OP.op === "ins" ? (r === 8 || r === 9) : (r === 7 || r === 8);
+      var jj = inLoop ? (m.cur || m.found || m.repl)[1] : null;
+      vars.push(jj == null ? { name: "j", value: null } : { name: "j", value: jj, idx: jj, at: pr });
+      return { vars: vars, frame: OP.op === "ins" ? "SeparateChainingInsert" : "SeparateChainingGet" };
+    }
     function snap(line, marks, text, tag, extra) {
       var inf = []; if (extra) inf.push(extra);
       inf.push({ label: "Load factor", html: "n/N = " + n + "/" + N + " = " + fmt(n / N) });
-      steps.push({ line: line, parts: [{ type: "chain", N: N, rows: rows(), marks: marks || {} }], info: inf, text: text, tag: tag });
+      var cv = chainVars(line, marks || {});
+      steps.push({ line: line, parts: [{ type: "chain", N: N, rows: rows(), marks: marks || {} }], info: inf, text: text, tag: tag, vars: cv.vars, frame: cv.frame });
     }
     snap(null, {}, t("Et tomt array med " + N + " plasser. Hver plass kan få sin egen bøtte (en liste).",
       "Tomt array, N = " + N + ". Alle plasser er null: bøttene lages først når noe hasher dit.", "N = " + N + ", alle plasser null."), "Start");
     (cfg.ops || []).forEach(function (o) {
       var k = o.k, i = hash(k, N, fixed), hx = { label: "h", html: hText(k, N, fixed) }, B = A[i], seen = [];
+      OP = o;
       if (o.op === "ins") {
         var L = 100, item = pv(o);
         snap(L + 2, { row: i }, t(item + " hører hjemme i bøtte " + i + ".", hText(k, N, fixed) + ".", hText(k, N, fixed) + "."), "Sett inn " + item, hx);
@@ -651,10 +695,11 @@
         snap(Lg + 9, { row: i, miss: i, seen: seen }, t("Vi lette i hele bøtta. " + show(k) + " finnes ikke.", "Hele bøtta er sjekket: returner null.", "Mislykket oppslag, O(1 + |B|)."), "Ikke funnet", hx);
       }
     });
+    OP = null;
     snap(null, {}, t("Ferdig! Nøkler som kolliderer, deler bøtte.",
       "Ferdig. n = " + n + " par i " + A.filter(Boolean).length + " bøtter. Load factor kan bli større enn 1 med Separate chaining.",
       "Ferdig. Forventet bøttelengde er n/N = " + fmt(n / N) + "."), "Ferdig");
-    return steps;
+    return linkVars(steps);
   });
 
   /* ---------- Rehash (Linear probing, start N, grense 0,75) ----------
@@ -670,11 +715,20 @@
       var inf = []; if (extra) inf.push(extra);
       inf.push({ label: "Load factor", html: "n/N = " + n + "/" + N + " = " + fmt(n / N) });
       inf.push({ label: "Arbeid", html: skriv(total) + " totalt (innsettinger og flytt)" });
-      steps.push({ line: line, parts: parts, info: inf, text: text, tag: tag });
+      var vars = [], frame = null;
+      if (line != null && line >= 200) {   // inne i Rehash()
+        var jr = extraParts && extraParts[0].marks ? extraParts[0].marks.cur : null;
+        vars = [kv("N", N), kv("n", n), at("j", line === 208 ? jr : null, 0)]; frame = "Rehash";
+      } else if (line != null) {            // Insert(k, v)
+        vars = [kv("k", KEY), at("i", line === 102 ? null : pick(marks, ["cur", "found", "fresh"]), parts.length - 1), kv("n", n), kv("N", N)]; frame = "Insert";
+      }
+      steps.push({ line: line, parts: parts, info: inf, text: text, tag: tag, vars: vars, frame: frame });
     }
+    var KEY = null;
     function place(B, k) { var i = hash(k, B.length); while (B[i] != null) i = (i + 1) % B.length; B[i] = { k: k }; return i; }
     snap(null, {}, t("Vi starter med en bitteliten tabell med " + N + " plass" + (N > 1 ? "er" : "") + ".", "Start: N = " + N + ", n = 0. Før hver innsetting sjekker vi om n/N ≥ 0,75.", "Grense 0,75, dobling ved rehash."), "Start");
     keys.forEach(function (k) {
+      KEY = k;
       var lfTxt = n + "/" + N + " = " + fmt(n / N);
       if (n / N >= 0.75) {
         snap(102, {}, t("Før vi setter inn " + show(k) + ", sjekker vi hvor full tabellen er: " + lfTxt + ". Det er minst tre fjerdedeler, så den er for full.",
@@ -682,7 +736,8 @@
         var B = A, oldN = N;
         var bPart = function (mk) { return [{ type: "probe", label: "B (gammelt, N = " + oldN + ")", N: oldN, cells: cloneCells(B), marks: mk || {} }]; };
         steps.push({ line: 202, parts: bPart(), info: [{ label: "Load factor", html: "n/N = " + n + "/" + N + " = " + fmt(n / N) }, { label: "Arbeid", html: skriv(total) + " totalt (innsettinger og flytt)" }],
-          text: t("Rehash() kalles. Først tar vi vare på den gamle tabellen og kaller den B.", "Rehash() (linje 3 i Insert) kalles. B ← A: B er det gamle arrayet.", "B ← A. Ingen kopiering ennå, B peker bare på det gamle arrayet."), tag: "Rehash()" });
+          text: t("Rehash() kalles. Først tar vi vare på den gamle tabellen og kaller den B.", "Rehash() (linje 3 i Insert) kalles. B ← A: B er det gamle arrayet.", "B ← A. Ingen kopiering ennå, B peker bare på det gamle arrayet."), tag: "Rehash()",
+          vars: [kv("N", N), kv("n", n), at("j", null)], frame: "Rehash" });
         N = 2 * N; A = emptyArr(N); n = 0;
         snap(204, {}, t("Vi lager en ny, tom tabell som er dobbelt så stor: " + N + " plasser. Telleren n starter på 0 igjen.",
           "N ← 2 · " + oldN + " = " + N + ", A ← nytt array med bare null, og n ← 0 (linje 3–5 samlet i ett steg).", "N ← " + N + ", nytt array, n ← 0 (linje 3–5 samlet)."), "Dobling", bPart());
@@ -722,20 +777,30 @@
     snap(null, {}, t("Ferdig! Selv om vi flyttet alt noen ganger, ble det ikke så mye arbeid til sammen.",
       "Ferdig: " + inserted + " innsettinger og " + moves + " flytt ved rehash. Fordi N dobles hver gang, blir flyttene til sammen O(n), ikke O(n²).",
       "Totalt arbeid " + total + " for " + inserted + " innsettinger: amortisert O(1) per innsetting."), "Ferdig");
-    return steps;
+    return linkVars(steps);
   });
 
   /* ---------- Python 3.6-ordbok: insert / get / rehash ----------
      input: [{ N, ops:[{op:"ins"|"get"|"rehash", k, v}], fixed }] */
   reg(IN.gen, "hsPyOps", function (input) {
-    var cfg = cfgOf(input), N = cfg.N || 8, fixed = cfg.fixed, idx = emptyArr(N), ent = [], steps = [];
+    var cfg = cfgOf(input), N = cfg.N || 8, fixed = cfg.fixed, idx = emptyArr(N), ent = [], steps = [], OP = null, E = null;
     function oldLayout() { var a = emptyArr(N); ent.forEach(function (e) { var i = hash(e.k, N, fixed); while (a[i]) i = (i + 1) % N; a[i] = { k: show(e.k), v: e.v }; }); return a; }
     function snap(line, mi, me, text, tag, extra) {
       mi = mi || {}; if (mi.occ) mi.occ = mi.occ.slice();   // øyeblikksbilde: seen vokser senere
       var cells = idx.map(function (x) { return x == null ? null : { ref: x }; });
       var inf = []; if (extra) inf.push(extra);
       inf.push({ label: "Load factor", html: "n/N = " + ent.length + "/" + N + " = " + fmt(ent.length / N) });
-      steps.push({ line: line, parts: [
+      var vars = [], frame = null;
+      if (line != null && OP) {
+        var e2 = me && (me.cur != null ? me.cur : me.found != null ? me.found : me.repl);
+        if (e2 != null) E = e2;
+        vars = [kv("k", OP.k)];
+        if (OP.op !== "get" && OP.v != null) vars.push({ name: "v", value: OP.v });
+        vars.push(kv("N", N), at("i", pick(mi, ["cur", "found", "fresh", "miss"])));
+        vars.push(E == null ? { name: "e", value: null } : { name: "e", value: pv({ k: ent[E].k, v: ent[E].v }), idx: E, part: 1 });
+        frame = OP.op === "get" ? "DictGet" : "DictInsert";
+      }
+      steps.push({ vars: vars, frame: frame, line: line, parts: [
         { type: "probe", label: "indices (N = " + N + ")", N: N, cells: cells, marks: mi || {} },
         { type: "entries", label: "entries (n = " + ent.length + ", i innsettingsrekkefølge)", items: ent.map(function (e) { return { k: show(e.k), v: e.v }; }), marks: me || {} },
         { type: "probe", label: "Til sammenligning, før 3.6: entries med N = " + N + " plasser (samme hashverdier)", N: N, cells: oldLayout(), marks: {}, dim: true }
@@ -754,6 +819,7 @@
       }
       var k = o.k, i = hash(k, N, fixed), home = i, seen = [], hx = { label: "h", html: hText(k, N, fixed) };
       var L = o.op === "get" ? 100 : 200;
+      OP = o; E = null;
       snap(L + 3, { home: i, cur: i }, {}, t(show(k) + " hører hjemme på plass " + i + " i indices.", hText(k, N, fixed) + ".", hText(k, N, fixed) + "."), (o.op === "get" ? "Søk " : "Sett inn ") + show(k), hx);
       var g = 0;
       while (idx[i] != null && g++ < N) {
@@ -777,10 +843,11 @@
       ent.push({ k: k, v: o.v });
       snap(L + 11, { home: home, fresh: i, occ: seen }, { fresh: ent.length - 1 }, t(pv(o) + " legges bakerst i entries.", "append " + pv(o) + " to entries. Innsettingsrekkefølgen er bevart.", "entries er fortsatt tettpakket."), "Lagt bakerst", hx);
     });
+    OP = null;
     snap(null, {}, {}, t("Ferdig! Lista med par har ingen hull, og den husker rekkefølgen.",
       "Ferdig. Sammenlign med den gamle layouten: der har parene N plasser, her bare n.",
       "Iterasjon går gjennom entries (n steg) i innsettingsrekkefølge, i stedet for gjennom N plasser."), "Ferdig");
-    return steps;
+    return linkVars(steps);
   });
 
   /* ---------- Flest forekomster ----------
@@ -792,9 +859,10 @@
     function ganger(c) { return c + (c === 1 ? " gang" : " ganger"); }
     function pairs() { return order.map(function (x) { return [x, F[x]]; }); }
     function snap(line, cur, text, tag, extra) {
-      var inf = [{ label: "m", html: String(m) + (F[m] != null ? " (" + ganger(F[m]) + ")" : "") }];
+      // m står i variabellinja (sammen med x); antallet står ved m i F
+      var inf = IN.varLine ? [] : [{ label: "m", html: String(m) + (F[m] != null ? " (" + ganger(F[m]) + ")" : "") }];   // uten variabellinje (f.eks. crash.html): m som pille
       if (extra) inf.push(extra);
-      steps.push({ line: line, parts: [{ type: "arr", label: "A", items: A.slice(), marks: { cur: cur, done: done.slice() } },
+      steps.push({ vars: [cur != null ? { name: "x", value: A[cur], idx: cur } : { name: "x", value: null }, { name: "m", value: m }], line: line, parts: [{ type: "arr", label: "A", items: A.slice(), marks: { cur: cur, done: done.slice() } },
         { type: "map", label: "F (hashmap: element ↦ antall)", pairs: pairs(), marks: { cur: cur != null ? A[cur] : null, best: m } }],
         info: inf, text: text, tag: tag });
     }
@@ -819,6 +887,6 @@
       done.push(i);
     });
     snap(10, null, t("Ferdig! " + m + " forekommer flest ganger: " + ganger(F[m]) + ".", "Returner m = " + m + " (" + ganger(F[m]) + ").", "n iterasjoner, hver forventet O(1): O(n) forventet."), "Ferdig");
-    return steps;
+    return linkVars(steps);
   });
 })();

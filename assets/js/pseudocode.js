@@ -20,28 +20,68 @@
   };
   function esc(s) { return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
 
-  var RE = /(\/\/[^\n]*)|([A-Za-z][A-Za-z0-9]*(?:\.[A-Za-z][A-Za-z0-9']*|\[[^\]\n]*\])+)|(\d+)|([A-Za-z_][A-Za-z0-9_']*)|(\s+)|([\s\S])/g;
+  /* Gruppe 2 = symboler med innhold (⌊…⌋, ⌈…⌉, |V|, |E|, |A|, w(u, v)) – pakkes i .sym med forklaring
+     (ordlista i symboler.js, tipset i core.js). Teksten (textContent) blir nøyaktig den samme som før. */
+  var RE = /(\/\/[^\n]*)|(⌊[^⌊⌋\n]{1,60}⌋|⌈[^⌈⌉\n]{1,60}⌉|\|[A-Z]\||\bw\([a-z]\w{0,3}, ?[a-z]\w{0,3}\))|([A-Za-z][A-Za-z0-9]*(?:\.[A-Za-z][A-Za-z0-9']*|\[[^\]\n]*\])+)|(\d+)|([A-Za-z_][A-Za-z0-9_']*)|(\s+)|([\s\S])/;
+
+  function symOpen(id, arg, cls) {
+    return '<span class="' + (cls ? cls + " " : "") + 'sym" data-sym="' + id + '"' + (arg ? ' data-arg="' + arg + '"' : "") + ">";
+  }
+  // Ren tekst (kommentar, A[...]-token, Input/Output) → escapet HTML med symbolene pakket inn.
+  function symPlain(s) {
+    var SY = IN.SYMBOLER, hits = SY ? SY.scan(s) : [];
+    if (!hits.length) return esc(s);
+    var out = "", pos = 0;
+    hits.forEach(function (h) {
+      out += esc(s.slice(pos, h.i)) + symOpen(h.id, h.arg) + esc(s.substr(h.i, h.n)) + "</span>";
+      pos = h.i + h.n;
+    });
+    return out + esc(s.slice(pos));
+  }
+  function symGroup(t) {
+    var c = t.charAt(0);
+    if (c === "⌊" || c === "⌈")
+      return symOpen(c === "⌊" ? "floor" : "ceil") + c + tokenize(t.slice(1, -1)) + t.slice(-1) + "</span>";
+    if (c === "|") {
+      var L = t.charAt(1), id = (L === "V" || L === "E") ? L : "card";
+      return symOpen(id, id === "card" ? L : null) + '|<span class="mono">' + L + "</span>|</span>";
+    }
+    return symOpen("weight") + '<span class="var">w</span>' + tokenize(t.slice(1)) + "</span>";   // w(u, v)
+  }
 
   function tokenize(code) {
-    var out = "", m;
-    RE.lastIndex = 0;
-    while ((m = RE.exec(code)) !== null) {
-      if (m[1] != null)      out += '<span class="cmt">' + esc(m[1]) + "</span>";
-      else if (m[2] != null) out += '<span class="mono">' + esc(m[2]) + "</span>";
-      else if (m[3] != null) out += esc(m[3]);
-      else if (m[4] != null) {
-        var w = m[4];
-        if (KEYWORDS[w]) out += '<span class="kw">' + esc(w) + "</span>";
+    var out = "", m, re = new RegExp(RE.source, "g"), SY = IN.SYMBOLER, ch;   // egen regex: tokenize kalles rekursivt
+    var sym = !!SY;
+    while ((m = re.exec(code)) !== null) {
+      if (m[1] != null)      out += '<span class="cmt">' + (sym ? symPlain(m[1]) : esc(m[1])) + "</span>";
+      else if (m[2] != null) out += sym ? symGroup(m[2]) : esc(m[2]);
+      else if (m[3] != null) out += '<span class="mono">' + (sym ? symPlain(m[3]) : esc(m[3])) + "</span>";
+      else if (m[4] != null) out += esc(m[4]);
+      else if (m[5] != null) {
+        var w = m[5];
+        if (sym && w === "mod") out += symOpen("mod", null, "kw") + "mod</span>";
+        else if (KEYWORDS[w]) out += '<span class="kw">' + esc(w) + "</span>";
         else if (/^[A-Z]/.test(w)) out += '<span class="mono">' + esc(w) + "</span>";
         else out += '<span class="var">' + esc(w) + "</span>";
       }
-      else if (m[5] != null) out += m[5];
-      else                   out += esc(m[6]);
+      else if (m[6] != null) out += m[6];
+      else if (sym && (ch = SY.CHAR[m[7]])) out += symOpen(ch) + esc(m[7]) + "</span>";
+      else                   out += esc(m[7]);
     }
     return out;
   }
+  /* Tastatur: første forekomst av hvert symbol i en kodeboks får tabindex (ikke alle – en lang
+     pseudokode med ← på hver linje skulle ellers gitt titalls tabulatorstopp). */
+  function symFocus(box) {
+    var seen = {};
+    IN.qsa(".sym", box).forEach(function (s) {
+      var k = s.getAttribute("data-sym") + (s.getAttribute("data-arg") || "");
+      if (!seen[k]) { seen[k] = 1; s.tabIndex = 0; }
+    });
+  }
   IN.pseudo = IN.pseudo || {};
   IN.pseudo.tokenize = tokenize;
+  IN.pseudo.symPlain = symPlain;
 
   /* ---------- Hover-tooltip for pseudokodelinjer ----------
      Delt, flytende boks. Viser nivåstyrt forklaring for linja man peker på,
@@ -128,8 +168,8 @@
 
     if (opts.head !== false) {
       var head = el("div", { class: "pc-head" });
-      if (algo.input)  head.appendChild(el("span", { class: "pc-io", html: "<b>Input:</b> " + esc(algo.input) }));
-      if (algo.output) head.appendChild(el("span", { class: "pc-io", html: "<b>Output:</b> " + esc(algo.output) }));
+      if (algo.input)  head.appendChild(el("span", { class: "pc-io", html: "<b>Input:</b> " + symPlain(algo.input) }));
+      if (algo.output) head.appendChild(el("span", { class: "pc-io", html: "<b>Output:</b> " + symPlain(algo.output) }));
       if (algo.input || algo.output) box.appendChild(head);
     }
 
@@ -149,6 +189,7 @@
       }
       box.appendChild(row);
     });
+    symFocus(box);
     clear(host); host.appendChild(box);
 
     var clickHandlers = [];
@@ -212,7 +253,7 @@
     if (b.why) {
       var why = el("div", { class: "bigo-why" });
       box.appendChild(why);
-      var paint = function () { why.innerHTML = "<b>Hvorfor:</b> " + IN.level.pick(b.why); };
+      var paint = function () { why.innerHTML = "<b>Hvorfor:</b> " + IN.level.pick(b.why); if (IN.symbolTips) IN.symbolTips(why); };
       paint(); IN.level.onChange(paint);
     }
     return box;
@@ -245,7 +286,7 @@
       det.appendChild(el("summary", { text: "Hvorfor?" }));
       det.appendChild(body);
       box.appendChild(det);
-      var paint = function () { body.innerHTML = IN.level.pick(b.why); };
+      var paint = function () { body.innerHTML = IN.level.pick(b.why); if (IN.symbolTips) IN.symbolTips(body); };
       paint(); IN.level.onChange(paint);
     }
     return box;
@@ -291,6 +332,7 @@
       else body.appendChild(el("p", { class: "pc-exp-hint", text: "Klikk en linje for forklaring." }));
       var g = handle.lines[sel - 1].grense;
       if (g) body.insertAdjacentHTML("beforeend", grenseHTML(g, lvl));
+      if (IN.symbolTips) IN.symbolTips(body);
       handle.select(sel); handle.highlight(sel);
     }
     handle.onLineClick(function (n) { sel = n; paint(); });

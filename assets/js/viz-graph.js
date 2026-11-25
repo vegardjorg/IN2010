@@ -48,9 +48,21 @@
   }
   function unit(dx, dy) { var l = Math.sqrt(dx * dx + dy * dy) || 1; return [dx / l, dy / l]; }
 
+  /* Prikken i variabellinja får fargen til noden variabelen peker på (v.idx = node-id). */
+  var DOT = { cur: "compare", done: "sorted", warn: "swap", src: "target", seen: "seen", queued: "queued", dim: "stale" };
+  function dotOf(s, v) {
+    var st = s.nodes && s.nodes[v.idx];
+    if (st) return DOT[st] || "default";
+    var k = s.comp && s.comp[v.idx];
+    return k != null ? "k" + (k % 6) : "default";
+  }
+
   IN.vizGraph = function (stage, s, opts) {
     opts = opts || {};
-    clear(stage);
+    // Variabellinja bare i steg-spilleren (steg med vars); eksamensfigurer får ingen linje.
+    var vl = s && s.vars && IN.varLine ? IN.varLine.attach(stage) : null;
+    if (vl) IN.varLine.clearStage(stage);
+    else { if (IN.varLine) IN.varLine.detach(stage); clear(stage); }
     if (!s || !s.g) return;
     var g = s.g, R = opts.R || 16, dir = !!g.directed;
     var pos = {};
@@ -169,6 +181,7 @@
       root.appendChild(side);
     }
     stage.appendChild(root);
+    if (vl) vl.update(s.vars, s.varsPrev, { frame: s.frame, dot: function (x) { return dotOf(s, x); } });
     return svg;
   };
 })();

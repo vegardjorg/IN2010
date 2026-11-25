@@ -5,8 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Blokk 0 · Begreper · IN2010</title>
   <meta name="description" content="Grunnbegreper i IN2010: algoritme, datastruktur, Big-O, stabil/in-place, ADT, rekursjon.">
-  <script>(function(){try{var d=document.documentElement;var t=localStorage.getItem('in-theme');if(t&&t!=='system')d.setAttribute('data-theme',t);var l=localStorage.getItem('in-level')||'normal';d.setAttribute('data-level',l);}catch(e){document.documentElement.setAttribute('data-level','normal');}})();</script>
-  <link rel="stylesheet" href="assets/css/styles.css">
+  <script>(function(){try{var d=document.documentElement;var t=localStorage.getItem('in-theme')||'light';if(t!=='system')d.setAttribute('data-theme',t);var l=localStorage.getItem('in-level')||'normal';d.setAttribute('data-level',l);}catch(e){document.documentElement.setAttribute('data-theme','light');document.documentElement.setAttribute('data-level','normal');}})();</script>
+  <link rel="stylesheet" href="assets/css/styles.css?v=20261125a">
 </head>
 <body data-page="begreper">
   <a class="skip-link" href="#main">Hopp til innhold</a>
@@ -222,11 +222,13 @@
 
   <footer class="footer">IN2010-guide · Blokk 0 · Begreper</footer>
 
-  <script src="assets/js/core.js"></script>
-  <script src="assets/js/data-tf.js"></script>
-  <script src="assets/js/pseudocode.js"></script>
-  <script src="assets/js/stepplayer.js"></script>
-  <script src="assets/js/viz-bars.js"></script>
+  <script src="assets/js/core.js?v=20261125a"></script>
+  <script src="assets/js/symboler.js?v=20261125a"></script>
+  <script src="assets/js/data-tf.js?v=20261125a"></script>
+  <script src="assets/js/pseudocode.js?v=20261125a"></script>
+  <script src="assets/js/stepplayer.js?v=20261125a"></script>
+  <script src="assets/js/varline.js?v=20261125a"></script>
+  <script src="assets/js/viz-bars.js?v=20261125a"></script>
   <script>
   (function () {
     var IN = window.IN, el = IN.el, qs = IN.qs;
@@ -395,7 +397,8 @@
         return s;
       }
       function snap(line, text, tag, inner, mark) {
-        steps.push({ line: line, stack: copy(), text: text, tag: tag, expr: expr(mark ? "<mark>" + inner + "</mark>" : inner) });
+        steps.push({ line: line, stack: copy(), text: text, tag: tag, expr: expr(mark ? "<mark>" + inner + "</mark>" : inner),
+          vars: [{ name: "n", value: stack[stack.length - 1].n }], frame: "Fakultet" });   // variabellinja: n i rammen øverst
       }
       steps.push({ line: null, stack: [], start: true, n: n, tag: "Start", expr: "Fakultet(" + n + ")",
         text: t("Vi skal regne ut " + n + "! («" + n + " fakultet»). Stakken med lapper er tom – ingen har begynt ennå.",
@@ -441,14 +444,15 @@
         "Ferdig: " + n + "! = " + res0(n) + ", og stakken er tom.",
         "Alle rammer er poppet; resultat " + res0(n) + ". " + (calls === 1 ? "Ett kall med O(1) arbeid." : calls + " kall, O(1) arbeid hver: O(n).")),
         tag: "Ferdig", expr: "<mark>" + res0(n) + "</mark>", done: n, val: res0(n) });
-      return steps;
+      return IN.varLine ? IN.varLine.link(steps) : steps;
     }
     function res0(n) { var r = 1; for (var i = 2; i <= n; i++) r *= i; return r; }
     IN.stepPlayer("#rk-player", {
       generate: genFact,
       presets: { "4!": [4], "5!": [5], "3!": [3], "6!": [6] },
       render: function (step, ctx) {
-        var stage = ctx.stage; IN.clear(stage);
+        var stage = ctx.stage, vl = IN.varLine ? IN.varLine.attach(stage) : null;
+        if (vl) IN.varLine.clearStage(stage); else IN.clear(stage);
         var wrap = el("div", { class: "callstack" });
         // .callstack er column-reverse: første ramme (eldste) havner nederst, nyeste øverst
         step.stack.forEach(function (fr, i) {
@@ -472,6 +476,7 @@
           el("span", { class: "muted small", text: "Regnestykket så langt: " }),
           el("span", { class: "mono", html: step.expr })
         ]));
+        if (vl) vl.update(step.vars || [], step.varsPrev, { frame: step.frame });
       },
       pseudo: rkHandle,
       inputLabel: "n fra 0 til 7, f.eks. 5",

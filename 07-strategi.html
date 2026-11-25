@@ -5,8 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Blokk 7 · Strategi · IN2010</title>
   <meta name="description" content="Strategi i IN2010: les kjøretiden ut av løkker og rekursjon, kjenn igjen algoritmestrategiene kurset bruker, forstå P, NP og reduksjoner, og svar slik sensor belønner – med drilloppgaver og eksamensoppgaver.">
-  <script>(function(){try{var d=document.documentElement;var t=localStorage.getItem('in-theme');if(t&&t!=='system')d.setAttribute('data-theme',t);var l=localStorage.getItem('in-level')||'normal';d.setAttribute('data-level',l);}catch(e){document.documentElement.setAttribute('data-level','normal');}})();</script>
-  <link rel="stylesheet" href="assets/css/styles.css">
+  <script>(function(){try{var d=document.documentElement;var t=localStorage.getItem('in-theme')||'light';if(t!=='system')d.setAttribute('data-theme',t);var l=localStorage.getItem('in-level')||'normal';d.setAttribute('data-level',l);}catch(e){document.documentElement.setAttribute('data-theme','light');document.documentElement.setAttribute('data-level','normal');}})();</script>
+  <link rel="stylesheet" href="assets/css/styles.css?v=20261125a">
 </head>
 <body data-page="strategi">
   <a class="skip-link" href="#main">Hopp til innhold</a>
@@ -103,7 +103,7 @@
         <p><b>Definisjonen av O.</b> f(n) er O(g(n)) hvis det finnes en konstant c &gt; 0 slik at f(n) ≤ c · g(n) for alle n som er store nok
           (altså for alle n ≥ n₀, se <a href="00-begreper.html#fane=bigo">Blokk 0 → Big-O</a>).
           Eksempel: 3n² + 5n + 2 ≤ 4n² så snart n ≥ 6, så 3n² + 5n + 2 er O(n²).</p>
-        <p>O er en <b>øvre grense</b>. En algoritme som er O(log n), er derfor også O(n) og O(n²). På eksamen skal du likevel oppgi den <b>laveste</b> klassen du kan begrunne: å svare O(n²) på en lineær algoritme er ikke feil matematikk, men det gir ikke poeng.</p>
+        <p>O er en <b>øvre grense</b>. En algoritme som er O(log n), er derfor også O(n) og O(n²). På eksamen bør du likevel oppgi den <b>laveste</b> klassen du kan begrunne. Å svare O(n²) på en lineær algoritme er ikke feil matematikk, men sensor ser etter kjøretiden løsningen faktisk har, og lavere kjøretid gir mer uttelling.</p>
         <p><b>Rekursjon.</b> Du trenger ikke løse rekurrensligninger på eksamen, og forelesningene bruker dem ikke.
           Noen steder i guiden står likevel en formel som T(n) = T(n/2) + O(1). Les den som en kortversjon av argumentet, ikke som noe du må regne på.
           På eksamen er argumentet: hvor mange nivåer eller runder, og hvor mye arbeid per nivå. Tegn kalltreet for deg: Merge sort har log n nivåer og O(n) arbeid per nivå, altså O(n log n). Quicksort med dårlig pivot har n nivåer med lineært arbeid, altså O(n²).</p>
@@ -127,7 +127,7 @@
       <h3>Eksamen</h3>
       <div id="exam-h2020-7a"></div>
       <div id="exam-h2022-2"></div>
-      <div class="callout sensor"><span class="lbl">Sensortips: kjøretid (H2020, H2025)</span>
+      <div class="callout sensor"><span class="lbl">Sensortips: kjøretid (H2023, H2020, H2025)</span>
         <ul>
           <li>Oppgi kjøretiden <b>og</b> én setning om hvorfor: «løkka går n ganger, og hver runde er O(1)». Det er ofte et eget poeng.</li>
           <li>Kjøretiden må stemme med <b>din</b> løsning, ikke med den beste mulige.</li>
@@ -245,7 +245,7 @@
         <ul>
           <li>I en drøfting: si hva hver strategi avhenger av, og <b>når</b> hver av dem er best. Det holder ikke å kåre én vinner.</li>
           <li>Kall strategien ved navn bare når du er sikker. Ellers er det bedre å beskrive hva den gjør.</li>
-          <li>Begynner du med en rett-fram-løsning, skriv den ferdig og oppgi kjøretiden. En riktig, treg løsning gir poeng. En rask løsning som er feil, gir ofte 0.</li>
+          <li>Begynner du med en rett-fram-løsning, skriv den ferdig og oppgi kjøretiden. En riktig, treg løsning gir som regel delvis uttelling, men ikke alltid: i H2020 7b og H2023 Finn duplikat ga en løsning over kravet til kjøretid 0 poeng. En rask løsning som er feil, gir ofte 0.</li>
         </ul>
       </div>
     </section>
@@ -259,7 +259,7 @@
         <a href="#fane=pnp&amp;oppg=pnp-erlik">Er P = NP?</a> ·
         <a href="#fane=pnp&amp;oppg=pnp-red">Reduksjoner</a> ·
         <a href="#fane=pnp&amp;oppg=pnp-hard">NP-hardt og NP-komplett</a> ·
-        <a href="#fane=pnp&amp;oppg=pnp-halt">Uavgjørbare problemer</a> ·
+        <a href="#fane=pnp&amp;oppg=pnp-halt">Uløselige problemer</a> ·
         <a href="#fane=pnp&amp;oppg=pnp-ov">Øv selv</a> ·
         <a href="#fane=pnp&amp;oppg=pnp-eks">Eksamen</a></p></nav>
       <div class="callout begrep"><span class="lbl">Begrep: problemets vanskelighet</span>
@@ -280,7 +280,7 @@
         <div class="card st-prob"><h4>HAMILTONSYKEL</h4><p class="small"><b>Instans:</b> en urettet graf G.<br><b>Spørsmål:</b> finnes det en sykel som er innom hver node nøyaktig én gang?</p><span class="tag st-tag-npc">NP-komplett</span></div>
         <div class="card st-prob"><h4>SUDOKU</h4><p class="small"><b>Instans:</b> et delvis utfylt n × n-brett.<br><b>Spørsmål:</b> kan resten fylles ut etter reglene?</p><span class="tag st-tag-npc">NP-komplett (store brett)</span></div>
         <div class="card st-prob"><h4>SAT</h4><p class="small"><b>Instans:</b> en logisk formel med variabler.<br><b>Spørsmål:</b> finnes det sann/usann-verdier som gjør formelen sann?</p><span class="tag st-tag-npc">Det første som ble bevist NP-hardt</span></div>
-        <div class="card st-prob"><h4>HALT</h4><p class="small"><b>Instans:</b> en algoritme A og et input x.<br><b>Spørsmål:</b> stopper A når den kjøres på x?</p><span class="tag st-tag-u">Uavgjørbart</span></div>
+        <div class="card st-prob"><h4>HALT</h4><p class="small"><b>Instans:</b> en algoritme A og et input x.<br><b>Spørsmål:</b> stopper A når den kjøres på x?</p><span class="tag st-tag-u">Uløselig</span></div>
       </div>
       <p class="muted small">Et rikere problem («finn den korteste stien») er minst like vanskelig som avgjørelsesversjonen («finnes en sti med lengde høyst k?»). Klarer vi det rike, klarer vi også JA/NEI-spørsmålet.</p>
 
@@ -408,14 +408,14 @@
       </div>
 
       <h3 id="pnp-halt">Problemer som ingen algoritme kan løse</h3>
-      <div class="callout begrep"><span class="lbl">Begrep: uavgjørbart</span>
-        <p>Noen avgjørelsesproblemer er <b>uavgjørbare</b>: det er bevist at ingen algoritme gir riktig svar på alle instanser i endelig tid. Det klassiske eksempelet er <b>stoppeproblemet</b> (HALT).
+      <div class="callout begrep"><span class="lbl">Begrep: uløselig</span>
+        <p>Noen avgjørelsesproblemer er <b>uløselige</b> (i andre bøker: uavgjørbare): det er bevist at ingen algoritme gir riktig svar på alle instanser i endelig tid. Det klassiske eksempelet er <b>stoppeproblemet</b> (HALT).
           Det hjelper ikke med en raskere datamaskin. Slike problemer ligger utenfor både P og NP.</p>
       </div>
       <div class="callout uni"><span class="lbl">Universitetsnivå: hvorfor HALT ikke kan løses</span>
         <p>Anta at det finnes en algoritme H(A, x) som alltid svarer riktig på om A stopper på x. Lag en ny algoritme D(A): spør H(A, A). Sier H «stopper», går D i evig løkke. Sier H «stopper ikke», svarer D JA og stopper.
           Kjør nå D på seg selv. Stopper D(D)? Hvis ja, sa H «stopper ikke», og D stoppet likevel. Hvis nei, sa H «stopper», og D gikk likevel i evig løkke. Begge deler er umulig, så H kan ikke finnes.
-          Dette beviste Alan Turing i 1936.</p>
+          Dette viste Alan Turing i 1936. Alonzo Church kom samme år fram til et tilsvarende resultat.</p>
       </div>
 
       <h3 id="pnp-ov">Øv selv</h3>
@@ -465,7 +465,7 @@
           </ul></details>
         <details class="card st-type" open><summary><b>Oppgi kjøretiden</b> <span class="muted small">ofte 1–2 poeng for seg</span></summary>
           <ul class="small">
-            <li>Kjøretiden skal stemme med din egen løsning. Feil eller manglende kjøretid ga −1 per deloppgave i H2023.</li>
+            <li>Kjøretiden skal stemme med din egen løsning. I H2023 Finn duplikat ga feil eller manglende kjøretid −1 per deloppgave. Andre oppgaver gir heller et eget poeng for kjøretiden.</li>
             <li>Uttrykk den i variabler som er definert: n, |V|, |E|, h, k.</li>
             <li>Si hvilket tilfelle du mener, særlig for hashing (forventet O(1), verste O(n)) og søketrær (O(h), som er O(n) for en kjede).</li>
             <li>Står det «begrunn kort», holder én setning: «hver node besøkes én gang med O(1) arbeid».</li>
@@ -485,7 +485,7 @@
           </ul></details>
         <details class="card st-type"><summary><b>Kjør for hånd</b> <span class="muted small">heap, AVL, Huffman, hashing</span></summary>
           <ul class="small">
-            <li>Vis mellomtilstandene: treet etter hver innsetting, køen etter hver sammenslåing, tabellen etter hver kollisjon.</li>
+            <li>Vis gjerne mellomtilstandene: treet etter hver innsetting, køen etter hver sammenslåing, tabellen etter hver kollisjon. Det er ikke alltid et krav (i H2023 2a trengte bare siste linje være med), men det gjør det lettere for sensor å gi delpoeng.</li>
             <li>Skriv hvilken regel du bruker (hvilken rotasjon, hvilken kant som får 0 og 1).</li>
           </ul></details>
         <details class="card st-type"><summary><b>Sant/usant og flervalg</b> <span class="muted small">rettes automatisk</span></summary>
@@ -497,7 +497,7 @@
 
       <div id="del1-ovelse">
         <h3>Del 1-øving: sant/usant med ekte poengregel</h3>
-        <p class="small">Fra 2023 begynner eksamen med en del 1 med små sant/usant-oppgaver: 32 poeng i H2023, 22 i H2024 og 26 i H2025.
+        <p class="small">Eksamen begynner med små oppgaver som rettes automatisk. Det gjorde også H2021 og H2022 (i H2021 oppgave 6 ga feil og blankt −1). Fra 2023 heter det del 1, med poengregelen under: 32 poeng i H2023, 22 i H2024 og 26 i H2025.
           Her trekkes en tilfeldig blanding fra alle blokkene i guiden, og svarene rettes med regelen fra sensorveiledningene.</p>
         <div class="callout snarvei"><span class="lbl">Poengregelen i del 1 (H2023–H2025)</span>
           <p>Det er N påstander, og n er antall riktige svar. Blankt og galt teller likt. Poengene blir <b>2 · max(n − N/2, 0)</b>.
@@ -576,16 +576,19 @@
   </main>
 
   <footer class="footer">
-    <p class="muted small">IN2010 · Blokk 7 · Strategi. Egne forklaringer og demoer basert på pensum. Eksamensoppgavene er gjengitt med egne ord.</p>
+    <p class="muted small">IN2010 · Blokk 7 · Strategi. Egne forklaringer og demoer basert på pensum. Eksamensoppgavene er gjengitt ordrett fra eksamensarkene (UiO, IN2010), med kildelinje og eventuelle avvik på hvert kort.</p>
   </footer>
 
-  <script src="assets/js/core.js"></script>
-  <script src="assets/js/data-tf.js"></script>
-  <script src="assets/js/pseudocode.js"></script>
-  <script src="assets/js/stepplayer.js"></script>
-  <script src="assets/js/viz-bars.js"></script>
-  <script src="assets/js/data-algos.js"></script>
-  <script src="assets/js/data-strategi.js"></script>
+  <script src="assets/js/core.js?v=20261125a"></script>
+  <script src="assets/js/symboler.js?v=20261125a"></script>
+  <script src="assets/js/data-tf.js?v=20261125a"></script>
+  <script src="assets/js/pseudocode.js?v=20261125a"></script>
+  <script src="assets/js/stepplayer.js?v=20261125a"></script>
+  <script src="assets/js/viz-bars.js?v=20261125a"></script>
+  <script src="assets/js/viz-graph.js?v=20261125a"></script>
+  <script src="assets/js/data-algos.js?v=20261125a"></script>
+  <script src="assets/js/data-strategi.js?v=20261125a"></script>
+  <script src="assets/js/perfekt/strategi.js?v=20261125a"></script>
   <script>
   (function () {
     "use strict";
@@ -829,7 +832,7 @@
       { q: "Vi vil vise at et nytt problem X er NP-hardt. Hvilken reduksjon trenger vi?", options: ["Fra X til SAT", "Fra SAT til X", "Fra X til et problem i P", "Ingen, det holder med en verifikator"], answer: 1,
         explain: "Fra det kjente vanskelige til det nye. Da er X minst like vanskelig som SAT. En verifikator viser at X er i NP, ikke at X er vanskelig." },
       { q: "Hvilket problem er NP-komplett?", options: ["PATH", "SORT", "HAMILTONSYKEL", "HALT"], answer: 2,
-        explain: "HAMILTONSYKEL er i NP (verifikatoren over) og NP-hardt. PATH og SORT er i P, og HALT er uavgjørbart." },
+        explain: "HAMILTONSYKEL er i NP (verifikatoren over) og NP-hardt. PATH og SORT er i P, og HALT er uløselig." },
       { q: "Hva vet vi om P og NP?", options: ["P = NP", "P ≠ NP", "P ⊆ NP, men om de er like, er ukjent", "NP er problemene som ikke kan løses i polynomiell tid"], answer: 2,
         explain: "Alt som kan løses raskt, kan også sjekkes raskt. Om det motsatte gjelder, er et åpent problem." }
     ]);
@@ -837,14 +840,14 @@
     /* ===================== EKSAMENSTEKNIKK ===================== */
     IN.explain("#intro-teknikk", t(
       "Sensor kan ikke lese tankene dine, bare det du skriver. Si hva du tenker å gjøre, gjør det ryddig, og si hvor lang tid det tar.",
-      "Poengene kommer fra tre ting: at løsningen er riktig, hvor rask den er, og at sensor forstår den. En rask løsning som ikke virker, gir lite. En riktig, men treg løsning gir delvis uttelling.",
+      "Poengene kommer fra tre ting: at løsningen er riktig, hvor rask den er, og at sensor forstår den. En rask løsning som ikke virker, gir lite. En riktig, men treg løsning gir som regel delvis uttelling, men noen oppgaver krever en bestemt kjøretid før de gir poeng (H2020 7b, H2023 Finn duplikat).",
       "Sensorveiledningene gir ofte poeng i trinn etter kjøretid, et eget poeng for riktig kjøretidsanalyse, og delvis uttelling for riktig idé med feil i detaljene. Presis naturlig tekst sidestilles med pseudokode. Uklarhet koster mer enn syntaksfeil."
     ), { label: "Nivå:" });
 
     (function trapp() {
       var TASKS = [
         { label: "H2021 InRange", total: 10, link: "04-traer.html#fane=bst&oppg=exam-h2021-8", what: "(a), skrive ut verdiene i [a, b] fra et søketre",
-          steps: [["O(h + k), inorder med beskjæring (O(log n) når a = b i et balansert tre)", 10], ["O(n)", 8], ["O(n log n)", 5], ["O(n²)", 2]] },
+          steps: [["O(log n + min(n, b − a)) i et balansert tre, inorder med beskjæring (O(log n) når a = b)", 10], ["O(n)", 8], ["O(n log n)", 5], ["O(n²)", 2]] },
         { label: "H2022 CheckBST", total: 6, link: "04-traer.html#fane=bst&oppg=exam-h2022-10", what: "(b), sjekke om et binærtre er et søketre",
           steps: [["O(n) (grenser eller inorder)", 6], ["O(n²) (FindMin/FindMax i hver node)", 4]] },
         { label: "H2023 Diameter", total: 8, link: "04-traer.html#fane=diameter&oppg=exam-h2023-5", what: "(c), diameteren til et binærtre",
@@ -916,7 +919,7 @@
     (function del1() {
       var host = qs("#del1-host"), GEN = IN.TF_GEN || {};
       if (!host) return;
-      var NAVN = { begreper: "Begreper", sortering: "Sortering", sok: "Søk", heap: "Heap", traer: "Trær", hashing: "Hashing", grafer: "Grafer", strategi: "Strategi" };
+      var NAVN = { begreper: "Begreper", sortering: "Sortering", sok: "Søk", heap: "Heap", traer: "Trær", hashing: "Hashing", grafer: "Grafer", strategi: "Strategi", lister: "Lister" };
       var secs = Object.keys(GEN).filter(function (k) { return GEN[k] && GEN[k].length; });
       if (!secs.length) { host.textContent = "Fant ingen påstander å trekke fra."; return; }
       var SIZES = [{ label: "22 (som H2024)", N: 22 }, { label: "26 (som H2025)", N: 26 }, { label: "32 (som H2023)", N: 32 }];
@@ -943,10 +946,25 @@
             "Du mister likevel ingenting på å gjette på de få du er usikker på, for blankt gir heller ikke noe. Det er påstandene du faktisk kan, som løfter deg over streken." })
         ])];
       }
+      // Påstandene i IN.TF_GEN er våre egne, laget ut fra eksamenene. Ingen av dem er ordrett fra et eksamenssett,
+      // så de får en kildelinje som sier det, og aldri et eksamensmerke (eksamen: false).
+      var BLOKK = { begreper: 0, sortering: 1, sok: 2, heap: 3, traer: 4, hashing: 5, grafer: 6, strategi: 7 };
+      function kildeFor(k) {
+        var navn = NAVN[k] || k, b = BLOKK[k];
+        return { ref: "Egen påstand i guiden (" + (b != null ? "blokk " + b + ", " : "") + navn.toLowerCase() + "), laget ut fra eksamenene H2020–H2025",
+          kort: "egen påstand · " + navn.toLowerCase(), egneOrd: true, eksamen: false };
+      }
+      // Visningsrettelse: «del 1» i forklaringene om H2021 og H2022 er oppgavenummeret i eksamenssettet
+      // (rettes i kilden plan/tf-generert senere, se plan/gjennomgang/tema-strategi-mock.md)
+      function rettForklaring(x) {
+        return String(x || "").replace(/\(H2022 del 1\)/g, "(H2022, oppgave 2)")
+          .replace(/H2021 testet definisjonen i del 1/g, "H2021 testet definisjonen i oppgave 6")
+          .replace(/H2021 del 1 testet/g, "H2021 oppgave 6 testet");
+      }
       // Rundgang over blokkene (i tilfeldig rekkefølge), så blandingen dekker alle temaene
       function draw() {
         var pools = shuffle(secs.map(function (k) {
-          return shuffle(GEN[k].map(function (it) { return { s: it.s, answer: !!it.answer, explain: it.explain || "", tema: NAVN[k] || k, kilde: false }; }));
+          return shuffle(GEN[k].map(function (it) { return { s: it.s, answer: !!it.answer, explain: rettForklaring(it.explain), tema: NAVN[k] || k, kilde: kildeFor(k) }; }));
         }));
         var out = [], p = 0;
         while (out.length < N && pools.some(function (x) { return x.length; })) {
@@ -965,13 +983,16 @@
       switchRow(sizeRow, SIZES, function (it) { N = it.N; draw(); });
     })();
 
-    /* ===================== EKSAMEN (gjengitt med egne ord) ===================== */
+    /* ===================== EKSAMEN (oppgavetekst ordrett fra arket) =====================
+       Nøkler og perfekt svar: assets/js/perfekt/strategi.js. H2020-7 og H2020-8 er delte nøkler,
+       og kortene her viser bare sine deler (deler). Ordrett tekst: plan/gjennomgang/08-eksamenstekst-ordrett.md. */
     // Løsning som DOM-node: (a), (b), … som deloppgavene + pseudokode via IN.pseudo (BYGGEGUIDE 5.4)
     function sol(items, algos, o) {
       o = o || {};
       var d = el("div");
       if (o.intro) d.appendChild(el("p", { html: o.intro }));
-      var ol = el(o.plain ? "ul" : "ol", o.plain ? {} : { class: "et-parts" }); items.forEach(function (x) { ol.appendChild(el("li", { html: x })); }); d.appendChild(ol);
+      var ol = el(o.plain ? "ul" : "ol", o.plain ? {} : { class: "et-parts" });
+      items.forEach(function (x) { ol.appendChild(el("li", { html: x })); }); d.appendChild(ol);
       (algos || []).forEach(function (key) {
         d.appendChild(el("h5", { style: "margin:.8rem 0 .3rem", text: "Pseudokode: " + A[key].name }));
         var h = el("div"); d.appendChild(h); IN.pseudo.render(h, A[key], {});
@@ -979,81 +1000,178 @@
       });
       return d;
     }
-    function pcFig(algo, cap) { return { cls: "code", cap: cap, draw: function (h) { IN.pseudo.render(h, algo, { head: false, tooltips: false }); } }; }
-    function tfParts(list) { return list.map(function (s) { return { t: s, p: 1 }; }); }
+    function tfParts(list) { return list.map(function (s) { return { t: s }; }); }
     function tfSol(list) { return list.map(function (x) { return "<b>" + (x[0] ? "Sant" : "Usant") + ".</b> " + x[1]; }); }
     function demoLink(fane, demo, txt) { return '<p class="small muted">Prøv selv: <a href="#fane=' + fane + "&amp;oppg=" + demo + '">' + txt + "</a>.</p>"; }
+    // Pseudokode fra arket, ordrett (egen algo, ikke kursets variant)
+    function sheetPc(host, algo) { IN.pseudo.render(host, algo, { tooltips: false }); }
+    function Ln(code, indent) { return { code: code, indent: indent }; }
 
+    /* ---------- H2020-7: felles innledning (ordrett) ---------- */
+    var SUB_INTRO = "<p>Vi ønsker å lage en nettside for å hjelpe sleipe Scrabble-spillere. En Scrabble-spiller har noen bokstaver som de skal prøve å forme ord fra, og disse ordene må stå i en ordbok. I denne oppgaven ignorerer alle andre Scrabble-regler, og fokuserer på det vi skal kalle subanagrammer.</p>" +
+      "<p>La oss anta at bokstavene man har tilgjengelig er gitt som en streng S, og at et ord W også er gitt som en streng. Vi sier at W er et subanagram av S, dersom W kan skrives ved å kun bruke bokstaver fra S.</p>" +
+      "<p>Merk at vi ikke tillater gjenbruk av bokstaver fra S. For eksempel er \"hole\" et subanagram av \"ehlo\". Derimot er \"hello\" ikke et subanagram av \"ehlo\", fordi det ikke er to \"l\"-er i \"ehlo\". Både \"hole\" og \"hello\" er subanagrammer av \"hheelloo\".</p>" +
+      "<p>Her er noen eksempler på subanagramer av \"aghilmort\":</p><ul><li>\"algorithm\"</li><li>\"logarithm\"</li><li>\"alright\"</li><li>\"right\"</li><li>\"math\"</li><li>\"git\"</li></ul>" +
+      "<p>I oppgavene som følger ser vi på ulike måter å finne subanagrammer fra en gitt ordbok.</p>";
+    var PC_SUB1 = { name: "IsSubanagramOf1", params: "W, S", input: "En streng W og en streng S", output: "Returner true hvis W et subanagram av S, false ellers",
+      lines: [Ln("r ← copy of W", 1), Ln("for c in S do", 1), Ln("if c is in r then", 2), Ln("remove an occurrence of c from r", 3), Ln("return r.length = 0", 1)] };
+    var PC_STRAT1 = { name: "SubanagramsOf1", params: "D, S",
+      lines: [Ln("r ← empty list", 1), Ln("for i ← 0 to d − 1 do", 1), Ln("W ← D[i]", 2), Ln("if IsSubanagramOf2(W, S) then", 2), Ln("add W to r", 3), Ln("return r", 1)] };
+    var PC_STRAT2 = { name: "Build", params: "D",
+      lines: [Ln("M ← empty map", 1), Ln("for i ← 0 to d − 1 do", 1), Ln("sortedword ← Sort(D[i])", 2), Ln("if M.get(sortedword) is empty then", 2), Ln("M.put(sortedword, empty list)", 3), Ln("add D[i] to M.get(sortedword)", 2), Ln("return M", 1),
+        { code: "Procedure SubanagramsOf2(M, S)", indent: 0 }, Ln("r ← empty list", 1), Ln("for x in sorted substrings of S do", 1), Ln("append M.get(x) to r", 2), Ln("return r", 1)] };
+
+    var o7a = IN.oppg({
+      intro: SUB_INTRO + '<p><b>(a)</b> <span class="et-p">(4p)</span></p><p class="small"><b>ALGORITHM: ER W ET SUBANAGRAM AV S?</b></p><div class="et-skel-7a"></div>' +
+        "<p>Algoritmen ovenfor skal sjekke om ordet W kan skrives med bokstavene fra S.</p>" +
+        "<ul><li>Anta at en streng fungerer akkurat som et array med bokstaver.</li><li>Å kopiere et array gjøres i lineær tid.</li><li>Å sjekke om et element er i et array gjøres i lineær tid.</li>" +
+        "<li>Å fjerne et element fra et array gjøres i lineær tid.</li><li>Å finne lengden av et array gjøres i konstant tid.</li><li>Vi lar w angi størrelsen på W og s angi størrelsen på S.</li></ul>" +
+        "<p>Hva er kjøretidskompleksiteten til algoritmen?</p>" +
+        "<ul class=\"et-choices\"><li>O(w + s)</li><li>O(s²)</li><li>O(w log(s))</li><li>O(s · w)</li><li>O(w²)</li></ul>"
+    });
+    sheetPc(qs(".et-skel-7a", o7a), PC_SUB1);
+
+    var o7c = IN.oppg({
+      intro: SUB_INTRO + '<p><b>(c)</b> <span class="et-p">(6p)</span></p>' +
+        '<div class="grid cols-2"><div><p class="small"><b>Strategi 1</b></p><div class="et-skel-s1"></div>' +
+        "<p class=\"small\">I pseudokoden ovenfor er vi gitt en ordbok D av lengde d, som er et array av strenger. Den bruker IsSubanagramOf2 fra forrige deloppgave til å finne alle ord i ordboka som er et subanagram av S. Å finne subanagrammer med denne teknikken kjører i O(d · (w + s)), der d er størrelsen på ordboka, w er størrelsen til det største ordet i ordboka, og s er størrelsen til S.</p></div>" +
+        '<div><p class="small"><b>Strategi 2</b></p><div class="et-skel-s2"></div>' +
+        "<p class=\"small\">I pseudokoden ovenfor lager vi et hashmap, der hver nøkkel k er en streng med bokstaver sortert i alfabetisk rekkefølge, og verdien er en liste med anagrammer av k som finnes i ordboka. For å finne alle subanagrammer i ordboken, må vi slå opp på alle sorterte substrenger av S i hashmapet. Å finne subanagrammer med denne teknikken kjører i O(2<sup>s</sup>), altså eksponensiell tid med hensyn til størrelsen av S.</p></div></div>" +
+        "<p>Drøft fordeler og ulemper mellom strategi 1 og strategi 2 med tanke på kjøretid.</p>"
+    });
+    sheetPc(qs(".et-skel-s1", o7c), PC_STRAT1);
+    sheetPc(qs(".et-skel-s2", o7c), PC_STRAT2);
+
+    /* ---------- H2020-8: oppgavetekst (ordrett) + steg-demo av verifikatoren ---------- */
+    var TYPER = "<p><b>Type 1</b> er en urettet komplett graf (brevduene)<br><b>Type 2</b> er en urettet graf med en hamiltonsk sykel (sykkelstien)<br>" +
+      "<b>Type 3</b> er et urettet tre (nettverkskabler)<br><b>Type 4</b> er en urettet ikke-sammenhengende graf (roping)</p><p>Alle grafer i denne oppgaven har mer enn to noder.</p>";
+    var o8 = IN.oppg({
+      intro: "<p>Du ønsker å forbedre kommunikasjonsnettverket i en liten by. Historisk sett har all kommunikasjon mellom husstander i byen skjedd ved hjelp av brevduer. På denne måten kunne alle nå hverandres hus direkte. Men brevduer er upraktiske, så du skal finne bedre måter for husstandene å kommunisere med hverandre på. Du har utforsket følgende muligheter:</p>" +
+        "<ul><li>Den nye startupen HamiltonBikes har begynt å bygge nye sykkelstier og kommer til å drifte brevlevering mellom alle hus. De garanterer at man kan ta seg en sykkeltur som går innom alle husene i byen, uten å måtte sykle forbi det samme huset to ganger.</li>" +
+        "<li>Husene kan forbindes med nettverkskabel, men med hensyn til kostnaden, vil redundante forbindelser unngås.</li>" +
+        "<li>Noen bor så nærme hverandre at naboer kan rope for rask én-til-én kommunikasjon.</li></ul>" +
+        "<p>Du innser at hver kommunkasjonsform kan formaliseres som en graf der nodene er husstandene og kantene er forbindelsene mellom disse. Du identifiserer fire typer grafer, som hver tilsvarer en kommunikasjonsform:</p>" +
+        TYPER + "<p>Graftypene er gjentatt der du trenger det, så du trenger ikke å huske dem.</p>" +
+        '<p><b>(a)</b> <span class="et-p">(7p)</span></p>' +
+        "<p>Din første oppgave er å sjekke om HamiltonBikes virkelig leverer det de lover. De tilbyr å sende deg et kart over sykkelstiene og et forslag på en runde som går forbi hvert hus nøyaktig én gang. Du oversetter problemet til et avgjørelsesproblem:</p>" +
+        "<p><b>Type2</b><br><b>Instans:</b> En graf G<br><b>Spørsmål:</b> Inneholder G en hamiltonsk sykel?</p>" +
+        "<p>Du bestemmer deg for å lage en effektiv algoritme som verifisererer Type2. Algoritmen tar en graf og et sertifikat som input, og svarer JA hvis sertifikatet bekrefter at grafen er av type 2, NEI ellers. Algoritmen skal kjøre i polynomisk tid.</p>" +
+        "<p>HamiltonBikes leverer sertifikatet som et array C av noder i G, slik at hver node er med nøyaktig én gang. Skriv pseudokode for verifikatoren Type2Verifier.</p>" +
+        '<p class="small"><b>ALGORITHM: VERIFIKATOR FOR TYPE2</b></p><div class="et-skel-8a"></div>' +
+        '<p><b>(b)</b> <span class="et-p">(3p)</span></p>' +
+        "<p>Forklar kort (maks 4 setninger) hvorfor svaret på forrige deloppgave viser at avgjørelsesproblemet Type2 er i NP. Ikke gi en detaljert kjøretidsanalyse av pseudokoden din for Type2Verifier.</p>" +
+        "<p>Dersom svaret ditt på forrige deloppgave har mangler, kan du gjøre nødvendige antagelser uten å få følgefeil.</p>",
+      figsAfter: [{ cap: "Eksempelgraf (egen figur, ikke fra arket)", draw: function (h) { h.innerHTML = gsvg(HAMG, { w: 320, h: 235, order: { a: 0, b: 1, c: 2, d: 3, e: 4, f: 5 }, edge: { "a|b": "on", "b|c": "on", "c|d": "on", "d|e": "on", "e|f": "on", "a|f": "on" }, label: "Eksempelgraf med en hamiltonsk sykel a, b, c, d, e, f" }); } }],
+      outro: demoLink("pnp", "ham-graf", "Vær verifikatoren")
+    });
+    sheetPc(qs(".et-skel-8a", o8), { name: "Type2Verifier", params: "G, C", input: "En graf G og et array av noder C", output: "Returner JA hvis C viser at G er av type 2, NEI ellers", lines: [{ code: "// Fyll ut", indent: 1 }] });
+
+    // Steg-demo: Type2Verifier på eksempelgrafen. Linjekoder som i kursets stType2Verifier (1 = Procedure-linja).
+    var HAM_VG = { directed: false, nodes: Object.keys(HAMG.nodes).map(function (id) { return { id: id, x: HAMG.nodes[id][0], y: HAMG.nodes[id][1] }; }), edges: HAMG.edges };
+    function genHam(inp) {
+      var g = inp[0], C = inp[1].slice(), N = C.length, steps = [], ok = {};
+      function snap(line, text, tag, cur, bad, res) {
+        var nodes = {}, edges = {}, lab = {};
+        C.forEach(function (v, k) { lab[v] = String(k); });
+        Object.keys(ok).forEach(function (k) { edges[k] = "tree"; });
+        if (cur) { edges[cur[0] + ">" + cur[1]] = "hot"; nodes[cur[0]] = "cur"; nodes[cur[1]] = "cur"; }
+        if (bad) { nodes[bad[0]] = "warn"; nodes[bad[1]] = "warn"; }
+        steps.push({ line: line, g: g, nodes: nodes, edges: edges, lab: lab, text: text, tag: tag, result: res || null,
+          panel: [{ label: "C:", items: C.map(function (v, k) { return k + ": " + v; }) }] });
+      }
+      snap(2, t("Forslaget har " + N + " byer. Nå sjekker vi at det går en vei mellom hver by og den neste.",
+        "N ← |C| = " + N + ". Tallet ved hver node er plassen i C.",
+        "N ← " + N + ". Oppgaven lover at C har hver node nøyaktig én gang, så vi sjekker bare kantene."), "N = " + N);
+      for (var i = 0; i < N; i++) {
+        var u = C[i], v = C[(i + 1) % N], last = i === N - 1;
+        var has = g.edges.some(function (e) { return (e[0] === u && e[1] === v) || (e[0] === v && e[1] === u); });
+        snap(4, t("Går det en vei mellom " + u + " og " + v + "?" + (last ? " Det er veien hjem igjen til start." : ""),
+          "i = " + i + ": finnes {" + u + ", " + v + "} i E?" + (last ? " (i + 1) mod N = 0, så dette er kanten tilbake til C[0]." : ""),
+          "i = " + i + ": {C[" + i + "], C[" + ((i + 1) % N) + "]} = {" + u + ", " + v + "}" + (last ? ", den lukkende kanten" : "") + "."), "i = " + i, [u, v]);
+        if (!has) {
+          snap(5, t("Det går ingen vei mellom " + u + " og " + v + ". Da er forslaget feil.",
+            "{" + u + ", " + v + "} er ikke en kant i G. return NEI.",
+            "{" + u + ", " + v + "} ∉ E, så C er ikke en sykel i G. Verifikatoren svarer NEI for dette sertifikatet og leter ikke etter et annet."), "NEI", null, [u, v], "NEI");
+          return steps;
+        }
+        ok[u + ">" + v] = 1;
+      }
+      snap(6, t("Alle veiene fantes, også veien hjem. Forslaget er en tur innom alle byene.",
+        "Alle " + N + " kantene finnes. return JA.",
+        "Alle " + N + " kantene i den foreslåtte sykelen er i E: C er en hamiltonsk sykel. N kantoppslag, altså polynomiell tid."), "JA", null, null, "JA");
+      return steps;
+    }
+    var HAM_DEMO = { engine: "graph", gen: genHam, input: [HAM_VG, ["a", "b", "c", "d", "e", "f"]], inputNavn: "Gyldig sykel",
+      presets: { "Mangler en kant": [HAM_VG, ["a", "b", "e", "d", "c", "f"]], "Bare en sti (siste → første mangler)": [HAM_VG, ["a", "c", "b", "e", "f", "d"]] },
+      pseudo: "stType2Verifier", del: "(a)", label: "Kjør Type2Verifier på eksempelgrafen",
+      legend: [{ cls: "compare", label: "Kanten vi sjekker nå" }, { cls: "sorted", label: "Kanten finnes" }, { cls: "swap", label: "Kanten mangler (endene)" }],
+      svar: function (s) { return s ? s.result : null; }, fasit: "JA" };
+
+    /* ---------- Kortene ---------- */
     var EXAM = {
-      "h2021-6": { year: "H2021", title: "Beregnbarhet og kompleksitet (P og NP)", oppgave_nr: "Oppgave 6", points: 8,
+      "h2021-6": { key: "H2021-6", year: "H2021", title: "Litt om beregnbarhet og kompleksitet", oppgave_nr: "Oppgave 6", points: 8,
+        ark: "Litt om beregnbarhet og kompleksitet", ordrett: true,
         oppgave: IN.oppg({
-          intro: "<p>Svar <b>Sant</b> eller <b>Usant</b> på hver påstand. Riktig svar gir 1 poeng. Feil svar <b>eller blankt</b> gir −1. Summen for oppgaven blir aldri lavere enn 0 eller høyere enn 8.</p>",
+          intro: "<p>For alle spørsmålene nedenfor, svar Sant eller Usant.</p>",
           parts: tfParts(["Det er bevist at P = NP.", "Det er bevist at P ≠ NP.",
-            "Alle NP-komplette problemer kan reduseres til hverandre i polynomiell tid.", "Alle problemer i P er også i NP.",
-            "Ethvert avgjørelsesproblem er enten i P eller i NP.", "Alle problemer der JA-instanser kan verifiseres i polynomiell tid, er i NP.",
-            "Den som finner en polynomiell algoritme for avgjørelsesproblemet Hamiltonsykel, Knapsack eller Sudoku, har bevist at P = NP.",
-            "Ethvert avgjørelsesproblem kan løses hvis datamaskinen er rask nok."])
+            "Alle NP-komplette problemer kan polynomtidsreduseres til hverandre.", "Alle problemer i P er også i NP.",
+            "Alle avgjørelsesproblemer er enten i P eller NP.", "Alle problemer hvor JA-instanser kan verifiseres i polynomiell tid, er i NP.",
+            "Hvis noen klarer å løse avgjørelsesproblemet Hamiltonsykel, Knapsack eller Sudoku i polynomiell tid, så har de bevist at P = NP.",
+            "Alle avgjørelsesproblemer kan løses med en rask nok datamaskin."])
         }),
         losning: sol(tfSol([
-          [false, "P vs NP er et åpent problem. Ingen har bevist noen av retningene."],
+          [false, "P mot NP er et åpent problem. Ingen har bevist noen av retningene."],
           [false, "Heller ikke det er bevist. De fleste tror det, men tro er ikke bevis."],
-          [true, "Hvert NP-komplett problem er i NP, og hvert NP-komplett problem er NP-hardt. Da kan alt i NP, også de andre NP-komplette, reduseres til det."],
+          [true, "Hvert NP-komplett problem er i NP og NP-hardt. Da kan alt i NP, også de andre NP-komplette, reduseres til det i polynomiell tid."],
           [true, "Kan du løse et problem i polynomiell tid, kan du verifisere et JA-svar ved å løse det selv. P ⊆ NP."],
-          [false, "Siden P ⊆ NP, sier påstanden at alt er i NP. Men det finnes problemer utenfor NP, for eksempel uavgjørbare problemer som stoppeproblemet."],
+          [false, "Siden P ⊆ NP, sier påstanden at alt er i NP. Men det finnes problemer utenfor NP, for eksempel uløselige problemer som stoppeproblemet (HALT)."],
           [true, "Det er selve definisjonen av NP."],
           [true, "Alle tre er NP-komplette (Knapsack som avgjørelsesproblem, Sudoku på generelle n × n-brett). En polynomiell algoritme for ett NP-komplett problem gir polynomielle algoritmer for alt i NP, og da er P = NP."],
-          [false, "Stoppeproblemet er uavgjørbart: ingen algoritme løser det, uansett hvor rask maskinen er."]
+          [false, "Stoppeproblemet (HALT) er uløselig: ingen algoritme løser det, uansett hvor rask maskinen er."]
         ])),
-        kjerne: "<p>Fire fakta dekker hele oppgaven: P ⊆ NP. P vs NP er åpent. NP-komplett = i NP og NP-hardt, så alle NP-komplette reduseres til hverandre. Uavgjørbare problemer ligger utenfor både P og NP.</p>",
-        tips: ["Blankt koster like mye som galt. Svar på alle åtte.", "Se etter ordet «bevist». Om P og NP er nesten alt som er «bevist», usant."] },
+        kjerne: "<p>Fire fakta dekker hele oppgaven: P ⊆ NP. P vs NP er åpent. NP-komplett = i NP og NP-hardt, så alle NP-komplette reduseres til hverandre. Uløselige problemer som HALT ligger utenfor både P og NP.</p>",
+        tips: ["Sensorveiledningen gir 1 poeng for riktig og −1 for galt eller blankt, med 0 som minste og 8 som største sum. Blankt koster altså like mye som galt: svar på alle åtte.",
+          "Se etter ordet «bevist». Om P og NP er nesten alt som er «bevist», usant."] },
 
-      "h2020-8": { year: "H2020", title: "Type 2-grafer: verifikator og NP", oppgave_nr: "Oppgave 8 (a–b)", points: 10,
-        oppgave: IN.oppg({
-          intro: "<p>En urettet graf G = (V, E) er av <b>type 2</b> hvis den har en <b>hamiltonsk sykel</b>: en sykel som er innom hver node nøyaktig én gang. Avgjørelsesproblemet <b>Type2</b> spør: er G av type 2?</p>" +
-            "<p>Et <b>sertifikat</b> C er et array med nodene i G, der hver node står nøyaktig én gang. Figuren er et eget eksempel: der er C = [a, b, c, d, e, f] en hamiltonsk sykel.</p>",
-          figs: [{ cap: "Eksempelgraf (egen figur)", draw: function (h) { h.innerHTML = gsvg(HAMG, { w: 320, h: 235, order: { a: 0, b: 1, c: 2, d: 3, e: 4, f: 5 }, edge: { "a|b": "on", "b|c": "on", "c|d": "on", "d|e": "on", "e|f": "on", "a|f": "on" }, label: "Eksempelgraf med en hamiltonsk sykel a, b, c, d, e, f" }); } }],
-          parts: [{ t: "Skriv en verifikator <code>Type2Verifier(G, C)</code> som returnerer JA hvis sertifikatet C viser at G er av type 2, og NEI ellers. Den skal gå i polynomiell tid.", p: 7 },
-            { t: "Forklar med høyst fire setninger hvorfor (a) viser at Type2 er i NP. Du trenger ikke en detaljert kjøretidsanalyse.", p: 3 }],
-          outro: demoLink("pnp", "ham-graf", "Vær verifikatoren")
-        }),
+      "h2020-8": { key: "H2020-8", deler: ["(a)", "(b)"], year: "H2020", title: "Fire typer grafer: verifikator og NP", oppgave_nr: "Oppgave 8 (a–b)", points: 10,
+        ark: "Fire typer grafer", ordrett: true,
+        avvik: "<p>Avvik fra eksamensarket: bare deloppgave (a) og (b) vises her, fordi resten av oppgaven handler om grafer og står på <a href=\"06-grafer.html\">Grafer</a>. Eksempelgrafen er vår egen figur, fordi arket ikke har noen figur til (a) og (b).</p>",
+        oppgave: o8,
+        demo: HAM_DEMO,
         losning: sol(["Gå gjennom C med i fra 0 til N − 1, og sjekk at {C[i], C[(i + 1) mod N]} er en kant i G. Mangler én kant, returner NEI. Finnes alle, returner JA. mod N tar med kanten fra den siste noden tilbake til den første.",
-          "Type2Verifier går i polynomiell tid (O(|V| + |E|) med naboliste). Altså kan en JA-instans av Type2 verifiseres i polynomiell tid når vi får et sertifikat, og det er nettopp definisjonen av at Type2 er i NP."], ["stType2Verifier"]),
+          "Type2Verifier går i polynomiell tid (N = |V| kantoppslag). Altså kan en JA-instans av Type2 verifiseres i polynomiell tid når vi får et sertifikat, og det er nettopp definisjonen av at Type2 er i NP."], ["stType2Verifier"]),
         kjerne: "<p>En verifikator <b>sjekker</b> et forslag. Den skal ikke selv lete etter en sykel. Polynomiell verifikator ⇒ problemet er i NP.</p>",
         tips: ["(a): 5 poeng for å sjekke sykelens kanter i G (−1 hvis kanten tilbake til start mangler), og 2 poeng for signatur og klarhet.", "BFS eller DFS som prøver å finne en sykel, ga 0 poeng.", "(b): koble verifikatorens polynomielle kjøretid direkte til definisjonen av NP."] },
 
-      "h2020-7a": { year: "H2020", title: "Subanagram: hva er kjøretiden?", oppgave_nr: "Oppgave 7a", points: 4,
-        oppgave: IN.oppg({
-          intro: "<p>W er et <b>subanagram</b> av S hvis W kan skrives med bokstaver fra S, uten å bruke noen bokstav i S mer enn én gang. «hole» er et subanagram av «ehlo», men «hello» er det ikke (S har bare én l).</p>" +
-            "<p>Prosedyren under sjekker det. Anta at Copy, Contains og Remove på en streng er lineære i lengden, og at det tar O(1) å finne lengden |r|. La w = |W| og s = |S|.</p>",
-          figs: [pcFig(A.stSubanagram1, "IsSubanagramOf1")],
-          parts: [{ t: "Hva er kjøretidskompleksiteten? Velg ett: O(w + s), O(s²), O(w log s), O(s · w), O(w²).", p: 4 }]
-        }),
-        losning: sol(["<b>O(s · w).</b> Løkka går s ganger, én gang per bokstav i S. Hver runde kaller Contains og kanskje Remove på r, som har opptil w tegn, så hver runde er O(w). Kopien i starten er O(w). Totalt O(w + s · w) = O(s · w)."], ["stSubanagram1"]),
-        kjerne: "<p>Runder × kostnad per runde. Her ligger den lineære kostnaden gjemt i hjelpeprosedyrene, ikke i en synlig indre løkke.</p>",
-        tips: ["Se etter kall på lister og strenger inni løkker: Contains, Remove og Copy er lineære.", "Med en frekvenstabell (hashmap fra bokstav til antall) blir det O(w + s). Det var neste deloppgave."] },
+      "h2020-7a": { key: "H2020-7", deler: ["(a)"], year: "H2020", title: "Subanagram: hva er kjøretiden?", oppgave_nr: "Oppgave 7 (a)", points: 4,
+        ark: "Subanagram", ordrett: true,
+        avvik: "<p>Avvik fra eksamensarket: bare deloppgave (a) vises her. (b) og (c) står på <a href=\"05-hashing.html\">Hashing</a>, og (d) på <a href=\"01-sortering.html\">Sortering</a>. Svaralternativene var et flervalg i Inspera og står ikke på arket. De er hentet fra sensorveiledningen.</p>",
+        oppgave: o7a,
+        losning: sol(["<b>O(s · w).</b> Løkka går s ganger, én gang per bokstav i S. Hver runde sjekker om c er i r og fjerner kanskje en forekomst. r har opptil w tegn, så hver runde er O(w). Kopien i starten er O(w). Totalt O(w + s · w) = O(s · w)."]),
+        kjerne: "<p>Runder × kostnad per runde. Her ligger den lineære kostnaden gjemt i operasjonene på r, ikke i en synlig indre løkke.</p>",
+        tips: ["Se etter operasjoner på lister og strenger inni løkker: kopiere, sjekke om noe finnes og fjerne er lineære her.", "Med en frekvenstabell (hashmap fra bokstav til antall) blir det O(w + s). Det var neste deloppgave."] },
 
-      "h2020-7c": { year: "H2020", title: "Subanagrammer: to strategier", oppgave_nr: "Oppgave 7c", points: 6,
-        oppgave: IN.oppg({
-          intro: "<p>Vi vil finne alle ord i en ordbok D som er subanagrammer av en streng S. Fra før har vi <code>IsSubanagramOf2(W, S)</code>, som svarer på om W er et subanagram av S i O(w + s) med frekvenstabeller. La d være antall ord i D, w lengden på det lengste ordet og s = |S|.</p>" +
-            "<ul><li><b>Strategi 1:</b> gå gjennom alle ord W i D, og kall IsSubanagramOf2(W, S) for hvert. Kjøretid O(d · (w + s)).</li>" +
-            "<li><b>Strategi 2:</b> bygg én gang på forhånd et hashmap der nøkkelen er bokstavene i et ord sortert alfabetisk, og verdien er lista med ord som har akkurat de bokstavene. For å svare slår vi opp alle de sorterte delmengdene av bokstavene i S. Kjøretid O(2ˢ) per spørring.</li></ul>",
-          parts: [{ t: "Drøft fordeler og ulemper ved de to strategiene med tanke på kjøretid.", p: 6 }]
-        }),
+      "h2020-7c": { key: "H2020-7", deler: ["(c)"], year: "H2020", title: "Subanagram: to strategier", oppgave_nr: "Oppgave 7 (c)", points: 6,
+        ark: "Subanagram", ordrett: true,
+        avvik: "<p>Avvik fra eksamensarket: bare deloppgave (c) vises her. IsSubanagramOf2 er prosedyren fra (b), som står på <a href=\"05-hashing.html\">Hashing</a>. På arket står de to strategiene i hver sin kolonne, slik som her.</p>",
+        oppgave: o7c,
         losning: sol(["Strategi 1 avhenger av d, w og s. Strategi 2 avhenger bare av s, men eksponentielt.",
           "Ordene i en ordbok er korte, mens ordboka er stor. Derfor er det d som dominerer i Strategi 1: hele ordboka må gjennomgås for hver spørring.",
-          "Strategi 2 slipper å gå gjennom ordboka per spørring, men 2ˢ vokser raskt. Den lønner seg når S er kort og D er stor. For en stor engelsk ordbok lå grensen rundt s ≈ 17 i forsøk.",
+          "Strategi 2 slipper å gå gjennom ordboka per spørring, men 2ˢ vokser raskt. Den lønner seg når S er kort og D er stor. For en stor engelsk ordbok lå grensen rundt s ≈ 17 i forsøkene til dem som laget oppgaven.",
           "Hashmapet i Strategi 2 koster noe å bygge, men det gjøres bare én gang og fordeles på alle spørringene.",
           "Konklusjon: velg Strategi 2 for korte S, og Strategi 1 for lange."], null, { plain: true }),
         kjerne: "<p>Forarbeid én gang mot eksponentiell avhengighet av s. Eksponentiell tid er sjelden bra, men den kan være grei når eksponenten holdes liten.</p>",
         tips: ["Det viktigste poenget (3 p) var å se at Strategi 2 lønner seg når S er liten og D er stor.", "Bruk O-notasjon (−1 hvis ikke) og definer variablene (−3 for å bruke n uten å si hva det er)."] },
 
-      "h2022-2": { year: "H2022", title: "Litt av hvert (sant/usant)", oppgave_nr: "Oppgave 2", points: 10,
+      "h2022-2": { key: "H2022-2", year: "H2022", title: "Litt av hvert", oppgave_nr: "Oppgave 2", points: 10,
+        ark: "Litt av hvert", ordrett: true,
+        avvik: "<p>Avvik fra eksamensarket: arket har ingen innledning til påstandene. De var sant/usant-spørsmål i Inspera, og linja «Svar Sant eller Usant» er lagt til her for å si hvordan de besvares. «kan ikke har» i (j) står slik på arket.</p>",
         oppgave: IN.oppg({
-          intro: "<p>Svar <b>Sant</b> eller <b>Usant</b> på hver påstand (1 poeng hver).</p>",
-          parts: tfParts(["I et binærtre har hver node høyst to barn.", "Bruker en algoritme O(n) steg, har den lineær kjøretid.", "Merge sort har kjøretid O(n log n).",
-            "Det går ikke an å avgjøre om et array er sortert i O(n).", "Binærsøk i et array er vesentlig raskere enn binærsøk i en lenket liste.",
-            "Kjøretidskompleksitet beskriver antall steg i forhold til størrelsen på input.", "Har algoritme A bedre kjøretidskompleksitet enn B, bruker A færre steg enn B for alle input-størrelser.",
-            "Huffman-koding brukes til å komprimere data.", "I et tre er roten den eneste noden uten forelder.", "En graf med n noder kan ha høyst n kanter."])
+          intro: "<p class=\"small muted\">Svar Sant eller Usant på hver påstand.</p>",
+          parts: tfParts(["Binære trær består av noder som har opptil to barn.", "Hvis en algoritme bruker O(n) antall steg sier vi den har lineær kjøretidskompleksitet.", "Kjøretidskompleksitet til Mergesort er O(n · log(n)).",
+            "Det er umulig å sjekke om et array er sortert i O(n).", "Binærsøk på arrayer er betydelig raskere enn binærsøk på lenkede lister.",
+            "Kjøretidskompleksitet sier noe om hvor mange steg en algoritme bruker i forhold til størrelsen på input.", "Dersom en algoritme har bedre kjøretidskompleksitet enn en annen algoritme, så vil den alltid bruke færre steg uansett størrelse på input.",
+            "Huffman-koding brukes for å komprimere data.", "Rotnoden av et tre er den eneste noden som ikke har en forelder.", "En graf med n noder kan ikke har mer enn n kanter."])
         }),
         losning: sol(tfSol([
           [true, "Det er definisjonen av et binærtre."],
@@ -1106,7 +1224,7 @@
       { s: "En verifikator for Hamiltonsykel kan bruke DFS til å lete etter sykelen.", answer: false, blokk: "7",
         explain: "En verifikator sjekker sertifikatet den får. H2020 ga 0 poeng for løsninger som lette etter sykelen." },
       { s: "Stoppeproblemet kan løses med en rask nok datamaskin.", answer: false, blokk: "7",
-        explain: "Stoppeproblemet er uavgjørbart: ingen algoritme løser det, uansett fart." },
+        explain: "Stoppeproblemet (HALT) er uløselig: ingen algoritme løser det, uansett fart." },
       { s: "Polynomiell tid betyr O(nᵏ) for en konstant k.", answer: true, blokk: "7",
         explain: "Ja. O(2ⁿ) er ikke polynomiell, fordi n står i eksponenten." }
     ], { id: "strategi-tf" });

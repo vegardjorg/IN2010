@@ -30,7 +30,9 @@
        out:   [...],            // verdier som er tatt ut (prioritetskø-rekkefølge)
        outLabel: "Tatt ut"
      }
-     opts: { onNode(i) }        // klikk på node/celle (indeksutforsker)
+     opts: { onNode(i),         // klikk på node/celle (indeksutforsker)
+             hideArray, noIdx,  // bare treet / ingen indekser ved nodene (eksamensfigurer)
+             label, arrName }
      Midlertidig sidelokal komponent – foreslått flyttet til felles
      assets/js/viz-tree.js (se plan/foresporsler/heap/).
      ===================================================================== */
@@ -84,7 +86,7 @@
         (opts.onNode ? ' tabindex="0" role="button" aria-label="Node ' + k + ', verdi ' + esc(A[k]) + '"' : "") + ">" +
         '<circle cx="' + p.x + '" cy="' + p.y + '" r="' + R + '"/>' +
         '<text class="hv-val" x="' + p.x + '" y="' + (p.y + 5) + '" text-anchor="middle">' + esc(A[k]) + "</text>" +
-        '<text class="hv-idx" x="' + (p.x + R + 3) + '" y="' + (p.y - R + 4) + '">' + k + "</text></g>";
+        (opts.noIdx ? "" : '<text class="hv-idx" x="' + (p.x + R + 3) + '" y="' + (p.y - R + 4) + '">' + k + "</text>") + "</g>";
     }
     if (!size) svg += '<text class="hv-empty" x="' + (W / 2) + '" y="' + (PAD + 6) + '" text-anchor="middle">(tom heap)</text>';
     svg += "</svg>";
@@ -325,8 +327,8 @@
   /* ===================== BUILDMINHEAP ===================== */
   var G_BUILD = g("Hvorfor starte på ⌊n/2⌋, og hvorfor baklengs?",
     t("Tallene i den bakerste halvdelen har ingen barn, så de kan ikke synke. Vi starter rundt midten og går baklengs mot toppen. En node kan nemlig bare synke riktig når alt under den allerede er i orden.",
-      "Siste element står på n − 1, og forelderen er ⌊(n − 2)/2⌋ = ⌊n/2⌋ − 1. Det er den siste noden med barn. Forelesningen starter på ⌊n/2⌋, som alltid er en løvnode, så det gir ett ekstra kall som ikke gjør noe. Begge er riktige. Å starte lavere er feil, fordi da hopper vi over noder med barn. Vi går nedover (downto) fordi BubbleDown krever at begge subtrærne allerede er heaper.",
-      "Indeksene ⌊n/2⌋ … n − 1 er løvnoder, og hver løvnode er alene en heap. Den siste interne noden er ⌊n/2⌋ − 1. Å starte på ⌊n/2⌋ (som forelesningen) eller høyere er korrekt, bare litt sløsete. Å starte lavere er feil. Retningen er viktig. Går vi oppover fra 0, kaller vi BubbleDown på roten før subtrærne er heaper, og da holder ikke forutsetningen. En liten verdi langt nede kan da bli liggende under en større."));
+      "Siste element står på n − 1, og forelderen er ⌊(n − 2)/2⌋ = ⌊n/2⌋ − 1. Det er den siste noden med barn. Forelesningen starter på ⌊n/2⌋, som alltid er en løvnode, så det gir ett ekstra kall som ikke gjør noe. Begge er riktige. Å starte lavere enn ⌊n/2⌋ − 1 er feil, fordi da hopper vi over noder med barn. Vi går nedover (downto) fordi BubbleDown krever at begge subtrærne allerede er heaper.",
+      "Indeksene ⌊n/2⌋ … n − 1 er løvnoder, og hver løvnode er alene en heap. Den siste interne noden er ⌊n/2⌋ − 1. Å starte på ⌊n/2⌋ (som forelesningen) eller høyere er korrekt, bare litt sløsete. Å starte lavere enn ⌊n/2⌋ − 1 er feil. Retningen er viktig. Går vi oppover fra 0, kaller vi BubbleDown på roten før subtrærne er heaper, og da holder ikke forutsetningen. En liten verdi langt nede kan da bli liggende under en større."));
   def(IN.algos, "buildMinHeap", {
     title: "BuildMinHeap – lag en heap av et array på lineær tid",
     name: "BuildMinHeap", params: "A, n",
@@ -923,17 +925,25 @@
   def(IN.gen, "heapSort", genHeapSort);
 
   /* --- LevelOrderHeap: 2 L ← tom · 3 for · 4 append · 5 return --- */
-  def(IN.gen, "levelOrderHeap", function (arr) {
+  function genLevelOrder(arr, asShape) {
     var A = clone(arr), n = A.length, steps = [], L = [];
     var wasHeap = isMinHeap(A);
-    if (!wasHeap) buildMin(A);
+    if (!wasHeap && !asShape) buildMin(A);
     function snap(line, marks, text, tag) {
       marks = marks || {}; marks.levels = true;
       steps.push({ line: line, array: clone(A), size: n, marks: marks, out: clone(L), outLabel: "L (level-order)", text: text, tag: tag });
     }
-    snap(2, {}, t("Hvert nivå i treet har sin egen farge. Vi lager en tom liste L." + (wasHeap ? "" : " (Tallene var ikke en heap, så vi laget en heap av dem først.)"),
-      "Nivåene er fargelagt. L ← empty list." + (wasHeap ? "" : " (Input gjort om til heap først.)"),
-      "Fargene viser dybden: roten har dybde 0, barna dybde 1, og så videre. Vi starter med tom L."), "Start");
+    // asShape: arrayet tolkes bare som et komplett tre (eksamensfiguren i H2025 er ikke en heap)
+    if (asShape) snap(null, {},
+      t("Her er treet, lagret i et array nivå for nivå: " + list(A) + ". Hvert nivå har sin egen farge." + (wasHeap ? "" : " Tallene er ikke i heap-orden, men det gjør ingenting. Algoritmen bruker bare at treet ligger nivå for nivå i arrayet."),
+        "Input: A = " + list(A) + ", n = " + n + ". Nivåene er fargelagt." + (wasHeap ? "" : " (Ikke heap-ordnet, men LevelOrderHeap bruker bare formen.)"),
+        "Input: A = " + list(A) + ", n = " + n + ". LevelOrderHeap bruker bare at treet er komplett og lagret i level-order i arrayet. Heap-egenskapen (forelder ≤ barn) brukes ikke" + (wasHeap ? "" : ", så vi kan like gjerne kjøre den på figurtreet, som ikke er heap-ordnet") + "."),
+      "Input");
+    snap(2, {}, asShape
+      ? t("Vi lager en tom liste L.", "L ← empty list.", "L ← tom liste.")
+      : t("Hvert nivå i treet har sin egen farge. Vi lager en tom liste L." + (wasHeap ? "" : " (Tallene var ikke en heap, så vi laget en heap av dem først.)"),
+        "Nivåene er fargelagt. L ← empty list." + (wasHeap ? "" : " (Input gjort om til heap først.)"),
+        "Fargene viser dybden: roten har dybde 0, barna dybde 1, og så videre. Vi starter med tom L."), asShape ? null : "Start");
     for (var i = 0; i < n; i++) {
       var d = Math.floor(Math.log2(i + 1));
       snap(3, { target: i }, t("Neste plass i arrayet er " + i + ".", "i = " + i + " (dybde " + d + ").", "i = " + i + " ligger på dybde ⌊log(" + (i + 1) + ")⌋ = " + d + "."), null);
@@ -941,8 +951,11 @@
       snap(4, { target: i }, t("Vi legger " + A[i] + " bakerst i lista.", "L får " + A[i] + ".", "append A[" + i + "] = " + A[i] + "."), "Dybde " + d);
     }
     snap(5, {}, t("Ferdig! Lista er nøyaktig lik arrayet. Arrayet var i level-order hele tiden.", "L = A: arrayet er allerede i level-order.", "L = " + list(L) + " = A. Heapen fylles nivå for nivå fra venstre, så indeksrekkefølgen er level-order. O(n)."), "Ferdig");
+    steps[steps.length - 1].svar = L.join(", ");
     return steps;
-  });
+  }
+  def(IN.gen, "levelOrderHeap", function (arr) { return genLevelOrder(arr, false); });
+  def(IN.gen, "levelOrderArray", function (arr) { return genLevelOrder(arr, true); });
 
   /* --- Mediankø (H2024): sett inn alle, så removeMedian ×k ---
      Linjekoder: 0xx MedianInsert (2 if · 3 small · 4 else large · 5 Balance)
@@ -957,7 +970,7 @@
     function sorted() { return S.concat(L).sort(function (a, b) { return a - b; }); }
     snap(null, {}, t("To tomme bunker: den nedre (største øverst) og den øvre (minste øverst). Vi setter inn " + vals.join(", ") + ", og tar så ut medianen " + removes + " ganger.",
       "Q.small (max-heap, nedre halvdel) og Q.large (heap, øvre halvdel) er tomme. Insert " + vals.join(", ") + ", så removeMedian ×" + removes + ".",
-      "Invariant: alt i Q.small ≤ alt i Q.large, og |Q.small| − |Q.large| er 0 eller 1. Da ligger medianen alltid i roten av Q.small."), "Start");
+      "Input: " + vals.join(", ") + " settes inn, så " + removes + " × removeMedian. Invariant: alt i Q.small ≤ alt i Q.large, og |Q.small| − |Q.large| er 0 eller 1. Da ligger medianen alltid i roten av Q.small."), "Start");
     function balance(callLine) {
       var c1 = S.length > L.length + 1;
       snap(callLine * 1000 + 102, c1 ? { s: [0], check: "|Q.small| > |Q.large| + 1? " + S.length + " > " + (L.length + 1) + ": ja" } : { check: "|Q.small| > |Q.large| + 1? " + S.length + " > " + (L.length + 1) + ": nei" },
@@ -1025,45 +1038,346 @@
   };
 
   IN.heapGen = { insert: genInsert, removeMin: genRemoveMin, buildMin: genBuildMin, heapSort: genHeapSort, median: genMedian };
-  /* ===================== BØTTEKØ / BUCKET QUEUE (H2022 oppg. 10) ===================== */
+  /* ===================== BØTTEKØ / BUCKET QUEUE (H2022 oppg. 10) =====================
+     Navn, input og output som på eksamensarket; linjene følger løsningen i sensorveiledningen. */
+  var BQ_IN = "En bucket queue Q med prioriteter fra 0 til N − 1";
   def(IN.algos, "bucketQueueInsert", {
     title: "Bøttekø: Insert",
-    name: "BucketQueueInsert", params: "Q, x, p",
-    input: "En bøttekø Q (et array av N bøtter, én liste per prioritet), et element x og prioriteten p, der 0 ≤ p ≤ N − 1",
-    output: "x ligger i bøtta for prioritet p",
+    name: "Insert", params: "Q, x, p",
+    input: BQ_IN + ", og et element x med prioritet p",
+    output: "Q med x satt inn med prioritet p",
     lines: [
-      { code: "append x to Q[p]", indent: 1,
-        eli5: "Legg elementet i skuffen med samme nummer som prioriteten.",
-        normal: "Legg x bakerst i bøtta for prioritet p.",
-        teknisk: "Prioriteten brukes direkte som indeks, som i bøttesortering. Ingen sammenligninger: O(1)." }
+      { code: "B ← Q[p]", indent: 1,
+        eli5: "Finn skuffen som har samme nummer som prioriteten.",
+        normal: "Bøtta for prioritet p ligger på plass p i arrayet Q.",
+        teknisk: "Prioriteten brukes direkte som indeks, akkurat som i bucket sort. Vi trenger ingen sammenligninger, og oppslaget er O(1)." },
+      { code: "add x to B", indent: 1,
+        eli5: "Legg elementet oppi skuffen.",
+        normal: "Legg x inn i bøtta. Rekkefølgen inni bøtta spiller ingen rolle.",
+        teknisk: "Med en enkeltlenket liste legger vi x først i lista, O(1). Oppgaven sier at det ikke spiller noen rolle hvilket av elementene med lavest prioritet som tas ut, så bøtta trenger ingen indre orden." }
     ],
     bigO: { best: "O(1)", avg: "O(1)", worst: "O(1)", space: "O(1)",
-      why: t("Vi går rett til riktig skuff.", "Direkte indeksering pluss å legge bakerst i en liste: O(1).", "Indeksering i arrayet er O(1), og å legge bakerst i en lenket liste er O(1).") }
+      why: t("Vi går rett til riktig skuff og legger elementet oppi.", "Ett oppslag i arrayet og én innsetting først i en liste: O(1).", "Indeksering i arrayet er O(1), og å legge først i en lenket liste er O(1). Ingen av delene avhenger av n eller N.") }
   });
   def(IN.algos, "bucketQueueRemoveMin", {
     title: "Bøttekø: RemoveMin",
-    name: "BucketQueueRemoveMin", params: "Q",
-    input: "En ikke-tom bøttekø Q med N bøtter",
-    output: "Et element med lavest prioritet (fjernet fra Q)",
+    name: "RemoveMin", params: "Q",
+    input: BQ_IN,
+    output: "En x med lavest mulig prioritet, som er fjernet fra Q",
     lines: [
       { code: "for i ← 0 to N − 1 do", indent: 1,
-        eli5: "Se i skuffene én etter én, fra den med lavest nummer.",
-        normal: "Gå gjennom bøttene fra lavest prioritet.",
-        teknisk: "Den første ikke-tomme bøtta inneholder et element med lavest prioritet.",
+        eli5: "Se i skuffene én etter én, og start med skuff 0.",
+        normal: "Gå gjennom bøttene fra lavest prioritet og oppover.",
+        teknisk: "Vi leter etter den første ikke-tomme bøtta. Den inneholder elementene med lavest prioritet.",
         grense: g("Hvorfor «to N − 1»?", "Prioritetene er 0, 1, …, N − 1, altså N bøtter. «to» tar med sluttverdien, så «to N» ville sett etter en bøtte som ikke finnes.") },
-      { code: "if |Q[i]| > 0 then", indent: 2,
+      { code: "B ← Q[i]", indent: 2,
+        eli5: "Se på skuff nummer i.",
+        normal: "B er bøtta for prioritet i.",
+        teknisk: "Oppslag i arrayet, O(1)." },
+      { code: "if B is not empty then", indent: 2,
         eli5: "Ligger det noe i denne skuffen?",
         normal: "Finnes det et element med prioritet i?",
-        teknisk: "Alle bøttene før denne var tomme, så ingen har lavere prioritet." },
-      { code: "return RemoveFirst(Q[i])", indent: 3,
-        eli5: "Ta ut det første elementet og gi det fra deg.",
-        normal: "Fjern og returner et element fra bøtta.",
-        teknisk: "Å ta ut forrest i en lenket liste er O(1)." }
+        teknisk: "Alle bøttene før i var tomme. Er B ikke tom, finnes det altså ingen elementer med lavere prioritet enn i." },
+      { code: "return B.pop()", indent: 3,
+        eli5: "Ta ut ett element fra skuffen og gi det fra deg.",
+        normal: "Fjern og returner ett element fra bøtta.",
+        teknisk: "pop tar ut det første elementet i lista, O(1) i en lenket liste. Alle elementene i B har samme prioritet, så det spiller ingen rolle hvilket vi tar." }
     ],
     bigO: { best: "O(1)", avg: "O(N)", worst: "O(N)", space: "O(1)",
-      why: t("Vi ser høyst i alle skuffene, og det er et fast antall skuffer.",
-        "Høyst N bøtter sjekkes. Med N = 100 (en konstant) blir det O(1).",
-        "Løkka går høyst N ganger, så det er O(N) uavhengig av n. Er N en fast konstant, som N = 100 i oppgaven, er det O(1). En binær heap gir derimot O(log n) og passer dårligere her.") }
+      why: t("Vi ser høyst i alle skuffene, og antallet skuffer er fast.",
+        "Høyst N bøtter sjekkes. Med N = 100, en konstant, blir det O(1).",
+        "Løkka går høyst N ganger, uansett hvor mange elementer n køen har. Generelt er RemoveMin O(N), og med en fast N = 100 er det O(1). En binær heap ville gitt O(log n).") }
+  });
+
+  /* --- Bøttekø som steg-demo (motor «bucketq»)
+     Input: liste av operasjoner, «navn:p» = Insert(Q, navn, p), «-» = RemoveMin(Q). N = 4.
+     Linjekoder (gruppe): 0xx Insert (2 B ← Q[p] · 3 add) · 1xx RemoveMin (2 for · 3 B ← Q[i] · 4 if · 5 return) */
+  var BQ_N = 4;
+  function bqOp(s) {
+    s = String(s).trim();
+    if (s === "-" || s === "−") return { rm: true };
+    var m = s.match(/^([A-Za-zÆØÅæøå0-9]{1,3})\s*:\s*(\d+)$/);
+    return m && +m[2] < BQ_N ? { x: m[1], p: +m[2] } : null;
+  }
+  function parseBQ(s) {
+    return String(s).split(",").filter(function (x) { return bqOp(x); }).map(function (x) { return String(x).trim().replace("−", "-").replace(/\s+/g, ""); }).slice(0, 12);
+  }
+  function opName(o) { return o.rm ? "RemoveMin(Q)" : "Insert(Q, " + o.x + ", " + o.p + ")"; }
+  function genBucketQueue(ops) {
+    var N = BQ_N, Q = [], out = [], steps = [], k;
+    for (k = 0; k < N; k++) Q.push([]);
+    var list0 = ops.map(bqOp).filter(Boolean);
+    function snap(line, mk, text, tag) {
+      steps.push({ line: line, Q: Q.map(clone), N: N, mk: mk || {}, out: clone(out), text: text, tag: tag });
+    }
+    snap(null, {}, t("Bøttekøen har N = " + N + " skuffer, Q[0] til Q[" + (N - 1) + "], én for hver prioritet. Alle er tomme. Nå gjør vi disse operasjonene: " + list0.map(opName).join(", ") + ".",
+      "Q er et array med N = " + N + " tomme bøtter. Operasjoner: " + list0.map(opName).join(", ") + ".",
+      "Q er et array av N = " + N + " enkeltlenkede lister, indeksert med prioriteten. Vi kjører operasjonene " + list0.map(opName).join(", ") + " i rekkefølge."), "Input");
+    list0.forEach(function (o) {
+      var op = opName(o);
+      if (!o.rm) {
+        snap(2, { op: op, focus: o.p, vars: [["x", o.x], ["p", o.p]] },
+          t(o.x + " har prioritet " + o.p + ", så det skal i skuff " + o.p + ".", "B ← Q[" + o.p + "].", "Prioriteten p = " + o.p + " er indeksen: B ← Q[" + o.p + "], O(1)."), op);
+        Q[o.p].unshift(o.x);
+        snap(3, { op: op, focus: o.p, active: o.x, vars: [["x", o.x], ["p", o.p]] },
+          t(o.x + " ligger nå i skuff " + o.p + ".", "add " + o.x + " to B: " + o.x + " legges først i Q[" + o.p + "].", o.x + " legges først i lista Q[" + o.p + "], O(1). Insert er ferdig."), null);
+        return;
+      }
+      for (var i = 0; i < N; i++) {
+        snap(102, { op: op, focus: i, vars: [["i", i]] },
+          t(i === 0 ? "Vi leter etter det med lavest prioritet. Vi starter med skuff 0." : "Vi går videre til skuff " + i + ".", "i = " + i + ".", "i = " + i + (i ? ": bøttene 0 … " + (i - 1) + " var tomme." : ": vi starter med lavest prioritet.")), i === 0 ? op : null);
+        snap(103, { op: op, focus: i, vars: [["i", i]] }, t("Vi ser i skuff " + i + ".", "B ← Q[" + i + "].", "B ← Q[" + i + "], O(1)."), null);
+        var has = Q[i].length > 0;
+        snap(104, { op: op, focus: i, vars: [["i", i], ["B is not empty?", has ? "ja" : "nei"]] },
+          has ? t("Det ligger noe i skuff " + i + ": " + Q[i].join(", ") + ".", "Q[" + i + "] er ikke tom.", "Q[" + i + "] er ikke tom. Alle bøttene før var tomme, så prioritet " + i + " er den laveste i køen.")
+              : t("Skuff " + i + " er tom.", "Q[" + i + "] er tom.", "Q[" + i + "] er tom, så løkka fortsetter."), null);
+        if (has) {
+          var x = Q[i].shift();
+          out.push(x);
+          snap(105, { op: op, focus: i, vars: [["i", i], ["returnerer", x]] },
+            t("Vi tar ut " + x + " og gir det fra oss." + (Q[i].length ? " (Det ligger mer i skuffen, men alle der har samme prioritet, så det spiller ingen rolle hvem vi tar.)" : ""),
+              "return B.pop() = " + x + "." + (Q[i].length ? " Flere i bøtta har prioritet " + i + "; hvem vi tar er likegyldig." : ""),
+              "pop tar ut det første elementet i lista, O(1): " + x + "." + (Q[i].length ? " Oppgaven sier at det ikke spiller noen rolle hvilket element med samme prioritet som tas ut." : "")), "RemoveMin ga " + x);
+          return;
+        }
+      }
+      snap(null, { op: op },
+        t("Alle skuffene var tomme, så det fantes ingenting å ta ut. Oppgaven sier at vi kan anta at dette ikke skjer.", "Køen var tom: løkka fant ingen ikke-tom bøtte.", "Løkka gikk gjennom alle N bøttene uten treff. Oppgaven lar oss anta at køen ikke er tom."), "Tom kø");
+    });
+    snap(null, {}, t("Ferdig! RemoveMin ga " + (out.length ? out.join(", ") : "ingenting") + ". Det som er igjen, ligger fortsatt i skuffene sine.",
+      "Ferdig. RemoveMin ga: " + (out.join(", ") || "ingen") + ".",
+      "Ferdig. RemoveMin ga " + (out.join(", ") || "ingen") + ". Insert var O(1) hver gang, og hver RemoveMin sjekket høyst N = " + N + " bøtter, så O(N), og O(1) når N er en konstant."), "Ferdig");
+    steps[steps.length - 1].svar = out.join(", ");
+    return steps;
+  }
+  IN.gen.bucketQueueOps = genBucketQueue;
+
+  IN.vizBucketQueue = function (stage, s) {
+    IN.clear(stage);
+    var el = IN.el, mk = s.mk || {};
+    var wrap = el("div", { class: "bk" });
+    var pills = [];
+    if (mk.op) pills.push(["Operasjon", mk.op]);
+    (mk.vars || []).forEach(function (v) { pills.push(v); });
+    if (pills.length) wrap.appendChild(el("div", { class: "hv-vars", "aria-label": "Variabler" }, pills.map(function (p) {
+      return el("span", { class: "hv-var" }, [el("span", { class: "lbl", text: p[0] }), el("span", { class: "val", text: String(p[1]) })]);
+    })));
+    var zone = el("div", { class: "bk-zone" }, [el("span", { class: "bk-cap", text: "Bøttekøen Q (N = " + s.N + "), første element i hver bøtte øverst" })]);
+    var bs = el("div", { class: "bk-buckets" });
+    s.Q.forEach(function (b, k) {
+      var col = el("div", { class: "bk-bucket" + (mk.focus === k ? " is-focus" : "") + (b.length ? "" : " is-emptyb") });
+      col.appendChild(el("span", { class: "bk-blbl", text: "Q[" + k + "]" }));
+      var st = el("div", { class: "bk-stack" });
+      b.forEach(function (x) {
+        st.appendChild(el("span", { class: "bk-chip" + (mk.active === x ? " is-active" : ""), style: "--bk-h:" + (200 + 45 * k), html: "<b>" + esc(x) + "</b>" }));
+      });
+      col.appendChild(st);
+      bs.appendChild(col);
+    });
+    zone.appendChild(bs);
+    wrap.appendChild(zone);
+    wrap.appendChild(el("div", { class: "hv-out small", html: '<span class="muted">RemoveMin ga:</span> ' +
+      (s.out.length ? s.out.map(function (v) { return '<b class="hv-outv">' + esc(v) + "</b>"; }).join(" ") : '<span class="muted">ingenting ennå</span>') }));
+    stage.appendChild(wrap);
+  };
+  if (IN.registerEngine) IN.registerEngine("bucketq", {
+    viz: "vizBucketQueue", file: "assets/js/data-heap.js", host: "et-bars-host", scheme: "group", parseInput: parseBQ,
+    answer: function (s) { return s && s.out ? s.out.join(", ") : null; }
+  });
+
+  /* ===================== H2025 oppg. 5 (b) og (d): søketre i level-order =====================
+     Input til demoene: tallene som settes inn i et tomt søketre, i rekkefølge (gir treet v).
+     Noder { id, k, l, r } som i viz-tree.js. */
+  function bstAdd(root, k, pre) {
+    var node = { id: pre + k, k: k, l: null, r: null }, path = [];
+    if (!root) return { root: node, path: path, node: node, parent: null };
+    var v = root;
+    while (true) {
+      path.push(v);
+      if (k === v.k) return { root: root, path: path, node: null, dup: true };
+      if (k < v.k) { if (!v.l) { v.l = node; break; } v = v.l; }
+      else { if (!v.r) { v.r = node; break; } v = v.r; }
+    }
+    return { root: root, path: path, node: node, parent: v };
+  }
+  function bstFrom(keys, pre) {
+    var r = null, used = [];
+    keys.forEach(function (k) { var o = bstAdd(r, k, pre); r = o.root; if (!o.dup) used.push(k); });
+    return { root: r, keys: used };
+  }
+  function treeClone(v) { return v ? { id: v.id, k: v.k, l: treeClone(v.l), r: treeClone(v.r) } : null; }
+  function treeSer(v) { return v ? (v.l || v.r ? v.k + "(" + treeSer(v.l) + ", " + treeSer(v.r) + ")" : String(v.k)) : "–"; }
+  function bfsNodes(root) { var out = [], q = root ? [root] : []; while (q.length) { var u = q.shift(); out.push(u); if (u.l) q.push(u.l); if (u.r) q.push(u.r); } return out; }
+  function byIds(a) { return a.map(function (v) { return v.id; }); }
+  function byKeys(a) { return a.map(function (v) { return v.k; }); }
+
+  def(IN.algos, "levelOrderBSTExam", {
+    title: "LevelOrderBST – bredde-først med en kø",
+    name: "LevelOrderBST", params: "v",
+    input: "Roten v av et binært søketre med n noder",
+    output: "En liste med elementene i søketreet i level-order",
+    lines: [
+      { code: "L ← empty list", indent: 1,
+        eli5: "Vi lager en tom liste som vi skal fylle med tallene.",
+        normal: "Start med en tom resultatliste L.",
+        teknisk: "L samler elementene i den rekkefølgen nodene besøkes." },
+      { code: "Q ← new Queue", indent: 1,
+        eli5: "Vi lager en tom kø, som køen i kantina: den som kom først, får gå først.",
+        normal: "Lag en tom kø Q for nodene som venter på å bli besøkt.",
+        teknisk: "Køen (FIFO) er det som gir level-order: alle nodene på dybde d legges i køen før noen node på dybde d + 1. Med en stakk (LIFO) blir det dybde-først i stedet." },
+      { code: "if v ≠ null then Enqueue(Q, v)", indent: 1,
+        eli5: "Finnes det et tre i det hele tatt, stiller roten seg først i køen.",
+        normal: "Legg roten i køen, hvis treet ikke er tomt.",
+        teknisk: "Null-sjekken gjør at et tomt tre gir en tom liste i stedet for å krasje.",
+        grense: g("Hvorfor sjekke v ≠ null?", "Et tomt søketre har ingen rot. Uten sjekken ville vi lagt null i køen og senere prøvd å lese null.element.") },
+      { code: "while Q is not empty do", indent: 1,
+        eli5: "Så lenge noen står i kø, fortsetter vi.",
+        normal: "Fortsett til køen er tom.",
+        teknisk: "Hver node legges i køen nøyaktig én gang, så løkka går n ganger." },
+      { code: "u ← Dequeue(Q)", indent: 2,
+        eli5: "Den som står først i køen, får komme fram.",
+        normal: "Ta ut noden som har ventet lengst.",
+        teknisk: "Dequeue tar fra fronten, O(1)." },
+      { code: "append u.element to L", indent: 2,
+        eli5: "Vi skriver tallet i noden bakerst i lista.",
+        normal: "Legg verdien til u bakerst i L.",
+        teknisk: "Det er elementet som skal i lista, ikke selve noden. O(1)." },
+      { code: "if u.left ≠ null then Enqueue(Q, u.left)", indent: 2,
+        eli5: "Har noden et barn til venstre, stiller det seg bakerst i køen.",
+        normal: "Legg venstre barn bakerst i køen, hvis det finnes.",
+        teknisk: "Venstre før høyre gir venstre-til-høyre innen hvert nivå.",
+        grense: g("Hvorfor sjekke u.left ≠ null?", "Mange noder mangler et barn. Uten sjekken havner null i køen, og neste runde prøver å lese null.element.") },
+      { code: "if u.right ≠ null then Enqueue(Q, u.right)", indent: 2,
+        eli5: "Har noden et barn til høyre, stiller det seg også bakerst i køen.",
+        normal: "Legg høyre barn bakerst i køen, hvis det finnes.",
+        teknisk: "Samme null-sjekk som for venstre barn." },
+      { code: "return L", indent: 1,
+        eli5: "Køen er tom, og lista har alle tallene, nivå for nivå.",
+        normal: "Returner lista med elementene i level-order.",
+        teknisk: "n Enqueue og n Dequeue à O(1) gir O(n) totalt. Et tre har ingen sykler, så vi trenger ingen mengde med besøkte noder." }
+    ],
+    bigO: { best: "O(n)", avg: "O(n)", worst: "O(n)", space: "O(n)",
+      why: t("Hver node står i køen én gang og blir skrevet i lista én gang.",
+        "Hver av de n nodene legges i køen og tas ut nøyaktig én gang: O(n).",
+        "n Enqueue, n Dequeue og n append, alle O(1): O(n). Køen og lista tar O(n) plass.") }
+  });
+
+  def(IN.gen, "levelOrderBSTExam", function (keys) {
+    var b = bstFrom(keys, "v"), root = b.root, L = [], Q = [], done = [], steps = [];
+    function snap(line, cur, text, tag) {
+      steps.push({ line: line, tree: treeClone(root), text: text, tag: tag,
+        info: [{ label: "Q (front → bak)", items: byKeys(Q), kind: "queue" }, { label: "L", items: clone(L) }],
+        marks: { cur: cur ? cur.id : null, queued: byIds(Q), done: clone(done) } });
+    }
+    snap(null, null, root
+      ? t("Her er søketreet v. Vi lagde det ved å sette inn " + b.keys.join(", ") + " i den rekkefølgen. Nå skal vi lese det nivå for nivå.",
+          "Input: søketreet v (satt inn i rekkefølgen " + b.keys.join(", ") + ").",
+          "Input: roten v av et søketre med n = " + b.keys.length + " noder (bygd ved å sette inn " + b.keys.join(", ") + "). Søketre-egenskapen brukes ikke. Algoritmen virker på et hvilket som helst binærtre.")
+      : t("Treet er tomt.", "Input: tomt tre (v = null).", "Input: v = null."), "Input");
+    snap(2, null, t("Vi lager en tom liste L.", "L ← empty list.", "L ← tom liste."), null);
+    snap(3, null, t("Vi lager en tom kø Q.", "Q ← new Queue.", "Q ← tom FIFO-kø."), null);
+    if (root) {
+      Q.push(root);
+      snap(4, null, t("Treet er ikke tomt, så roten " + root.k + " stiller seg i køen.", "v ≠ null: Enqueue(Q, " + root.k + ").", "v ≠ null, så roten legges i køen."), "Rot i køen");
+    } else snap(4, null, t("Treet er tomt, så ingen stiller seg i køen.", "v = null: køen forblir tom.", "v = null: null-sjekken hindrer at null havner i køen."), null);
+    while (true) {
+      var go = Q.length > 0;
+      snap(5, null, go ? t("Det står noen i køen, så vi fortsetter.", "Q er ikke tom.", "Q har " + Q.length + " node" + (Q.length > 1 ? "r" : "") + ": løkka fortsetter.")
+        : t("Køen er tom. Da har vi vært innom alle nodene.", "Q er tom: løkka stopper.", "Q er tom, så alle n nodene er besøkt."), go ? null : "Kø tom");
+      if (!go) break;
+      var u = Q.shift();
+      snap(6, u, t(u.k + " står først i køen og får komme fram.", "u ← Dequeue(Q) = " + u.k + ".", "u ← " + u.k + " fra fronten av køen."), "Ta ut " + u.k);
+      L.push(u.k); done.push(u.id);
+      snap(7, u, t("Vi skriver " + u.k + " bakerst i lista.", "append " + u.k + " to L.", "L = [" + L.join(", ") + "]."), null);
+      if (u.l) { Q.push(u.l); snap(8, u, t("Venstre barn " + u.l.k + " stiller seg bakerst i køen.", "u.left = " + u.l.k + " ≠ null: Enqueue.", "Enqueue(Q, " + u.l.k + ")."), null); }
+      else snap(8, u, t(u.k + " har ikke noe venstre barn.", "u.left = null: ingenting legges i køen.", "u.left = null, så null-sjekken hopper over Enqueue."), null);
+      if (u.r) { Q.push(u.r); snap(9, u, t("Høyre barn " + u.r.k + " stiller seg bakerst i køen.", "u.right = " + u.r.k + " ≠ null: Enqueue.", "Enqueue(Q, " + u.r.k + ")."), null); }
+      else snap(9, u, t(u.k + " har ikke noe høyre barn.", "u.right = null: ingenting legges i køen.", "u.right = null, så null-sjekken hopper over Enqueue."), null);
+    }
+    snap(10, null, t("Ferdig! Lista er " + L.join(", ") + ": først roten, så nivået under, og så videre.",
+      "return L = " + L.join(", ") + ".",
+      "return L = [" + L.join(", ") + "]. Hver node gikk inn og ut av køen én gang: O(n)."), "Ferdig");
+    steps[steps.length - 1].svar = L.join(", ");
+    return steps;
+  });
+
+  /* ConstructBST (ordrett fra eksamensarket H2025 5 (d)), med våre forklaringer */
+  def(IN.algos, "constructBSTExam", {
+    title: "ConstructBST – sett inn i level-order",
+    name: "ConstructBST", params: "v",
+    input: "Roten v av et binært søketre",
+    output: "Et nytt binært søketre",
+    lines: [
+      { code: "B ← empty binary search tree", indent: 1,
+        eli5: "Vi starter med et nytt, tomt søketre B.",
+        normal: "B er et nytt, tomt søketre.",
+        teknisk: "B bygges opp ved vanlig innsetting i søketre." },
+      { code: "nodes ← LevelOrderBST(v)", indent: 1,
+        eli5: "Vi leser tallene i input-treet nivå for nivå, med algoritmen fra (b).",
+        normal: "Hent elementene til v i level-order (algoritmen fra (b)).",
+        teknisk: "Lista har roten først, og hver node kommer etter forelderen sin." },
+      { code: "for u in nodes do", indent: 1,
+        eli5: "Vi tar tallene ett og ett, i den rekkefølgen.",
+        normal: "Gå gjennom lista i level-order.",
+        teknisk: "n runder." },
+      { code: "B ← Insert(B, u)", indent: 2,
+        eli5: "Vi setter tallet inn i det nye treet på vanlig måte: mindre går til venstre, større til høyre.",
+        normal: "Sett u inn i søketreet B.",
+        teknisk: "Vanlig innsetting i søketre: følg søkestien fra roten og heng u på der stien slutter." },
+      { code: "return B", indent: 1,
+        eli5: "Det nye treet er ferdig.",
+        normal: "Returner det nye søketreet.",
+        teknisk: "B har samme form og samme element i hver posisjon som v." }
+    ],
+    bigO: { best: "O(n)", avg: "O(n log n)", worst: "O(n²)", space: "O(n)",
+      why: t("Hvert tall settes inn én gang, og hver innsetting går så langt ned som treet er høyt.",
+        "n innsettinger, hver O(h), der h er høyden. Balansert tre: O(n log n). Skjevt tre: O(n²).",
+        "LevelOrderBST er O(n), og hver av de n innsettingene koster O(h). Totalt O(n · h): O(n log n) når v er balansert, O(n²) når v er en lang kjede. (Oppgaven spør ikke om dette.)") }
+  });
+
+  def(IN.gen, "constructBSTExam", function (keys) {
+    var V = bstFrom(keys, "v").root, B = null, nodes = null, done = [], steps = [];
+    var order = bfsNodes(V);
+    function snap(line, mk, text, tag, extra) {
+      mk = mk || {};
+      var forest = B ? [treeClone(V), treeClone(B)] : [treeClone(V)], sup = {};
+      if (V) sup[V.id] = "v";
+      if (B) sup[B.id] = "B";
+      var s = { line: line, forest: forest, sup: sup, text: text, tag: tag,
+        info: [{ label: "nodes", items: nodes ? clone(nodes) : [] }, { label: "satt inn i B", items: clone(done) }],
+        marks: { cur: mk.cur || null, done: done.map(function (k) { return "v" + k; }), fresh: mk.fresh || null, path: mk.path || [] } };
+      if (extra) for (var e in extra) s[e] = extra[e];
+      steps.push(s);
+    }
+    snap(null, {}, t("Til venstre er input-treet v. Vi skal bygge et nytt søketre B ved å sette inn tallene fra v i level-order.",
+      "Input: søketreet v (merket «v»). B tegnes til høyre når det får noder.",
+      "Input: roten v av et søketre med n = " + order.length + " noder. Spørsmålet er hvordan B forholder seg til v."), "Input");
+    snap(2, {}, t("B er tomt foreløpig.", "B ← tomt søketre.", "B ← tomt søketre."), null);
+    nodes = byKeys(order);
+    snap(3, {}, t("Vi leser v nivå for nivå: " + nodes.join(", ") + ". Roten kommer først, og hvert tall kommer etter tallet over seg.",
+      "nodes = " + nodes.join(", ") + " (LevelOrderBST fra (b)).",
+      "nodes = [" + nodes.join(", ") + "]. I level-order kommer hver node etter forelderen sin, så alle forfedrene til u er allerede i B når u settes inn."), null);
+    order.forEach(function (u) {
+      snap(4, { cur: u.id }, t("Neste tall er " + u.k + ".", "u = " + u.k + ".", "u = " + u.k + "."), null);
+      var o = bstAdd(B, u.k, "b");
+      B = o.root;
+      done.push(u.k);
+      var pathTxt = o.path.map(function (p) { return u.k < p.k ? u.k + " < " + p.k + ": venstre" : u.k + " > " + p.k + ": høyre"; });
+      snap(5, { cur: u.id, fresh: o.node.id, path: byIds(o.path).concat([o.node.id]) },
+        o.parent
+          ? t(u.k + " går ned fra roten i B: " + pathTxt.join(", så ") + ". Det havner under " + o.parent.k + ", akkurat der det står i v.",
+              "Insert(B, " + u.k + "): " + pathTxt.join(", ") + ". Samme plass som i v.",
+              "Søkestien i B er " + byKeys(o.path).join(" → ") + ", som er nøyaktig forfedrene til " + u.k + " i v. Plassen under " + o.parent.k + " er ledig, fordi bare " + u.k + " står der i v.")
+          : t("B er tomt, så " + u.k + " blir roten i B, slik det er roten i v.", "Insert(B, " + u.k + "): B var tomt, så " + u.k + " blir roten.", u.k + " blir roten i B. Det er også roten i v."),
+        "Sett inn " + u.k);
+    });
+    var same = treeSer(B) === treeSer(V);
+    snap(6, {}, same
+      ? t("Ferdig! B er helt likt v: samme form og samme tall på samme plass.",
+          "return B. B og v er like trær.",
+          "return B. B = v: hver node fikk samme forelder og samme side som i v. Grunnen er at forfedrene alltid settes inn før etterkommerne i level-order.")
+      : t("Ferdig. B ble ikke likt v.", "return B. B og v er ulike.", "return B. B ≠ v."), "Ferdig", { svar: same ? "like trær" : "ulike trær" });
+    return steps;
   });
 
 })();

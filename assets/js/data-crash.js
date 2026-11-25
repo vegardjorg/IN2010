@@ -87,7 +87,7 @@
         kjerne: t(
           "Eksamen er som et brettspill med faste regler. Først et lett spørsmål. Så mange små «sant eller usant», der det lønner seg å svare på alt. Til slutt større oppgaver der du forklarer, skriver pseudokode og sier hvor lang tid løsningen tar. Den som kan reglene, taper færre poeng på dumme ting.",
           "<p>Eksamen er 100 poeng: oppvarming (2 p), del 1 med sant/usant (32, 22 og 26 p i 2023–2025) og del 2 med 6–7 langsvarsoppgaver. I del 1 teller blankt og galt likt, så svar på alle. I del 2 gir lavere kjøretid flere poeng, og du kan bruke pensumalgoritmer uten å skrive dem selv (står i oppgavesettene fra 2023). Gjør rede for antagelsene dine.</p>",
-          "<p>Del 1 (2023–2025): N påstander, n riktige, poeng = 2 · max(n − N/2, 0). Ren gjetting gir i snitt 0. Del 2: sensorveiledningene gir poeng i trinn etter kjøretid (optimal løsning full pott, ett trinn dårligere omtrent halvparten, kvadratisk eller verre 0–1 p). Feil eller manglende kjøretid koster typisk 1 p. Riktig idé uten pseudokode gir opptil halv pott, og presis tekst kan gi mer enn uklar pseudokode.</p>"),
+          "<p>Del 1 (2023–2025): N påstander, n riktige, poeng = 2 · max(n − N/2, 0). Ren gjetting gir i snitt 0. Del 2: sensorveiledningene gir poeng i trinn etter kjøretid (optimal løsning full pott, ett trinn dårligere omtrent halvparten, vesentlig tregere gir ofte fortsatt en god del, f.eks. inntil 5 av 8 for O(n²) på H2023 diameter og 4 av 6 for kvadratisk CheckBST på H2022, men på noen oppgaver nesten ingenting, f.eks. 1 p på H2023 Finn duplikat). Feil eller manglende kjøretid koster typisk 1 p. Riktig idé uten pseudokode gir opptil halv pott, og presis tekst kan gi mer enn uklar pseudokode.</p>"),
         les: [["strategi", "eksamensteknikk", "tek-typer", "Strategi → Oppgavetypene"], ["strategi", "eksamensteknikk", "tek-bygg", "Pensum som byggeklosser"]],
         oppskrift: [
           "<b>Del 1:</b> svar på alle påstandene. Blankt teller som galt.",
@@ -151,7 +151,7 @@
           "Les påstanden ord for ord. Hvilket tilfelle: verste, forventet eller amortisert?",
           "Hvilken struktur? Søk er O(h) i et vanlig søketre, men O(log n) i et AVL-tre.",
           "Se etter lure ord: «alltid», «i verste tilfelle», «for alle input».",
-          "Er du usikker, gjør et raskt moteksempel: sortert input for Quicksort, alle nøkler i samme bøtte for hashing."
+          "Er du usikker, gjør et raskt moteksempel: sortert input for Quicksort med første eller siste element som pivot, alle nøkler i samme bøtte for hashing."
         ],
         eksempel: [["strategi", "kjoretid", "drill", "Kjøretidsdrillen i Strategi"]],
         oppgaver: ["p22tf", "g22kj"],
@@ -210,7 +210,7 @@
         kjerne: t(
           "Noen gåter er lette å løse. Andre er vanskelige å løse, men lette å sjekke når noen viser deg et svar, som en Sudoku. NP er gåtene som er lette å sjekke. Ingen vet om alle slike gåter også er lette å løse.",
           "<p>Et <b>avgjørelsesproblem</b> har svar JA eller NEI. <b>P</b> er problemene som kan løses i polynomiell tid. <b>NP</b> er problemene der et JA-svar kan <b>verifiseres</b> i polynomiell tid med et <b>sertifikat</b>. P ⊆ NP, men om P = NP er ukjent. <b>NP-hardt:</b> minst like vanskelig som alle problemer i NP. <b>NP-komplett:</b> i NP og NP-hardt.</p>",
-          "<p>En <b>reduksjon</b> oversetter instanser av ett problem til et annet i polynomiell tid, slik at JA blir JA og NEI blir NEI. For å vise at X er NP-hardt, reduserer du et kjent NP-hardt problem (for eksempel SAT) til X. Stoppeproblemet (HALT) er uavgjørbart: ingen algoritme løser det for alle input.</p>"),
+          "<p>En <b>reduksjon</b> oversetter instanser av ett problem til et annet i polynomiell tid, slik at JA blir JA og NEI blir NEI. For å vise at X er NP-hardt, reduserer du et kjent NP-hardt problem (for eksempel SAT) til X. Stoppeproblemet (HALT) er uløselig: ingen algoritme løser det for alle input.</p>"),
         les: [["strategi", "pnp", null, "Strategi → P og NP"]],
         oppskrift: [
           "Lær definisjonene ordrett med egne ord: P, NP, sertifikat, reduksjon, NP-hardt, NP-komplett.",
@@ -220,13 +220,13 @@
         eksempel: [["strategi", "pnp", "ham-graf", "Verifikator for Hamiltonsykel, steg for steg"]],
         oppgaver: ["p21pnp"],
         sjekk: [{ type: "quiz", items: [
-          { q: "Hva betyr det at et avgjørelsesproblem er i NP?", options: ["Det kan ikke løses i polynomiell tid", "Et JA-svar kan sjekkes i polynomiell tid med et sertifikat", "Det er NP-hardt", "Det er uavgjørbart"], answer: 1,
+          { q: "Hva betyr det at et avgjørelsesproblem er i NP?", options: ["Det kan ikke løses i polynomiell tid", "Et JA-svar kan sjekkes i polynomiell tid med et sertifikat", "Det er NP-hardt", "Det er uløselig"], answer: 1,
             explain: "NP handler om å verifisere, ikke om å løse. Alle problemer i P er også i NP." },
           { q: "Du vil vise at et nytt problem X er NP-hardt. Hva gjør du?", options: ["Reduserer X til SAT", "Reduserer et kjent NP-hardt problem, for eksempel SAT, til X", "Lager en verifikator for X", "Viser at X er i P"], answer: 1,
             explain: "Kan et kjent vanskelig problem oversettes til X, er X minst like vanskelig. En verifikator viser bare at X er i NP." },
           { q: "Hvilket utsagn er riktig?", options: ["P = NP er bevist", "P ⊆ NP, men om P = NP er ukjent", "NP er problemene som ikke kan løses raskt", "Alle problemer i NP er NP-komplette"], answer: 1,
             explain: "Alt som kan løses raskt, kan også sjekkes raskt. Om det motsatte gjelder, er et åpent problem." },
-          { q: "Hva er et NP-komplett problem?", options: ["Et problem som er i NP og NP-hardt", "Et problem som er NP-hardt, men ikke i NP", "Et problem som løses i polynomiell tid", "Et uavgjørbart problem"], answer: 0,
+          { q: "Hva er et NP-komplett problem?", options: ["Et problem som er i NP og NP-hardt", "Et problem som er NP-hardt, men ikke i NP", "Et problem som løses i polynomiell tid", "Et uløselig problem"], answer: 0,
             explain: "NP-komplett = i NP og NP-hardt. Hamiltonsykel er et eksempel." }
         ] }],
         feller: [
@@ -263,11 +263,11 @@
         hvorfor: "Første oppgave i del 2 har vært den samme typen fire år på rad (10 p): kjør en pensumoperasjon for hånd. 2022 Linear probing, 2023 innsetting i heap, 2024 Huffman, 2025 Separate chaining. Formen er lik hver gang, så oppskriften gir poeng uansett hvilken operasjon som kommer.",
         kjerne: t(
           "Tenk deg en rekke med barn der den minste skal stå først. Et nytt barn stiller seg bakerst og bytter plass med den foran (forelderen) så lenge den foran er større. Til slutt står alle riktig igjen.",
-          "<p><b>HeapInsert:</b> legg x bakerst, på indeks n. Så lenge i > 0 og forelderen A[⌊(i − 1)/2⌋] er større enn A[i], bytter du dem og går til forelderen. Kjøretid O(log n), fordi x høyst kan boble opp gjennom høyden, og et komplett binærtre har høyde ⌊log n⌋.</p>",
-          "<p>Innsettingen bevarer formen (komplett binærtre) ved å bruke første ledige plass, og reparerer heap-egenskapen langs én sti fra løvnoden mot roten. Antall bytter er høyst høyden ⌊log n⌋, med O(1) arbeid per bytte: O(log n) i verste tilfelle.</p>"),
+          "<p><b>HeapInsert:</b> legg x bakerst, på indeks n. Så lenge i > 0 og forelderen A[⌊(i − 1)/2⌋] er større enn A[i], bytter du dem og går til forelderen. Kjøretid O(log n), fordi x høyst kan boble opp gjennom høyden, og høyden til et komplett binærtre er O(log n).</p>",
+          "<p>Innsettingen bevarer formen (komplett binærtre) ved å bruke første ledige plass, og reparerer heap-egenskapen langs én sti fra løvnoden mot roten. Antall bytter er høyst høyden etter innsettingen, ⌊log(n + 1)⌋, med O(1) arbeid per bytte: O(log n) i verste tilfelle.</p>"),
         les: [["heap", "innsetting", null, "Heap → Innsetting"]],
         oppskrift: [
-          "<b>(a) Sluttilstand, 2–3 p:</b> vis tilstanden etter hver innsetting, ikke bare til slutt. Da får du delpoeng selv om ett steg blir feil.",
+          "<b>(a) Sluttilstand, 2–3 p:</b> regn én innsetting om gangen på kladd og skriv sluttilstanden tydelig. Sensor gir poeng for riktig svar og ingen for feil (H2022), så ett feil steg underveis koster hele deloppgaven.",
           "<b>(b) Forklaring og pseudokode, 5–7 p:</b> forklar idéen i én–to setninger og skriv pseudokoden. Uten pseudokode får du omtrent 3.",
           "<b>(c) Kjøretid:</b> til slutt, med begrunnelse. For hashing: både forventet og verste tilfelle.",
           "Skriv hvilken regel du bruker (bobler opp mot forelder ⌊(i − 1)/2⌋, overskriver lik nøkkel, slår sammen de to minste)."
@@ -280,14 +280,14 @@
           { type: "quiz", items: [
             { q: "Sett inn 6, 4, 9, 2 og 5 i en tom min-heap (i den rekkefølgen). Hvordan ser arrayet ut?", options: ["2, 4, 9, 6, 5", "2, 4, 5, 6, 9", "2, 6, 9, 4, 5", "4, 2, 9, 6, 5"], answer: 0,
               explain: "6 → [6]. 4 bobler forbi 6 → [4, 6]. 9 → [4, 6, 9]. 2 starter på indeks 3, bobler forbi 6 og så 4 → [2, 4, 9, 6]. 5 havner på indeks 4 under 4 og blir stående → [2, 4, 9, 6, 5]." },
-            { q: "Hvorfor er HeapInsert O(log n)?", options: ["Fordi arrayet er sortert", "Fordi verdien høyst bobler opp gjennom høyden, og høyden er ⌊log n⌋", "Fordi vi bruker binærsøk", "Fordi vi bare sammenligner med roten"], answer: 1,
+            { q: "Hvorfor er HeapInsert O(log n)?", options: ["Fordi arrayet er sortert", "Fordi verdien høyst bobler opp gjennom høyden, og høyden er O(log n)", "Fordi vi bruker binærsøk", "Fordi vi bare sammenligner med roten"], answer: 1,
               explain: "Ett bytte per nivå, og et komplett binærtre med n noder har ⌊log n⌋ + 1 nivåer." }
           ] },
           { type: "parsons", algo: "heapInsert", tekst: "Sett linjene i HeapInsert i riktig rekkefølge." }
         ],
         feller: [
           "1-indekserte foreldreformler. Med 0-indeksering er forelderen ⌊(i − 1)/2⌋.",
-          "Å bare vise sluttilstanden. Mellomtilstandene redder delpoeng.",
+          "Å regne i hodet. Ett feil steg gir feil sluttsvar, og feil svar gir 0 p, så ta det én innsetting om gangen på kladd.",
           "Å kalle Insert når oppgaven ber deg forklare og skrive selve innsettingen."
         ] },
 
@@ -677,7 +677,7 @@
     /* ===================== 9 · GRAFHISTORIEN ===================== */
     { nr: 9, navn: "Grafhistorien", hvor: "Del 2, alltid sist og størst, 22–26 p", steg: [
       { id: "9a", tittel: "Fra historie til graf", vekt: 3, min: "E", tid: 10, tidG: 15,
-        hvorfor: "Grafer har kommet alle seks år, og siste oppgave er alltid en grafhistorie (tunneler, venner, turstier, kollektivtrafikk). Første deloppgave er nesten alltid modellen: 1–2 p.",
+        hvorfor: "Grafer har kommet alle seks år, ofte som en større oppgave med en historie rundt (tunneler, venner, turstier, kollektivtrafikk). Første deloppgave er nesten alltid modellen: 1–2 p.",
         kjerne: t(
           "Gjør historien om til prikker og streker. Prikkene (nodene) er tingene, for eksempel bygninger eller personer. Strekene (kantene) er forbindelsene. Spør: går strekene begge veier? Har de en pris?",
           "<p>Si hva <b>nodene</b> og <b>kantene</b> er, om grafen er <b>rettet</b> (går forbindelsen bare én vei?) og <b>vektet</b> (har kantene kostnad, tid, avstand?). Si også om den er sammenhengende eller asyklisk hvis historien sier det.</p>",
@@ -758,7 +758,7 @@
         sjekk: [{ type: "tf", fra: [["grafer", ["traversering", "sykler", "topologisk sortering"]]], maks: 10 }],
         feller: [
           "DFS eller BFS én gang per node: maks 3 av 5 og 3 av 6 (sykler 2023 og 2025).",
-          "DFS én gang per startnode: −2 p (garbage collection 2022). Bruk en superkilde.",
+          "Nytt besøkt-sett for hver startnode: da blir løsningen tregere enn O(|V| + |E|), og det koster 2 p (garbage collection 2022). Kjør DFSVisit fra hver startnode med ett felles besøkt-sett.",
           "Umodifisert topologisk sortering der rekkefølgen blant ledige noder betyr noe: maks 5 av 10 (2021)."
         ] },
 
@@ -1064,8 +1064,13 @@
     var f = fortsettTarget(L, st, stt.sist), fs = f ? BYID[f] : null;
     var ko = STEPS.filter(function (s) { return st[s.id].queue; })
       .sort(function (a, b) { return b.vekt - a.vekt; }).map(function (s) { return s.id; });
+    /* Påbegynt løypa: åpnet et steg, eller noe teller på et steg (i hvilken som helst lengde).
+       Å bare velge lengde teller ikke. Brukes til «Start» mot «Fortsett». */
+    var startet = !!stt.sist || STEPS.some(function (s) { return st[s.id].started || st[s.id].done; });
+    /* Fullførte steg som ikke er med i valgt lengde (lagret, teller igjen i en lengre løype) */
+    var utenfor = STEPS.filter(function (s) { return !inLen(s, L) && st[s.id].done; }).length;
     return {
-      lengde: L, lengdeNavn: LEN[L].navn, sist: stt.sist,
+      lengde: L, lengdeNavn: LEN[L].navn, sist: stt.sist, startet: startet, ferdigeUtenfor: utenfor,
       dekket: dekket, total: total, prosent: total ? Math.round(100 * dekket / total) : 0,
       alle100: alle100,                       // poeng dekket over hele løypa (alle lengder), av 100
       ferdigeSteg: ferdige, antallSteg: list.length, minutter: tid,

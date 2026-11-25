@@ -447,6 +447,6 @@
       answer: "O(n³)",
       why: t("Alle mulige trioer av tall. Med n tall blir det n · n · n trioer.",
              "Tre nøstede løkker som hver går n ganger: n³.",
-             "k nøstede løkker gir O(nᵏ). Det er fortsatt polynomiell tid, altså en algoritme i P-familien, selv om den er treg.") }
+             "k nøstede løkker gir O(nᵏ). Det er fortsatt polynomiell tid, altså en polynomiell algoritme, selv om den er treg.") }
   ];
 })();

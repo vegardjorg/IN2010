@@ -5,8 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Blokk 6 · Grafer · IN2010</title>
   <meta name="description" content="Grafer i IN2010: begreper, bredde-først og dybde-først søk, topologisk sortering, Dijkstra og Bellman-Ford, minimale spenntrær (Prim og Kruskal), sterkt sammenhengende komponenter, sykler og 2-sammenheng – med stegvise demoer, pseudokode og eksamensoppgaver.">
-  <script>(function(){try{var d=document.documentElement;var t=localStorage.getItem('in-theme');if(t&&t!=='system')d.setAttribute('data-theme',t);var l=localStorage.getItem('in-level')||'normal';d.setAttribute('data-level',l);}catch(e){document.documentElement.setAttribute('data-level','normal');}})();</script>
-  <link rel="stylesheet" href="assets/css/styles.css">
+  <script>(function(){try{var d=document.documentElement;var t=localStorage.getItem('in-theme')||'light';if(t!=='system')d.setAttribute('data-theme',t);var l=localStorage.getItem('in-level')||'normal';d.setAttribute('data-level',l);}catch(e){document.documentElement.setAttribute('data-theme','light');document.documentElement.setAttribute('data-level','normal');}})();</script>
+  <link rel="stylesheet" href="assets/css/styles.css?v=20261125a">
 </head>
 <body data-page="grafer">
   <a class="skip-link" href="#main">Hopp til innhold</a>
@@ -558,13 +558,15 @@
     <p class="muted small">IN2010 · Blokk 6 · Grafer. Egne forklaringer og demoer basert på pensum. Eksamensoppgavene er gjengitt med egne ord.</p>
   </footer>
 
-  <script src="assets/js/core.js"></script>
-  <script src="assets/js/data-tf.js"></script>
-  <script src="assets/js/pseudocode.js"></script>
-  <script src="assets/js/stepplayer.js"></script>
-  <script src="assets/js/viz-graph.js"></script>
-  <script src="assets/js/data-algos.js"></script>
-  <script src="assets/js/data-grafer.js"></script>
+  <script src="assets/js/core.js?v=20261125a"></script>
+  <script src="assets/js/symboler.js?v=20261125a"></script>
+  <script src="assets/js/data-tf.js?v=20261125a"></script>
+  <script src="assets/js/pseudocode.js?v=20261125a"></script>
+  <script src="assets/js/stepplayer.js?v=20261125a"></script>
+  <script src="assets/js/varline.js?v=20261125a"></script>
+  <script src="assets/js/viz-graph.js?v=20261125a"></script>
+  <script src="assets/js/data-algos.js?v=20261125a"></script>
+  <script src="assets/js/data-grafer.js?v=20261125a"></script>
   <script>
   (function () {
     "use strict";
@@ -744,9 +746,9 @@
 
     /* ===================== 2-SAMMENHENG ===================== */
     IN.explain("#intro-sammenheng", t(
-      "Er det en bro i nettet som alt avhenger av? Hvis én person i en vennegjeng er den eneste som kjenner folk i to grupper, faller gjengen fra hverandre når hun ikke kommer.",
+      "Finnes det ett knutepunkt som alt avhenger av? Hvis én person i en vennegjeng er den eneste som kjenner folk i to grupper, faller gjengen fra hverandre når den personen ikke kommer.",
       "En separasjonsnode er en node som deler grafen i flere deler hvis den fjernes. En graf uten slike er 2-sammenhengende. De finnes med ett dybde-først søk som holder styr på depth og low: O(|V| + |E|).",
-      "Kurset definerer 2-sammenheng via separasjonsnoder: grafen er sammenhengende, og ingen enkeltnode kan dele den. Separasjonsnodene finnes med depth og low i ett DFS. Roten behandles for seg: den er en separasjonsnode hvis den har mer enn ett barn i DFS-treet. (Ekstra, ikke pensum: med minst tre noder er det det samme som at hvert par av noder har to stier mellom seg som ikke deler andre noder.)"
+      "En sammenhengende graf er 2-sammenhengende hvis den fortsatt henger sammen uansett hvilken ene node vi fjerner, altså hvis den ikke har noen separasjonsnoder. Forelesningen viser også en likeverdig beskrivelse: med minst tre noder har hvert par av noder to stier mellom seg som ikke deler andre noder. Separasjonsnodene finnes med depth og low i ett DFS. Roten behandles for seg: den er en separasjonsnode hvis den har mer enn ett barn i DFS-treet."
     ), { label: "Nivå:" });
     pcBlock("#pc-sep", "sepVertices", "#exp-sep");
     pcBlock("#pc-sepvisit", "sepVisit", "#exp-sepvisit");
@@ -978,7 +980,7 @@
           intro: "<p>Her er to urettede grafer, G1 og G2. For hvert utsagn: gjelder det for <b>ingen</b>, bare <b>G1</b>, bare <b>G2</b>, eller <b>begge</b>?</p>",
           figs: [gFig(G1P, "G1", {}, { scale: 0.75 }), gFig(G2P, "G2", {}, { scale: 0.75 })],
           parts: [{ t: "Grafen er sammenhengende.", p: 1 }, { t: "Grafen er 2-sammenhengende.", p: 1 }, { t: "Grafen er et tre.", p: 1 },
-            { t: "Grafen har mer enn to separasjonsnoder.", p: 1 }, { t: "Det finnes to distinkte stier fra B til F.", p: 1 },
+            { t: "Grafen har mer enn to separasjonsnoder.", p: 1 }, { t: "Grafen har to (forskjellige) stier fra B til F.", p: 1 },
             { t: "Grafen har to komponenter.", p: 1 }, { t: "Grafen er rettet.", p: 1 }, { t: "Grafen inneholder en sykel.", p: 1 },
             { t: "Grafen blir et tre hvis vi fjerner én kant.", p: 1 }, { t: "Grafen er enkel.", p: 1 }]
         }),
