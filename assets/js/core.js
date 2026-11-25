@@ -49,9 +49,9 @@
     { id: "sok",        href: "02-sok.html",       label: "2 · Søk",     ready: true },
     { id: "heap",       href: "03-heap.html",      label: "3 · Heap",    ready: true },
     { id: "traer",      href: "04-traer.html",     label: "4 · Trær",    ready: true },
-    { id: "hashing",    href: "05-hashing.html",   label: "5 · Hashing", ready: false },
-    { id: "grafer",     href: "06-grafer.html",    label: "6 · Grafer",  ready: false },
-    { id: "strategi",   href: "07-strategi.html",  label: "7 · Strategi", ready: false }
+    { id: "hashing",    href: "05-hashing.html",   label: "5 · Hashing", ready: true },
+    { id: "grafer",     href: "06-grafer.html",    label: "6 · Grafer",  ready: true },
+    { id: "strategi",   href: "07-strategi.html",  label: "7 · Strategi", ready: true }
   ];
 
   function buildNav() {
