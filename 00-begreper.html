@@ -6,7 +6,7 @@
   <title>Blokk 0 · Begreper · IN2010</title>
   <meta name="description" content="Grunnbegreper i IN2010: algoritme, datastruktur, Big-O, stabil/in-place, ADT, rekursjon.">
   <script>(function(){try{var d=document.documentElement;var t=localStorage.getItem('in-theme')||'light';if(t!=='system')d.setAttribute('data-theme',t);var l=localStorage.getItem('in-level')||'normal';d.setAttribute('data-level',l);}catch(e){document.documentElement.setAttribute('data-theme','light');document.documentElement.setAttribute('data-level','normal');}})();</script>
-  <link rel="stylesheet" href="assets/css/styles.css?v=20261125a">
+  <link rel="stylesheet" href="assets/css/styles.css?v=20261125b">
 </head>
 <body data-page="begreper">
   <a class="skip-link" href="#main">Hopp til innhold</a>
@@ -45,16 +45,13 @@
       <h3>Forklaring</h3>
       <div id="ex-algoritme"></div>
 
-      <div class="callout eksempel"><span class="lbl">Eksempel på svar (maks fire setninger)</span>
-        <p><b>Algoritme:</b> «En algoritme er en entydig, endelig sekvens av steg som tar et input og
-          produserer et output som løser et bestemt problem. Et eksempel er binærsøk, som finner et tall i
-          et sortert array.»</p>
-        <p><b>Datastruktur:</b> «En datastruktur organiserer data i minnet slik at visse operasjoner blir
-          raske. For eksempel gir en heap rask tilgang til det minste elementet.»</p></div>
+      <div class="callout snarvei"><span class="lbl">Vårt råd</span>
+        Få med at en algoritme er presis og entydig, at den tar slutt, og at den går fra input til output.
+        For en datastruktur: at den organiserer data, og at valget avhenger av hvilke operasjoner som skal gå fort.
+        Oppgaven under står likt på hver eksamen fra H2020 til H2025.</div>
 
-      <div class="callout sensor"><span class="lbl">Sensortips</span>
-        «Vi er ikke ute etter et fasitsvar – alle rimelige svar gir full uttelling.» Få med: entydig/presis,
-        endelig, input→output for algoritme; organisering + effektive operasjoner for datastruktur.</div>
+      <h3>Eksamen: oppvarmingen</h3>
+      <div id="exam-oppvarming"></div>
 
       <h3>Sjekk deg selv</h3>
       <div id="quiz-algoritme"></div>
@@ -97,8 +94,9 @@
 
       <div class="callout uni"><span class="lbl">Universitetsnivå</span>
         Rekkefølgen er <span class="mono">1 &lt; log n &lt; n &lt; n log n &lt; n² &lt; 2ⁿ</span>. En O(n log n)-sortering
-        på n = 1 000 000 gjør ~20 millioner steg; en O(n²) gjør ~10¹². Derfor står det på eksamen at
-        «lavere kjøretidskompleksitet foretrekkes».</div>
+        på n = 1 000 000 gjør ~20 millioner steg; en O(n²) gjør ~10¹². Derfor står det i «Om eksamen» på H2023:
+        «I implementasjonsoppgaver foretrekkes lavere kjøretidskompleksitet.»
+        <span class="muted small">(Kilde: eksamen IN2010 H2023, «Om eksamen». H2024 og H2025 skriver at lavere kjøretidskompleksitet er «mer poenggivende».)</span></div>
 
       <h3>Tell operasjoner</h3>
       <div id="quiz-bigo"></div>
@@ -152,6 +150,7 @@
       </div>
       <p class="muted small">In-place betyr at algoritmen ikke mellomlagrer elementene i en ekstra datastruktur.
         Derfor er quicksort in-place, mens merge sort (hjelpearray) og bøtte/radix (bøttene) ikke er det.</p>
+      <p class="muted small">Om en sortering er stabil, kan avhenge av hvordan den er skrevet. Tabellen gjelder variantene i kurset. At quicksort og heapsort er ustabile og radix sort stabil, er vår egen utledning: quicksort og heapsort bytter elementer som ikke står ved siden av hverandre, og radix sort er stabil fordi hvert pass er en stabil bøttesortering.</p>
       <p class="muted small">Eksamen: H2021 · Oppgave 2 (3p) spør om en sortering var stabil. Oppgaven med løsning ligger under
         <a href="01-sortering.html#fane=bucket&amp;oppg=exam-h2021-2">Sortering → Bøtte</a>.</p>
     </section>
@@ -212,7 +211,7 @@
     <!-- SANT/USANT -->
     <section data-panel="test">
       <h3>Test deg selv – begreper</h3>
-      <p class="muted small">Disse påstandene har aldri stått på eksamen. De er laget ut fra hva eksamenene og
+      <p class="muted small">Disse påstandene er ikke hentet ordrett fra eksamen. De er laget ut fra hva eksamenene og
         sensorveiledningene H2020–H2025 tester igjen og igjen, så du kan sjekke at du kan det sensor ser etter.
         De oftest testede står først.</p>
       <p class="muted small">Svar Sant/Usant, trykk <b>Sjekk svar</b>, og åpne <b>Forklaring</b> under hver påstand. Svarene huskes i nettleseren din.</p>
@@ -222,13 +221,14 @@
 
   <footer class="footer">IN2010-guide · Blokk 0 · Begreper</footer>
 
-  <script src="assets/js/core.js?v=20261125a"></script>
-  <script src="assets/js/symboler.js?v=20261125a"></script>
-  <script src="assets/js/data-tf.js?v=20261125a"></script>
-  <script src="assets/js/pseudocode.js?v=20261125a"></script>
-  <script src="assets/js/stepplayer.js?v=20261125a"></script>
-  <script src="assets/js/varline.js?v=20261125a"></script>
-  <script src="assets/js/viz-bars.js?v=20261125a"></script>
+  <script src="assets/js/core.js?v=20261125b"></script>
+  <script src="assets/js/symboler.js?v=20261125b"></script>
+  <script src="assets/js/data-tf.js?v=20261125b"></script>
+  <script src="assets/js/pseudocode.js?v=20261125b"></script>
+  <script src="assets/js/stepplayer.js?v=20261125b"></script>
+  <script src="assets/js/varline.js?v=20261125b"></script>
+  <script src="assets/js/viz-bars.js?v=20261125b"></script>
+  <script src="assets/js/perfekt/begreper.js?v=20261125b"></script>
   <script>
   (function () {
     var IN = window.IN, el = IN.el, qs = IN.qs;
@@ -244,13 +244,13 @@
     IN.explain("#ex-bigo", {
       eli5: "<p>Big-O svarer på: «Når det blir dobbelt så mange ting, hvor mye mer jobb blir det?» O(n) betyr dobbelt så mye jobb. O(n²) betyr fire ganger så mye. 2ⁿ betyr … mye verre!</p>",
       normal: "<p>Big-O beskriver veksttakten til kjøretiden når n vokser, uten konstanter og lavordensledd – vi skriver f.eks. O(n) eller O(n²) etter hvor raskt arbeidet vokser. Legg merke til at dette er noe annet enn beste/verste/snitt-tilfelle: tilfellet velger <i>hvilken</i> situasjon vi analyserer, mens Big-O sier hvor fort kjøretiden vokser der. Derfor kan vi gi én kjøretid for beste tilfelle (ofte O(n)) og en annen for verste (ofte O(n²)).</p>",
-      teknisk: "<p>Formelt: f(n) = O(g(n)) betyr at f til slutt holder seg under g bortsett fra en konstant faktor – det finnes konstanter c &gt; 0 og n₀ slik at f(n) ≤ c·g(n) for alle n ≥ n₀. I praksis: fra en viss størrelse n₀ og oppover er f aldri mer enn et fast antall ganger (c) g – hva som skjer for små input, og hvor stor den faste faktoren er, teller ikke. Grunnen til at vi dropper konstanter og lavordensledd er at for store n er det det dominerende leddet som avgjør: en O(n²)-algoritme taper for en O(n log n)-algoritme uansett hvor god konstanten er. Og husk at veksttakt (Big-O) og tilfelle (beste/verste/snitt) er to uavhengige valg – vi kan gi en Big-O for hvilket som helst tilfelle.</p>"
+      teknisk: "<p>Formelt: f(n) = O(g(n)) betyr at f til slutt holder seg under g bortsett fra en konstant faktor – det finnes konstanter c &gt; 0 og n₀ slik at f(n) ≤ c·g(n) for alle n ≥ n₀. I praksis: fra en viss størrelse n₀ og oppover er f aldri mer enn et fast antall ganger (c) g – hva som skjer for små input, og hvor stor den faste faktoren er, teller ikke. Grunnen til at vi dropper konstanter og lavordensledd er at for store n er det det dominerende leddet som avgjør: en algoritme der arbeidet vokser kvadratisk, taper for store n mot en der det vokser som n log n, uansett hvor gode konstantene er. Husk at O bare er en øvre grense: at noe er O(n²), sier ikke at det faktisk vokser kvadratisk, så sammenligningen gjelder den faktiske veksten. Og husk at veksttakt (Big-O) og tilfelle (beste/verste/snitt) er to uavhengige valg – vi kan gi en Big-O for hvilket som helst tilfelle.</p>"
     }, { label: "Nivå:" });
 
     IN.explain("#ex-stabil", {
       eli5: "<p><b>Stabil</b>: hvis to kort har samme tall, holder de samme rekkefølge som før. <b>In-place</b>: vi rydder i selve bunken uten en ekstra stor bunke ved siden av.</p>",
       normal: "<p><b>Stabil</b> sortering bevarer rekkefølgen mellom like nøkler – viktig når du sorterer på flere nøkler etter hverandre. <b>In-place</b> betyr at algoritmen sorterer i selve arrayet, uten en ekstra datastruktur å mellomlagre elementene i.</p>",
-      teknisk: "<p>Stabilitet: for like nøkler bevares den relative inputrekkefølgen i outputen. Avgjørende for radix/flernøkkel-sortering (sorter minst viktig nøkkel først, stabilt). In-place: elementene mellomlagres aldri i en ekstra datastruktur – merge sort, som fletter via et hjelpearray, er derfor ikke in-place. Quicksort sorterer derimot inne i selve arrayet og er in-place.</p>"
+      teknisk: "<p>Stabilitet: for like nøkler bevares den relative inputrekkefølgen i outputen. Det er nyttig når vi sorterer på flere nøkler etter hverandre: sorterer vi først på den minst viktige og så stabilt på den viktigste, ligger like elementer fortsatt i riktig rekkefølge etter den første nøkkelen. Radix sort bygger på samme idé, med siste siffer først. In-place: elementene mellomlagres aldri i en ekstra datastruktur – merge sort, som fletter via et hjelpearray, er derfor ikke in-place. Quicksort sorterer derimot inne i selve arrayet og er in-place.</p>"
     }, { label: "Nivå:" });
 
     IN.explain("#ex-adt", {
@@ -264,6 +264,32 @@
       normal: "<p>En rekursiv funksjon løser et problem ved å kalle seg selv på en mindre del, og kombinere svarene. Den må ha et basistilfelle for å stoppe. Hvert kall legges på <b>kallstakken</b> og venter der til kallet over det har svart; da regner det seg ferdig og fjernes fra toppen.</p>",
       teknisk: "<p>Hvert kall løser en mindre utgave av samme problem og har sine egne lokale variabler. For å finne kjøretiden teller vi kall og arbeid per kall: fakultet gjør n kall med O(1) arbeid hver, altså O(n).</p>"
     }, { label: "Nivå:" });
+
+    /* ---- Eksamen: oppvarmingen (oppgave 1, lik H2020–H2025), ordrett med kildelinje.
+       Vårt svar og sensorveiledningen står i assets/js/perfekt/begreper.js. ---- */
+    IN.examTasks("#exam-oppvarming", [{
+      key: "H2025-1", year: "H2025", oppgave_nr: "Oppgave 1", title: "Algoritme og datastruktur", points: 2,
+      kilde: "Oppgavetekst: UiO, IN2010, H2020–H2025, oppgave 1 (samme tekst alle år)",
+      ark: "Oppvarming", ordrett: true,
+      oppgave: IN.oppg({
+        parts: [
+          { t: "Hva er en algoritme? Svar kort (maks fire setninger)." },
+          { t: "Hva er en datastruktur? Svar kort (maks fire setninger)." }
+        ],
+        outro: "<p>Vi er ikke ute etter et «fasitsvar». Vi er ute etter å høre din forståelse av begrepene, og alle rimelige svar gir full uttelling.</p>"
+      }),
+      avvik: "Arket gir 2 poeng for hele oppgaven og fordeler dem ikke på (a) og (b). Derfor står det ingen poeng ved deloppgavene.",
+      losning: [
+        "<b>(a)</b> Få med at en algoritme er en presis og entydig oppskrift med endelig mange steg, som løser et problem: fra input til riktig output. Et eksempel, som binærsøk, viser at du kan bruke begrepet.",
+        "<b>(b)</b> Få med at en datastruktur er en måte å organisere data på, og at vi velger den etter hvilke operasjoner som skal gå fort. Et eksempel: en heap gir raskt det minste elementet."
+      ],
+      kjerne: "<p>Algoritmen er <i>hva vi gjør</i>, datastrukturen er <i>hvordan dataene ligger</i>. Et godt valg av datastruktur gjør algoritmen raskere.</p>",
+      tips: [
+        "Hold deg til fire setninger per deloppgave. Det er det oppgaven ber om.",
+        "Ifølge sensorveiledningen gir alle rimelige svar full uttelling. Du mister poeng hvis du lar oppgaven stå tom, skriver noe som er direkte feil, eller har vesentlige feil i deler av svaret.",
+        "Bland ikke datastruktur og ADT: ADT-en sier hvilke operasjoner som finnes, datastrukturen hvordan de lages. Se fanen ADT."
+      ]
+    }]);
 
     /* ---- Quiz: algoritme ---- */
     IN.quiz("#quiz-algoritme", [
@@ -367,7 +393,7 @@
         explain: "Hashtabell gir O(1) forventet. Balansert BST gir O(log n) garantert og ordnet iterasjon." },
       { q: "En <b>stakk</b> (LIFO) kan implementeres med …",
         options: ["Array ELLER lenket liste", "Bare en heap", "Bare et søketre", "Bare en hashtabell"], answer: 0,
-        explain: "Samme ADT, flere datastrukturer. Begge gir O(1) push/pop." }
+        explain: "Samme ADT, flere datastrukturer. Begge gir O(1) push og pop, men med dynamisk array er push bare amortisert O(1): av og til må arrayet dobles, og da koster den ene push-en O(n)." }
     ]);
 
     /* ---- Rekursjon: kallstakk fakultet ---- */

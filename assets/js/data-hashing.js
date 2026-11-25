@@ -135,7 +135,7 @@
     bigO: { best: "O(1)", avg: "O(1) forventet", worst: "O(n)", space: "O(n + N)",
       why: t("Vanligvis er bøtta nesten tom, så det går fort. Men havner alt i samme bøtte, må vi lete gjennom alt.",
         "Vi må lete gjennom én bøtte. Med en god hashfunksjon og lav Load factor (n/N) er bøttene korte, så forventet tid er O(1). Hasher alle n nøklene til samme bøtte, blir det O(n).",
-        "Kostnaden er O(1 + |B|). Med god hashfunksjon er forventet bøttelengde n/N, som holdes konstant ved rehash. Verste tilfelle: alle n nøkler i samme bøtte, O(n). Med rehash blir innsetting forventet amortisert O(1).") }
+        "Kostnaden er O(1 + |B|). Med en god hashfunksjon og en tilstrekkelig lav Load factor er lengden på hver liste begrenset av en konstant, så det blir forventet O(1). Verste tilfelle: alle n nøkler i samme bøtte, O(n). Tar vi med rehash for å holde Load factor lav, er innsetting forventet amortisert O(1).") }
   });
 
   reg(IN.algos, "hsChainGet", {
@@ -153,7 +153,7 @@
     ],
     bigO: { best: "O(1)", avg: "O(1) forventet", worst: "O(n)", space: "O(1) ekstra",
       why: t("Som oftest er det bare et par ting i bøtta. Men havner alt i samme bøtte, må vi lete gjennom alt.", "Vi leter bare i én bøtte. Den er forventet kort, men kan i verste fall inneholde alle n nøklene.",
-        "O(1 + |B|). Forventet |B| = n/N, altså O(1) når Load factor holdes konstant. Verste tilfelle O(n).") }
+        "O(1 + |B|). Med en god hashfunksjon og lav Load factor er |B| begrenset av en konstant, altså forventet O(1). Verste tilfelle O(n).") }
   });
 
   /* ---------- Linear probing ---------- */
@@ -183,7 +183,7 @@
     bigO: { best: "O(1)", avg: "O(1) forventet", worst: "O(n)", space: "O(N)",
       why: t("Som regel er hjemmeplassen ledig eller nesten ledig. Men står mange i kø på rad, må vi gå forbi alle.",
         "Vi går forbi opptatte plasser til vi treffer en ledig. Med lav Load factor er det få av dem. I verste fall ligger alle n i ett langt segment.",
-        "Forventet O(1) når Load factor holdes under en fast grense (f.eks. 0,75) og hashfunksjonen sprer godt. Lange segmenter uten hull (clustering) gjør probingen lengre. Verste tilfelle O(n). Med rehash: forventet amortisert O(1).") }
+        "Forventet O(1) når Load factor holdes under en fast grense (f.eks. 0,75) og hashfunksjonen sprer godt. Lange segmenter uten hull gjør probingen lengre. Verste tilfelle O(n). Med rehash: forventet amortisert O(1).") }
   });
 
   reg(IN.algos, "hsProbeGet", {
@@ -244,7 +244,7 @@
       { code: "i ← h(k, N)", indent: 1, eli5: "Vi regner ut hvor nøkkelen helst vil bo, og begynner der.", normal: "Start på hjemmeplassen.", teknisk: "Samme startpunkt som uten merker." },
       { code: "p ← null", indent: 1, eli5: "Vi har ikke sett noe merke ennå.", normal: "p husker det første slettet-merket vi går forbi.", teknisk: "p er indeksen til det første merket på veien, eller null hvis vi ikke har møtt noe merke ennå." },
       { code: "while A[i] ≠ null do", indent: 1, eli5: "Vi må gå helt til en tom plass, for nøkkelen kan ligge lenger ut.", normal: "Vi må helt til en ledig plass for å vite at k ikke finnes lenger ut.",
-        teknisk: "Stopper vi ved første merke, kan k ligge lenger ut, og da får vi duplikat." },
+        teknisk: "Kurset sier at innsetting regner merkede plasser som ledige. Vår presisering: vi gjenbruker merket først etter at vi har sjekket fram til en ledig plass. Stopper vi ved første merke, kan k ligge lenger ut, og da får vi duplikat." },
       { code: "if A[i] = DELETED then", indent: 2, eli5: "Står det en «slettet»-lapp på plassen?", normal: "Et merke kan gjenbrukes.", teknisk: "Et merke er ikke null, så løkka går forbi det. Plassen kan likevel gjenbrukes til slutt." },
       { code: "if p = null then p ← i", indent: 3, eli5: "Husk den første plassen med slettemerke. Der kan vi sette nøkkelen hvis den ikke finnes fra før.", normal: "Husk det første merket.", teknisk: "Vi husker bare det første merket, fordi det ligger nærmest hjemmeplassen og gir kortest probing neste gang." },
       { code: "else if A[i].key = k then", indent: 2, eli5: "Bor nøkkelen allerede her? Da skal vi bare bytte verdien.", normal: "Ligger k her fra før?", teknisk: "Et merke har ingen nøkkel. Derfor sjekker vi merket først, og leser key bare på ekte par." },
@@ -471,6 +471,12 @@
     }
     // Innsetting med merker: h-pillen pluss en pille for p (husket merke)
     function withP(hx, p) { return [hx, { label: "p", html: p === null ? "null" : String(p) }]; }
+    // Fullt array og nøkkelen finnes ikke: pseudokoden antar at A ikke er fullt, så løkka ville gått i ring.
+    function fullStop(home, seen, hx) {
+      snap(null, { home: home, occ: seen }, t("Vi har gått en hel runde uten å finne en tom plass. Tabellen er full, så vi stopper her.",
+        "Vi er tilbake på hjemmeplassen " + home + " uten å ha truffet null. Pseudokoden antar at arrayet ikke er fullt, ellers ville løkka gått i ring. Demoen stopper derfor her. Med rehash skjer ikke dette.",
+        "Alle N = " + N + " plasser er opptatt" + (mark ? " (av nøkler eller merker)" : "") + ", og k finnes ikke. Uten en null-plass stopper aldri løkka. Kurset unngår dette med rehash når Load factor blir høy" + (mark ? ", og rehash fjerner også merkene" : "") + "."), "Fullt: stopp", hx);
+    }
     function nextText(i, ni) {
       var wrapTxt = ni === 0 && i === N - 1;
       return t("Vi prøver neste plass" + (wrapTxt ? ". Etter siste plass går vi rundt til plass 0." : ", plass " + ni + "."),
@@ -554,6 +560,7 @@
           snap(Lg + 6, { home: home, cur: nk, occ: seen }, nextText(i, nk), "Neste plass", hx);
           i = nk;
         }
+        if (!hit && A[i] != null) { fullStop(home, seen, hx); return; }
         if (!hit) snap(Lg + 7, { home: home, miss: i, occ: seen }, t("Plass " + i + " er tom. Var " + show(k) + " her, ville den ligget før denne tomme plassen. Den finnes ikke.",
           "A[" + i + "] = null: k finnes ikke. Returner null.", "Mislykket oppslag etter " + tries(seen.length + 1) + "."), "Ikke funnet", hx);
       } else if (o.op === "del") {
@@ -573,6 +580,7 @@
             snap(Ld + 7, { home: home, cur: nm, occ: seen }, nextText(i, nm), "Neste plass", hx);
             i = nm;
           }
+          if (!got && A[i] != null) { fullStop(home, seen, hx); return; }
           if (!got) snap(Ld + 8, { home: home, miss: i, occ: seen }, t("Tom plass: " + show(k) + " finnes ikke.", "A[" + i + "] = null: løkka stopper uten treff, og ingenting slettes.", "Løkka er ferdig uten treff: return A."), "Ikke funnet", hx);
           return;
         }
@@ -583,6 +591,7 @@
             "A[" + i + "].key = " + show(A[i].k) + " ≠ " + show(k) + ". i ← " + nd + ".", "i ← (" + i + " + 1) mod " + N + " = " + nd + "."), "Let", hx);
           i = nd;
         }
+        if (A[i] != null && A[i].k !== k) { fullStop(home, seen, hx); return; }
         if (A[i] == null) {
           snap(Ld + 5, { home: home, miss: i, occ: seen }, t("Plass " + i + " er tom. Da stopper letingen, og " + show(k) + " finnes ikke.",
             "Løkka stopper fordi A[" + i + "] = null. Sjekken A[i] = null er sann: k finnes ikke.", "A[" + i + "] = null: k finnes ikke."), "Ikke funnet", hx);
@@ -628,7 +637,7 @@
     OP = null;
     snap(null, {}, t("Ferdig! Hver nøkkel står på hjemmeplassen sin eller litt etter.",
       "Ferdig. Load factor er " + cc.n + "/" + N + ". Understreking viser segmenter av opptatte plasser uten hull.",
-      "Ferdig. Lange segmenter uten hull (clustering) gir lengre probing for nøkler som hasher inn i dem."), "Ferdig");
+      "Ferdig. Lange segmenter uten hull gir lengre probing for nøkler som hasher inn i dem."), "Ferdig");
     return linkVars(steps);
   });
 
@@ -698,7 +707,7 @@
     OP = null;
     snap(null, {}, t("Ferdig! Nøkler som kolliderer, deler bøtte.",
       "Ferdig. n = " + n + " par i " + A.filter(Boolean).length + " bøtter. Load factor kan bli større enn 1 med Separate chaining.",
-      "Ferdig. Forventet bøttelengde er n/N = " + fmt(n / N) + "."), "Ferdig");
+      "Ferdig. Load factor n/N = " + fmt(n / N) + ". Holdes den lav, er bøttene korte."), "Ferdig");
     return linkVars(steps);
   });
 
@@ -784,7 +793,7 @@
      input: [{ N, ops:[{op:"ins"|"get"|"rehash", k, v}], fixed }] */
   reg(IN.gen, "hsPyOps", function (input) {
     var cfg = cfgOf(input), N = cfg.N || 8, fixed = cfg.fixed, idx = emptyArr(N), ent = [], steps = [], OP = null, E = null;
-    function oldLayout() { var a = emptyArr(N); ent.forEach(function (e) { var i = hash(e.k, N, fixed); while (a[i]) i = (i + 1) % N; a[i] = { k: show(e.k), v: e.v }; }); return a; }
+    function oldLayout() { var a = emptyArr(N); ent.forEach(function (e) { var i = hash(e.k, N, fixed), g = 0; while (a[i] && g++ < N) i = (i + 1) % N; if (!a[i]) a[i] = { k: show(e.k), v: e.v }; }); return a; }
     function snap(line, mi, me, text, tag, extra) {
       mi = mi || {}; if (mi.occ) mi.occ = mi.occ.slice();   // øyeblikksbilde: seen vokser senere
       var cells = idx.map(function (x) { return x == null ? null : { ref: x }; });
@@ -835,6 +844,13 @@
         snap(L + (o.op === "get" ? 8 : 9), { home: home, cur: ni, occ: seen }, {}, t("Vi prøver neste plass i indices" + (ni === 0 && i === N - 1 ? ". Etter siste plass går vi rundt til plass 0." : ", plass " + ni + "."),
           "i ← (" + i + " + 1) mod " + N + " = " + ni + ".", "i ← " + ni + (ni === 0 && i === N - 1 ? " (rundt enden)." : ".")), "Neste plass", hx);
         i = ni;
+      }
+      if (idx[i] != null) {
+        // Gått en hel runde: indices er full og k finnes ikke. Løkka i pseudokoden ville aldri stoppet.
+        snap(null, { home: home, occ: seen }, {}, t("Vi har gått en hel runde i indices uten å finne en tom plass. Den er full, så vi stopper her. Skriv «rehash» før neste innsetting.",
+          "indices er full (n = N = " + N + "), og " + show(k) + " finnes ikke. Linear probing antar at arrayet ikke er fullt, ellers går løkka i ring. Demoen stopper derfor her. Legg inn «rehash» i input for å doble indices.",
+          "Ingen null-plass i indices, så probingen stopper aldri. I praksis rehasher vi lenge før n = N. Legg inn «rehash» i input."), "Fullt: stopp", hx);
+        return;
       }
       if (o.op === "get") { snap(L + 9, { home: home, miss: i, occ: seen }, {}, t("Tom plass: " + show(k) + " finnes ikke.", "indices[" + i + "] = null: returner null.", "Mislykket oppslag."), "Ikke funnet", hx); return; }
       idx[i] = ent.length;
@@ -888,5 +904,47 @@
     });
     snap(10, null, t("Ferdig! " + m + " forekommer flest ganger: " + ganger(F[m]) + ".", "Returner m = " + m + " (" + ganger(F[m]) + ").", "n iterasjoner, hver forventet O(1): O(n) forventet."), "Ferdig");
     return linkVars(steps);
+  });
+
+  /* ---------- Subanagram med to frekvenstabeller (IsSubanagramOf2, H2020 7b) ----------
+     input: [W, S] (to strenger). Siste steg har svar: "true" | "false". */
+  reg(IN.gen, "hsSubanagramOps", function (input) {
+    var W = String((input && input[0]) || "").slice(0, 24), S = String((input && input[1]) || "").slice(0, 24);
+    var steps = [], F = {}, Fo = [], G = {}, Go = [], doneW = [], res = null;
+    function freq(str, M, order) { for (var i = 0; i < str.length; i++) { var c = str[i]; if (M[c] == null) { M[c] = 0; order.push(c); } M[c]++; } }
+    function pairs(M, order) { return order.map(function (c) { return [c, M[c]]; }); }
+    function getv(M, c) { return M[c] || 0; }
+    function snap(line, cur, text, tag, extra, showF, showG) {
+      var c = cur != null ? W[cur] : null;
+      var parts = [
+        { type: "arr", label: "W = «" + W + "»", items: W.split(""), marks: { cur: cur, done: doneW.slice() } },
+        { type: "arr", label: "S = «" + S + "»", items: S.split(""), marks: {} }
+      ];
+      if (showF) parts.push({ type: "map", label: "F = FreqTable(W)", pairs: pairs(F, Fo), marks: { cur: c } });
+      if (showG) parts.push({ type: "map", label: "G = FreqTable(S)", pairs: pairs(G, Go), marks: { cur: c } });
+      steps.push({ line: line, parts: parts, info: extra ? [extra] : [], text: text, tag: tag, svar: res,
+        vars: [cur != null ? { name: "c", value: "«" + c + "»", idx: cur } : { name: "c", value: null }] });
+    }
+    snap(null, null, t("Vi skal finne ut om ordet W kan legges med bokstavene i S.", "W = «" + W + "», S = «" + S + "». w = " + W.length + ", s = " + S.length + ".", "Mål: O(w + s)."), "Start");
+    freq(W, F, Fo);
+    snap(2, null, t("Først teller vi bokstavene i ordet W.", "F ← FreqTable(W): én gjennomgang av W.", "O(w)."), "Tell W", null, true, false);
+    freq(S, G, Go);
+    snap(3, null, t("Så teller vi bokstavene vi har i S.", "G ← FreqTable(S): én gjennomgang av S.", "O(s). Bokstaver som ikke finnes, gir 0 med get."), "Tell S", null, true, true);
+    for (var i = 0; i < W.length; i++) {
+      var c = W[i], f = getv(F, c), g = getv(G, c), bad = f > g;
+      snap(4, i, t("Vi ser på bokstaven «" + c + "» i W.", "c = «" + c + "».", "Runde " + (i + 1) + " av " + W.length + "."), "for c", null, true, true);
+      var cmp = { label: "Sjekk", html: "F.get(«" + c + "») > G.get(«" + c + "»)? " + f + " > " + g + " → " + (bad ? "ja" : "nei") };
+      if (bad) {
+        snap(5, i, t("Ordet trenger " + f + " «" + c + "», men S har bare " + g + ".", "F.get(c) = " + f + " > G.get(c) = " + g + ": sann.", f + " > " + g + ": sann."), "For få", cmp, true, true);
+        res = "false";
+        snap(6, i, t("Da går det ikke. Svaret er false.", "return false: W er ikke et subanagram av S.", "Tidlig retur. Totalt høyst O(w + s)."), "false", null, true, true);
+        return steps;
+      }
+      snap(5, i, t("Ordet trenger " + f + " «" + c + "», og S har " + g + ". Det holder.", "F.get(c) = " + f + " > G.get(c) = " + g + "? Nei.", f + " > " + g + ": usann."), "Nok", cmp, true, true);
+      doneW.push(i);
+    }
+    res = "true";
+    snap(7, null, t("Alle bokstavene holdt. Svaret er true.", "Løkka er ferdig uten at noen bokstav manglet: return true.", "w runder med O(1)-oppslag. Totalt O(w + s)."), "true", null, true, true);
+    return steps;
   });
 })();

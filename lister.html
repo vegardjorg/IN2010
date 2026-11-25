@@ -6,7 +6,7 @@
   <title>Lister &amp; stakk · IN2010</title>
   <meta name="description" content="Lister i IN2010: arrayer, dynamiske arrayer, enkelt- og dobbeltlenkede lister, stakk, kø og deque, nylige søk (LRU) og eksamensoppgaven om velformaterte tagger – med stegvise demoer, pseudokode og sant/usant.">
   <script>(function(){try{var d=document.documentElement;var t=localStorage.getItem('in-theme')||'light';if(t!=='system')d.setAttribute('data-theme',t);var l=localStorage.getItem('in-level')||'normal';d.setAttribute('data-level',l);}catch(e){document.documentElement.setAttribute('data-theme','light');document.documentElement.setAttribute('data-level','normal');}})();</script>
-  <link rel="stylesheet" href="assets/css/styles.css?v=20261125a">
+  <link rel="stylesheet" href="assets/css/styles.css?v=20261125b">
 </head>
 <body data-page="lister">
   <a class="skip-link" href="#main">Hopp til innhold</a>
@@ -269,7 +269,7 @@
       <div id="demo-tags"></div>
       <div class="callout felle"><span class="lbl">Felle: to sjekker, ikke én</span>
         <p>Både telleren og stakken trenger to sjekker: <b>underveis</b> (lukker vi noe som ikke er åpent, eller feil type?) og <b>til slutt</b> (står noe fortsatt åpent?).
-          Å glemme én av dem er den vanligste feilen, og sensor trakk for begge.</p>
+          Sensorveiledningen til H2020 trekker 2 poeng for å glemme sjekken underveis og 1 poeng for å glemme sjekken til slutt.</p>
       </div>
       <h4>Pusle sammen GoodTags</h4>
       <div class="card" id="parsons-tags"></div>
@@ -324,25 +324,26 @@
       <div id="tf-lister"></div>
 
       <h3 style="margin-top:2rem">Test deg selv – lister og stakk</h3>
-      <p class="muted small">Disse påstandene har aldri stått på eksamen. De er laget ut fra forelesningen, ukesoppgavene og H2020 oppgave 9 med sensorveiledning.
+      <p class="muted small">Disse påstandene er ikke hentet ordrett fra eksamen. De er laget ut fra forelesningen, ukesoppgavene og H2020 oppgave 9 med sensorveiledning.
         De oftest testede står først.</p>
       <div data-tf-gen="lister"></div>
     </section>
   </main>
 
   <footer class="footer">
-    <p class="muted small">IN2010 · Lister &amp; stakk. Egne forklaringer og demoer basert på pensum. Eksamensoppgaven er gjengitt med egne ord.</p>
+    <p class="muted small">IN2010 · Lister &amp; stakk. Egne forklaringer og demoer basert på pensum. Eksamensoppgaven og sensorveiledningen er gjengitt ordrett med kildelinje, og avvik fra arket står på kortet.</p>
   </footer>
 
-  <script src="assets/js/core.js?v=20261125a"></script>
-  <script src="assets/js/symboler.js?v=20261125a"></script>
-  <script src="assets/js/data-tf.js?v=20261125a"></script>
-  <script src="assets/js/pseudocode.js?v=20261125a"></script>
-  <script src="assets/js/stepplayer.js?v=20261125a"></script>
-  <script src="assets/js/varline.js?v=20261125a"></script>
-  <script src="assets/js/viz-list.js?v=20261125a"></script>
-  <script src="assets/js/data-algos.js?v=20261125a"></script>
-  <script src="assets/js/data-lister.js?v=20261125a"></script>
+  <script src="assets/js/core.js?v=20261125b"></script>
+  <script src="assets/js/symboler.js?v=20261125b"></script>
+  <script src="assets/js/data-tf.js?v=20261125b"></script>
+  <script src="assets/js/pseudocode.js?v=20261125b"></script>
+  <script src="assets/js/stepplayer.js?v=20261125b"></script>
+  <script src="assets/js/varline.js?v=20261125b"></script>
+  <script src="assets/js/viz-list.js?v=20261125b"></script>
+  <script src="assets/js/data-algos.js?v=20261125b"></script>
+  <script src="assets/js/data-lister.js?v=20261125b"></script>
+  <script src="assets/js/perfekt/lister.js?v=20261125b"></script>
   <script>
   (function () {
     "use strict";
@@ -398,7 +399,7 @@
     IN.explain("#intro-begreper", t(
       "En liste er bare ting i en rekkefølge: den første, den andre, den tredje … Vi kan be om en bestemt plass, bytte ut noe, sette inn noe eller ta bort noe. Spørsmålet er hvordan vi lagrer det, for det bestemmer hva som går fort.",
       "Lista er en ADT med Get, Set, Add og Remove. Med et dynamisk array er Get og Set O(1), men Add og Remove O(n), fordi elementer må flyttes. Med en lenket liste er det å hekte inn og ut O(1), men alle fire er O(n), fordi vi først må gå til plass i.",
-      "Liste-ADT-en: Get(L, i), Set(L, i, e), Add(L, i, e), Remove(L, i) med 0 ≤ i &lt; n (for Add: 0 ≤ i ≤ n). Dynamisk array: Get/Set O(1), Add/Remove O(n − i). Lenket liste: alle O(i) på grunn av NodeAt, mens operasjonen på selve noden er O(1)."
+      "Liste-ADT-en: Get(L, i), Set(L, i, e), Add(L, i, e), Remove(L, i) med 0 ≤ i &lt; n (for Add: 0 ≤ i ≤ n). Dynamisk array: Get/Set O(1), Add/Remove O(n) i verste tilfelle (flyttingen er O(n − i), og Add kan i tillegg måtte doble arrayet). Lenket liste: alle O(i) på grunn av NodeAt, mens operasjonen på selve noden er O(1)."
     ), { label: "Nivå:" });
     IN.tips(qs("#ops-table"));
     (function drill() {
@@ -431,8 +432,8 @@
     /* ===================== DYNAMISK ARRAY ===================== */
     IN.explain("#intro-dynamisk", t(
       "Tenk på en hylle med et fast antall plasser. Blir den full, kjøper du en ny hylle som er dobbelt så lang, og flytter alle tingene over. Det er tungt der og da, men så har du god plass lenge.",
-      "PushBack skriver på plass D.n og øker D.n. Er arrayet fullt, dobler EnsureCapacity kapasiteten og kopierer alt først. Én PushBack kan altså koste O(n), men i snitt koster den O(1).",
-      "Invariant: 0 ≤ D.n ≤ |D.A|, og elementene ligger på 0, …, D.n − 1. Dobling gir at n PushBack-er fra tomt koster O(n) totalt (amortisert O(1) hver). Get, Set, PushBack og PopBack er O(1) (PushBack amortisert), Add og Remove er O(D.n − i)."
+      "PushBack skriver på plass D.n og øker D.n. Er arrayet fullt, dobler EnsureCapacity kapasiteten og kopierer alt først. Én PushBack kan altså koste O(n), men fordelt over mange PushBack-er koster hver O(1). Det kalles amortisert O(1).",
+      "Invariant: 0 ≤ D.n ≤ |D.A|, og elementene ligger på 0, …, D.n − 1. Dobling gir at n PushBack-er fra tomt koster O(n) totalt (amortisert O(1) hver). Get, Set, PushBack og PopBack er O(1) (PushBack amortisert). Add og Remove flytter D.n − i elementer, og Add kan i tillegg måtte doble arrayet, så begge er O(D.n) i verste tilfelle."
     ), { label: "Nivå:" });
     mountOps("#demo-pushback", {
       algos: ["lsPushBack", "lsEnsureCapacity", "lsPopBack"], gen: "lsDynPush",
@@ -491,8 +492,11 @@
         "Get(L, 3)": [{ items: [7, 2, 9, 4, 5], ops: [{ op: "get", i: 3 }] }],
         "Sett inn 8 etter plass 1": [{ items: [7, 2, 9, 4, 5], ops: [{ op: "insAfter", i: 1, v: 8 }] }],
         "Fjern etter plass 0": [{ items: [7, 2, 9, 4, 5], ops: [{ op: "remAfter", i: 0 }] }],
-        "Sett inn bakerst": [{ items: [7, 2, 9], ops: [{ op: "insAfter", i: 2, v: 6 }] }]
-      }
+        "Sett inn bakerst": [{ items: [7, 2, 9], ops: [{ op: "insAfter", i: 2, v: 6 }] }],
+        "Fjern, så en plass som er borte": [{ items: [7, 2, 9, 4, 5], ops: [{ op: "remAfter", i: 3 }, { op: "get", i: 4 }] }]
+      },
+      // Plassene sjekkes i generatoren mot lista slik den er da, så en plass som er fjernet, gir en forklaring i stedet for feil
+      parseInput: LS.parseSingly, inputLabel: "liste ; operasjoner, f.eks. 7 2 9 4 5 ; get 3, ins 1 8, rem 0"
     });
     mountOps("#demo-dobbel", {
       algos: ["lsDInsertAfter", "lsRemoveNode"], gen: "lsDoubly",
@@ -519,7 +523,7 @@
     /* ===================== STAKK & KØ ===================== */
     IN.explain("#intro-stakk", t(
       "En stakk er som en stabel med tallerkener: du legger på og tar av øverst. En kø er som køen i kantina: den som kom først, får mat først.",
-      "Stakk: push og pop i samme ende (LIFO). Kø: enqueue i den ene enden, dequeue i den andre (FIFO). Begge kan lages med O(1) per operasjon, med lenket liste eller (for stakk) med dynamisk array.",
+      "Stakk: push og pop i samme ende (LIFO). Kø: enqueue i den ene enden, dequeue i den andre (FIFO). Begge kan lages med O(1) per operasjon, med lenket liste eller (for stakk) med dynamisk array, der push er amortisert O(1).",
       "Stakk og kø er ADT-er: de sier hvilken rekkefølge elementene kommer ut i, ikke hvordan de lagres. Begge er spesialtilfeller av liste der vi bare bruker endene, og derfor kan alle operasjonene være O(1) (push på dynamisk array amortisert)."
     ), { label: "Nivå:" });
 
@@ -568,53 +572,81 @@
     });
     IN.pseudo.parsons("#parsons-tags", A.lsGoodTags, {});
 
-    /* ---------- Eksamen (gjengitt med egne ord) ---------- */
-    function sol(items, algos, o) {
-      o = o || {};
-      var d = el("div");
-      if (o.intro) d.appendChild(el("p", { html: o.intro }));
-      var ol = el("ol", { class: "et-parts" }); items.forEach(function (x) { ol.appendChild(el("li", { html: x })); }); d.appendChild(ol);
-      if (o.figs) d.appendChild(IN.oppg({ figs: o.figs }));
-      (algos || []).forEach(function (key) {
-        d.appendChild(el("h5", { style: "margin:.8rem 0 .3rem", text: "Pseudokode: " + A[key].name }));
-        var h = el("div"); d.appendChild(h); IN.pseudo.render(h, A[key], {});
-      });
-      return d;
-    }
-    function demoLink(fane, demo, txt) { return '<p class="small muted">Prøv selv: <a href="#fane=' + fane + "&amp;oppg=" + demo + '">' + txt + "</a>.</p>"; }
-    function stepAt(gen, input, pred) { var s = G[gen](input); for (var i = 0; i < s.length; i++) if (pred(s[i])) return s[i]; return s[s.length - 1]; }
-    function listFig(step, cap) { return { cls: "wide", cap: cap, draw: function (h) { IN.vizList(h, { parts: step.parts }, { compact: true }); } }; }
-
-    var EX_OK = tags("<div> <p> </p> <div> </div> </div>");
-    var figMid = stepAt("lsTags", EX_OK, function (s) { return s.line === 5 && s.parts[0].cur === 3; });
-    var EXAM = {
-      "h2020-9": { year: "H2020", title: "Velformaterte tagger", oppgave_nr: "Oppgave 9", points: 12,
-        oppgave: IN.oppg({
-          intro: "<p>En nettside er skrevet for hånd i HTML, og noen har vært slurvete: noen <code>&lt;div&gt;</code>-tagger blir aldri lukket, og noen <code>&lt;/div&gt;</code> lukker noe som aldri ble åpnet. " +
-            "Kravet er at hver tagg som åpnes, senere blir lukket av en tagg av samme type, og at ingen tagg blir lukket uten å ha vært åpnet. Da er taggene <b>velformaterte</b>.</p>" +
-            "<p>Du får taggene som et array A med n elementer, i den rekkefølgen de står i dokumentet. All annen tekst er fjernet.</p>",
-          parts: [
-            { t: "Anta at A bare inneholder strengene <code>\"&lt;div&gt;\"</code> og <code>\"&lt;/div&gt;\"</code>. Skriv en algoritme <code>GoodDivs(A)</code> i pseudokode som returnerer true hvis taggene er velformaterte, og false ellers.", p: 4 },
-            { t: "Nå kan A inneholde alle slags tagger. Du kan bruke <code>isOpen(tag)</code>, som sier om taggen er en åpnetagg, og <code>TagType(tag)</code>, som gir typen: <code>TagType(\"&lt;div&gt;\")</code> gir \"div\", og <code>TagType(\"&lt;/p&gt;\")</code> gir \"p\". Skriv <code>GoodTags(A)</code> i pseudokode. Hint: tenk nøye på valget av datastruktur.", p: 8 }
-          ],
-          outro: demoLink("stakk", "demo-tags", "stakkdemoen for tagger")
-        }),
-        losning: sol([
-          "Tell hvor mange div-er som står åpne. Øk telleren ved <code>&lt;div&gt;</code> og senk den ved <code>&lt;/div&gt;</code>. " +
-            "Blir telleren negativ underveis, har vi lukket noe som ikke var åpent: returner false. Til slutt er taggene velformaterte bare hvis telleren er 0. Én gjennomgang: <b>O(n)</b> tid og O(1) minne.",
-          "Med flere typer holder ikke én felles teller: da ville <code>&lt;div&gt;&lt;/p&gt;</code> sluppet gjennom. Den tiltenkte tolkningen (se tipsene) er at taggene også skal være nøstet, så <code>&lt;div&gt;&lt;p&gt;&lt;/div&gt;&lt;/p&gt;</code> skal gi false selv om antallet stemmer. Da må vi huske <i>hvilke</i> tagger som står åpne, og den sist åpnede må lukkes først. " +
-            "Det er en <b>stakk</b>: push hver åpnetagg. Ved en lukketagg må stakken ikke være tom, og toppen må ha samme type (vi popper og sammenligner med TagType). Til slutt må stakken være tom. " +
-            "<b>Kjøretid:</b> n runder, og push, pop, isOpen og TagType er O(1). Totalt <b>O(n)</b>, med O(n) ekstra minne i verste tilfelle. En riktig løsning på (b) løser også (a)."
-        ], ["lsGoodDivs", "lsGoodTags"], { figs: [listFig(figMid, "Underveis i et riktig eksempel: <code>&lt;p&gt;</code> er lukket, og <code>&lt;div&gt;</code> ble nettopp åpnet inni den ytre div-en")] }),
-        kjerne: "<p>Den sist åpnede taggen må lukkes først: det er LIFO, altså en stakk. Telleren i (a) er egentlig en stakk der bare høyden betyr noe, fordi alle taggene er av samme type.</p>",
-        tips: [
-          "Å bare sjekke at det er like mange åpne- som lukketagger ga 1 poeng totalt. Det samme ga det å bare sjekke at hver &lt;div&gt; følges rett etter av en &lt;/div&gt;.",
-          "Glemmer du å sjekke underveis at det ikke lukkes flere enn som er åpnet, trekkes 2 poeng. Glemmer du sluttsjekken (alt lukket til slutt), trekkes 1 poeng. (b) ble vurdert på samme måte.",
-          "Oppgaveteksten var teknisk sett så åpen at kryssende tagger kunne regnes som velformaterte, så en løsning med én teller per taggtype kunne også gi full pott. Stakkløsningen er den tiltenkte, og den du bør skrive.",
-          "Oppgi kjøretiden, O(n), og si kort hvorfor: én gjennomgang med O(1) per tagg."
-        ] }
-    };
-    Object.keys(EXAM).forEach(function (id) { if (qs("#exam-" + id)) IN.examTasks("#exam-" + id, [EXAM[id]]); });
+    /* ---------- Eksamen: H2020 oppgave 9, ordrett oppgavetekst med kildelinje.
+       Perfekt svar og sensorveiledningen står i assets/js/perfekt/lister.js. ---------- */
+    var HTML_FIL = "&lt;div&gt;\n  &lt;div&gt;\n    Velkommen til nettsiden vår!\n  &lt;div&gt;\n   Se våre nyeste saker!\n    &lt;div&gt;\n    Vi har ansatt en ung person! Kanskje blir nettsiden oppdatert nå?\n    FØLG MED PÅ UTVIKLINGEN. Hilsen Kåre.\n    &lt;/div&gt;\n&lt;/div&gt;";
+    var h20Oppg = IN.oppg({
+      intro: "<p>Du har tatt på deg en jobb hos en bedrift som har en eldre nettside skrevet i ren HTML. Nylig har de fått nyss om at nettsiden fungerer svært dårlig, og de (som har lite intern kompetanse på slikt) har gitt opp og håper at den unge lovende informatikeren skal finne ut av hva i all verden som foregår. " +
+          "Nettsiden består av flere tusen håndskrevne HTML-sider; all snakk om å «lage noe nytt og fresht» blir møtt med spørrende blikk.</p>" +
+        "<p>Det tar ikke spesielt lang tid før du finner en feil som gjentar seg i mange av sidene det er rapportert feil på. Mange av de håndskrevne HTML-filene er feilformaterte! " +
+          "Du merker deg at det mange steder åpnes en &lt;div&gt;-tag, som aldri lukkes med en &lt;/div&gt;. Andre steder lukkes det en &lt;/div&gt;-tag, der den aldri har blitt åpnet.</p>" +
+        "<p>Her er et eksempel på en feilformatert HTML-fil:</p>" +
+        "<pre class=\"ls-htmlfil\" aria-label=\"Eksempel på en feilformatert HTML-fil\">" + HTML_FIL + "</pre>",
+      parts: [
+        { t: "<p>Du innser at det første du må gjøre er å finne alle filene som inneholder feil. Etter litt Unix-magi sitter du igjen med filer der all tekst bortsett fra &lt;div&gt; og &lt;/div&gt; er fjernet. Alt går på skinner frem til du må løse en liten nøtt:</p>" +
+            "<p><i>Hvordan sjekker man at det for hver tag som åpnes med &lt;div&gt; også lukkes med &lt;/div&gt;, og at ingen tag lukkes før den er åpnet?</i></p>" +
+            "<p>Du må skrive en prosedyre GoodDivs som sjekker dette, med andre ord, at &lt;div&gt;-tagene er velformaterte. Den tar et array A som argument, der hvert element enten er strengen \"&lt;div&gt;\" eller strengen \"&lt;/div&gt;\". <span class=\"et-p\">(4p)</span></p>" +
+            "<p class=\"small\"><b>ALGORITHM: AVGJØRE OM &lt;div&gt;-TAGENE ER VELFORMATERTE</b></p><div class=\"et-skel ls-skel-a\"></div>" },
+        { t: "<p>GoodDivs fungerer som den skal og finner mange filer som inneholder feilformatert HTML. Dessverre oppdager den ikke alle filene det er rapportert feil på. Du observerer at de inneholder samme feil, men med andre type tag-er! " +
+            "Altså er det ikke bare &lt;div&gt;-tagene som fører til problemer, men også andre tag-er som &lt;head&gt;, &lt;body&gt;, &lt;p&gt; og flere andre. Du finner ut at prosedyren GoodDivs må generaliseres til en prosedyre GoodTags.</p>" +
+            "<p><i>Hvordan sjekker man at det for hver tag som åpnes også lukkes med en tag av samme type, og at ingen tag lukkes før den er åpnet?</i></p>" +
+            "<p>Du har allerede en enkel prosedyre isOpen, som tar en streng og returnerer true hvis det er en åpne-tag og false hvis det er en lukke-tag. Altså vil isOpen(\"&lt;tag&gt;\") returnere true og isOpen(\"&lt;/tag&gt;\") returnere false. " +
+            "I tillegg har du en prosedyre som gir deg hvilken type en tag har; for eksempel vil TagType(\"&lt;div&gt;\") gi \"div\", og TagType(\"&lt;/p&gt;\") gir \"p\". <span class=\"et-p\">(8p)</span></p>" +
+            "<p class=\"small\"><b>ALGORITHM: AVGJØRE OM TAG-ENE ER VELFORMATERTE</b></p><div class=\"et-skel ls-skel-b\"></div>" +
+            "<p>Hint: Her kan et lurt valg av datastruktur være til stor hjelp.</p>" }
+      ]
+    });
+    IN.pseudo.render(qs(".ls-skel-a", h20Oppg), {
+      name: "GoodDivs", params: "A",
+      input: "Et array med \"<div>\" og \"</div>\" av lengde n",
+      output: "Returner true hvis tag-ene er velformaterte, false ellers",
+      lines: [{ code: "// Fyll ut", indent: 1 }]
+    }, { tooltips: false });
+    IN.pseudo.render(qs(".ls-skel-b", h20Oppg), {
+      name: "GoodTags", params: "A",
+      input: "Et array A med tag-er av lengde n",
+      output: "Returner true hvis tag-ene er velformaterte, false ellers",
+      lines: [{ code: "// Fyll ut", indent: 1 }]
+    }, { tooltips: false });
+    // Taggene fra eksempelfila (all tekst fjernet, som i (a)), og kryssingseksempelet fra sensorveiledningen til (b)
+    var H20_FIL = tags("<div> <div> <div> <div> </div> </div>");
+    var H20_KRYSS = tags("<div> <p> </div> </p>");
+    IN.examTasks("#exam-h2020-9", [{
+      key: "H2020-9", year: "H2020", oppgave_nr: "Oppgave 9", title: "Velformaterte tagger", points: 12,
+      ark: "HTML", ordrett: true,
+      oppgave: h20Oppg,
+      avvik: [
+        "Arket viser bare «poeng» i overskriften, uten total. De 12 poengene her er summen av deloppgavene (4 + 8), som arket oppgir.",
+        "Skjelettene med «// Fyll ut» er satt med guidens pseudokodestil. Tittel, Input, Output og prosedyrenavn er de samme som på arket.",
+        "Eksempelfila er satt med samme innrykk som på arket, men i guidens skrift.",
+        "Steg-demoene bruker taggene fra eksempelfila i (a) og kryssingseksempelet fra sensorveiledningen i (b). Oppgaven selv gir ingen input å kjøre."
+      ],
+      demo: [
+        { tab: "(a) GoodDivs", engine: "list", gen: "lsDivs", input: H20_FIL, inputNavn: "Taggene i eksempelfila",
+          presets: { "Nøstet, riktig": tags("<div> <div> </div> <div> </div> </div>"), "Lukker for tidlig": tags("<div> </div> </div> <div>") },
+          pseudo: "lsGoodDivs", legend: LEGEND, parseInput: function (s) { return LS.parseTags(s, true); }, inputLabel: "f.eks. div div /div /div",
+          label: "Kjør GoodDivs på taggene i eksempelfila", del: "(a)" },
+        { tab: "(b) GoodTags", engine: "list", gen: "lsTags", input: H20_KRYSS, inputNavn: "Kryssende tagger (sensorveiledningen)",
+          presets: { "Riktig nøstet": tags("<html> <div> <p> </p> </div> <p> </p> </html>"), "Lukker uten å åpne": tags("<p> </p> </div>"), "Ikke lukket": tags("<div> <p> </p>") },
+          pseudo: "lsGoodTags", legend: LEGEND, parseInput: function (s) { return LS.parseTags(s); }, inputLabel: "f.eks. div p /p /div",
+          label: "Kjør GoodTags på kryssende tagger", del: "(b)" }
+      ],
+      losning: [
+        "<b>(a)</b> Tell hvor mange div-er som står åpne. Øk telleren ved <code>&lt;div&gt;</code> og senk den ved <code>&lt;/div&gt;</code>. " +
+          "Blir telleren negativ underveis, har vi lukket noe som ikke var åpent: returner false. Til slutt er taggene velformaterte bare hvis telleren er 0. " +
+          "Eksempelfila gir false: fire åpnes og bare to lukkes, så telleren ender på 2. Se demoen «(a) GoodDivs» i dette kortet.",
+        "<b>(b)</b> Med flere typer holder ikke én felles teller: da ville <code>&lt;div&gt;&lt;/p&gt;</code> sluppet gjennom. Vi må huske <i>hvilke</i> tagger som står åpne, og den sist åpnede må lukkes først. " +
+          "Det er en <b>stakk</b>: push hver åpnetagg. Ved en lukketagg må stakken ikke være tom, og toppen må ha samme type (vi popper og sammenligner med TagType). Til slutt må stakken være tom. " +
+          "Se demoen «(b) GoodTags», der <code>&lt;div&gt; &lt;p&gt; &lt;/div&gt; &lt;/p&gt;</code> gir false."
+      ],
+      kjerne: "<p>Den sist åpnede taggen må lukkes først: det er LIFO, altså en stakk. Telleren i (a) er egentlig en stakk der bare høyden betyr noe, fordi alle taggene er av samme type.</p>",
+      tips: [
+        "Sensorveiledningen gir totalt 1 poeng for bare å sjekke at det er like mange <code>&lt;div&gt;</code> som <code>&lt;/div&gt;</code>, og det samme for bare å sjekke at hver <code>&lt;div&gt;</code> følges rett etter av en <code>&lt;/div&gt;</code>.",
+        "Den trekker 2 poeng for å glemme sjekken underveis og 1 poeng for å glemme sjekken til slutt. (b) vektes vanligvis på samme måte.",
+        "Oppgaveteksten åpner for at kryssende tagger regnes som velformaterte, og sensorveiledningen sier at en løsning med en teller per taggtype også kan gi full uttelling. Stakken er den tiltenkte løsningen, og den vi anbefaler.",
+        "Oppgaven spør ikke etter kjøretid. Vil du likevel nevne den, er begge O(n): én gjennomgang med O(1) arbeid per tagg."
+      ]
+    }]);
 
     IN.quiz("#quiz-stakk", [
       { q: "Tom stakk: push(1), push(2), push(3), pop(), push(4), pop(), pop(). Hva gir den siste pop()?", options: ["1", "2", "3", "4"], answer: 1,

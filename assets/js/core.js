@@ -1454,11 +1454,13 @@
   })();
 
   /* Høyden på de faste linjene øverst (meny + ev. nivålinje) når de står fast, + litt luft */
-  IN.stickyH = function () {
+  // skip: et element som ikke skal telles med (en fast linje som plasserer seg selv må ikke måle seg selv,
+  // ellers sklir den én egen høyde nedover for hver ny utregning).
+  IN.stickyH = function (skip) {
     var h = 0;
     // Faste linjer: toppmenyen, nivålinja og sidelokale linjer merket med data-sticky (f.eks. crash-sidens fremdriftslinje)
     [qs("#topnav"), qs("#levelbar")].concat(qsa("[data-sticky]")).forEach(function (n) {
-      if (!n) return;
+      if (!n || n === skip) return;
       var cs = getComputedStyle(n);
       if (cs.position === "sticky" || cs.position === "fixed") h = Math.max(h, (parseFloat(cs.top) || 0) + n.offsetHeight);
     });

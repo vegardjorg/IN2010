@@ -2243,3 +2243,70 @@ body[data-page="crash"] .cr-step { scroll-margin-top: 0; }
 /* Hashmap-tabellen i H2022-9: lang, men smal; ruller sidelengs inne i boksen ved behov */
 .tr-hashtab { max-width: 100%; overflow-x: auto; }
 .tr-hashtab .et-tab td, .tr-hashtab .et-tab th { white-space: nowrap; }
+
+/* ===== Tema lister-begreper (bølge 2) ===== */
+/* Eksempelfila i H2020-9: innrykket fra arket beholdes, lange linjer brytes så kortet ikke ruller sidelengs på 375 px */
+.ls-htmlfil { font-family: var(--font-mono); font-size: var(--text-xs, .8rem); line-height: 1.5; white-space: pre-wrap; overflow-wrap: anywhere;
+  background: var(--color-surface-container, transparent); border: 1px solid var(--color-outline-variant, currentColor); border-radius: 6px; padding: .5rem .7rem; margin: .4rem 0 .8rem; max-width: 100%; }
+
+/* ===== Tema hashing (bølge 2) ===== */
+/* Kodeblokker fra arket (H2024-5): innrykket beholdes, kortet ruller ikke sidelengs på 375 px */
+.hs-sheet { font-family: var(--font-mono); font-size: var(--text-xs, .8rem); line-height: 1.5; white-space: pre-wrap; overflow-wrap: anywhere;
+  background: var(--color-surface-container, transparent); border: 1px solid var(--color-outline-variant, currentColor); border-radius: 6px; padding: .5rem .7rem; margin: .4rem 0 .8rem; max-width: 100%; }
+/* Tomt array 0–9 fra arket: egen scrollboks, så tabellen aldri gjør siden bredere */
+.hs-tabwrap { max-width: 100%; overflow-x: auto; margin: .3rem 0 .6rem; }
+.hs-tabwrap .et-tab td, .hs-tabwrap .et-tab th { white-space: nowrap; }
+/* Overskrifter over kodeblokkene i arket («STRATEGI 1», «ALGORITHM: …») */
+.et-lbl-sm { font-size: var(--text-xs, .8rem); font-weight: 600; letter-spacing: .03em; margin: .6rem 0 .2rem; }
+
+/* ===== Hovedøkta: kompakt eksempelrad og antall inne i demoboksen ===== */
+.sp-presets .sp-custom { flex: 0 1 auto; gap: 4px; }
+.sp-presets .sp-custom input { width: 9.5rem; max-width: 100%; min-height: 30px; padding: 2px 8px; font-size: var(--text-sm); }
+.sp-frame { position: relative; }
+.sp-frame.has-count > .sp-stage { padding-top: 30px; }
+.sp-frame > .sp-count {
+  position: absolute; top: 6px; right: 8px; z-index: 2; margin: 0;
+  display: inline-flex; align-items: center; gap: 2px;
+  font-size: 11px; color: var(--color-on-surface-variant);
+  background: color-mix(in srgb, var(--color-surface-container-lowest) 85%, transparent);
+  border: 1px solid var(--color-outline-variant); border-radius: 999px; padding: 1px 3px;
+}
+.sp-frame > .sp-count .cval { min-width: 3rem; font-size: 11px; text-align: center; font-variant-numeric: tabular-nums; }
+.sp-cbtn {
+  width: 22px; height: 22px; display: inline-grid; place-items: center; padding: 0;
+  border: 0; border-radius: 50%; background: transparent; color: var(--color-on-surface);
+  font: 700 14px/1 var(--font-sans, inherit); cursor: pointer;
+}
+.sp-cbtn:hover:not(:disabled) { background: var(--color-surface-container-high); }
+.sp-cbtn:focus-visible { outline: 2px solid var(--color-primary); outline-offset: 1px; }
+.sp-cbtn:disabled { opacity: .35; cursor: default; }
+@media (max-width: 560px) {
+  .sp-presets .sp-custom { flex: 1 1 100%; }
+  .sp-presets .sp-custom input { flex: 1 1 auto; width: auto; }
+}
+
+/* ===== Tema variabellinje heap/trær (bølge 2) ===== */
+/* Prikker for tilstander som bare finnes i heap- og tredemoene */
+.vl-dot.is-moved { background: color-mix(in srgb, var(--vf-teal) 25%, var(--color-surface)); box-shadow: inset 0 0 0 1.5px var(--vf-teal); }
+.vl-dot.is-alt   { background: transparent; border: 1.5px dashed var(--color-on-surface); box-sizing: border-box; }
+.vl-dot.is-del   { background: color-mix(in srgb, var(--c-swap) 25%, var(--color-surface)); box-shadow: inset 0 0 0 1.5px var(--c-swap); }
+/* Steg uten variabler: linja står der med samme høyde, men tom (bryteren er fortsatt synlig) */
+.vl.is-ghost .vl-body { visibility: hidden; }
+/* Heap og trær: innholdet står rett under linja, så det ikke flytter seg når scenen har fast høyde */
+.sp-stage:has(> .vl) > .vl + .hv,
+.sp-stage:has(> .vl) > .vl + .tv,
+.sp-stage:has(> .vl) > .vl + .itv { margin-top: 0; }
+/* Arrayraden i heapdemoene på én linje, så løkkespennene kan dekke cellene */
+.hv-arr.is-fit { flex-wrap: nowrap; gap: 2px; }
+.hv-arr.is-fit .hv-cell { flex: 0 0 var(--hcw); width: var(--hcw); min-width: 0; padding-left: 0; padding-right: 0; }
+.hv-arr.is-small .hv-cell .v { font-size: 11px; }
+.hv-arr.is-small .hv-cell .ix { font-size: 9px; }
+.hv-vr { margin-top: 4px; }
+.hv-vr .vr-row.is-empty { height: 12px; }
+
+/* ===== Tema sortering-sok (bølge 2) ===== */
+/* Fast høyde i søyle-/bøttedemoene: viz-bars.js og viz-buckets.js setter min-height på variabellinja
+   ut fra det høyeste steget. Når linja er slått av, skal den ikke holde av plass. */
+.vl.is-off { min-height: 0 !important; }
+/* Antall-pillen øverst til høyre: variabellinja starter under den, så de aldri overlapper */
+.sp-frame.has-count > .sp-stage > .vl { margin-top: .25rem; }

@@ -94,12 +94,12 @@
       { code: "D.A ← A", indent: 1,
         eli5: "Nå bruker vi den nye, lange hylla.",
         normal: "D bruker nå det nye arrayet. Det gamle kastes.",
-        teknisk: "Etterpå er |D.A| = 2 · D.n, så de neste D.n PushBack-ene er O(1)." }
+        teknisk: "Etterpå er |D.A| = 2 · D.n, altså D.n ledige plasser. PushBack-en som kalte oss, bruker straks én av dem, så de D.n − 1 neste PushBack-ene er O(1)." }
     ],
-    bigO: { best: "O(1)", avg: "O(1)", worst: "O(n)", space: "O(n) for det nye arrayet",
+    bigO: { best: "O(1)", avg: "O(1) amortisert", worst: "O(n)", space: "O(n) for det nye arrayet",
       why: t("Er det plass, skjer ingenting. Er det fullt, må alt flyttes.",
-        "O(1) hvis det er plass. Ellers kopieres alle n elementene: O(n).",
-        "O(1) når D.n < |D.A|, ellers O(D.n) for kopieringen pluss det nye arrayet.") }
+        "O(1) hvis det er plass. Ellers kopieres alle n elementene: O(n). Fordi størrelsen dobles, skjer kopieringen sjelden.",
+        "O(1) når D.n < |D.A|, ellers O(D.n) for kopieringen pluss det nye arrayet. Snittet O(1) gjelder bare sett over en hel rekke PushBack-er: det er amortisert O(1), ikke O(1) for hvert kall.") }
   });
 
   reg(IN.algos, "lsPopBack", {
@@ -141,12 +141,13 @@
       { code: "D.A[i] ← e", indent: 1,
         eli5: "Nå er plass i ledig. Legg e der.", normal: "Plass i er frigjort, så e kan settes inn.", teknisk: "O(1)." },
       { code: "D.n ← D.n + 1", indent: 1,
-        eli5: "Én ting mer.", normal: "Øk antallet.", teknisk: "Totalt O(D.n − i), altså O(n) i verste tilfelle." }
+        eli5: "Én ting mer.", normal: "Øk antallet.",
+        teknisk: "Flyttingen kostet O(D.n − i). Var arrayet fullt, kopierte EnsureCapacity i tillegg alle D.n elementene, så Add er O(D.n) i verste tilfelle uansett i, slik kurset sier." }
     ],
-    bigO: { best: "O(1) (i = D.n)", avg: "O(n)", worst: "O(n)", space: "O(1) ekstra",
+    bigO: { best: "O(1) (i = D.n, ledig plass)", avg: "O(n)", worst: "O(n)", space: "O(1) ekstra (O(n) når arrayet dobles)",
       why: t("Alt som står etter plass i, må flyttes ett hakk. Setter vi inn helt foran, må alt flyttes.",
         "Vi flytter D.n − i elementer. For i = 0 er det alle n, så O(n). Bakerst (i = D.n) er det ingen, og da er det som PushBack.",
-        "O(D.n − i) for flyttingen pluss EnsureCapacity. Verste tilfelle O(n).") }
+        "O(D.n − i) for flyttingen, pluss O(D.n) for EnsureCapacity når arrayet er fullt. Til sammen O(D.n), altså O(n) i verste tilfelle.") }
   });
 
   reg(IN.algos, "lsRemove", {
@@ -323,7 +324,7 @@
       { code: "for tag in A do", indent: 1,
         eli5: "Se på hver tagg, fra venstre mot høyre.", normal: "Gå gjennom taggene i rekkefølge.", teknisk: "n runder." },
       { code: "if isOpen(tag) then", indent: 2,
-        eli5: "Åpner taggen en boks?", normal: "Er det en åpnetagg?", teknisk: "isOpen er gitt i oppgaven og er O(1)." },
+        eli5: "Åpner taggen en boks?", normal: "Er det en åpnetagg?", teknisk: "isOpen er gitt i oppgaven. Oppgaven sier ikke hva den koster, så vi antar O(1) (en tagg er kort). Det samme antar vi for TagType." },
       { code: "s.push(tag)", indent: 3,
         eli5: "Legg den øverst på stabelen.", normal: "Legg den åpne taggen øverst på stakken.", teknisk: "push er O(1)." },
       { code: "else if s is empty or TagType(s.pop()) ≠ TagType(tag) then", indent: 2,
@@ -433,7 +434,7 @@
               t("Alle " + n + " tingene flyttes over, én etter én.", "Løkka går for i = 0 til D.n − 1 = " + (n - 1) + ": " + n + " kopieringer.", n + " kopieringer, O(D.n)."), "Kopier alle " + n);
           }
           A = B; CI = null;
-          snap(207, main(), t("Nå bruker vi den nye hylla. Det er god plass igjen.", "D.A er nå det nye arrayet med " + A.length + " plasser.", "|D.A| = " + A.length + ". " + (A.length - n === 1 ? "Den neste PushBack-en er O(1)." : "De neste " + (A.length - n) + " PushBack-ene er O(1).")), "Byttet array");
+          snap(207, main(), t("Nå bruker vi den nye hylla. Det er god plass igjen.", "D.A er nå det nye arrayet med " + A.length + " plasser.", "|D.A| = " + A.length + ". Denne PushBack-en bruker én av de " + (A.length - n) + " ledige plassene" + (A.length - n - 1 === 1 ? ", så den neste PushBack-en er O(1)." : ", så de " + (A.length - n - 1) + " neste PushBack-ene er O(1).")), "Byttet array");
         }
         A[n] = e;
         snap(103, main({ fresh: n }), t("Legg " + e + " på plass " + n + ", den første ledige.", "D.A[D.n] = D.A[" + n + "] ← " + e + ".", "Skriv på indeks D.n = " + n + "."), "Skriv");
@@ -563,9 +564,28 @@
       snap(L + 5, { found: it, ptrs: p }, t("Her er vogn nummer " + i + ": " + nodes[it].v + ".", "return it: noden på plass " + i + " har elementet " + nodes[it].v + ". Det tok " + i + " pekersteg.", i + " steg: O(i)."), "Funnet");
       return it;
     }
+    function len() { var c = 0, x = first; while (x != null && c < 1000) { c++; x = nodes[x].next; } return c; }
+    var opsIn = (cfg.ops || []).slice(0, 12);
     snap(null, {}, t("Et tog med vogner. Hver vogn vet bare hvem som kommer etter.", "En enkeltlenket liste. Hver node har elem og next, og vi har bare L.first.", "Enkeltlenket liste, n = " + order().length + "."), "Start");
-    (cfg.ops || []).forEach(function (o) {
-      gone = null; extra = null;
+    if (cfg.warn) snap(null, {}, t(cfg.warn, cfg.warn, cfg.warn), "Merk");
+    if ((cfg.ops || []).length > opsIn.length)
+      snap(null, {}, t("Vi tar bare de 12 første operasjonene.", "Bare de 12 første operasjonene kjøres, så demoen holder seg kort.", "Operasjoner etter nr. 12 hoppes over."), "Kuttet");
+    opsIn.forEach(function (o) {
+      gone = null; extra = null; V = {};
+      // Sjekk at plassen finnes i lista slik den ser ut NÅ (en tidligere RemoveAfter kan ha gjort den kortere).
+      var n0 = len(), i0 = o.i, okI = typeof i0 === "number" && isFinite(i0) && i0 === Math.floor(i0) && i0 >= 0 && i0 < n0;
+      var navn = o.op === "get" ? "Get(L, " + i0 + ")" : o.op === "insAfter" ? "InsertAfter på plass " + i0 : o.op === "remAfter" ? "RemoveAfter på plass " + i0 : "ukjent operasjon";
+      if (o.op !== "get" && o.op !== "insAfter" && o.op !== "remAfter") {
+        snap(null, {}, t("Den operasjonen kjenner vi ikke. Vi hopper over den.", "Ukjent operasjon. Lov er get, ins og rem. Den hoppes over.", "Ukjent operasjon, hoppes over."), "Ugyldig");
+        return;
+      }
+      if (!okI) {
+        var omr = n0 === 0 ? "lista er tom, så ingen plass finnes" : "lista har " + n0 + (n0 === 1 ? " node (bare plass 0)" : " noder (plass 0–" + (n0 - 1) + ")");
+        snap(null, {}, t("Plass " + i0 + " finnes ikke: " + omr + ". Vi hopper over " + navn + ".",
+          "Plass " + i0 + " finnes ikke: " + omr + ". " + navn + " hoppes over, ellers ville NodeAt lett etter en node som ikke finnes.",
+          "Forutsetningen 0 ≤ i < n er brutt (n = " + n0 + "). NodeAt ville fulgt en null-peker, så operasjonen hoppes over."), "Ugyldig plass");
+        return;
+      }
       if (o.op === "get") {
         var v = nodeAt(o.i, 100);
         snap(null, { found: v, ret: nodes[v].v }, t("Get gir oss det som ligger i vogna: " + nodes[v].v + ".", "Get(L, " + o.i + ") = NodeAt(L, " + o.i + ").elem = " + nodes[v].v + ".", "Get er O(n) på grunn av NodeAt."), "Get(L, " + o.i + ")");
@@ -584,7 +604,7 @@
         snap(204, { ptrs: pu, hl: hl2, fresh: u }, t("Fest " + nodes[vv].v + " til den nye vogna. Ferdig!", "v.next ← u. " + o.v + " står nå rett etter " + nodes[vv].v + ".", "To pekerendringer, O(1). Selve innsettingen kostet ingenting ekstra etter NodeAt."), "v.next");
       } else if (o.op === "remAfter") {
         var w = nodeAt(o.i, 100);
-        if (nodes[w].next == null) { snap(null, {}, t("Det er ingen vogn etter denne.", "v.next = null, så RemoveAfter kan ikke brukes.", "Forutsetning brutt."), "Ingen å fjerne"); return; }
+        if (nodes[w].next == null) { snap(null, {}, t("Det er ingen vogn etter denne, så det er ingenting å ta bort. Vi hopper over den.", "Plass " + o.i + " er den siste noden, så v.next = null. RemoveAfter krever en node etter v, og hoppes over.", "Forutsetningen v.next ≠ null er brutt. RemoveAfter hoppes over."), "Ingen å fjerne"); return; }
         var pw = {}; pw[w] = "v";
         var x = nodes[w].next, hlx = {}; pw[x] = "v.next";
         V = { v: w, e: nodes[x].v };
@@ -601,6 +621,35 @@
       "Ferdig. Get, Set, Add og Remove er O(n) på lenket liste, fordi de bruker NodeAt."), "Ferdig");
     return linkVars(steps);
   });
+
+  /* Egen input til lsSingly: "7 2 9 4 5 ; get 3, ins 1 8, rem 0".
+     Plassene sjekkes ikke her, men i generatoren, mot lista slik den er når operasjonen kjører.
+     Returnerer alltid ett input-objekt (med warn) når noe er skrevet, så brukeren får en forklaring i stedet for ingenting. */
+  LS.parseSingly = function (s) {
+    s = String(s || "").trim();
+    if (!s) return [];
+    if (!/[;|]/.test(s) && /^[-\d,\s]+$/.test(s)) s += ";";   // bare tall: det er lista, uten operasjoner
+    var halves = s.split(/[;|]/), warn = [];
+    var rawItems = halves.length > 1 ? halves[0] : "", rawOps = halves.length > 1 ? halves.slice(1).join(",") : halves[0];
+    var items = rawItems.split(/[,\s]+/).filter(Boolean).map(function (x) { return /^-?\d{1,4}$/.test(x) ? parseInt(x, 10) : null; });
+    if (items.some(function (x) { return x === null; })) warn.push("Elementer som ikke er heltall (maks fire sifre), er hoppet over.");
+    items = items.filter(function (x) { return x !== null; });
+    if (halves.length < 2) { items = [7, 2, 9, 4, 5]; warn.push("Ingen liste før «;», så vi bruker 7, 2, 9, 4, 5."); }
+    if (items.length > 10) { items = items.slice(0, 10); warn.push("Lista er kuttet til de 10 første elementene."); }
+    var ops = [], bad = 0;
+    rawOps.split(/,/).forEach(function (part) {
+      var w = part.trim().split(/\s+/).filter(Boolean);
+      if (!w.length) return;
+      var op = w[0].toLowerCase(), num = function (x) { return /^-?\d+$/.test(x || "") ? parseInt(x, 10) : NaN; };
+      if (op === "get" && w.length === 2 && !isNaN(num(w[1]))) ops.push({ op: "get", i: num(w[1]) });
+      else if (op === "ins" && w.length === 3 && !isNaN(num(w[1])) && /^-?\d{1,4}$/.test(w[2])) ops.push({ op: "insAfter", i: num(w[1]), v: parseInt(w[2], 10) });
+      else if (op === "rem" && w.length === 2 && !isNaN(num(w[1]))) ops.push({ op: "remAfter", i: num(w[1]) });
+      else bad++;
+    });
+    if (bad) warn.push(bad === 1 ? "Én operasjon forsto vi ikke, og den er hoppet over. Lov er «get i», «ins i e» og «rem i»." : bad + " operasjoner forsto vi ikke, og de er hoppet over. Lov er «get i», «ins i e» og «rem i».");
+    if (!ops.length) warn.push("Ingen gyldige operasjoner, så demoen viser bare lista.");
+    return [{ items: items, ops: ops, warn: warn.length ? warn.join(" ") : null }];
+  };
 
   /* ---------- Dobbeltlenket liste med hode og hale ----------
      input: [{ items, ops:[{op:"ins", after:i (−1 = hode), v} | {op:"del", i}] }]
@@ -682,11 +731,21 @@
   function isOpen(tg) { return !/^<\//.test(tg); }
   function tagType(tg) { return tg.replace(/[<\/>]/g, ""); }
   LS.normTag = normTag; LS.isOpen = isOpen; LS.tagType = tagType;
+  /* Gjør tekst om til tagger. Returnerer alltid ett input-objekt når noe er skrevet,
+     med warn hvis noe ble hoppet over, så demoen forklarer i stedet for å gjøre ingenting. */
   LS.parseTags = function (s, onlyDiv) {
-    var out = String(s).split(/[,\s]+/).map(normTag).filter(Boolean);
-    if (onlyDiv) out = out.filter(function (x) { return tagType(x) === "div"; });
-    out = out.slice(0, 14);
-    return out.length ? [{ tags: out }] : [];
+    var raw = String(s || "").split(/[,\s]+/).filter(Boolean);
+    if (!raw.length) return [];
+    var out = raw.map(normTag).filter(Boolean), warn = [];
+    if (out.length < raw.length) warn.push("Noe av det du skrev, er ikke en tagg, og er hoppet over.");
+    if (onlyDiv) {
+      var nd = out.length;
+      out = out.filter(function (x) { return tagType(x) === "div"; });
+      if (out.length < nd) warn.push("Denne demoen tar bare div-tagger, så de andre er hoppet over.");
+    }
+    if (out.length > 14) { out = out.slice(0, 14); warn.push("Bare de 14 første taggene er tatt med."); }
+    if (!out.length) warn.push("Ingen gyldige tagger igjen. Skriv for eksempel div p /p /div.");
+    return [{ tags: out, warn: warn.length ? warn.join(" ") : null }];
   };
   function tagStr(tg) { return "\"" + esc(tg) + "\""; }
   function tagVar(A, k) { return k == null ? { name: "tag", value: null } : { name: "tag", value: "\"" + A[k] + "\"", idx: k }; }
@@ -700,6 +759,8 @@
       steps.push({ line: line, parts: [{ type: "tags", label: "A", items: A, cur: cur, bad: bad, allDone: cur == null && ret === true }], info: inf, text: text, tag: tag,
         vars: [sv("i", i), tagVar(A, cur)], frame: "GoodDivs" });
     }
+    var warn = cfgOf(input).warn;
+    if (warn) snap(null, null, t(esc(warn), esc(warn), esc(warn)), "Merk");
     snap(2, null, t("Ingen bokser er åpne ennå.", "i ← 0.", "Dybde 0."), "Start");
     for (var k = 0; k < A.length; k++) {
       var tg = A[k];
@@ -718,6 +779,7 @@
         snap(8, k, t(i < 0 ? "Vi har lukket flere enn vi åpnet." : "Ikke lukket for mange så langt.", "i < 0? " + (i < 0 ? "Ja." : "Nei."), i < 0 ? "i = " + i + " < 0." : "i ≥ 0."), "Sjekk i < 0", i < 0);
         if (i < 0) {
           snap(9, k, t("Feil! En boks ble lukket uten å være åpnet.", "return false: " + tagStr(tg) + " på plass " + k + " lukker noe som ikke er åpent.", "Tidlig retur på plass " + k + "."), "false", true, false);
+          steps[steps.length - 1].svar = "false, i = −1 ved plass " + k;
           return linkVars(steps);
         }
       }
@@ -725,6 +787,7 @@
     var ok = i === 0;
     snap(10, null, t(ok ? "Alle boksene er lukket. Riktig!" : (i === 1 ? "1 boks står fortsatt åpen. Feil!" : i + " bokser står fortsatt åpne. Feil!"),
       "return i = 0: i = " + i + ", så svaret er " + ok + ".", ok ? "Velformatert." : (i === 1 ? "1 åpen tagg er aldri lukket." : i + " åpne tagger er aldri lukket.")), String(ok), !ok, ok);
+    steps[steps.length - 1].svar = ok + ", i = " + i;
     return linkVars(steps);
   });
 
@@ -740,6 +803,8 @@
         { type: "stack", label: "s (stakken)", items: s.slice(), mark: { top: o.top }, out: o.out, outBad: o.bad, outLabel: "s.pop()" }], info: inf, text: text, tag: tag,
         vars: [tagVar(A, cur)], frame: "GoodTags" });
     }
+    var warn = cfgOf(input).warn;
+    if (warn) snap(null, null, t(esc(warn), esc(warn), esc(warn)), "Merk");
     snap(2, null, t("En tom stabel. Her legger vi hver boks som åpnes.", "s ← tom stakk.", "Tom stakk."), "Start");
     for (var k = 0; k < A.length; k++) {
       var tg = A[k];
@@ -750,6 +815,7 @@
       } else if (!s.length) {
         snap(6, k, t("Den lukker, men stabelen er tom. Det finnes ingenting å lukke!", "Lukketagg og s er tom: betingelsen er sann (pop kalles ikke).", "Tom stakk, kortslutning i «or»."), "Tom stakk", { bad: true });
         snap(7, k, t("Feil!", "return false.", "Tidlig retur."), "false", { bad: true, ret: false });
+        steps[steps.length - 1].svar = "false ved plass " + k + ", s er tom";
         return linkVars(steps);
       } else {
         var top = s.pop(), same = tagType(top) === tagType(tg);
@@ -757,12 +823,13 @@
           "s.pop() = " + tagStr(top) + ". TagType: \"" + tagType(top) + "\" " + (same ? "=" : "≠") + " \"" + tagType(tg) + "\".",
           "pop, O(1). Typene er " + (same ? "like: fortsett." : "ulike: feil nøsting.")), same ? "pop, lik type" : "pop, ulik type",
           { out: top, bad: !same, cmp: esc(tagType(top)) + (same ? " = " : " ≠ ") + esc(tagType(tg)) });
-        if (!same) { snap(7, k, t("Feil! Taggene krysser hverandre.", "return false.", "Tidlig retur."), "false", { bad: true, ret: false, out: top }); return linkVars(steps); }
+        if (!same) { snap(7, k, t("Feil! Taggene krysser hverandre.", "return false.", "Tidlig retur."), "false", { bad: true, ret: false, out: top }); steps[steps.length - 1].svar = "false ved plass " + k + ", " + tagType(top) + " ≠ " + tagType(tg); return linkVars(steps); }
       }
     }
     var ok = !s.length;
     snap(8, null, t(ok ? "Stabelen er tom: alt som ble åpnet, ble lukket. Riktig!" : "Det ligger " + s.length + " igjen på stabelen. De ble aldri lukket. Feil!",
       "return s is empty: " + ok + ".", ok ? "Velformatert." : (s.length === 1 ? "1 åpen tagg igjen." : s.length + " åpne tagger igjen.")), String(ok), { ret: ok, bad: !ok });
+    steps[steps.length - 1].svar = ok ? "true, s er tom" : "false, " + s.length + " igjen i s";
     return linkVars(steps);
   });
 

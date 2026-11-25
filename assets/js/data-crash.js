@@ -28,10 +28,10 @@
     k25kmin: ["sok",       "kminste",    "H2025", "6",  "Finn k minste", 12, "exam-kminste"],
     h21bin:  ["heap",      "removemin",  "H2021", "4",  "Binære heaps", 6, "exam-removemin"],
     h22bq:   ["heap",      "pk",         "H2022", "10", "Bucket queue (bøttekø)", 10, "exam-pk"],
-    h22tf:   ["heap",      "test",       "H2022", "5",  "Prioritetskøer og heaper (sant/usant)", 10, "exam-test"],
+    h22tf:   ["heap",      "test",       "H2022", "5",  "Prioritetskøer og binære heaps (sant/usant)", 10, "exam-test"],
     h23ins:  ["heap",      "innsetting", "H2023", "2",  "Innsetting i heap", 10, "exam-innsetting"],
     h24med:  ["heap",      "median",     "H2024", "7",  "Mediankø", 12, "exam-median"],
-    h25lvl:  ["heap",      "levelorder", "H2025", "5",  "Level-order (heap)", 12, "exam-levelorder"],
+    h25lvl:  ["heap",      "levelorder", "H2025", "5",  "Level-order", 12, "exam-levelorder"],
     t20bst:  ["traer",     "bst",        "H2020", "2",  "Binære søketrær", 4, "exam-h2020-2"],
     t21rng:  ["traer",     "bst",        "H2021", "8",  "Verdier i et intervall (InRange)", 10, "exam-h2021-8"],
     t22chk:  ["traer",     "bst",        "H2022", "11", "Er treet et søketre? (CheckBST)", 10, "exam-h2022-10"],
@@ -42,8 +42,8 @@
     t25anti: ["traer",     "antiavl",    "H2025", "4",  "Anti-AVL", 12, "exam-h2025-3"],
     t21huf:  ["traer",     "huffman",    "H2021", "5",  "Huffman-trær", 5, "exam-h2021-5"],
     t22auto: ["traer",     "huffman",    "H2022", "9",  "Autofullføring: prefikstre mot hashmap", 6, "exam-h2022-8"],
-    t24huf:  ["traer",     "huffman",    "H2024", "2",  "Huffman-trær", 10, "exam-h2024-2"],
-    t25lvl:  ["traer",     "trav",       "H2025", "5",  "Level-order (binærtre)", 12, "exam-h2025-4"],
+    t24huf:  ["traer",     "huffman",    "H2024", "2",  "Huffman", 10, "exam-h2024-2"],
+    t25lvl:  ["traer",     "trav",       "H2025", "5",  "Level-order", 12, "exam-h2025-4"],
     x20lp:   ["hashing",   "probing",    "H2020", "4",  "Linear probing", 2, "exam-h2020-4"],
     x20sub:  ["hashing",   "triks",      "H2020", "7",  "Subanagram (a–c)", 17, "exam-h2020-7"],
     x21frek: ["hashing",   "triks",      "H2021", "9",  "Flest forekomster", 8, "exam-h2021-9"],
@@ -67,9 +67,9 @@
     g25syk:  ["grafer",    "sykler",     "H2025", "3",  "Sykler i grafer", 11, "exam-h2025-2"],
     g25kol:  ["grafer",    "mst",        "H2025", "7",  "Kollektivtilbudet i Oslo", 15, "exam-h2025-6"],
     l20tag:  ["lister",    "stakk",      "H2020", "9",  "Velformaterte tagger (stakk)", 12, "exam-h2020-9"],
-    p20ver:  ["strategi",  "pnp",        "H2020", "8a", "Fire typer grafer: verifikator (NP)", 10, "exam-h2020-8"],
-    p21pnp:  ["strategi",  "pnp",        "H2021", "6",  "Beregnbarhet og kompleksitet (P og NP)", 8, "exam-h2021-6"],
-    p22tf:   ["strategi",  "kjoretid",   "H2022", "2",  "Litt av hvert (sant/usant)", 10, "exam-h2022-2"]
+    p20ver:  ["strategi",  "pnp",        "H2020", "8a", "Fire typer grafer: verifikator og NP", 10, "exam-h2020-8"],
+    p21pnp:  ["strategi",  "pnp",        "H2021", "6",  "Litt om beregnbarhet og kompleksitet", 8, "exam-h2021-6"],
+    p22tf:   ["strategi",  "kjoretid",   "H2022", "2",  "Litt av hvert", 10, "exam-h2022-2"]
   };
 
   var LENGDER = [
@@ -87,7 +87,7 @@
         kjerne: t(
           "Eksamen er som et brettspill med faste regler. Først et lett spørsmål. Så mange små «sant eller usant», der det lønner seg å svare på alt. Til slutt større oppgaver der du forklarer, skriver pseudokode og sier hvor lang tid løsningen tar. Den som kan reglene, taper færre poeng på dumme ting.",
           "<p>Eksamen er 100 poeng: oppvarming (2 p), del 1 med sant/usant (32, 22 og 26 p i 2023–2025) og del 2 med 6–7 langsvarsoppgaver. I del 1 teller blankt og galt likt, så svar på alle. I del 2 gir lavere kjøretid flere poeng, og du kan bruke pensumalgoritmer uten å skrive dem selv (står i oppgavesettene fra 2023). Gjør rede for antagelsene dine.</p>",
-          "<p>Del 1 (2023–2025): N påstander, n riktige, poeng = 2 · max(n − N/2, 0). Ren gjetting gir i snitt 0. Del 2: sensorveiledningene gir poeng i trinn etter kjøretid (optimal løsning full pott, ett trinn dårligere omtrent halvparten, vesentlig tregere gir ofte fortsatt en god del, f.eks. inntil 5 av 8 for O(n²) på H2023 diameter og 4 av 6 for kvadratisk CheckBST på H2022, men på noen oppgaver nesten ingenting, f.eks. 1 p på H2023 Finn duplikat). Feil eller manglende kjøretid koster typisk 1 p. Riktig idé uten pseudokode gir opptil halv pott, og presis tekst kan gi mer enn uklar pseudokode.</p>"),
+          "<p>Del 1 (2023–2025): N påstander, n riktige, poeng = 2 · max(n − N/2, 0). Ren gjetting gir i snitt 0. Del 2: sensorveiledningene gir poeng i trinn etter kjøretid (optimal løsning full pott). Hvor mye en tregere, riktig løsning gir, varierer: 4 av 5 for O(n log n) på H2023 Finn duplikat, inntil 5 av 8 for O(n²) på H2023 diameter og 4 av 6 for kvadratisk CheckBST på H2022, men høyst 1 p for verre enn O(n log n) på Finn duplikat. Feil eller manglende kjøretid koster typisk 1 p. Riktig idé uten pseudokode gir opptil halv pott, og presis tekst kan gi mer enn uklar pseudokode.</p>"),
         les: [["strategi", "eksamensteknikk", "tek-typer", "Strategi → Oppgavetypene"], ["strategi", "eksamensteknikk", "tek-bygg", "Pensum som byggeklosser"]],
         oppskrift: [
           "<b>Del 1:</b> svar på alle påstandene. Blankt teller som galt.",
@@ -144,7 +144,7 @@
         hvorfor: "Del 1 har vært 32, 22 og 26 poeng (2023–2025). Påstandene for de årene er ikke offentlige, men 2021–2022 viser at kjøretid for pensumoperasjoner går igjen, og kjøretid er i tillegg et eget poeng i nesten hver langsvarsoppgave.",
         kjerne: t(
           "Big-O sier hvor mye lengre tid noe tar når det blir mer å gjøre. Leter du etter et navn i en telefonkatalog, går det fort å slå opp på midten og kaste halvparten hver gang. Å lese hver eneste side går sakte, og det blir verre jo tykkere katalogen er. På eksamen må du kunne hvor fort de vanlige oppskriftene i pensum er, like sikkert som gangetabellen.",
-          "<p>Kunne disse utenat: binærsøk O(log n) · heap insert og removeMin O(log n), BuildHeap O(n) · søk i binært søketre O(h), som er O(log n) i et AVL-tre og O(n) i verste fall ellers · hashing forventet O(1), O(n) i verste tilfelle · Merge sort og Heapsort O(n log n) · Quicksort O(n²) i verste fall · Insertion sort O(n²), men O(n) på sortert input · Bucket sort O(N + n) · BFS, DFS og topologisk sortering O(|V| + |E|) · Dijkstra O((|V| + |E|) · log(|V|)) · Prim og Kruskal O(|E| · log(|V|)) · Bellman-Ford O(|V| · |E|).</p>",
+          "<p>Kunne disse utenat: binærsøk O(log n) · heap insert og removeMin O(log n), BuildHeap O(n) · søk i binært søketre O(h), som er O(log n) i et AVL-tre og O(n) i verste fall ellers · hashing forventet O(1), O(n) i verste tilfelle · Merge sort og Heapsort O(n log n) · Quicksort O(n²) i verste fall · Insertion sort O(n²), men O(n) på sortert input · Bucket sort O(N + n) · BFS, DFS og topologisk sortering O(|V| + |E|) · Dijkstra O((|V| + |E|) · log(|V|)) · Prim O(|E| · log(|V|)), og Kruskal like raskt når sjekken «lager kanten en sykel?» er rask, fordi sorteringen av kantene da koster mest · Bellman-Ford O(|V| · |E|).</p>",
           "<p>Regnereglene: behold det største leddet og dropp konstanter. Løkker etter hverandre adderes, løkker inni hverandre multipliseres. Les alltid hvilket tilfelle påstanden gjelder (verste, forventet, amortisert) og hvilken struktur (BST eller AVL). Tabellen i Strategi → Pensum som byggeklosser samler kjøretidene.</p>"),
         les: [["begreper", "bigo", null, "Begreper → Big-O"], ["strategi", "kjoretid", null, "Strategi → Kjøretidsanalyse"], ["strategi", "eksamensteknikk", "tek-bygg", "Kjøretidstabellen (byggeklosser)"]],
         oppskrift: [
@@ -163,7 +163,7 @@
         ] },
 
       { id: "2b", tittel: "Stabil og in-place", vekt: 4, min: "S", tid: 10, tidG: 15,
-        hvorfor: "Påstander om hvilke sorteringsalgoritmer som er stabile eller in-place er en fast type i del 1, og stabilitet var egen oppgave i 2021. Det er også nøkkelen til bøttesorteringsoppgavene (2020, 2024).",
+        hvorfor: "Stabilitet var egen oppgave i 2021 (oppgave 2, 3 p), og stabil og in-place passer godt som sant/usant-påstander. Om de har vært med i del 1 2023–2025, vet vi ikke, for de påstandene er ikke offentlige. Det er også nøkkelen til bøttesorteringsoppgavene (2020, 2024).",
         kjerne: t(
           "Stabil betyr at like elementer står i samme innbyrdes rekkefølge etter sorteringen som før, som to like gamle barn som ikke bytter plass i køen. In-place betyr at du sorterer i selve arrayet uten å trenge en ekstra hylle.",
           "<p><b>Stabil:</b> like nøkler beholder rekkefølgen fra input. Stabile i kurset: Bubble, Insertion, Gnome, Merge, Bucket og Radix sort. Ustabile: Selection sort, Quicksort og Heapsort. <b>In-place:</b> sorterer i selve arrayet uten en ekstra datastruktur. In-place: Selection, Bubble, Insertion, Gnome, Quicksort og Heapsort. Ikke in-place: Merge, Bucket og Radix sort.</p>",
@@ -184,11 +184,11 @@
         ] },
 
       { id: "2c", tittel: "Fakta om heap, AVL og søketrær", vekt: 6, min: "S", tid: 15, tidG: 20,
-        hvorfor: "Heap og trær var egne del 1-oppgaver i 2021 (heap 6 p, Huffman 5 p) og 2022 (AVL 6 p, heap 10 p), og er sentrale i del 1 også etterpå.",
+        hvorfor: "Heap og trær var egne korte oppgaver i 2021 (binære heaps 6 p, Huffman 5 p) og 2022 (balanserte søketrær 6 p, prioritetskøer og heaper 10 p). Påstandene i del 1 for 2023–2025 er ikke offentlige, men temaene er sentrale i pensum.",
         kjerne: t(
           "En heap er en pyramide der den minste alltid står øverst, men resten ikke er sortert. Et AVL-tre er et søketre som passer på at ingen gren blir mye lengre enn den andre, så det aldri blir en lang kjede.",
-          "<p><b>Min-heap:</b> komplett binærtre der hver node er større enn eller lik forelderen, så den minste er i roten. Lagres i et array: barna til i er 2i + 1 og 2i + 2, forelderen er ⌊(i − 1)/2⌋. Høyden er ⌊log n⌋. Et sortert array er en gyldig min-heap. <b>AVL-tre:</b> binært søketre der høydene til venstre og høyre deltre er ulike med høyst 1 i hver node. Da er høyden O(log n), så søk, innsetting og fjerning er O(log n).</p>",
-          "<p>Høyde måles i kanter: en løvnode har høyde 0, et tomt tre høyde −1. Balansefaktor = høyde(venstre) − høyde(høyre), og AVL krever at den er −1, 0 eller 1. Inorder i et binært søketre gir verdiene sortert. En heap er bare delvis ordnet: søsken kan stå i hvilken som helst rekkefølge.</p>"),
+          "<p><b>Min-heap:</b> komplett binærtre der hver node er større enn eller lik forelderen, så den minste er i roten. Lagres i et array: barna til i er 2i + 1 og 2i + 2, forelderen er ⌊(i − 1)/2⌋. Høyden er ⌊log n⌋, fordi treet er komplett. Et sortert array er en gyldig min-heap, fordi hver forelder står før barna sine. <b>AVL-tre:</b> binært søketre der høydene til venstre og høyre deltre er ulike med høyst 1 i hver node. Da er høyden O(log n), så søk, innsetting og fjerning er O(log n).</p>",
+          "<p>Høyde måles i kanter: en løvnode har høyde 0, et tomt tre høyde −1. Balansefaktor = høyde(venstre) − høyde(høyre), og AVL krever at den er −1, 0 eller 1. Inorder i et binært søketre gir verdiene sortert (venstre deltre, noden, høyre deltre). Det er derfor inorder er én av løsningene i CheckBST (H2022). En heap er bare delvis ordnet: søsken kan stå i hvilken som helst rekkefølge.</p>"),
         les: [["heap", "hva", null, "Heap → Hva er en heap"], ["traer", "avl", null, "Trær → AVL"], ["traer", "begreper", null, "Trær → Begreper (høyde og dybde)"]],
         oppskrift: [
           "Tegn et lite eksempel. De fleste heap- og trepåstander avsløres med 3–5 noder.",
@@ -206,7 +206,7 @@
         ] },
 
       { id: "2d", tittel: "P og NP: begrepene du må kunne", vekt: 3, min: "S", tid: 10,
-        hvorfor: "P og NP var egne oppgaver bare i 2020 (verifikator, 10 p) og 2021 (8 p i del 1). Temaet kan ha flyttet til sant/usant, men det vet vi ikke sikkert. Det er likevel tyngdepunktet i foreleserens egen kompleksitetsguide.",
+        hvorfor: "P og NP har vært med som deloppgaver i 2020 (verifikatoren i «Fire typer grafer», (a) 7 p og (b) 3 p) og som egen oppgave i 2021 (oppgave 6, 8 p). Temaet kan ha flyttet til sant/usant, men det vet vi ikke sikkert. Det har uansett en egen forelesning, så vi tar det med.",
         kjerne: t(
           "Noen gåter er lette å løse. Andre er vanskelige å løse, men lette å sjekke når noen viser deg et svar, som en Sudoku. NP er gåtene som er lette å sjekke. Ingen vet om alle slike gåter også er lette å løse.",
           "<p>Et <b>avgjørelsesproblem</b> har svar JA eller NEI. <b>P</b> er problemene som kan løses i polynomiell tid. <b>NP</b> er problemene der et JA-svar kan <b>verifiseres</b> i polynomiell tid med et <b>sertifikat</b>. P ⊆ NP, men om P = NP er ukjent. <b>NP-hardt:</b> minst like vanskelig som alle problemer i NP. <b>NP-komplett:</b> i NP og NP-hardt.</p>",
@@ -227,10 +227,10 @@
           { q: "Hvilket utsagn er riktig?", options: ["P = NP er bevist", "P ⊆ NP, men om P = NP er ukjent", "NP er problemene som ikke kan løses raskt", "Alle problemer i NP er NP-komplette"], answer: 1,
             explain: "Alt som kan løses raskt, kan også sjekkes raskt. Om det motsatte gjelder, er et åpent problem." },
           { q: "Hva er et NP-komplett problem?", options: ["Et problem som er i NP og NP-hardt", "Et problem som er NP-hardt, men ikke i NP", "Et problem som løses i polynomiell tid", "Et uløselig problem"], answer: 0,
-            explain: "NP-komplett = i NP og NP-hardt. Hamiltonsykel er et eksempel." }
+            explain: "NP-komplett = i NP og NP-hardt. Hamiltonsykel er et kjent eksempel (en sann påstand i H2021 oppgave 6)." }
         ] }],
         feller: [
-          "Å snu reduksjonen: X til SAT viser ingenting om hvor vanskelig X er.",
+          "Å snu reduksjonen. X til SAT viser bare at X ikke er vanskeligere enn SAT, ikke at X er NP-hardt.",
           "Å tro at NP betyr «ikke polynomiell»."
         ] },
 
@@ -344,16 +344,16 @@
         ] },
 
       { id: "3d", tittel: "Huffman for hånd", vekt: 2, min: "S", tid: 15, tidG: 20,
-        hvorfor: "Standardoppgaven i 2024 (10 p), og egen del 1-oppgave i 2021 (5 p).",
+        hvorfor: "Standardoppgaven i 2024 (10 p), og egen kort oppgave i 2021 (oppgave 5, 5 p).",
         kjerne: t(
           "Lag et tre av bokstavene, der de vanligste får korte koder. Ta alltid de to sjeldneste, bind dem sammen til en ny «bokstav», og fortsett til du har ett tre.",
-          "<p>Legg hvert symbol som en løvnode med frekvensen sin i en prioritetskø (min-heap). Så lenge køen har mer enn ett tre: ta ut de to med lavest frekvens, lag en forelder med summen, og sett den inn igjen. Kodelengden til et symbol er dybden til løvnoden. Med n symboler er det O(n log n).</p>",
+          "<p>Legg hvert symbol som en løvnode med frekvensen sin i en prioritetskø (min-heap). Så lenge køen har mer enn ett tre: ta ut de to med lavest frekvens, lag en forelder med summen, og sett den inn igjen. Kodelengden til et symbol er dybden til løvnoden. Med n symboler blir det n − 1 sammenslåinger med O(log n) arbeid hver, altså O(n log n).</p>",
           "<p>Løvnodene inneholder symbolene (med frekvens), de indre nodene bare summen. Koden er prefiksfri fordi bare løvnoder har symboler. Ved like frekvenser kan flere trær være riktige: kodelengdene kan bli ulike, men den totale kodelengden blir den samme.</p>"),
         les: [["traer", "huffman", null, "Trær → Huffman"]],
         oppskrift: [
           "Skriv køen etter hver sammenslåing: hvilke to som tas ut, og hvilken sum som settes inn.",
           "Tegn det ferdige treet og les av kodelengdene som dybder.",
-          "Byggealgoritmen: prioritetskø på frekvens, ta ut to, sett inn summen, til ett tre er igjen. O(n log n)."
+          "Byggealgoritmen: prioritetskø på frekvens, ta ut to, sett inn summen, til ett tre er igjen. Kjøretid O(n log n): n − 1 runder med to removeMin og én insert."
         ],
         eksempel: [["traer", "huffman", "demo-huffman", "Huffman steg for steg"]],
         oppgaver: ["t24huf"],
@@ -609,7 +609,7 @@
         ] },
 
       { id: "7b", tittel: "Rehash, amortisering og Python-ordbøker", vekt: 1, min: "S", tid: 10, tidG: 15,
-        hvorfor: "Python 3.6-ordbøker (2024, 10 p) handlet om oppslag, rehash og fordelene med ny struktur. Rehash og amortisert tid er også del 1-stoff.",
+        hvorfor: "Python 3.6-ordbøker (2024, 10 p) handlet om oppslag, rehash og fordelene med ny struktur. Rehash og amortisert tid passer også godt som sant/usant-påstander (vår vurdering, siden del 1-påstandene 2023–2025 ikke er offentlige).",
         kjerne: t(
           "Blir garderoben for full, flytter du til en dobbelt så stor og henger opp alle jakkene på nytt. Det tar tid, men skjer så sjelden at det i snitt nesten ikke merkes.",
           "<p><b>Load factor</b> er n/N. Kurset rehasher når n/N når 0,75: lag et array med dobbel størrelse og sett inn alle parene på nytt med ny N, O(n). Fordi N dobles, blir innsetting <b>amortisert</b> O(1) (forventet). Python fra 3.6: et tett <b>entries</b>-array i innsettingsrekkefølge og et glissent <b>indices</b>-array med indekser inn i entries.</p>",
@@ -636,7 +636,7 @@
         kjerne: t(
           "Har du bare noen få kategorier, lager du én kurv per kategori. Gå gjennom tingene i rekkefølge og legg hver i sin kurv. Tøm kurvene etter hverandre. Ting i samme kurv står i samme rekkefølge som før.",
           "<p><b>Bucket sort:</b> nøklene er 0 … N − 1. Lag N tomme lister, gå gjennom A i rekkefølge og legg hvert element <b>bakerst</b> i bøtte[nøkkel], og tøm bøttene i rekkefølge. Stabil og O(N + n).</p>",
-          "<p>Stabil fordi rekkefølgen fra A bevares innen hver bøtte. Skal du sortere på to nøkler: sorter først på den minst viktige, så stabilt på den viktigste. Sensormønsteret: stabil og lineær 6/6, stabil O(n log n) maks 4, ustabil −1, O(n²) maks 2.</p>"),
+          "<p>Stabil fordi rekkefølgen fra A bevares innen hver bøtte. Skal du sortere på to nøkler: sorter først på den minst viktige, så stabilt på den viktigste. Etymologisk ordliste (H2024) ga 6 p for en tilpasset Bucket sort og opptil 2 p for en O(n²)-sortering, og ustabile løsninger ble trukket.</p>"),
         les: [["sortering", "bucket", null, "Sortering → Bucket sort"], ["sortering", "radix", null, "Sortering → Radix sort"]],
         oppskrift: [
           "Les om sorteringskall er forbudt. Er det det, er Bucket sort poenget.",
@@ -670,12 +670,12 @@
         sjekk: [{ type: "tf", fra: [["sortering", ["Gnome sort", "Insertion sort", "Selection sort", "Quicksort", "Heapsort", "in-place"]]], maks: 9 }],
         feller: [
           "Å bare beskrive koden uten å sammenligne med pensum.",
-          "Å glemme beste tilfelle (O(n) på sortert input)."
+          "Kjøretid uten begrunnelse. Riktig kjøretid ga opptil 2 p (2023). Vårt råd: nevn også beste tilfelle (O(n) på sortert input), for det viser slektskapet med Insertion sort."
         ] }
     ] },
 
     /* ===================== 9 · GRAFHISTORIEN ===================== */
-    { nr: 9, navn: "Grafhistorien", hvor: "Del 2, alltid sist og størst, 22–26 p", steg: [
+    { nr: 9, navn: "Grafhistorien", hvor: "Del 2, ofte sist og størst, 22–26 p", steg: [
       { id: "9a", tittel: "Fra historie til graf", vekt: 3, min: "E", tid: 10, tidG: 15,
         hvorfor: "Grafer har kommet alle seks år, ofte som en større oppgave med en historie rundt (tunneler, venner, turstier, kollektivtrafikk). Første deloppgave er nesten alltid modellen: 1–2 p.",
         kjerne: t(
@@ -744,8 +744,8 @@
         hvorfor: "En liten variant av BFS eller DFS kommer nesten hvert år: to-fargelegging (2021), garbage collection (2022), dependency hell (2023), jazz eller klassisk (2024), sykler i grafer (2025).",
         kjerne: t(
           "BFS er som ringer i vann: først de nærmeste, så de neste. DFS er som å gå i en labyrint: gå så langt du kan, og snu når det stopper. Begge husker hvor de har vært, så de ikke går i ring.",
-          "<p><b>BFS</b> bruker en kø og gir avstand i antall kanter. <b>DFS</b> bruker en stakk eller rekursjon. Begge er O(|V| + |E|). <b>Sykel i urettet graf:</b> DFS som møter en besøkt nabo som ikke er forelderen, eller |E| ≠ |V| − antall komponenter. <b>Sykel i rettet graf:</b> topologisk sortering får med færre enn |V| noder. <b>To-fargelegging:</b> BFS, farge etter partall eller oddetall avstand, og sjekk at ingen kant går mellom like farger.</p>",
-          "<p>Topologisk sortering med DFS: legg en node på en stakk når alle naboene er ferdige. Stakken er da en topologisk sortering (bare for asykliske grafer). Trenger du en bestemt rekkefølge blant noder som er klare samtidig, bytt stakken med de klare nodene ut med en prioritetskø (Whops-logger 2021). Mange startnoder: superkilde eller én DFS med alle startnodene i stakken, ikke én DFS per startnode.</p>"),
+          "<p><b>BFS</b> bruker en kø og gir avstand i antall kanter. <b>DFS</b> bruker en stakk eller rekursjon. Begge er O(|V| + |E|). <b>Sykel i urettet graf:</b> DFS som møter en besøkt nabo som ikke er forelderen, eller |E| ≠ |V| − antall komponenter. <b>Sykel i rettet graf:</b> topologisk sortering får med færre enn |V| noder. <b>To-fargelegging:</b> DFS (som i sensors løsning) eller BFS som gir hver ny nabo motsatt farge av noden den kom fra, og sjekker at ingen kant går mellom like farger.</p>",
+          "<p>Topologisk sortering med DFS: legg en node på en stakk når alle naboene er ferdige. Stakken er da en topologisk sortering (bare for asykliske grafer). Kursets andre variant tar hele tiden ut en node med inngrad 0. Trenger du en bestemt rekkefølge blant noder som er klare samtidig, legger du nodene med inngrad 0 i en prioritetskø i stedet for en stakk (Whops-logger 2021). Mange startnoder: superkilde, eller DFSVisit fra hver startnode med ett felles besøkt-sett, ikke et nytt søk med nytt besøkt-sett per startnode.</p>"),
         les: [["grafer", "bfs", null, "Grafer → BFS"], ["grafer", "dfs", null, "Grafer → DFS"], ["grafer", "sykler", null, "Grafer → Sykler"], ["grafer", "topologisk", null, "Grafer → Topologisk sortering"]],
         oppskrift: [
           "Skriv varianten som en liten endring av BFS eller DFS, og si hva som er endret.",
@@ -768,7 +768,7 @@
         kjerne: t(
           "Tenk deg at du sender ut løpere fra start. Den løperen som er nærmest, er alltid først framme. Hver gang en løper kommer fram til en node, sjekker hun om veien videre gjør noen andre noder raskere å nå.",
           "<p>Sett avstanden til start til 0 og til alle andre til ∞. Ta hele tiden ut noden med minst avstand fra prioritetskøen. For hver kant (u, v): er d[u] + w(u, v) < d[v], oppdater d[v] og forrige[v], og legg v i køen (edge relaxation). En node som er tatt ut, er ferdig. Krever at ingen kanter har negativ vekt. O((|V| + |E|) · log(|V|)).</p>",
-          "<p>Tabellen: én rad per uttak, én kolonne per node med (avstand, forrige). Kurset viser også en versjon uten DecreasePriority: legg noden inn på nytt med ny prioritet og hopp over noder som allerede er ferdige. Køen kan da ha opptil |E| elementer, men siden log(|E|) ≤ 2 · log(|V|), er kjøretiden fortsatt O((|V| + |E|) · log(|V|)).</p>"),
+          "<p>Tabellen: én rad per uttak, én kolonne per node med (avstand, forrige). Kurset viser også en versjon uten DecreasePriority: legg noden inn på nytt med ny prioritet og hopp over noder som allerede er ferdige. Køen kan da ha opptil |E| elementer, men siden |E| ≤ |V|², er log(|E|) ≤ 2 · log(|V|), og derfor er kjøretiden fortsatt O((|V| + |E|) · log(|V|)).</p>"),
         les: [["grafer", "dijkstra", null, "Grafer → Dijkstra"]],
         oppskrift: [
           "Tegn tabellen før du begynner: kolonner for hver node, rad for hvert uttak.",
@@ -800,13 +800,13 @@
         hvorfor: "Blindern-problemet (2023, 10 p), Kruskal i 2020, og flaskehals-spørsmålet i Kollektivtilbudet i Oslo (2025).",
         kjerne: t(
           "Alle husene skal få strøm, og hver kabel har en pris. Prim starter i ett hus og kobler alltid på den billigste kabelen til et nytt hus. Kruskal kjøper de billigste kablene først, men aldri en som bare lager en ring.",
-          "<p>Et <b>minimalt spenntre</b> binder sammen alle nodene i en urettet, vektet, sammenhengende graf med lavest mulig sum av vekter, og har |V| − 1 kanter. <b>Prim</b> lar ett tre vokse og tar alltid den letteste kanten ut av treet (prioritetskø). <b>Kruskal</b> tar kantene sortert på vekt og hopper over dem som lager en sykel. Begge er grådige og O(|E| · log(|V|)).</p>",
+          "<p>Et <b>minimalt spenntre</b> binder sammen alle nodene i en urettet, vektet, sammenhengende graf med lavest mulig sum av vekter, og har |V| − 1 kanter. <b>Prim</b> lar ett tre vokse og tar alltid den letteste kanten ut av treet (prioritetskø). <b>Kruskal</b> tar kantene sortert på vekt og hopper over dem som lager en sykel. Begge er grådige. Prim er O(|E| · log(|V|)). Kruskal blir like rask når sjekken «lager kanten en sykel?» er rask, fordi sorteringen av kantene da koster mest.</p>",
           "<p>Minste terskel k slik at grafen fortsatt er sammenhengende når alle kanter med vekt større enn k fjernes, er den største kantvekten i et minimalt spenntre (H2025 (c)). Et minimalt spenntre er ikke det samme som korteste vei: stien mellom to noder i spenntreet trenger ikke være den korteste i grafen.</p>"),
         les: [["grafer", "mst", null, "Grafer → Minimalt spenntre"]],
         oppskrift: [
           "Si at grafen er urettet, vektet og sammenhengende, og at du derfor kan bruke Prim eller Kruskal.",
           "Kjør for hånd: skriv kanten du legger til i hvert steg, og totalvekten til slutt.",
-          "Kjøretid O(|E| · log(|V|)), og nevn prioritetskøen (Prim) eller sorteringen (Kruskal)."
+          "Kjøretid: O(|E| · log(|V|)) for Prim, med prioritetskøen. For Kruskal: si at sorteringen av kantene koster mest, gitt en rask sykelsjekk."
         ],
         eksempel: [["grafer", "mst", "demo-prim", "Prim steg for steg"], ["grafer", "mst", "demo-kruskal", "Kruskal steg for steg"]],
         oppgaver: ["g23bl", "g25kol"],
@@ -888,7 +888,7 @@
         feller: ["Å glemme sjekken av at stakken er tom til slutt."] },
 
       { id: "10b", tittel: "Verifikator og sertifikat", vekt: 1, min: "G", tid: 15,
-        hvorfor: "Verifikator for et grafproblem var 10 p i 2020. Å lete etter en løsning i stedet for å sjekke sertifikatet ga 0 p.",
+        hvorfor: "Verifikatoren i «Fire typer grafer» (2020) ga 10 p: (a) 7 p for verifikatoren og (b) 3 p for å vise at den er polynomiell. Sensor ga ingen poeng for å finne en sykel selv, for eksempel med BFS eller DFS, i stedet for å sjekke sertifikatet.",
         kjerne: t(
           "Noen gir deg et forslag til løsning. Jobben din er bare å sjekke om forslaget stemmer, ikke å finne en løsning selv.",
           "<p>En <b>verifikator</b> tar en instans og et <b>sertifikat</b> (et løsningsforslag) og sjekker i polynomiell tid om sertifikatet viser at svaret er JA. For Hamiltonsykel: sjekk at sertifikatet inneholder hver node nøyaktig én gang, og at hvert nabopar, også fra den siste til den første, er en kant.</p>",
@@ -903,13 +903,13 @@
         oppgaver: ["p20ver"],
         sjekk: [{ type: "quiz", items: [
           { q: "Hva gjør en verifikator for Hamiltonsykel?", options: ["Leter etter en Hamiltonsykel", "Sjekker at sertifikatet faktisk er en Hamiltonsykel", "Teller syklene i grafen", "Kjører Dijkstra"], answer: 1,
-            explain: "Å lete ga 0 p i 2020." },
+            explain: "Å finne en sykel selv, for eksempel med BFS eller DFS, ga ingen poeng i 2020. Verifikatoren skal sjekke sertifikatet." },
           { q: "Hva må sjekkes?", options: ["At sertifikatet er sortert", "At hver node er med nøyaktig én gang, og at hvert nabopar, også siste til første, er en kant", "At grafen er sammenhengende", "At grafen er rettet"], answer: 1,
             explain: "Det er definisjonen av en Hamiltonsykel." },
           { q: "Hvor rask må en verifikator være?", options: ["Polynomiell", "Eksponentiell er greit", "O(1)", "O(log n)"], answer: 0,
             explain: "Polynomiell verifisering er definisjonen av NP." }
         ] }],
-        feller: ["Å søke etter en løsning i stedet for å verifisere: 0 p (2020)."] }
+        feller: ["Å finne en sykel selv (for eksempel med BFS eller DFS) i stedet for å sjekke sertifikatet: ingen poeng (2020)."] }
     ] },
 
     /* ===================== 11 · GENERALPRØVE ===================== */

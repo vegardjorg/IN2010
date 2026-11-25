@@ -6,7 +6,7 @@
   <title>Pseudokode-skolen · IN2010</title>
   <meta name="description" content="Lær eksamensformatet for pseudokode: notasjon, linjeleser, tracer og øving.">
   <script>(function(){try{var d=document.documentElement;var t=localStorage.getItem('in-theme')||'light';if(t!=='system')d.setAttribute('data-theme',t);var l=localStorage.getItem('in-level')||'normal';d.setAttribute('data-level',l);}catch(e){document.documentElement.setAttribute('data-theme','light');document.documentElement.setAttribute('data-level','normal');}})();</script>
-  <link rel="stylesheet" href="assets/css/styles.css?v=20261125a">
+  <link rel="stylesheet" href="assets/css/styles.css?v=20261125b">
 </head>
 <body data-page="pseudokode">
   <a class="skip-link" href="#main">Hopp til innhold</a>
@@ -126,13 +126,13 @@
 
   <footer class="footer">IN2010-guide · Pseudokode-skolen</footer>
 
-  <script src="assets/js/core.js?v=20261125a"></script>
-  <script src="assets/js/symboler.js?v=20261125a"></script>
-  <script src="assets/js/pseudocode.js?v=20261125a"></script>
-  <script src="assets/js/stepplayer.js?v=20261125a"></script>
-  <script src="assets/js/varline.js?v=20261125a"></script>
-  <script src="assets/js/viz-bars.js?v=20261125a"></script>
-  <script src="assets/js/data-algos.js?v=20261125a"></script>
+  <script src="assets/js/core.js?v=20261125b"></script>
+  <script src="assets/js/symboler.js?v=20261125b"></script>
+  <script src="assets/js/pseudocode.js?v=20261125b"></script>
+  <script src="assets/js/stepplayer.js?v=20261125b"></script>
+  <script src="assets/js/varline.js?v=20261125b"></script>
+  <script src="assets/js/viz-bars.js?v=20261125b"></script>
+  <script src="assets/js/data-algos.js?v=20261125b"></script>
   <script>
   (function () {
     var IN = window.IN, el = IN.el, qs = IN.qs;
@@ -224,9 +224,9 @@
       { q: "Hvor mange bytter gjør Selection sort <b>totalt</b> på et array med n elementer (verste tilfelle)?",
         options: ["O(1)", "O(n)", "O(n log n)", "O(n²)"], answer: 1,
         explain: "Høyst ett bytte per ytre runde (byttet hoppes over når det minste alt står på plass i), altså høyst n − 1 bytter → O(n), selv om det er O(n²) sammenligninger." },
-      { q: "Bubble sort med swapped-flagg på et allerede sortert array bruker …",
-        options: ["O(n) tid (én runde uten bytter)", "O(n log n)", "O(n²) uansett", "O(log n)"], answer: 0,
-        explain: "Første runde gir ingen bytter → swapped er false → break. Det er beste tilfelle: O(n)." }
+      { q: "Bubble sort slik den står i forelesningen (uten tidlig stopp), på et allerede sortert array, bruker …",
+        options: ["O(n) tid (én runde uten bytter)", "O(n log n)", "O(n²) uansett", "O(log n)"], answer: 2,
+        explain: "Kursets versjon går alltid alle n − 1 rundene og gjør n(n − 1)/2 sammenligninger, også når ingenting byttes. Det blir O(n²). Legger du selv til et flagg som stopper når en runde ikke bytter noe, blir beste tilfelle O(n). Det er en valgfri forbedring." }
     ]);
 
     /* ---- Finn feilen ---- */

@@ -27,41 +27,38 @@
     var presetRow = null;
     if (opts.presets) {
       presetRow = el("div", { class: "sp-presets" });
-      presetRow.appendChild(el("span", { class: "lbl", text: "Eksempler:" }));
+      // Kompakt: «Eks.» + eksempelknapper, og eget array (lite felt + Bruk) på samme linje.
+      presetRow.appendChild(el("span", { class: "lbl", text: "Eks.", title: "Eksempler" }));
       Object.keys(opts.presets).forEach(function (navn) {
         presetRow.appendChild(el("button", {
           class: "btn sm", type: "button", text: navn,
           onclick: function () { setInput(opts.presets[navn]); }
         }));
       });
-      wrap.appendChild(presetRow);
-      // Egen linje: eget array (felt + Bruk samlet) og antall − / +
-      var toolRow = el("div", { class: "sp-presets sp-tools" });
       if (opts.customInput !== false) {
-        var fld = el("input", { type: "text", placeholder: opts.inputLabel || "f.eks. 5,1,4,2,8", "aria-label": "Eget array" });
+        var fld = el("input", { type: "text", placeholder: "Egne: " + String(opts.inputLabel || "5,1,4,2,8").replace(/^f\.eks\.\s*/, ""),
+          "aria-label": "Egne tall, skilt med komma" });
         var go = el("button", { class: "btn sm", type: "button", text: "Bruk",
           onclick: function () { var v = parseInput(fld.value); if (v.length) setInput(v); } });
         fld.addEventListener("keydown", function (e) { if (e.key === "Enter") { e.preventDefault(); go.click(); } });
-        toolRow.appendChild(el("span", { class: "sp-custom" }, [el("span", { class: "lbl", text: "Eget:" }), fld, go]));
+        presetRow.appendChild(el("span", { class: "sp-custom" }, [fld, go]));
       }
-      // Flere / færre tall (med fornuftige grenser)
+      wrap.appendChild(presetRow);
+      // Flere / færre tall (med fornuftige grenser): liten bryter øverst til høyre inne i demoboksen
       if (opts.countControl) {
         var cmin = opts.countControl.min || 3, cmax = opts.countControl.max || 9;
         var cval = el("span", { class: "cval", "aria-live": "polite" });
-        var bMinus = el("button", { class: "btn sm", type: "button", title: "Færre tall", "aria-label": "Færre tall", text: "−",
+        var bMinus = el("button", { class: "sp-cbtn", type: "button", title: "Færre tall", "aria-label": "Færre tall", text: "−",
           onclick: function () { if (input && input.length > cmin) { input = input.slice(0, -1); regen(); countUpdate(); } } });
-        var bPlus = el("button", { class: "btn sm", type: "button", title: "Flere tall", "aria-label": "Flere tall", text: "+",
+        var bPlus = el("button", { class: "sp-cbtn", type: "button", title: "Flere tall", "aria-label": "Flere tall", text: "+",
           onclick: function () { if (input && input.length < cmax) { input = input.concat([1 + Math.floor(Math.random() * 9)]); regen(); countUpdate(); } } });
         countUpdate = function () {
           var n = input ? input.length : 0;
           cval.textContent = n + " tall";
           bMinus.disabled = n <= cmin; bPlus.disabled = n >= cmax;
         };
-        toolRow.appendChild(el("span", { class: "sp-count" }, [
-          el("span", { class: "lbl", text: "Antall:" }), bMinus, cval, bPlus
-        ]));
+        var countEl = el("span", { class: "sp-count", role: "group", "aria-label": "Antall tall" }, [bMinus, cval, bPlus]);
       }
-      if (toolRow.childNodes.length) wrap.appendChild(toolRow);
     }
 
     var stage = el("div", { class: "sp-stage", tabindex: "0", role: "group", "aria-label": "Visualisering" });
@@ -71,7 +68,9 @@
       html: (window.matchMedia && matchMedia("(hover: none)").matches)
         ? "Trykk «Neste» og «Forrige» for å gå steg for steg."
         : "Hold musa over demoen: <span class=\"kbd\">←</span> <span class=\"kbd\">→</span> for steg · <span class=\"kbd\">mellomrom</span> spill/pause" });
-    wrap.appendChild(el("div", { class: "sp-frame" }, [stage, el("div", { class: "sp-foot" }, [hint, counter])]));
+    var frame = el("div", { class: "sp-frame" + (countEl ? " has-count" : "") }, [stage, el("div", { class: "sp-foot" }, [hint, counter])]);
+    if (countEl) frame.appendChild(countEl);
+    wrap.appendChild(frame);
 
     // Kontroller
     var bPrev = el("button", { class: "btn sm", type: "button", html: "← Forrige", onclick: function () { step(-1); } });

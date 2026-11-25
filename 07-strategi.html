@@ -6,7 +6,7 @@
   <title>Blokk 7 · Strategi · IN2010</title>
   <meta name="description" content="Strategi i IN2010: les kjøretiden ut av løkker og rekursjon, kjenn igjen algoritmestrategiene kurset bruker, forstå P, NP og reduksjoner, og svar slik sensor belønner – med drilloppgaver og eksamensoppgaver.">
   <script>(function(){try{var d=document.documentElement;var t=localStorage.getItem('in-theme')||'light';if(t!=='system')d.setAttribute('data-theme',t);var l=localStorage.getItem('in-level')||'normal';d.setAttribute('data-level',l);}catch(e){document.documentElement.setAttribute('data-theme','light');document.documentElement.setAttribute('data-level','normal');}})();</script>
-  <link rel="stylesheet" href="assets/css/styles.css?v=20261125a">
+  <link rel="stylesheet" href="assets/css/styles.css?v=20261125b">
 </head>
 <body data-page="strategi">
   <a class="skip-link" href="#main">Hopp til innhold</a>
@@ -579,16 +579,19 @@
     <p class="muted small">IN2010 · Blokk 7 · Strategi. Egne forklaringer og demoer basert på pensum. Eksamensoppgavene er gjengitt ordrett fra eksamensarkene (UiO, IN2010), med kildelinje og eventuelle avvik på hvert kort.</p>
   </footer>
 
-  <script src="assets/js/core.js?v=20261125a"></script>
-  <script src="assets/js/symboler.js?v=20261125a"></script>
-  <script src="assets/js/data-tf.js?v=20261125a"></script>
-  <script src="assets/js/pseudocode.js?v=20261125a"></script>
-  <script src="assets/js/stepplayer.js?v=20261125a"></script>
-  <script src="assets/js/viz-bars.js?v=20261125a"></script>
-  <script src="assets/js/viz-graph.js?v=20261125a"></script>
-  <script src="assets/js/data-algos.js?v=20261125a"></script>
-  <script src="assets/js/data-strategi.js?v=20261125a"></script>
-  <script src="assets/js/perfekt/strategi.js?v=20261125a"></script>
+  <script src="assets/js/core.js?v=20261125b"></script>
+  <script src="assets/js/symboler.js?v=20261125b"></script>
+  <script src="assets/js/data-tf.js?v=20261125b"></script>
+  <script src="assets/js/pseudocode.js?v=20261125b"></script>
+  <script src="assets/js/stepplayer.js?v=20261125b"></script>
+  <script src="assets/js/viz-bars.js?v=20261125b"></script>
+  <script src="assets/js/viz-graph.js?v=20261125b"></script>
+  <script src="assets/js/data-algos.js?v=20261125b"></script>
+  <script src="assets/js/data-strategi.js?v=20261125b"></script>
+  <script src="assets/js/viz-hash.js?v=20261125b"></script>
+  <script src="assets/js/data-hashing.js?v=20261125b"></script>
+  <script src="assets/js/perfekt/hashing.js?v=20261125b"></script>
+  <script src="assets/js/perfekt/strategi.js?v=20261125b"></script>
   <script>
   (function () {
     "use strict";
@@ -954,17 +957,10 @@
         return { ref: "Egen påstand i guiden (" + (b != null ? "blokk " + b + ", " : "") + navn.toLowerCase() + "), laget ut fra eksamenene H2020–H2025",
           kort: "egen påstand · " + navn.toLowerCase(), egneOrd: true, eksamen: false };
       }
-      // Visningsrettelse: «del 1» i forklaringene om H2021 og H2022 er oppgavenummeret i eksamenssettet
-      // (rettes i kilden plan/tf-generert senere, se plan/gjennomgang/tema-strategi-mock.md)
-      function rettForklaring(x) {
-        return String(x || "").replace(/\(H2022 del 1\)/g, "(H2022, oppgave 2)")
-          .replace(/H2021 testet definisjonen i del 1/g, "H2021 testet definisjonen i oppgave 6")
-          .replace(/H2021 del 1 testet/g, "H2021 oppgave 6 testet");
-      }
       // Rundgang over blokkene (i tilfeldig rekkefølge), så blandingen dekker alle temaene
       function draw() {
         var pools = shuffle(secs.map(function (k) {
-          return shuffle(GEN[k].map(function (it) { return { s: it.s, answer: !!it.answer, explain: rettForklaring(it.explain), tema: NAVN[k] || k, kilde: kildeFor(k) }; }));
+          return shuffle(GEN[k].map(function (it) { return { s: it.s, answer: !!it.answer, explain: it.explain, tema: NAVN[k] || k, kilde: kildeFor(k) }; }));
         }));
         var out = [], p = 0;
         while (out.length < N && pools.some(function (x) { return x.length; })) {

@@ -64,7 +64,7 @@
     {
       "s": "En O(n log n)-algoritme bruker færre steg enn en O(n²)-algoritme for alle n.",
       "answer": false,
-      "explain": "O-notasjon sier noe om veksten når n blir stor. For små n kan konstantfaktorer gjøre den «dårligere» algoritmen raskere (H2022 del 1).",
+      "explain": "O-notasjon sier noe om veksten når n blir stor. For små n kan konstantfaktorer gjøre den «dårligere» algoritmen raskere (H2022, oppgave 2).",
       "tema": "O-notasjon",
       "kilde": false
     },
@@ -78,7 +78,7 @@
     {
       "s": "Vet vi at en algoritme er i O(n²), kan den ikke samtidig være i O(n).",
       "answer": false,
-      "explain": "O er bare en øvre grense: en lineær algoritme er både i O(n) og i O(n²). Sensor vil derfor ha den laveste grensen du kan begrunne.",
+      "explain": "O er bare en øvre grense: en lineær algoritme er både i O(n) og i O(n²). Oppgi derfor den laveste grensen du kan begrunne – det er den som sier noe.",
       "tema": "O-notasjon",
       "kilde": false
     },
@@ -148,14 +148,14 @@
     {
       "s": "Et avgjørelsesproblem er i NP hvis JA-instanser kan verifiseres i polynomiell tid.",
       "answer": true,
-      "explain": "Det er definisjonen. H2020 ba om en verifikator som sjekker et sertifikat, og H2021 testet definisjonen i del 1.",
+      "explain": "Det er definisjonen. H2020 ba om en verifikator som sjekker et sertifikat, og H2021 testet definisjonen i oppgave 6.",
       "tema": "P/NP",
       "kilde": false
     },
     {
       "s": "Det er bevist at alle problemer i NP er vanskeligere enn problemene i P.",
       "answer": false,
-      "explain": "Alle problemer i P er også i NP, og om P = NP er ikke avgjort. H2021 del 1 testet begge disse punktene.",
+      "explain": "Alle problemer i P er også i NP, og om P = NP er ikke avgjort. H2021 oppgave 6 testet begge disse punktene.",
       "tema": "P/NP",
       "kilde": false
     }
@@ -1268,7 +1268,7 @@
     {
       "s": "En riktig O(n²)-løsning gir full pott selv om oppgaven har en løsning i O(n).",
       "answer": false,
-      "explain": "Riktige, men trege løsninger gir delvis uttelling. Diameter og CheckBST (H2022, H2023) er typiske eksempler.",
+      "explain": "Riktige, men trege løsninger gir som regel bare delvis uttelling. En kvadratisk løsning ga opptil 5 av 8 poeng for diameter (H2023) og opptil 4 av 6 for CheckBST (H2022).",
       "tema": "kjøretid",
       "kilde": false
     },
@@ -1352,7 +1352,7 @@
     {
       "s": "I drøftingsoppgaver gir det uttelling å si når hver strategi er best, ikke bare hvilken som er raskest generelt.",
       "answer": true,
-      "explain": "H2020 lot svaret avhenge av hvor mange oppslag det var. Sensor ville se at du skifter strategi når forholdene endrer seg.",
+      "explain": "I «Subanagram» (H2020) ga det poeng å si at strategi 2 lønner seg når S er liten og ordboka D er stor. H2021 ba også om når hver strategi bør foretrekkes.",
       "tema": "drøfting",
       "kilde": false
     },
@@ -1459,14 +1459,14 @@
     {
       "s": "Binærsøk på en sortert lenket liste er like raskt som binærsøk på et sortert array.",
       "answer": false,
-      "explain": "Hvert «hopp til midten» koster O(n) i en lenket liste, så vi ender på O(n log n), som er verre enn et vanlig rett-frem søk i O(n).",
+      "explain": "Hvert «hopp til midten» koster opptil O(n) i en lenket liste, fordi vi må gå node for node. Binærsøket blir derfor ikke raskere enn et vanlig rett-frem søk i O(n).",
       "tema": "lenket liste",
       "kilde": false
     },
     {
       "s": "Med et hashmap fra nøkkel til node og en dobbeltlenket liste kan «flytt nøkkelen fremst, og kast den eldste når det er fullt» gjøres på forventet O(1).",
       "answer": true,
-      "explain": "Hashmapet finner noden på forventet O(1), og å ta ut og sette inn en node i en dobbeltlenket liste er O(1). Slik er løsningen på «nylige søk» i ukesoppgave 08 (ofte kalt LRU-cache).",
+      "explain": "Hashmapet finner noden på forventet O(1), og å ta ut og sette inn en node i en dobbeltlenket liste er O(1). Slik er løsningen på «nylige søk» i ukesoppgavene om hashing (ofte kalt LRU-cache).",
       "tema": "nylige søk (LRU)",
       "kilde": false
     }
