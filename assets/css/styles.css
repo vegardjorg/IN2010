@@ -2322,3 +2322,7 @@ body[data-page="crash"] .cr-step { scroll-margin-top: 0; }
 .sp-frame.has-count > .sp-stage > .vl { margin-top: .25rem; }
 /* Søk: lange kjøretider («O(n log n) + …») i den kompakte Big-O-ruta brytes i stedet for å gjøre siden bred på 375 px */
 [data-page="sok"] .bigo-compact .bigo-val { white-space: normal; overflow-wrap: anywhere; }
+
+/* ===== Tema grafer (bølge 2) ===== */
+/* Tabeller i «Perfekt svar» for grafer (Dijkstra-runder o.l.) ruller sideveis i stedet for å gjøre siden bred */
+.gr-pf-tab { overflow-x: auto; max-width: 100%; }

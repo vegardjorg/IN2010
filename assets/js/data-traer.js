@@ -20,8 +20,20 @@
       if (window.console && console.warn) console.warn("data-traer.js: «" + key + "» finnes fra før og beholdes.");
       return;
     }
-    obj[key] = val;
+    // Steggeneratorene får varsPrev (forrige stegs vars) satt på hvert steg, til uthevingen i variabellinja
+    obj[key] = obj === IN.gen && typeof val === "function"
+      ? function () { var r = val.apply(this, arguments); return Array.isArray(r) ? linkVars(r) : r; }
+      : val;
   }
+  /* ---------- Variabellinja (varline.js) ----------
+     step.vars = [{ name, value, idx }] med navnene fra pseudokoden, step.frame = prosedyren (toppkallet).
+     Nodepekere vises som Node(7), som «new Node(x)» i pseudokoden; idx = node-id-en (prikken henter farge fra noden).
+     undefined vises som «–» (ikke satt ennå). */
+  function NV(name, nd) { return nd ? { name: name, value: "Node(" + nd.k + ")", idx: nd.id } : { name: name, value: nd === null ? "null" : undefined }; }
+  function VV(name, value) { return { name: name, value: value }; }
+  // varsPrev = forrige stegs vars (uthevingen); __all = hele lista (fast høyde i demoen, se IN.vlReserve i viz-tree.js)
+  function linkVars(steps) { for (var z = 0; z < steps.length; z++) { steps[z].varsPrev = z ? (steps[z - 1].vars || null) : null; steps[z].__all = steps; } return steps; }
+  function findId(v, id) { if (!v || id == null) return null; if (v.id === id) return v; var c = v.ch || [v.l, v.r]; for (var z = 0; z < c.length; z++) { var f = findId(c[z], id); if (f) return f; } return null; }
   function neg(n) { return n < 0 ? "−" + (-n) : String(n); }   // ekte minustegn
   // Tom linje i en pseudokode, slik at linjenumrene blir de samme som på eksamensarket.
   var BLANK = { code: "", indent: 1, eli5: "Tom linje, som på eksamensarket.", normal: "Tom linje (står slik på eksamensarket).", teknisk: "Tom linje. Den er med så linjenumrene blir de samme som på arket." };
@@ -1388,8 +1400,11 @@
       }
       function snap(line, cur, text, tag) {
         var onStack = frames.filter(function (f) { return f.v; }).map(function (f) { return f.v.id; });
-        steps.push({ line: line, tree: cl(root), text: text, tag: tag, info: info(),
-          marks: { cur: cur ? cur.id : null, path: onStack, done: visited.map(function (v) { return v.id; }) } });
+        var st = { line: line, tree: cl(root), text: text, tag: tag, info: info(),
+          marks: { cur: cur ? cur.id : null, path: onStack, done: visited.map(function (v) { return v.id; }) } };
+        // Bare toppkallet: v i rammen øverst på kallstakken
+        if (line != null && frames.length) { st.vars = [NV("v", frames[frames.length - 1].v)]; st.frame = NAME; }
+        steps.push(st);
       }
       function seq() { return visited.map(function (v) { return v.k; }).join(", "); }
       var SIDE = { l: "venstre", r: "høyre" }, FIELD = { l: "v.left", r: "v.right" };
@@ -1463,6 +1478,7 @@
         info: [{ label: "Kø (front → bak)", items: Q.map(function (v) { return v.k; }), kind: "queue" },
                { label: cfg.list ? "L" : "Besøkt", items: visited.map(function (v) { return v.k; }) }],
         marks: { cur: cur ? cur.id : null, queued: Q.map(function (v) { return v.id; }), done: visited.map(function (v) { return v.id; }) } };
+      if (line != null) { s.vars = [NV("v", root), NV("u", u)]; s.frame = cfg.list ? "LevelOrderBST" : "LevelOrder"; }
       if (extra) for (var k in extra) s[k] = extra[k];
       steps.push(s);
     }
@@ -1514,10 +1530,11 @@
   function stackTxt(S) { return S.length ? seqOf(S) + " (" + topOf(S) + " øverst)" : "tom"; }
 
   reg(IN.gen, "iterativePreorder", function (input) {
-    var o = norm(input), root = treeOf(o), steps = [], S = [], vis = [];
+    var o = norm(input), root = treeOf(o), steps = [], S = [], vis = [], u;
     function snap(line, cur, text, tag, out) {
       steps.push({ line: line, tree: cl(root), text: text, tag: tag, visited: vis.map(kOf),
         stacks: [{ label: "Stakk S", items: S.map(kOf), out: out ? out.k : null }],
+        vars: [NV("v", root), NV("u", u)], frame: "IterativePreorder",
         marks: { cur: cur ? cur.id : null, queued: S.map(idOf), done: vis.map(idOf) } });
     }
     snap(2, null, t("Vi lager en tom bunke med huskelapper. Den skal huske hvilke noder som venter.",
@@ -1528,7 +1545,7 @@
         "Push(S, rot). Tilsvarer det første kallet Preorder(" + root.k + ")."), "Push " + root.k);
     }
     while (S.length) {
-      var u = S.pop();
+      u = S.pop();
       snap(5, u, t("Vi tar den øverste lappen: " + u.k + ".", "Pop(S) gir u = " + u.k + ". Stakken er nå " + stackTxt(S) + ".",
         "u ← " + u.k + ", den sist pushede noden. Stakken: " + stackTxt(S) + "."), "Pop " + u.k, u);
       vis.push(u);
@@ -1561,7 +1578,7 @@
     function snap(line, cur, text, tag, out) {
       steps.push({ line: line, tree: cl(root), text: text, tag: tag, visited: vis.map(kOf),
         stacks: [{ label: "Stakk S", items: S.map(kOf), out: out ? out.k : null }],
-        vars: [["v", v ? v.k : "null"]],
+        vars: [NV("v", v)], frame: "IterativeInorder",
         marks: { cur: cur ? cur.id : null, path: v && (!cur || v.id !== cur.id) ? [v.id] : [], queued: S.map(idOf), done: vis.map(idOf) } });
     }
     snap(2, null, t("Vi lager en tom bunke. Vi står på roten" + (root ? ", " + root.k : "") + ".",
@@ -1598,9 +1615,10 @@
   });
 
   reg(IN.gen, "iterativePostorder", function (input) {
-    var o = norm(input), root = treeOf(o), steps = [], S = [], R = [], vis = [];
+    var o = norm(input), root = treeOf(o), steps = [], S = [], R = [], vis = [], uu;
     function snap(line, cur, text, tag, outS, outR) {
       steps.push({ line: line, tree: cl(root), text: text, tag: tag, visited: vis.map(kOf),
+        vars: [NV("v", root), NV("u", uu)], frame: "IterativePostorder",
         stacks: [{ label: "Stakk S", items: S.map(kOf), out: outS ? outS.k : null },
                  { label: "Stakk R", items: R.map(kOf), out: outR ? outR.k : null }],
         marks: { cur: cur ? cur.id : null, queued: S.map(idOf), path: R.map(idOf), done: vis.map(idOf) } });
@@ -1612,7 +1630,7 @@
       snap(4, root, t("Roten " + root.k + " legges i S.", "Push(S, " + root.k + ").", "Push(S, rot)."), "Push " + root.k);
     }
     while (S.length) {
-      var u = S.pop(); R.push(u);
+      var u = S.pop(); R.push(u); uu = u;
       snap(7, u, t("Vi tar " + u.k + " fra S. Vi hilser ikke ennå, men legger den i R.",
         "Pop(S) gir " + u.k + ", og Push(R, " + u.k + ").",
         u.k + " flyttes fra S til R. R er nå " + stackTxt(R) + "."), "Til R: " + u.k, u, null);
@@ -1635,7 +1653,7 @@
         "R bunn → topp = " + seqOf(R) + " (node – høyre – venstre). Tatt av fra toppen blir det postorder."), "Snu med R");
     }
     while (R.length) {
-      var x = R.pop();
+      var x = R.pop(); uu = x;
       snap(11, x, t("Vi tar " + x.k + " fra toppen av R.", "Pop(R) gir u = " + x.k + ".", "u ← Pop(R) = " + x.k + ". R: " + stackTxt(R) + "."), "Pop " + x.k, null, x);
       vis.push(x);
       snap(12, x, t("Nå hilser vi på " + x.k + ".", "Besøk " + x.k + ".", "Visit(" + x.k + "). Postorder så langt: " + seqOf(vis) + "."), "Besøk " + x.k);
@@ -1694,11 +1712,18 @@
 
   /* ---------- BST: innsetting ---------- */
   reg(IN.gen, "bstInsert", function (input) {
-    var o = norm(input), root = o.base ? bstFrom(o.base) : null, steps = [];
-    function snap(line, marks, text, tag) { fixH(root); steps.push({ line: line, tree: cl(root), marks: marks, text: text, tag: tag }); }
+    var o = norm(input), root = o.base ? bstFrom(o.base) : null, steps = [], curX;
+    // Toppkallet Insert(v, x): v er noden steget står på (cur/found/fresh)
+    function snap(line, marks, text, tag) {
+      fixH(root);
+      var st = { line: line, tree: cl(root), marks: marks, text: text, tag: tag };
+      if (line != null) { st.vars = [NV("v", findId(root, marks.cur || marks.found || marks.fresh)), VV("x", curX)]; st.frame = "Insert"; }
+      steps.push(st);
+    }
     snap(null, {}, t("Vi setter inn tallene ett og ett: " + o.keys.join(", ") + ".", "Setter inn " + o.keys.join(", ") + " i denne rekkefølgen.",
       "Innsettingsrekkefølgen bestemmer formen. Sortert input gir en kjede."), "Start");
     o.keys.forEach(function (x) {
+      curX = x;
       var path = [], v = root, par = null, dir = null;
       while (v) {
         path.push(v.id);
@@ -1729,7 +1754,13 @@
   /* ---------- BST: søk ---------- */
   reg(IN.gen, "bstSearch", function (input) {
     var o = norm(input), x = o.x, root = bstFrom(o.keys), steps = [], path = [];
-    function snap(line, marks, text, tag) { marks.path = path.slice(); steps.push({ line: line, tree: cl(root), marks: marks, text: text, tag: tag }); }
+    // Toppkallet Search(v, x): v er noden steget står på (null når søket har gått ut av treet)
+    function snap(line, marks, text, tag) {
+      marks.path = path.slice();
+      var st = { line: line, tree: cl(root), marks: marks, text: text, tag: tag };
+      if (line != null) { st.vars = [NV("v", findId(root, marks.cur || marks.found)), VV("x", x)]; st.frame = "Search"; }
+      steps.push(st);
+    }
     snap(null, {}, t("Vi leter etter " + x + ".", "Search(rot, " + x + ").", "Søk etter x = " + x + ". Hver sammenligning forkaster et helt subtre."), "Start");
     var v = root;
     while (v) {
@@ -1755,17 +1786,26 @@
     var o = norm(input), x0 = o.x, root = bstFrom(o.keys), steps = [], calls = [];
     // calls = nodene som har et Remove-kall i gang (stien fra roten). del = noden som skal fjernes.
     var del = [], keep = null;
+    var RS = []; // rammene til Remove-kallene (bunn → topp): { v, x, u }; variabellinja viser toppen
     function snap(line, marks, text, tag) {
       fixH(root);
       if (!marks.path) marks.path = calls.slice();
       if (!marks.del) marks.del = del.slice();
       if (keep && marks.found === undefined) marks.found = keep;
-      steps.push({ line: line, tree: cl(root), marks: marks, text: text, tag: tag });
+      var st = { line: line, tree: cl(root), marks: marks, text: text, tag: tag }, top = RS[RS.length - 1];
+      if (line != null && top) { st.vars = [NV("v", top.v), VV("x", top.x)]; if (top.two) st.vars.push(NV("u", top.u)); st.frame = "Remove"; } // u finnes bare i to-barn-tilfellet
+      steps.push(st);
     }
     function nk(v) { return v ? String(v.k) : "null"; }
     snap(null, {}, t("Vi skal fjerne " + x0 + ". Først må vi finne det.", "Remove(rot, " + x0 + "): finn noden først.", "Fjern x = " + x0 + ". Søkefasen er som Search: ett kall per nivå."), "Start");
     // Returnerer roten i subtreet etter fjerning. inner = kallet fra linje 13 (fjerner etterfølgerens gamle plass)
     function rem(v, x, inner) {
+      RS.push({ v: v, x: x, u: undefined });
+      var r = rem0(v, x, inner);
+      RS.pop();
+      return r;
+    }
+    function rem0(v, x, inner) {
       if (!v) {
         snap(2, {}, t(x + " finnes ikke, så ingenting fjernes.", "Remove(null, " + x + "): v = null, så " + x + " finnes ikke. return null.", "Basistilfellet: Remove(null, x) = null. Treet er uendret."), "Ikke funnet");
         return null;
@@ -1813,6 +1853,7 @@
         calls.pop(); del = [];
         return v.l;
       }
+      RS[RS.length - 1].two = true;
       snap(10, { cur: v.id }, t(x + " har to barn, så vi kan ikke bare ta den bort. Vi leter etter det minste tallet til høyre.",
         "v.left ≠ null og v.right ≠ null: verken linje 9 eller 10 slår til. To barn.",
         "Tilfelle 2 barn. Ingen av barna kan rykke opp alene, så vi bruker etterfølgeren."), "To barn");
@@ -1822,6 +1863,7 @@
         u = u.l; p2.push(u.id);
         snap(11, { cur: u.id, path: p2.slice() }, t("Det finnes et mindre tall til venstre. Vi går videre til " + u.k + ".", "FindMin: venstre barn finnes, gå til " + u.k + ".", "FindMin går langs venstre kant: " + u.k + "."), "FindMin");
       }
+      RS[RS.length - 1].u = u;
       snap(11, { found: u.id, path: p2.slice() }, t(u.k + " har ingen til venstre. Det er det minste tallet til høyre.", "Etterfølger u = " + u.k + " (har ikke venstre barn).", "u = FindMin(v.right) = " + u.k + ". u.left = null."), "Etterfølger");
       var old = v.k; v.k = u.k; keep = v.id; del = [u.id];
       snap(12, { cur: u.id }, t("Vi skriver " + u.k + " inn der " + old + " stod. Nå står " + u.k + " to steder en liten stund. Den nederste skal bort.",
@@ -1868,10 +1910,12 @@
       if (extra) for (var k in extra) s[k] = extra[k];
       steps.push(s);
     }
-    var rng = "linje " + L5 + "–" + L6, nullL = "linje " + (2 + OFF);
+    var rng = "linje " + L5 + "–" + L6, nullL = "linje " + (2 + OFF), last = null;
     snap(cfg.outer ? 2 : null, {}, t("Vi spør hver node om to ting: hvor høy er du, og hvor lang er den lengste stien hos deg? Svarene står under nodene som (h, d). Vi viser bare øyeblikket der hver node har fått svar fra barna sine.",
       (cfg.outer ? "Diameter(" + (root ? root.k : "null") + ") kaller " + NAME + " på roten. " : "") + "Postorder: hver node får (h, d) fra barna og regner ut sin egen. Merket under noden er (h, d). Forløpet er forkortet: vi viser ett steg per node, når h og d er regnet ut (" + rng + "). Kallene ned og null-kallene (som gir (−1, 0)) er hoppet over.",
       "Input: treet med rot " + (root ? root.k : "null") + ". Én gjennomgang nedenfra og opp. Etiketten under hver node er paret (h, d) som returneres. Forkortet forløp: ett steg per kall, når h og d er klare (" + rng + "), rett før return. Null-kallene returnerer (−1, 0) på " + nullL + " og vises ikke."), "Start");
+    // Ytre Diameter(v) på arket: (h, d) er ikke satt før DiameterPair har returnert
+    if (cfg.outer) { steps[steps.length - 1].vars = [NV("v", root), VV("h", undefined), VV("d", undefined)]; steps[steps.length - 1].frame = "Diameter"; }
     function rec(v) {
       if (!v) return { h: -1, d: 0, deep: [], best: [] };
       stack.push(v);
@@ -1885,11 +1929,13 @@
       lab[v.id] = "(" + h + ", " + d + ")"; done.push(v.id);
       var leaf = !v.l && !v.r;
       var edges = pathEdges(best);
+      last = [NV("v", v), VV("hL", A.h), VV("dL", A.d), VV("hR", B.h), VV("dR", B.d), VV("h", h), VV("d", d)];
       snap(L6, { cur: v.id }, leaf
         ? t(v.k + " har ingen barn. Høyde 0, og ingen sti å gå: (0, 0).", "Løvnode " + v.k + ": begge null-kallene ga (−1, 0), så hL = hR = −1. Da blir h = 0 og d = −1 + (−1) + 2 = 0.", "Løvnode: h = 1 + Max(−1, −1) = 0, hL + hR + 2 = 0.")
         : t("Hos " + v.k + ": venstre side er " + neg(A.h) + " høy, høyre side " + neg(B.h) + ". En sti gjennom " + v.k + " blir " + through + " lang. Den lengste stien så langt er " + d + ".",
             v.k + ": hL = " + neg(A.h) + ", hR = " + neg(B.h) + ". h = " + h + ". Gjennom " + v.k + ": " + par(A.h) + " + " + par(B.h) + " + 2 = " + through + ". d = Max(" + through + ", " + A.d + ", " + B.d + ") = " + d + (src === "gjennom" ? " (gjennom " + v.k + ")." : " (ligger i " + src + " subtre)."),
-            "h = 1 + Max(" + neg(A.h) + ", " + neg(B.h) + ") = " + h + ", d = Max(" + through + ", " + A.d + ", " + B.d + ") = " + d + "."), "(" + h + ", " + d + ")", edges);
+            "h = 1 + Max(" + neg(A.h) + ", " + neg(B.h) + ") = " + h + ", d = Max(" + through + ", " + A.d + ", " + B.d + ") = " + d + "."), "(" + h + ", " + d + ")", edges,
+        { vars: last, frame: NAME });
       stack.pop();
       return { h: h, d: d, deep: deep, best: best };
     }
@@ -1897,7 +1943,8 @@
     var viaRoot = root && R.best.indexOf(root.id) >= 0;
     snap(cfg.outer ? 3 : 7, { found: root ? root.id : null }, t("Ferdig! Den lengste stien er " + R.d + " kanter lang (markert)." + (viaRoot ? "" : " Legg merke til at den ikke går gjennom roten!"),
       "Diameter = " + R.d + ". Stien er markert." + (viaRoot ? " Her går den gjennom roten." : " Den går ikke gjennom roten (jf. H2023 b)."),
-      NAME + "(rot) = (" + R.h + ", " + R.d + ")" + (cfg.outer ? ", og Diameter returnerer d = " + R.d : "") + ". Lineær tid: hver node ga ett kall." + (viaRoot ? "" : " Den lengste stien ligger helt i et subtre.")), "Diameter " + R.d, pathEdges(R.best), { svar: String(R.d) });
+      NAME + "(rot) = (" + R.h + ", " + R.d + ")" + (cfg.outer ? ", og Diameter returnerer d = " + R.d : "") + ". Lineær tid: hver node ga ett kall." + (viaRoot ? "" : " Den lengste stien ligger helt i et subtre.")), "Diameter " + R.d, pathEdges(R.best),
+      { svar: String(R.d), vars: cfg.outer ? [NV("v", root), VV("h", R.h), VV("d", R.d)] : (last || [NV("v", null)]), frame: cfg.outer ? "Diameter" : NAME });
     return steps;
     };
   }
@@ -1925,6 +1972,8 @@
         var s = { line: line, tree: root, marks: marks, lab: lab, text: text, tag: tag,
           info: [{ label: "Kallstakk", kind: "frames", items: frames.map(function (f, i) {
             return { name: f.name, note: f.note || (i < frames.length - 1 ? "venter på svar" : ""), ret: !!f.ret }; }) }] };
+        // Toppkallet LCA(u, v): u og v før de løftes, med dybdene
+        if (line != null) { s.vars = [NV("u", u), NV("v", v), VV("u.depth", depth[u.id]), VV("v.depth", depth[v.id])]; s.frame = NAME; }
         if (extra) for (var k in extra) s[k] = extra[k];
         steps.push(s);
       }
@@ -1970,6 +2019,7 @@
         var s = { line: line, tree: cl(root), marks: marks, text: text, tag: tag,
           info: [{ label: "Kallstakk", kind: "frames", items: frames.map(function (f, i) {
             return { name: f.name, note: f.note || (i < frames.length - 1 ? "venter på svar" : ""), ret: !!f.ret }; }) }] };
+        if (line != null) { s.vars = [NV("v", v), VV("x", x), VV("y", y)]; s.frame = NAME; }
         if (extra) for (var k in extra) s[k] = extra[k];
         steps.push(s);
       }
@@ -2010,6 +2060,13 @@
       marks.warn = warn;
       var s = { line: line, tree: cl(root), marks: marks, lab: L.lab, sup: L.sup, text: text, tag: tag, counter: "Rotasjoner: " + rots,
         info: [{ label: "Kallstakk", kind: "frames", items: frames.map(function (f) { return { name: f.name, note: f.note, ret: !!f.ret }; }) }] };
+      // Toppkallet Insert(v, x). v.height og BalanceFactor(v) vises etter SetHeight(v) (linje 8, og linje 9 før rotasjonen).
+      var top = frames[frames.length - 1];
+      if (line != null && top) {
+        s.vars = [NV("v", top.v), VV("x", top.x)];
+        if (top.hset && !marks.rot) s.vars.push(VV("v.height", top.v.h), VV("BalanceFactor(v)", bf(top.v)));
+        s.frame = "Insert";
+      }
       if (extra) for (var k in extra) s[k] = extra[k];
       steps.push(s);
     }
@@ -2052,14 +2109,14 @@
       return v;
     }
     function ins(v, x, attach, path) {
-      var fr = { name: "Insert(" + (v ? v.k : "null") + ", " + x + ")", note: "", ret: false };
+      var fr = { name: "Insert(" + (v ? v.k : "null") + ", " + x + ")", note: "", ret: false, v: v, x: x };
       frames.push(fr);
       try { return ins0(v, x, attach, path, fr); } finally { frames.pop(); }
     }
     function ins0(v, x, attach, path, fr) {
       if (!v) {
         fr.note = "ny node ↩"; fr.ret = true;
-        var nn = mk(x); attach(nn);
+        var nn = mk(x); attach(nn); fr.v = nn;
         path.forEach(function (id) { pending[id] = 1; });
         var up = path.length > 0;
         snap(3, { fresh: nn.id, path: path.slice() }, t("Tom plass: " + x + " blir en ny node her." + (up ? " Høydene over den er ikke oppdatert ennå (b=?). Det gjør vi på vei opp igjen." : ""),
@@ -2082,7 +2139,7 @@
         return v;
       }
       path.pop();
-      var oldH = v.h; setH(v); delete pending[v.id];
+      var oldH = v.h; setH(v); delete pending[v.id]; fr.hset = true;
       var b = bf(v);
       fr.note = "Balance(" + v.k + ")";
       if (Math.abs(b) <= 1) {
@@ -2121,6 +2178,8 @@
     function snap(line, marks, text, tag, extra) {
       fixH(root);
       var s = { line: line, tree: cl(root), marks: marks, text: text, tag: tag, counter: "Rotasjoner: " + rots, info: info() };
+      var top = frames[frames.length - 1];
+      if (line != null && top) { s.vars = [NV("v", top.v), VV("x", top.x)]; s.frame = "InsertAntiAVL"; }
       if (extra) for (var k in extra) s[k] = extra[k];
       steps.push(s);
     }
@@ -2129,10 +2188,10 @@
       "InsertAntiAVL av " + o.keys.join(", ") + " i et tomt tre. Høyrerotasjon hver gang en node på veien har venstre barn. Kallstakken viser kallene som er i gang.",
       "Input: tallene " + o.keys.join(", ") + ", satt inn ett om gangen fra et tomt tre. Regel: etter rekursjonen, hvis v.left ≠ null, returner RightRotate(v)."), "Start");
     function ins(v, x, attach, path, par) {
-      var fr = { name: call(v, x), note: "", ret: false };
+      var fr = { name: call(v, x), note: "", ret: false, v: v, x: x };
       frames.push(fr);
       if (!v) {
-        var nn = mk(x); attach(nn);
+        var nn = mk(x); attach(nn); fr.v = nn;
         fr.note = "ny node ↩"; fr.ret = true;
         snap(3, { fresh: nn.id, path: path.slice() }, t("Her er det tomt, så " + x + " blir en ny node.",
           "v = null: ny løvnode " + x + ". Kallet returnerer den nye noden" + (par ? " til " + par.k + "." : ", og den blir roten."),
@@ -2198,6 +2257,9 @@
                  return { name: call(f.v), note: !f.v ? "v = null → return ↩" : (f.ret ? "ferdig ↩" : (!top ? "venter på " + f.wait : f.note || "")), ret: !f.v || !!f.ret };
                }) },
                { label: "Utskrift", items: printed.map(function (v) { return v.k; }) }] };
+      // Toppkallet InRange(v, a, b): navnene a og b som i pseudokoden
+      var top = frames[frames.length - 1];
+      if (line != null && top) { s.vars = [NV("v", top.v), VV("a", a), VV("b", b)]; s.frame = "InRange"; }
       if (extra) for (var k in extra) s[k] = extra[k];
       steps.push(s);
     }
@@ -2277,6 +2339,12 @@
           var top = i === frames.length - 1;
           return { name: f.name, note: f.ret ? "returnerer " + f.res + " ↩" : (!top ? "venter" : f.note || ""), ret: !!f.ret };
         }) }] };
+      // Toppkallet: CheckBST(v) eller CheckBSTHelper(v, low, high)
+      var tf = frames[frames.length - 1];
+      if (line != null && tf) {
+        if (tf === outer) { s.vars = [NV("v", root)]; s.frame = "CheckBST"; }
+        else { s.vars = [NV("v", tf.v), VV("low", num(tf.lo)), VV("high", num(tf.hi))]; s.frame = "CheckBSTHelper"; }
+      }
       if (extra) for (var k in extra) s[k] = extra[k];
       steps.push(s);
     }
@@ -2294,7 +2362,7 @@
         "Null-barn: CheckBSTHelper(null, …) returnerer true (linje 5)."), "null → true");
     }
     function rec(v, lo, hi) {
-      var fr = { v: v, name: call(v, lo, hi), note: "", ret: false, res: null };
+      var fr = { v: v, lo: lo, hi: hi, name: call(v, lo, hi), note: "", ret: false, res: null };
       frames.push(fr);
       lab[v.id] = "(" + num(lo) + ", " + num(hi) + ")";
       function ret(r) { fr.ret = true; fr.res = r; }
@@ -2361,10 +2429,14 @@
       list.forEach(function (r) { (function w(v) { if (!v) return; if (v.sym !== undefined) L[v.id] = String(v.f); w(v.l); w(v.r); })(r); });
       return L;
     }
+    // Huffman-noder som i pseudokoden: new Node(s, f) for symboler, new Node(null, f) for interne noder
+    function HV(nm, v) { return v ? { name: nm, value: "Node(" + (v.sym !== undefined ? v.sym : "null") + ", " + v.f + ")", idx: v.id } : { name: nm, value: undefined }; }
+    var v1, v2, nv;
     function snap(line, forest, marks, text, tag, info, svar) {
       var s = { line: line, forest: forest.map(cl), marks: marks, lab: labs(forest), text: text, tag: tag, bits: true,
         info: info || [{ label: "Kø (minst først)", items: Q.map(item), kind: "queue" }] };
       if (svar != null) s.svar = svar;
+      if (line != null) { s.vars = [HV("v1", v1), HV("v2", v2), HV("v", nv)]; s.frame = "Huffman"; }
       steps.push(s);
     }
     pairs.forEach(function (p) { Q.push({ id: "L" + p[0], k: p[0], sym: p[0], f: p[1], l: null, r: null, h: 0, seq: seq++ }); });
@@ -2377,15 +2449,15 @@
     var round = 0;
     while (Q.length > 1) {
       round++;
-      var v1 = Q.shift();
+      v1 = Q.shift();
       snap(6, [v1].concat(Q), { cur: v1.id }, t("Vi tar ut den minste: " + name(v1) + " (" + v1.f + ").",
         "v1 ← RemoveMin(Q) = " + item(v1) + ".",
         "RemoveMin gir minste frekvens, " + v1.f + "." + (Q.length && Q[0].f === v1.f ? " " + name(Q[0]) + " har samme frekvens, men kom senere inn i køen." : "")), "v1 = " + name(v1));
-      var v2 = Q.shift();
+      v2 = Q.shift();
       snap(7, [v1, v2].concat(Q), { cur: v1.id, alt: v2.id }, t("Så tar vi ut den nest minste: " + name(v2) + " (" + v2.f + ").",
         "v2 ← RemoveMin(Q) = " + item(v2) + ".",
         "Ny RemoveMin: v2 har frekvens " + v2.f + ". De to minste skal slås sammen. Det er det grådige valget."), "v2 = " + name(v2));
-      var nv = { id: "N" + (cnt++), k: v1.f + v2.f, f: v1.f + v2.f, l: v1, r: v2, h: 0, seq: seq++ };
+      nv = { id: "N" + (cnt++), k: v1.f + v2.f, f: v1.f + v2.f, l: v1, r: v2, h: 0, seq: seq++ };
       snap(10, [nv].concat(Q), { fresh: nv.id }, t("Vi lager en ny node over dem med summen " + v1.f + " + " + v2.f + " = " + nv.f + ". " + name(v1) + " henger til venstre (0) og " + name(v2) + " til høyre (1).",
         "Linje 8–10: ny intern node " + name(nv) + " med frekvens " + v1.f + " + " + v2.f + " = " + nv.f + ". v1 til venstre (bit 0), v2 til høyre (bit 1).",
         "new Node(null, " + nv.f + ") med v.left = v1 og v.right = v2. Den er ikke i køen ennå."), "Ny node " + nv.f);

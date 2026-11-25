@@ -51,6 +51,197 @@
     return c;
   }
 
+  /* Prikkfargen til en variabel som peker på plass i: samme tilstand som cella/noden er tegnet med
+     (samme rekkefølge som CSS-reglene for .hv-cell: flyttes > byttes > minste > sammenlignes > følges > ferdig).
+     Utenfor arrayet (f.eks. left ≥ n): ingen prikk. */
+  function dotOf(marks, size, n, i) {
+    if (typeof i !== "number" || i < 0 || i >= n) return null;
+    if (inArr(marks.moved, i)) return "moved";
+    if (inArr(marks.swap, i)) return "swap";
+    if (marks.min === i) return "min";
+    if (inArr(marks.compare, i) || inArr(marks.rel, i)) return "compare";
+    if (marks.active === i || marks.target === i || marks.sel === i) return "target";
+    if (i >= size || inArr(marks.sorted, i)) return "sorted";
+    return "default";
+  }
+
+  /* Løkkespenn under arrayraden (samme klasser og utseende som viz-bars.js: .vr / .vr-br / .vr-lbl).
+     ranges: [{ name, from, to, dashed?, call? }], grensene inklusive. Plassen måles fra cellene. */
+  function rangeBox(step, names, marks, size, n, arrEl) {
+    var vr = document.createElement("div");
+    vr.className = "vr hv-vr";
+    vr.setAttribute("aria-hidden", "true");
+    vr.__arr = arrEl; vr.__items = [];
+    // Én fast rad per løkkevariabel i hele demoen; er løkka ikke aktiv i dette steget, står raden tom
+    names.forEach(function (nm) {
+      var r = null;
+      (step.ranges || []).forEach(function (x) { if (x.name === nm) r = x; });
+      if (!r || !step.vars) {
+        var empty = document.createElement("div"); empty.className = "vr-row is-empty";
+        vr.appendChild(empty);
+        return;
+      }
+      var row = document.createElement("div"); row.className = "vr-row";
+      var br = document.createElement("span"); br.className = "vr-br" + (r.dashed ? " is-dashed" : "") + (r.call ? " is-call" : "");
+      var lbl = document.createElement("span"); lbl.className = "vr-lbl";
+      var v = null;
+      (step.vars || []).forEach(function (x) { if (x && x.name === r.name) v = x; });
+      var cls = v && v.idx != null ? dotOf(marks, size, n, v.idx) : null;
+      if (cls) { var d = document.createElement("i"); d.className = "vl-dot is-" + cls; lbl.appendChild(d); }
+      lbl.appendChild(document.createTextNode(r.label || r.name));
+      br.appendChild(lbl); row.appendChild(br); vr.appendChild(row);
+      vr.__items.push({ r: r, el: br });
+    });
+    return vr;
+  }
+  function layoutRanges(vr) {
+    var base = vr.getBoundingClientRect();
+    if (!base.width) return;
+    var cells = vr.__arr ? vr.__arr.children : [];
+    vr.__items.forEach(function (it) {
+      var a = cells[it.r.from], b = cells[it.r.to];
+      if (!a || !b || it.r.from > it.r.to) { it.el.style.display = "none"; return; }
+      var ra = a.getBoundingClientRect(), rb = b.getBoundingClientRect();
+      var left = ra.left - base.left, width = Math.max(0, rb.right - ra.left);
+      it.el.style.display = "";
+      it.el.style.left = left + "px";
+      it.el.style.width = width + "px";
+      var lbl = it.el.firstChild;
+      lbl.classList.remove("is-right", "is-left");
+      if (lbl.offsetWidth + 14 > width) lbl.classList.add(left + width + lbl.offsetWidth + 6 <= base.width ? "is-right" : "is-left");
+    });
+  }
+  /* Arrayraden i stegdemoene står på én linje, så spennene kan dekke cellene fra kant til kant.
+     Får ikke cellene standardbredden, krymper de (til minst 16 px); først da scroller scenen. */
+  function fitCells(arr) {
+    arr.classList.remove("is-fit", "is-small");
+    arr.style.removeProperty("--hcw");
+    var cells = arr.children, n = cells.length;
+    if (!n) return;
+    var avail = arr.clientWidth;
+    if (!(avail > 0)) return;
+    var total = 0;
+    for (var z = 0; z < n; z++) total += cells[z].offsetWidth;
+    total += (n - 1) * 3;
+    if (total <= avail) return;
+    var w = Math.max(16, Math.floor((avail - (n - 1) * 2) / n));
+    arr.style.setProperty("--hcw", w + "px");
+    arr.classList.add("is-fit");
+    if (w < 30) arr.classList.add("is-small");
+  }
+  function hvRefit(stage) {
+    IN.qsa(".hv-arr.hv-fitme", stage).forEach(fitCells);
+    IN.qsa(".hv-vr", stage).forEach(layoutRanges);
+  }
+  var HV_RO = typeof ResizeObserver === "function" ? new ResizeObserver(function (es) {
+    es.forEach(function (e) {
+      var st = e.target;
+      if (!st.isConnected) { HV_RO.unobserve(st); return; }
+      var w = st.clientWidth;
+      if (w === st.__hvW) return;
+      st.__hvW = w;
+      hvRefit(st);
+    });
+  }) : null;
+  // Spennene skjules når variabellinja slås av; når de vises igjen, endres størrelsen og de legges ut på nytt
+  var VR_RO = typeof ResizeObserver === "function" ? new ResizeObserver(function (es) {
+    es.forEach(function (e) { if (!e.target.isConnected) VR_RO.unobserve(e.target); else layoutRanges(e.target); });
+  }) : null;
+  function watchStage(stage) {
+    if (VR_RO) IN.qsa(".hv-vr", stage).forEach(function (vr) { VR_RO.observe(vr); });
+    stage.__hvW = stage.clientWidth;
+    if (stage.__hvObs) return;
+    stage.__hvObs = true;
+    if (HV_RO) HV_RO.observe(stage);
+    else window.addEventListener("resize", function () { hvRefit(stage); });
+  }
+
+  /* ---------- Fast høyde i stegdemoene (felles for viz-tree.js og data-heap.js; den som lastes først, definerer) ----------
+     Demoen skal ikke hoppe opp og ned når man blar. Generatorene setter step.__all = hele steglista (linkVars).
+     IN.vlReserve(stage, step, draw): første gang en ny steglista vises (og når bredden eller variabel-bryteren endres),
+     tegnes alle stegene én gang i scenen og den største høyden settes som min-height. Så tegnes det aktuelle steget igjen.
+     IN.vlPaint(stage, step, dot): variabellinja. Steg uten vars i en demo som ellers har dem, får en tom linje
+     med samme høyde (variablene fra nærmeste steg med vars, usynlige), så innholdet under ikke flytter seg. */
+  if (!IN.vlReserve) (function () {
+    var stages = [];
+    function measure(stage) {
+      var cur = stage.__resCur;
+      if (!cur || !cur.s || !cur.s.__all || !stage.isConnected) return;
+      var all = cur.s.__all, pos0 = stage.__tvPos, max = 0;
+      stage.__resBusy = true;
+      try {
+        stage.style.minHeight = "";
+        for (var z = 0; z < all.length; z++) {
+          stage.__tvPos = null;
+          cur.draw(all[z]);
+          if (stage.__tvRaf) { cancelAnimationFrame(stage.__tvRaf); stage.__tvRaf = 0; }
+          max = Math.max(max, stage.offsetHeight);
+        }
+      } finally {
+        stage.__tvPos = pos0;
+        stage.__resBusy = false;
+      }
+      stage.__resAll = all;
+      stage.__resW = stage.clientWidth;
+      stage.__resOn = IN.varLine ? IN.varLine.isOn() : true;
+      if (max > 0) stage.style.minHeight = max + "px";
+      cur.draw(cur.s);
+    }
+    var RO = typeof ResizeObserver === "function" ? new ResizeObserver(function (es) {
+      es.forEach(function (e) {
+        var st = e.target;
+        if (!st.isConnected) { RO.unobserve(st); return; }
+        if (st.__resBusy || st.clientWidth === st.__resW) return;
+        measure(st);
+      });
+    }) : null;
+    // Variabel-bryteren endrer høyden på linja (og skjuler spennene): mål på nytt i alle åpne demoer
+    function remeasureAll() {
+      stages = stages.filter(function (st) { return st.isConnected; });
+      var on = IN.varLine ? IN.varLine.isOn() : true;
+      stages.forEach(function (st) { if (st.__resOn !== on) measure(st); });
+    }
+    document.addEventListener("click", function (e) {
+      if (e.target && e.target.closest && e.target.closest(".vl-tog")) setTimeout(remeasureAll, 0);
+    });
+    window.addEventListener("storage", function (e) { if (e.key === "in2010:vis-variabler") setTimeout(remeasureAll, 0); });
+    if (!RO) window.addEventListener("resize", function () {
+      stages.forEach(function (st) { if (st.isConnected && st.clientWidth !== st.__resW) measure(st); });
+    });
+    IN.vlReserve = function (stage, s, draw) {
+      if (stage.__resBusy || !s || !s.__all) return;
+      stage.__resCur = { s: s, draw: draw };
+      if (stages.indexOf(stage) < 0) { stages.push(stage); if (RO) RO.observe(stage); }
+      var on = IN.varLine ? IN.varLine.isOn() : true;
+      if (stage.__resAll === s.__all && stage.__resW === stage.clientWidth && stage.__resOn === on) return;
+      measure(stage);
+    };
+    function refStep(s) {
+      var all = s.__all;
+      if (!all) return null;
+      var i = all.indexOf(s), z;
+      if (i < 0) i = 0;
+      for (z = i; z < all.length; z++) if (all[z].vars) return all[z];
+      for (z = i - 1; z >= 0; z--) if (all[z].vars) return all[z];
+      return null;
+    }
+    IN.vlPaint = function (stage, s, dot) {
+      if (!IN.varLine) return null;
+      var src = s.vars ? s : refStep(s);
+      if (!src) { IN.varLine.detach(stage); return null; }
+      var vl = IN.varLine.attach(stage);
+      vl.update(src.vars, s.vars ? s.varsPrev : null, { frame: src.frame, dot: s.vars ? dot : null });
+      vl.el.classList.toggle("is-ghost", !s.vars);
+      return vl;
+    };
+    /* Navnene på alle løkkespenn i demoen, i rekkefølge: én fast rad per løkkevariabel */
+    IN.vlRangeNames = function (s) {
+      var names = [];
+      (s.__all || [s]).forEach(function (st) { (st.ranges || []).forEach(function (r) { if (names.indexOf(r.name) < 0) names.push(r.name); }); });
+      return names;
+    };
+  })();
+
   IN.vizHeap = function (stage, step, opts) {
     opts = opts || {};
     var A = step.array || [];
@@ -88,7 +279,8 @@
         '<text class="hv-val" x="' + p.x + '" y="' + (p.y + 5) + '" text-anchor="middle">' + esc(A[k]) + "</text>" +
         (opts.noIdx ? "" : '<text class="hv-idx" x="' + (p.x + R + 3) + '" y="' + (p.y - R + 4) + '">' + k + "</text>") + "</g>";
     }
-    if (!size) svg += '<text class="hv-empty" x="' + (W / 2) + '" y="' + (PAD + 6) + '" text-anchor="middle">(tom heap)</text>';
+    // Tom heap: står den stiplede ringen (neste ledige plass) i roten, kommer teksten under ringen
+    if (!size) svg += '<text class="hv-empty" x="' + (W / 2) + '" y="' + (marks.ghost ? PAD + R + 16 : PAD + 6) + '" text-anchor="middle">(tom heap)</text>';
     svg += "</svg>";
 
     // Array-rad
@@ -101,8 +293,12 @@
     if (marks.ghost) cells += '<div class="hv-cell hv-ghostcell"><span class="v">&nbsp;</span><span class="ix">' + A.length + "</span></div>";
     if (!A.length && !marks.ghost) cells = '<span class="muted small">(tomt array)</span>';
 
-    var vars = step.vars || marks.vars, varsHtml = "";
-    if (vars && vars.length) varsHtml = '<div class="hv-vars" aria-label="Variabler">' + vars.map(function (p) {
+    // Variabellinja (varline.js): step.vars = [{ name, value, idx }], idx = plassen i A prikken henter farge fra.
+    // marks.vars er bare sjekk-piller (vilkår som «A[p] > A[i]?» og kall), som tegnes under treet som før.
+    // Steg uten vars i en demo med variabellinje får en tom linje med samme høyde (IN.vlPaint).
+    var vl = IN.vlPaint(stage, step, function (v) { return dotOf(marks, size, A.length, v.idx); });
+    var pills = marks.vars, varsHtml = "";
+    if (pills && pills.length) varsHtml = '<div class="hv-vars" aria-label="Sjekk">' + pills.map(function (p) {
       return '<span class="hv-var"><span class="lbl">' + esc(p[0]) + '</span><span class="val">' + esc(p[1]) + "</span></span>"; }).join("") + "</div>";
     var html = '<div class="hv">' + (opts.label ? '<div class="hv-lbl small">' + opts.label + "</div>" : "") + svg + varsHtml +
       (opts.hideArray ? "" : '<div class="hv-arr-wrap"><div class="hv-arr-lbl muted small">' + esc(opts.arrName || "Array A") +
@@ -113,7 +309,20 @@
         (step.out.length ? step.out.map(function (v) { return '<b class="hv-outv">' + esc(v) + "</b>"; }).join(" ") : '<span class="muted">ingen ennå</span>') + "</div>";
     }
     html += "</div>";
-    stage.innerHTML = html;   // all verdi-tekst er escapet (esc) over
+    // all verdi-tekst er escapet (esc) over
+    if (vl) { IN.varLine.clearStage(stage); stage.insertAdjacentHTML("beforeend", html); }
+    else stage.innerHTML = html;
+    if (vl && !opts.hideArray) {
+      var arrEl = stage.querySelector(".hv-arr");
+      if (arrEl) {
+        arrEl.classList.add("hv-fitme");
+        var names = IN.vlRangeNames(step);
+        if (names.length) arrEl.parentNode.appendChild(rangeBox(step, names, marks, size, A.length, arrEl));
+        hvRefit(stage);
+        watchStage(stage);
+      }
+    }
+    IN.vlReserve(stage, step, function (st) { IN.vizHeap(stage, st, opts); });
 
     if (opts.onNode) {
       IN.qsa("[data-i]", stage).forEach(function (n) {
@@ -145,6 +354,19 @@
       clear: clearAll
     };
   };
+
+  /* ===================== Variabellinja: hjelpere =====================
+     V(navn, verdi) – variabel uten prikk; I(navn, i) – indeksvariabel (prikk fra plass i).
+     verdi undefined vises som «–» (ikke satt ennå / for-variabel utenfor løkka). */
+  function V(name, value) { return { name: name, value: value }; }
+  function I(name, i) { var o = { name: name, value: i }; if (typeof i === "number") o.idx = i; return o; }
+  function F(name, from, to) { return { name: name, from: from, to: to }; }
+  // Etter generering: varsPrev = variablene i steget før (uthever endringer). Hvert kall på RemoveMin/
+  // HeapInsert er en ny ramme, så endringer måles bare mot steg i samme prosedyre.
+  // Nodepeker som i pseudokoden: Node(7), null, eller «–» før den er satt. idx = node-id-en (prikken henter farge fra noden).
+  function NV(name, nd) { return nd ? { name: name, value: "Node(" + nd.k + ")", idx: nd.id } : { name: name, value: nd === null ? "null" : undefined }; }
+  // varsPrev = forrige stegs vars (uthevingen); __all = hele lista (fast høyde, se IN.vlReserve)
+  function linkVars(steps) { for (var z = 0; z < steps.length; z++) { steps[z].varsPrev = z ? (steps[z - 1].vars || null) : null; steps[z].__all = steps; } return steps; }
 
   /* ===================== Hjelpere ===================== */
   function isMinHeap(A) { for (var i = 1; i < A.length; i++) if (A[parent(i)] > A[i]) return false; return true; }
@@ -604,11 +826,15 @@
   function genInsert(vals, start, opts) {
     opts = opts || {};
     var A = start ? clone(start) : [], steps = [];
-    function snap(line, marks, text, tag, edge, vars) {
+    // pills: sjekk-piller (vilkår); vars: variabellinja i HeapInsert(A, x)
+    function snap(line, marks, text, tag, edge, pills, vars) {
       marks = marks || {};
-      if (vars) marks.vars = vars;
-      steps.push({ line: line, array: clone(A), size: A.length, marks: marks, edge: edge || null, text: text, tag: tag });
+      if (pills) marks.vars = pills;
+      var s = { line: line, array: clone(A), size: A.length, marks: marks, edge: edge || null, text: text, tag: tag };
+      if (vars) { s.vars = vars; s.frame = "HeapInsert"; }
+      steps.push(s);
     }
+    var PAR = "⌊(i−1)/2⌋";
     if (!opts.quiet) {
       snap(null, { ghost: true },
         A.length
@@ -627,10 +853,10 @@
         t(x + " legges på første ledige plass nederst i treet (plass " + n + "). Da er treet fortsatt fylt opp fra venstre.",
           "A[" + n + "] ← " + x + ": legg " + x + " bakerst.",
           "Vi plasserer " + x + " på indeks n = " + n + ". Treet er fortsatt komplett, men heap-egenskapen kan være brutt mellom " + x + " og forelderen."),
-        "Sett inn " + x, null, [["x", x], ["n", n]]);
+        "Sett inn " + x, null, null, [V("x", x), V("n", n), I("i", undefined)]);
       var i = n;
       snap(3, { target: i },
-        t("Vi følger " + x + " med «i» = " + i + ".", "i ← " + i + ".", "i ← " + i + ": boble opp starter i den nye løvnoden."), null, null, [["x", x], ["i", i]]);
+        t("Vi følger " + x + " med «i» = " + i + ".", "i ← " + i + ".", "i ← " + i + ": boble opp starter i den nye løvnoden."), null, null, null, [V("x", x), V("n", n), I("i", i)]);
       while (true) {
         if (i === 0) {
           snap(4, { target: 0 },
@@ -641,7 +867,7 @@
               : t(x + " har klatret helt til toppen. Nå er det det minste tallet i hele heapen.",
               "i = 0: roten er nådd, løkka stopper.",
               "i = 0, så løkkevilkåret er usant. " + x + " er nytt minimum i roten."), n === 0 ? "Første element" : "Roten nådd", null,
-            [["x", x], ["i", 0], ["i > 0?", "nei"]]);
+            [["i > 0?", "nei"]], [V("x", x), V("n", n), I("i", 0)]);
           break;
         }
         var p = parent(i);
@@ -650,22 +876,22 @@
             t("Forelderen " + A[p] + " er større enn " + A[i] + ". Det minste skal stå øverst, så de må bytte.",
               "Forelder A[" + p + "] = " + A[p] + " > A[" + i + "] = " + A[i] + ": heap-egenskapen er brutt.",
               "Forelderen til " + i + " er ⌊(" + i + " − 1)/2⌋ = " + p + ". Siden " + A[p] + " > " + A[i] + " holder løkkevilkåret, og vi må boble opp."),
-            "Sammenlign", [p, i], [["x", x], ["i", i], ["forelder", p], ["A[" + p + "] > A[" + i + "]?", A[p] + " > " + A[i] + ": ja"]]);
+            "Sammenlign", [p, i], [["A[" + p + "] > A[" + i + "]?", A[p] + " > " + A[i] + ": ja"]], [V("x", x), V("n", n), I("i", i), I(PAR, p)]);
           var tmp = A[p]; A[p] = A[i]; A[i] = tmp;
           snap(5, { swap: [p, i] },
             t(A[p] + " og " + A[i] + " bytter plass. Det lille tallet flytter én etasje opp.",
               "Bytt A[" + i + "] og A[" + p + "].",
               "Etter byttet holder heap-egenskapen mellom " + p + " og barna. En eventuell feil finnes nå bare mellom " + p + " og forelderen dens."),
-            "Bytt", [p, i], [["x", x], ["i", i], ["forelder", p]]);
+            "Bytt", [p, i], null, [V("x", x), V("n", n), I("i", i), I(PAR, p)]);
           i = p;
           snap(6, { target: i },
-            t("Vi følger " + A[i] + " opp til plass " + i + " og sjekker igjen.", "i ← " + i + ".", "i ← ⌊(i − 1)/2⌋ = " + i + "."), null, null, [["x", x], ["i", i]]);
+            t("Vi følger " + A[i] + " opp til plass " + i + " og sjekker igjen.", "i ← " + i + ".", "i ← ⌊(i − 1)/2⌋ = " + i + "."), null, null, null, [V("x", x), V("n", n), I("i", i)]);
         } else {
           snap(4, { compare: [p, i] },
             t("Forelderen " + A[p] + " er ikke større enn " + A[i] + ". Da står " + A[i] + " riktig, og vi er ferdige med dette tallet.",
               "A[" + p + "] = " + A[p] + " ≤ " + A[i] + ": heap-egenskapen holder, stopp.",
               "Vilkåret A[" + p + "] > A[" + i + "] er usant, så " + A[i] + " står riktig og løkka avslutter."),
-            "Stopp", [p, i], [["x", x], ["i", i], ["forelder", p], ["A[" + p + "] > A[" + i + "]?", A[p] + " > " + A[i] + ": nei"]]);
+            "Stopp", [p, i], [["A[" + p + "] > A[" + i + "]?", A[p] + " > " + A[i] + ": nei"]], [V("x", x), V("n", n), I("i", i), I(PAR, p)]);
           break;
         }
       }
@@ -681,7 +907,7 @@
                 "Ferdig. Sluttilstand: " + A.join(", ") + " (n = " + A.length + "). Hver innsetting kostet O(log n), så " + vals.length + " innsettinger koster O(n log n) til sammen."),
         tag: "Ferdig" });
     }
-    return steps;
+    return linkVars(steps);
   }
   def(IN.gen, "heapInsert", function (vals) { return genInsert(vals, null); });
   IN.gen.heapInsertInto = IN.gen.heapInsertInto || genInsert;
@@ -695,10 +921,15 @@
     var wasHeap = isMinHeap(A);
     if (!wasHeap) buildMin(A);
     var reps = Math.min(count == null ? 3 : count, A.length);
-    function snap(line, marks, size, text, tag, edge, vars) {
+    // pills: bare vilkårene («…?») blir sjekk-piller; variabellinja leser x, n, i, j direkte fra løkka
+    var x, n, i, j;
+    function snap(line, marks, size, text, tag, edge, pills) {
       marks = marks || {};
-      if (vars) marks.vars = vars;
-      steps.push({ line: line, array: clone(A), size: size, marks: marks, edge: edge || null, out: clone(out), outLabel: "Tatt ut (i rekkefølge)", text: text, tag: tag });
+      var ck = (pills || []).filter(function (q) { return /\?$/.test(q[0]); });
+      if (ck.length) marks.vars = ck;
+      var st = { line: line, array: clone(A), size: size, marks: marks, edge: edge || null, out: clone(out), outLabel: "Tatt ut (i rekkefølge)", text: text, tag: tag };
+      if (line != null) { st.vars = [V("x", x), V("n", n), I("i", i), I("j", j)]; st.frame = "RemoveMin"; }
+      steps.push(st);
     }
     function ganger(k) { return k + (k === 1 ? " gang" : " ganger"); }
     if (!opts.quiet) {
@@ -713,7 +944,8 @@
         "Start");
     }
     for (var r = 0; r < reps; r++) {
-      var n = A.length, x = A[0], m = n - 1, X = ["x (tas ut)", x];
+      n = A.length; x = A[0]; i = undefined; j = undefined;
+      var m = n - 1, X = ["x (tas ut)", x];
       snap(2, { min: 0 }, n,
         t("Det minste tallet, " + x + ", ligger alltid på toppen. Vi tar vare på det.", "x ← A[0] = " + x + ".", "Minimum ligger i roten: x ← A[0] = " + x + ". Her er n = " + n + "."), "Minste = " + x, null, [X]);
       A[0] = A[n - 1];
@@ -725,14 +957,16 @@
           : t("Det var bare ett tall, så toppen er også det siste. Nå er heapen tom.", "n = 1: heapen blir tom.", "n = 1: n − 1 = 0, heapen er tom etterpå."),
         n > 1 ? "Siste kopieres til roten" : "Siste til roten", null, [X]);
       A.pop();
-      var i = 0, stopped = false;
+      i = 0;
+      var stopped = false;
       if (m > 0) snap(4, { target: 0 }, m,
         t("Nå følger vi " + A[0] + " fra toppen. (Den gamle bakerste plassen er fjernet fra tegningen.)", "i ← 0. Grensen i løkka er n − 1 = " + m + ".", "Boble ned starter i roten. Heapen har n − 1 = " + m + " elementer, og det er grensen løkka bruker."), null, null, [X, ["i", 0]]);
       while (2 * i + 1 < m) {
-        var j = 2 * i + 1;
+        var j1 = 2 * i + 1;
         snap(5, { target: i }, m,
-          t(A[i] + " har barn under seg, så vi må sjekke om det står riktig.", "2i + 1 = " + j + " < n − 1 = " + m + ": i har minst ett barn.", "Venstre barn 2·" + i + " + 1 = " + j + " ligger innenfor heapen (< n − 1 = " + m + "), så " + i + " er ikke en løvnode."), null, null,
-          [X, ["i", i], ["2i + 1 < n − 1?", j + " < " + m + ": ja"]]);
+          t(A[i] + " har barn under seg, så vi må sjekke om det står riktig.", "2i + 1 = " + j1 + " < n − 1 = " + m + ": i har minst ett barn.", "Venstre barn 2·" + i + " + 1 = " + j1 + " ligger innenfor heapen (< n − 1 = " + m + "), så " + i + " er ikke en løvnode."), null, null,
+          [X, ["i", i], ["2i + 1 < n − 1?", j1 + " < " + m + ": ja"]]);
+        j = j1;
         snap(6, { target: i, compare: [j] }, m, t("Vi ser først på barnet til venstre: " + A[j] + ".", "j ← " + j + " (venstre barn).", "j ← 2i + 1 = " + j + "."), null, null, [X, ["i", i], ["j", j]]);
         if (j + 1 < m) {
           var right = A[j + 1] < A[j];
@@ -786,7 +1020,7 @@
             "Tatt ut: " + out[0] + ". Heap igjen: " + list(A) + ".",
             "RemoveMin ga " + out[0] + ", og heapen " + list(A) + " er gyldig igjen. O(log n)."),
       tag: "Ferdig" });
-    return steps;
+    return linkVars(steps);
   }
   def(IN.gen, "removeMin", function (arr) { return genRemoveMin(arr, 3); });
   // Parsons: «x ← A[0]» må stå først (før roten overskrives). «A[0] ← A[n − 1]» og «i ← 0» er uavhengige og kan byttes.
@@ -800,8 +1034,12 @@
     var word = isMax ? "største" : "minste", bigW = isMax ? "størst" : "minst", key = isMax ? "largest" : "smallest";
     var code = function (l) { return (caller ? caller * 1000 : 0) + base + l; };
     var i = i0;
-    function V(s, l, r, extra) { var v = [["i", i], [key, s], ["left", l], ["right", r]]; if (extra) v.push(extra); return v; }
-    function M(m, vars) { m.vars = vars; return m; }
+    var frame = isMax ? "BubbleDown" : "BubbleDownMin";
+    // Variabellinja for toppkallet BubbleDown(Min)(A, i, n): legges på marks.__vars, snap flytter dem over på steget.
+    // Sjekk-pillene (vilkårene) står i marks.vars som før.
+    function V(s, l, r, extra) { return { vl: [I("i", i), I(key, s), I("left", l), I("right", r), V2("n", n)], ck: extra ? [extra] : null }; }
+    function M(m, v) { m.__vars = v.vl; m.__frame = frame; if (v.ck) m.vars = v.ck; return m; }
+    function V2(a, b) { return { name: a, value: b }; }
     while (true) {
       var s = i, l = 2 * i + 1, r = 2 * i + 2;
       snap(code(2), M({ target: i }, V(s, l, r)),
@@ -832,7 +1070,7 @@
       if (counter) counter.swaps++;
       snap(code(10), M({ swap: [i, s] }, V(s, l, r)),
         t(A[s] + " og " + A[i] + " bytter plass." + (counter ? " (Bytter så langt: " + counter.swaps + ".)" : ""), "Bytt A[" + i + "] og A[" + s + "].", "Bytt: " + A[i] + " opp, " + A[s] + " ned ett nivå." + (counter ? " Bytter totalt: " + counter.swaps + "." : "")), "Bytt", [i, s]);
-      snap(code(11), M({ target: s }, [["kall", (isMax ? "BubbleDown" : "BubbleDownMin") + "(A, " + s + ", " + n + ")"]]), t("Vi fortsetter der " + A[s] + " havnet.", "Rekursivt kall fra " + s + ".", "Rekursjon: " + (isMax ? "BubbleDown" : "BubbleDownMin") + "(A, " + s + ", " + n + ")."), null);
+      snap(code(11), M({ target: s }, { vl: V(s, l, r).vl, ck: [["kall", frame + "(A, " + s + ", " + n + ")"]] }), t("Vi fortsetter der " + A[s] + " havnet.", "Rekursivt kall fra " + s + ".", "Rekursjon: " + (isMax ? "BubbleDown" : "BubbleDownMin") + "(A, " + s + ", " + n + ")."), null);
       i = s;
     }
   }
@@ -842,17 +1080,24 @@
   function genBuildMin(arr) {
     var A = clone(arr), n = A.length, steps = [], counter = { swaps: 0 }, done = [];
     for (var z = Math.floor(n / 2); z < n; z++) done.push(z);
+    var H = Math.floor(n / 2), i0;
     function snap(line, marks, text, tag, edge) {
       marks = marks || {};
       marks.sorted = clone(done);
-      steps.push({ line: line, array: clone(A), size: n, marks: marks, edge: edge || null, text: text, tag: tag });
+      var st = { line: line, array: clone(A), size: n, marks: marks, edge: edge || null, text: text, tag: tag };
+      if (marks.__vars) { st.vars = marks.__vars; st.frame = marks.__frame; delete marks.__vars; delete marks.__frame; }
+      else if (line != null) {
+        st.vars = [I("i", i0 >= 0 ? i0 : undefined), V("n", n)]; st.frame = "BuildMinHeap"; // «–» utenfor for-løkka
+        if (i0 >= 0 && i0 <= H) st.ranges = [F("i", 0, H)];
+      }
+      steps.push(st);
     }
     snap(null, {},
       t("Her er tallene, lagt inn i treet akkurat slik de står i arrayet. Det er ikke en heap ennå. De grønne bakerst har ingen barn, så de er allerede i orden.",
         "Arrayet " + list(A) + " sett som et komplett tre. Løvnodene (grønne, indeks " + Math.floor(n / 2) + "–" + (n - 1) + ") er allerede heaper.",
         "Utgangspunkt: et vilkårlig array. Hver løvnode (indeks ≥ ⌊n/2⌋ = " + Math.floor(n / 2) + ") er alene en heap. Vi jobber nedenfra og opp, så begge subtrærne er ferdige heaper når vi kommer til en node."),
       "Start");
-    for (var i0 = Math.floor(n / 2); i0 >= 0; i0--) {
+    for (i0 = H; i0 >= 0; i0--) {
       var leaf = 2 * i0 + 1 >= n;
       snap(2, { target: i0 },
         leaf
@@ -870,7 +1115,7 @@
       snap(3, {},
         t("Nå er hele grenen under plass " + i0 + " i orden (grønn).", "Subtreet med rot " + i0 + " er en heap.", "Invariant: alle subtrær med rot ≥ " + i0 + " er heaper."), null);
     }
-    snap(2, { vars: [["i", -1], ["i ≥ 0?", "nei"]] },
+    snap(2, { vars: [["i ≥ 0?", "−1 ≥ 0: nei"]] },
       t("Vi har vært innom alle plassene fra " + Math.floor(n / 2) + " og ned til 0. Da er løkka ferdig.",
         "i = −1: for-løkka (ned til 0) er ferdig.",
         "Etter i = 0 blir i = −1, og løkka stopper. Invarianten gjelder nå for roten, så hele arrayet er en heap."), "Løkka stopper");
@@ -879,7 +1124,7 @@
               "Heap: " + list(A) + ". Totalt " + counter.swaps + " bytter (n = " + n + ").",
               "Ferdig: " + list(A) + ". " + counter.swaps + " bytter for n = " + n + ". Antall bytter er alltid under n, og det er derfor BuildMinHeap er O(n)."),
       tag: "Ferdig" });
-    return steps;
+    return linkVars(steps);
   }
   def(IN.gen, "buildMinHeap", genBuildMin);
 
@@ -888,14 +1133,25 @@
      BuildMaxHeap: 2 for · 3 BubbleDown(A, i, n) */
   function genHeapSort(arr) {
     var A = clone(arr), n = A.length, steps = [], size = n;
+    var H = Math.floor(n / 2), i0, i, inLoop = false;
     function snap(line, marks, text, tag, edge) {
-      steps.push({ line: line, array: clone(A), size: size, marks: marks || {}, edge: edge || null, text: text, tag: tag });
+      marks = marks || {};
+      var st = { line: line, array: clone(A), size: size, marks: marks, edge: edge || null, text: text, tag: tag };
+      if (marks.__vars) { st.vars = marks.__vars; st.frame = marks.__frame; delete marks.__vars; delete marks.__frame; }
+      else if (line === 2102) {
+        st.vars = [I("i", i0), V("n", n)]; st.frame = "BuildMaxHeap";
+        st.ranges = [F("i", 0, H)];
+      } else if (line != null) {
+        st.vars = [I("i", inLoop ? i : undefined), V("n", n)]; st.frame = "HeapSort"; // «–» utenfor for-løkka
+        if (inLoop && line >= 3 && line <= 5) st.ranges = [F("i", 0, n - 1)];
+      }
+      steps.push(st);
     }
     snap(null, {}, t("Vi skal sortere " + list(A) + ". Først lager vi en max-heap, der det STØRSTE tallet ligger øverst.",
       "Input " + list(A) + ". Fase 1: BuildMaxHeap. Fase 2: flytt maks bakerst, n ganger.",
       "Heapsort fra forelesningen: in-place med en max-heap. Treet viser heapdelen A[0..i − 1]; den sorterte halen står bare i arrayet."), "Start");
     snap(2, {}, t("Fase 1: gjør arrayet om til en max-heap.", "BuildMaxHeap(A, " + n + ").", "BuildMaxHeap(A, n) på O(n)."), "Bygg");
-    for (var i0 = Math.floor(n / 2); i0 >= 0; i0--) {
+    for (i0 = H; i0 >= 0; i0--) {
       if (2 * i0 + 1 >= n) {
         snap(2102, { target: i0 }, t("Plass " + i0 + " har ingen barn – ingenting å gjøre.", "i = " + i0 + ": løvnode.", "i = ⌊n/2⌋ = " + i0 + " er en løvnode; kallet er tomt."), null);
         continue;
@@ -904,7 +1160,8 @@
       bubbleSteps(A, i0, n, true, 200, 103, snap, null);
     }
     snap(2, {}, t("Max-heapen er klar. Det største tallet, " + A[0] + ", ligger øverst.", "Max-heap: " + list(A) + ".", "A er en max-heap: " + list(A) + "."), "Max-heap");
-    for (var i = n - 1; i >= 0; i--) {
+    inLoop = true;
+    for (i = n - 1; i >= 0; i--) {
       snap(3, { target: i }, t("Neste plass bakfra som skal fylles: " + i + ".", "i = " + i + ".", "i = " + i + ": heapen er A[0.." + i + "], halen A[" + (i + 1) + "..] er sortert."), null);
       var tmp = A[0]; A[0] = A[i]; A[i] = tmp;
       size = i;
@@ -919,19 +1176,25 @@
         bubbleSteps(A, 0, i, true, 200, 5, snap, null);
       }
     }
+    inLoop = false;
     snap(6, {}, t("Ferdig! Arrayet er sortert: " + list(A) + ".", "Sortert: " + list(A) + ".", "return A = " + list(A) + ". O(n) + n · O(log n) = O(n log n)."), "Ferdig");
-    return steps;
+    return linkVars(steps);
   }
   def(IN.gen, "heapSort", genHeapSort);
 
   /* --- LevelOrderHeap: 2 L ← tom · 3 for · 4 append · 5 return --- */
   function genLevelOrder(arr, asShape) {
-    var A = clone(arr), n = A.length, steps = [], L = [];
+    var A = clone(arr), n = A.length, steps = [], L = [], i, inLoop = false;
     var wasHeap = isMinHeap(A);
     if (!wasHeap && !asShape) buildMin(A);
     function snap(line, marks, text, tag) {
       marks = marks || {}; marks.levels = true;
-      steps.push({ line: line, array: clone(A), size: n, marks: marks, out: clone(L), outLabel: "L (level-order)", text: text, tag: tag });
+      var st = { line: line, array: clone(A), size: n, marks: marks, out: clone(L), outLabel: "L (level-order)", text: text, tag: tag };
+      if (line != null) {
+        st.vars = [I("i", inLoop ? i : undefined), V("n", n)]; st.frame = "LevelOrderHeap";
+        if (inLoop) st.ranges = [F("i", 0, n - 1)];
+      }
+      steps.push(st);
     }
     // asShape: arrayet tolkes bare som et komplett tre (eksamensfiguren i H2025 er ikke en heap)
     if (asShape) snap(null, {},
@@ -944,15 +1207,17 @@
       : t("Hvert nivå i treet har sin egen farge. Vi lager en tom liste L." + (wasHeap ? "" : " (Tallene var ikke en heap, så vi laget en heap av dem først.)"),
         "Nivåene er fargelagt. L ← empty list." + (wasHeap ? "" : " (Input gjort om til heap først.)"),
         "Fargene viser dybden: roten har dybde 0, barna dybde 1, og så videre. Vi starter med tom L."), asShape ? null : "Start");
-    for (var i = 0; i < n; i++) {
+    inLoop = true;
+    for (i = 0; i < n; i++) {
       var d = Math.floor(Math.log2(i + 1));
       snap(3, { target: i }, t("Neste plass i arrayet er " + i + ".", "i = " + i + " (dybde " + d + ").", "i = " + i + " ligger på dybde ⌊log(" + (i + 1) + ")⌋ = " + d + "."), null);
       L.push(A[i]);
       snap(4, { target: i }, t("Vi legger " + A[i] + " bakerst i lista.", "L får " + A[i] + ".", "append A[" + i + "] = " + A[i] + "."), "Dybde " + d);
     }
+    inLoop = false;
     snap(5, {}, t("Ferdig! Lista er nøyaktig lik arrayet. Arrayet var i level-order hele tiden.", "L = A: arrayet er allerede i level-order.", "L = " + list(L) + " = A. Heapen fylles nivå for nivå fra venstre, så indeksrekkefølgen er level-order. O(n)."), "Ferdig");
     steps[steps.length - 1].svar = L.join(", ");
-    return steps;
+    return linkVars(steps);
   }
   def(IN.gen, "levelOrderHeap", function (arr) { return genLevelOrder(arr, false); });
   def(IN.gen, "levelOrderArray", function (arr) { return genLevelOrder(arr, true); });
@@ -964,8 +1229,20 @@
   function genMedian(vals, removes) {
     var S = [], L = [], out = [], steps = [];
     removes = Math.min(removes == null ? 3 : removes, vals.length);
+    var curX; // x i toppkallet (MedianInsert eller RemoveMedian)
     function snap(line, mk, text, tag) {
-      steps.push({ line: line, small: clone(S), large: clone(L), mk: mk || {}, out: clone(out), text: text, tag: tag });
+      var st = { line: line, small: clone(S), large: clone(L), mk: mk || {}, out: clone(out), text: text, tag: tag };
+      if (line != null) {
+        var l0 = line % 1000, sz = [V("|Q.small|", S.length), V("|Q.large|", L.length)];
+        if (l0 >= 100 && l0 < 200) { st.frame = "Balance"; st.vars = sz; }
+        else {
+          st.frame = l0 >= 200 ? "RemoveMedian" : "MedianInsert";
+          var xv = V("x", curX);
+          if (l0 === 3 || l0 === 4) xv.cls = "target";
+          st.vars = [xv].concat(sz);
+        }
+      }
+      steps.push(st);
     }
     function sorted() { return S.concat(L).sort(function (a, b) { return a - b; }); }
     snap(null, {}, t("To tomme bunker: den nedre (største øverst) og den øvre (minste øverst). Vi setter inn " + vals.join(", ") + ", og tar så ut medianen " + removes + " ganger.",
@@ -992,6 +1269,7 @@
       }
     }
     vals.forEach(function (x) {
+      curX = x;
       var toSmall = !S.length || x < S[0];
       snap(2, { s: S.length ? [0] : [] }, t(S.length ? "Skal " + x + " i den nedre bunken? Vi sammenligner med toppen der, " + S[0] + "." : "Den nedre bunken er tom, så " + x + " går dit.",
         S.length ? x + " < Peek(Q.small) = " + S[0] + "? " + (toSmall ? "Ja." : "Nei.") : "Q.small er tom.",
@@ -1004,19 +1282,26 @@
     });
     for (var r = 0; r < removes; r++) {
       var m = maxPop(S);
+      curX = m;
       out.push(m);
       snap(202, { s: S.length ? [0] : [] }, t("Vi tar ut toppen av den nedre bunken: " + m + ". Det er medianen.", "x ← RemoveMax(Q.small) = " + m + ".", "Medianen er roten i Q.small: " + m + "."), "Median ut: " + m);
       balance(203);
       snap(204, {}, t("Medianen " + m + " er gitt fra oss. Hittil: " + out.join(", ") + ".", "return " + m + ". Hittil: " + out.join(", ") + ".", "return " + m + "; sekvens så langt: " + out.join(", ") + "."), null);
     }
     snap(null, {}, t("Ferdig! Medianene kom ut i denne rekkefølgen: " + out.join(", ") + ".", "removeMedian ga: " + out.join(", ") + ".", "Svar: " + out.join(", ") + ". Både insert og removeMedian er O(log n)."), "Ferdig");
-    return steps;
+    return linkVars(steps);
   }
   def(IN.gen, "medianQueue", function (vals) { return genMedian(vals, 3); });
 
+  /* Variabellinja for scener uten array-celler (median, bøttekø): prikkfargen står i v.cls. */
+  function vlStage(stage, step) {
+    if (IN.vlPaint(stage, step, null)) IN.varLine.clearStage(stage);
+    else IN.clear(stage);
+  }
+
   /* IN.vizMedian(stage, step) – to «tårn»: Q.small (max-heap) og Q.large (heap) */
   IN.vizMedian = function (stage, step) {
-    IN.clear(stage);
+    vlStage(stage, step);
     var row = IN.el("div", { class: "hv-median" });
     var a = IN.el("div", { class: "hv-tower" }), b = IN.el("div", { class: "hv-tower" });
     row.appendChild(a); row.appendChild(b);
@@ -1035,6 +1320,7 @@
     var wrap = IN.el("div", { class: "hv" });
     wrap.appendChild(row); if (chk) wrap.appendChild(chk); wrap.appendChild(info);
     stage.appendChild(wrap);
+    IN.vlReserve(stage, step, function (st) { IN.vizMedian(stage, st); });
   };
 
   IN.heapGen = { insert: genInsert, removeMin: genRemoveMin, buildMin: genBuildMin, heapSort: genHeapSort, median: genMedian };
@@ -1107,8 +1393,26 @@
     var N = BQ_N, Q = [], out = [], steps = [], k;
     for (k = 0; k < N; k++) Q.push([]);
     var list0 = ops.map(bqOp).filter(Boolean);
+    var bqB;
+    // Variabellinja: Insert(Q, x, p) viser x, p, B; RemoveMin(Q) viser i, B, N. mk.vars er bare sjekk-piller.
     function snap(line, mk, text, tag) {
-      steps.push({ line: line, Q: Q.map(clone), N: N, mk: mk || {}, out: clone(out), text: text, tag: tag });
+      mk = mk || {};
+      var st = { line: line, Q: Q.map(clone), N: N, mk: mk, out: clone(out), text: text, tag: tag };
+      var pv = mk.vars || [], g = function (nm) { for (var z = 0; z < pv.length; z++) if (pv[z][0] === nm) return pv[z][1]; };
+      if (line != null) {
+        if (line < 100) {
+          st.frame = "Insert";
+          st.vars = [V("x", g("x")), { name: "p", value: g("p"), cls: "compare" }, V("B", "Q[" + g("p") + "]")];
+        } else {
+          st.frame = "RemoveMin";
+          var iv = g("i");
+          if (line === 102 && iv === 0) bqB = undefined; // nytt kall: B er ikke satt ennå
+          if (line === 103) bqB = "Q[" + iv + "]";      // B beholder forrige bøtte til linje 3 setter den på nytt
+          st.vars = [{ name: "i", value: iv, cls: "compare" }, V("B", bqB), V("N", N)];
+        }
+        mk.vars = pv.filter(function (q) { return /\?$/.test(q[0]) || q[0] === "returnerer"; });
+      }
+      steps.push(st);
     }
     snap(null, {}, t("Bøttekøen har N = " + N + " skuffer, Q[0] til Q[" + (N - 1) + "], én for hver prioritet. Alle er tomme. Nå gjør vi disse operasjonene: " + list0.map(opName).join(", ") + ".",
       "Q er et array med N = " + N + " tomme bøtter. Operasjoner: " + list0.map(opName).join(", ") + ".",
@@ -1148,12 +1452,12 @@
       "Ferdig. RemoveMin ga: " + (out.join(", ") || "ingen") + ".",
       "Ferdig. RemoveMin ga " + (out.join(", ") || "ingen") + ". Insert var O(1) hver gang, og hver RemoveMin sjekket høyst N = " + N + " bøtter, så O(N), og O(1) når N er en konstant."), "Ferdig");
     steps[steps.length - 1].svar = out.join(", ");
-    return steps;
+    return linkVars(steps);
   }
   IN.gen.bucketQueueOps = genBucketQueue;
 
   IN.vizBucketQueue = function (stage, s) {
-    IN.clear(stage);
+    vlStage(stage, s);
     var el = IN.el, mk = s.mk || {};
     var wrap = el("div", { class: "bk" });
     var pills = [];
@@ -1179,6 +1483,7 @@
     wrap.appendChild(el("div", { class: "hv-out small", html: '<span class="muted">RemoveMin ga:</span> ' +
       (s.out.length ? s.out.map(function (v) { return '<b class="hv-outv">' + esc(v) + "</b>"; }).join(" ") : '<span class="muted">ingenting ennå</span>') }));
     stage.appendChild(wrap);
+    IN.vlReserve(stage, s, function (st) { IN.vizBucketQueue(stage, st); });
   };
   if (IN.registerEngine) IN.registerEngine("bucketq", {
     viz: "vizBucketQueue", file: "assets/js/data-heap.js", host: "et-bars-host", scheme: "group", parseInput: parseBQ,
@@ -1263,11 +1568,13 @@
   });
 
   def(IN.gen, "levelOrderBSTExam", function (keys) {
-    var b = bstFrom(keys, "v"), root = b.root, L = [], Q = [], done = [], steps = [];
+    var b = bstFrom(keys, "v"), root = b.root, L = [], Q = [], done = [], steps = [], u;
     function snap(line, cur, text, tag) {
-      steps.push({ line: line, tree: treeClone(root), text: text, tag: tag,
+      var st = { line: line, tree: treeClone(root), text: text, tag: tag,
         info: [{ label: "Q (front → bak)", items: byKeys(Q), kind: "queue" }, { label: "L", items: clone(L) }],
-        marks: { cur: cur ? cur.id : null, queued: byIds(Q), done: clone(done) } });
+        marks: { cur: cur ? cur.id : null, queued: byIds(Q), done: clone(done) } };
+      if (line != null) { st.vars = [NV("v", root), NV("u", u)]; st.frame = "LevelOrderBST"; }
+      steps.push(st);
     }
     snap(null, null, root
       ? t("Her er søketreet v. Vi lagde det ved å sette inn " + b.keys.join(", ") + " i den rekkefølgen. Nå skal vi lese det nivå for nivå.",
@@ -1285,7 +1592,7 @@
       snap(5, null, go ? t("Det står noen i køen, så vi fortsetter.", "Q er ikke tom.", "Q har " + Q.length + " node" + (Q.length > 1 ? "r" : "") + ": løkka fortsetter.")
         : t("Køen er tom. Da har vi vært innom alle nodene.", "Q er tom: løkka stopper.", "Q er tom, så alle n nodene er besøkt."), go ? null : "Kø tom");
       if (!go) break;
-      var u = Q.shift();
+      u = Q.shift();
       snap(6, u, t(u.k + " står først i køen og får komme fram.", "u ← Dequeue(Q) = " + u.k + ".", "u ← " + u.k + " fra fronten av køen."), "Ta ut " + u.k);
       L.push(u.k); done.push(u.id);
       snap(7, u, t("Vi skriver " + u.k + " bakerst i lista.", "append " + u.k + " to L.", "L = [" + L.join(", ") + "]."), null);
@@ -1298,7 +1605,7 @@
       "return L = " + L.join(", ") + ".",
       "return L = [" + L.join(", ") + "]. Hver node gikk inn og ut av køen én gang: O(n)."), "Ferdig");
     steps[steps.length - 1].svar = L.join(", ");
-    return steps;
+    return linkVars(steps);
   });
 
   /* ConstructBST (ordrett fra eksamensarket H2025 5 (d)), med våre forklaringer */
@@ -1336,7 +1643,7 @@
   });
 
   def(IN.gen, "constructBSTExam", function (keys) {
-    var V = bstFrom(keys, "v").root, B = null, nodes = null, done = [], steps = [];
+    var V = bstFrom(keys, "v").root, B = null, nodes = null, done = [], steps = [], cu;
     var order = bfsNodes(V);
     function snap(line, mk, text, tag, extra) {
       mk = mk || {};
@@ -1347,6 +1654,8 @@
         info: [{ label: "nodes", items: nodes ? clone(nodes) : [] }, { label: "satt inn i B", items: clone(done) }],
         marks: { cur: mk.cur || null, done: done.map(function (k) { return "v" + k; }), fresh: mk.fresh || null, path: mk.path || [] } };
       if (extra) for (var e in extra) s[e] = extra[e];
+      // u er et element (for u in nodes), ikke en node; prikken hentes fra noden i v
+      if (line != null) { s.vars = [NV("v", V), cu ? { name: "u", value: cu.k, idx: cu.id } : { name: "u", value: undefined }]; s.frame = "ConstructBST"; }
       steps.push(s);
     }
     snap(null, {}, t("Til venstre er input-treet v. Vi skal bygge et nytt søketre B ved å sette inn tallene fra v i level-order.",
@@ -1358,6 +1667,7 @@
       "nodes = " + nodes.join(", ") + " (LevelOrderBST fra (b)).",
       "nodes = [" + nodes.join(", ") + "]. I level-order kommer hver node etter forelderen sin, så alle forfedrene til u er allerede i B når u settes inn."), null);
     order.forEach(function (u) {
+      cu = u;
       snap(4, { cur: u.id }, t("Neste tall er " + u.k + ".", "u = " + u.k + ".", "u = " + u.k + "."), null);
       var o = bstAdd(B, u.k, "b");
       B = o.root;
@@ -1372,12 +1682,13 @@
         "Sett inn " + u.k);
     });
     var same = treeSer(B) === treeSer(V);
+    cu = undefined; // for-løkkevariabelen er utenfor løkka
     snap(6, {}, same
       ? t("Ferdig! B er helt likt v: samme form og samme tall på samme plass.",
           "return B. B og v er like trær.",
           "return B. B = v: hver node fikk samme forelder og samme side som i v. Grunnen er at forfedrene alltid settes inn før etterkommerne i level-order.")
       : t("Ferdig. B ble ikke likt v.", "return B. B og v er ulike.", "return B. B ≠ v."), "Ferdig", { svar: same ? "like trær" : "ulike trær" });
-    return steps;
+    return linkVars(steps);
   });
 
 })();

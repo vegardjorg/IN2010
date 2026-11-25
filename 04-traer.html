@@ -5,8 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Blokk 4 · Trær · IN2010</title>
   <meta name="description" content="Trær i IN2010: begreper, traverseringer, binære søketrær, diameter, laveste felles forfeder, AVL og rotasjoner, Anti-AVL og Huffman – med stegvise demoer, pseudokode og eksamensoppgaver.">
-  <script>(function(){try{var d=document.documentElement;var t=localStorage.getItem('in-theme')||'light';if(t!=='system')d.setAttribute('data-theme',t);var l=localStorage.getItem('in-level')||'normal';d.setAttribute('data-level',l);}catch(e){document.documentElement.setAttribute('data-theme','light');document.documentElement.setAttribute('data-level','normal');}})();</script>
-  <link rel="stylesheet" href="assets/css/styles.css?v=20261125a">
+  <script>(function(){try{var d=document.documentElement;var t=localStorage.getItem('in-theme');if(t!=='dark'&&t!=='system')t='light';if(t!=='system')d.setAttribute('data-theme',t);var l=localStorage.getItem('in-level');if(l!=='eli5'&&l!=='teknisk')l='normal';d.setAttribute('data-level',l);}catch(e){document.documentElement.setAttribute('data-theme','light');document.documentElement.setAttribute('data-level','normal');}})();</script>
+  <link rel="stylesheet" href="assets/css/styles.css?v=20261125e">
   <style>
     /* Sidelokalt: stakk-kolonner ved siden av treet (fanen «Uten rekursjon»). Bare designtokens fra styles.css. */
     .itv { display: flex; flex-direction: column; gap: .55rem; min-width: 0; }
@@ -683,16 +683,17 @@
     <p class="muted small">IN2010 · Blokk 4 · Trær. Egne forklaringer og demoer basert på pensum. Eksamensoppgavene er gjengitt ordrett fra eksamensarkene (UiO, IN2010), med kildelinje og eventuelle avvik på hvert kort.</p>
   </footer>
 
-  <script src="assets/js/core.js?v=20261125a"></script>
-  <script src="assets/js/symboler.js?v=20261125a"></script>
-  <script src="assets/js/data-tf.js?v=20261125a"></script>
-  <script src="assets/js/pseudocode.js?v=20261125a"></script>
-  <script src="assets/js/stepplayer.js?v=20261125a"></script>
-  <script src="assets/js/viz-bars.js?v=20261125a"></script>
-  <script src="assets/js/viz-tree.js?v=20261125a"></script>
-  <script src="assets/js/data-algos.js?v=20261125a"></script>
-  <script src="assets/js/data-traer.js?v=20261125a"></script>
-  <script src="assets/js/perfekt/traer.js?v=20261125a"></script>
+  <script src="assets/js/core.js?v=20261125e"></script>
+  <script src="assets/js/varline.js?v=20261125e"></script>
+  <script src="assets/js/symboler.js?v=20261125e"></script>
+  <script src="assets/js/data-tf.js?v=20261125e"></script>
+  <script src="assets/js/pseudocode.js?v=20261125e"></script>
+  <script src="assets/js/stepplayer.js?v=20261125e"></script>
+  <script src="assets/js/viz-bars.js?v=20261125e"></script>
+  <script src="assets/js/viz-tree.js?v=20261125e"></script>
+  <script src="assets/js/data-algos.js?v=20261125e"></script>
+  <script src="assets/js/data-traer.js?v=20261125e"></script>
+  <script src="assets/js/perfekt/traer.js?v=20261125e"></script>
   <script>
   (function () {
     "use strict";
@@ -887,15 +888,15 @@
       var treeHost = el("div", { class: "itv-tree" }), side = el("div", { class: "itv-side" });
       (s.stacks || []).forEach(function (c) { side.appendChild(stackCol(c)); });
       row.appendChild(treeHost); row.appendChild(side); wrap.appendChild(row);
-      if (s.vars && s.vars.length) {
-        var pl = el("div", { class: "pills", style: "justify-content:center" });
-        s.vars.forEach(function (v) { pl.appendChild(el("span", { class: "pill", html: '<span class="k">' + esc(v[0]) + "</span> " + esc(v[1]) })); });
-        wrap.appendChild(pl);
-      }
       wrap.appendChild(el("div", { class: "itv-cap", text: "Toppen av stakken står øverst (gul kant). ↑ viser elementet som nettopp ble tatt av." }));
       wrap.appendChild(infoRow({ label: "Besøkt", items: s.visited || [] }));
-      IN.clear(stage); stage.appendChild(wrap);
+      // Variabellinja (varline.js) øverst i scenen; prikkene henter farge fra nodene i treet
+      // Steg uten vars får en tom linje med samme høyde, og scenen får fast høyde (IN.vlPaint / IN.vlReserve i viz-tree.js)
+      if (IN.vlPaint && IN.vlPaint(stage, s, function (v) { return vizTree.dot({ tree: s.tree, marks: s.marks }, v.idx); })) IN.varLine.clearStage(stage);
+      else IN.clear(stage);
+      stage.appendChild(wrap);
       vizTree(treeHost, { tree: s.tree, marks: s.marks }, { ariaLabel: "Treet som traverseres" });
+      if (IN.vlReserve) IN.vlReserve(stage, s, function (st) { renderIter(stage, st); });
     }
     var RING = "transparent;border:2px dashed var(--c-compare)", BLUERING = PATHC;
     function mountIter(host, cfg) {
