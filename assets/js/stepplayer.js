@@ -76,7 +76,9 @@
     var scope = IN.levelScope({ initial: opts.initial_level || null });
     wrap.appendChild(el("div", { class: "sp-controls" }, [bPrev, bPlay, bNext, bReset, scope.el, counter]));
     wrap.appendChild(el("div", { class: "sp-hint muted small",
-      html: "Hold musa over demoen: <span class=\"kbd\">←</span> <span class=\"kbd\">→</span> for steg · <span class=\"kbd\">mellomrom</span> spill/pause" }));
+      html: (window.matchMedia && matchMedia("(hover: none)").matches)
+        ? "Trykk «Neste» og «Forrige» for å gå steg for steg."
+        : "Hold musa over demoen: <span class=\"kbd\">←</span> <span class=\"kbd\">→</span> for steg · <span class=\"kbd\">mellomrom</span> spill/pause" }));
 
     var explain = el("div", { class: "sp-explain" });
     wrap.appendChild(explain);
@@ -122,8 +124,12 @@
       else if (opts.pseudo) opts.pseudo.clear();
       paintExplain(s);
       counter.textContent = "Steg " + (idx + 1) + " av " + steps.length;
-      bPrev.disabled = idx === 0;
-      bNext.disabled = idx >= steps.length - 1;
+      // Flytt fokus før knappen blir deaktivert, så tastaturbrukere ikke havner øverst på siden
+      var atStart = idx === 0, atEnd = idx >= steps.length - 1;
+      if (atEnd && document.activeElement === bNext) bPrev.focus();
+      if (atStart && document.activeElement === bPrev && !atEnd) bNext.focus();
+      bPrev.disabled = atStart;
+      bNext.disabled = atEnd;
     }
     function paintExplain(s) {
       clear(explain);

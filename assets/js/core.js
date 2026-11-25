@@ -164,7 +164,7 @@
       b.addEventListener("click", function () { setLocal(L.id); });
       btns[L.id] = b; ctrl.appendChild(b);
     });
-    var reset = el("button", { class: "seg-btn reset", type: "button", title: "Følg toppnivået igjen", text: "↺", hidden: true });
+    var reset = el("button", { class: "seg-btn reset", type: "button", title: "Følg toppnivået igjen", "aria-label": "Tilbake til nivået øverst på siden", text: "↺", hidden: true });
     reset.addEventListener("click", function () { setLocal(null); });
     ctrl.appendChild(reset);
     function eff() { return local || levelGet(); }

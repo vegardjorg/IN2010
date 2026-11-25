@@ -211,16 +211,16 @@
         links: [["begreper", "algoritme", "Begreper → Algoritme"]] },
       { key: "d1", part: "Del 1", name: "Sant/usant", pts: "22–32 p", w: 26,
         text: "Mange korte påstander om kjøretid, stabil og in-place, heaper og trær. Rettes automatisk. Feil og ubesvart teller likt, og gjetting gir i snitt 0 – svar på alle, men tenk.",
-        links: [["sortering", "test", "Sortering"], ["sok", "test", "Søk"], ["heap", "test", "Heap"], ["traer", "test", "Trær"], ["begreper", "bigo", "Big-O"]] },
+        links: [["sortering", "test", "Sortering"], ["sok", "test", "Søk"], ["heap", "test", "Heap"], ["traer", "test", "Trær"], ["hashing", "test", "Hashing"], ["grafer", "test", "Grafer"], ["begreper", "bigo", "Big-O"]] },
       { key: "std", part: "Del 2, først", name: "Standardoppgaven", short: "Første oppg.", pts: "10 p", w: 10,
         text: "Kjør en pensumoperasjon for hånd – innsetting i heap, hashing eller Huffman – forklar den, skriv pseudokode og oppgi kjøretid.",
-        links: [["heap", "innsetting", "Heap-innsetting"], ["traer", "huffman", "Huffman", ["t24huf"]], ["hashing", "", "Hashing"]] },
+        links: [["heap", "innsetting", "Heap-innsetting"], ["traer", "huffman", "Huffman", ["t24huf"]], ["hashing", "probing", "Linear probing"], ["hashing", "chaining", "Chaining"], ["hashing", "python", "Python-dict"]] },
       { key: "mid", part: "Del 2, midten", name: "4–5 oppgaver", pts: "10–12 p hver", w: 48,
         text: "Ett problem per oppgave, ofte med en liten historie: trær, heap, søk i array, sortering, hashing. Lavere kjøretid gir flere poeng.",
         anchor: "eo-temaer" },
       { key: "graf", part: "Del 2, sist", name: "Grafhistorien", pts: "12–15 p", w: 14,
         text: "Gjør en historie om til en graf: hva er nodene og kantene? Velg en pensumalgoritme (BFS/DFS, Dijkstra, MST, topologisk sortering) og oppgi kjøretiden.",
-        links: [["grafer", "", "Grafer"]] }
+        links: [["grafer", "begreper", "Fra historie til graf"], ["grafer", "bfs", "BFS"], ["grafer", "dijkstra", "Dijkstra"], ["grafer", "mst", "MST"], ["grafer", "topologisk", "Topologisk sortering"]] }
     ];
     var flowHost = IN.qs("#exam-flow");
     var ruler = el("div", { class: "a4-ruler" });
@@ -254,7 +254,8 @@
       { name: "Grafer", n: 6, pts: "22–46 p", often: "Alltid",
         items: "Gjør en historie om til en graf. BFS/DFS, sykler, topologisk sortering, komponenter. Dijkstra, Bellman-Ford, minimalt spenntre.",
         tip: "O(|V| + |E|) gir full pott. Én traversering per node gir omtrent halvparten.",
-        links: [["grafer", "", "Grafer"]] },
+        links: [["grafer", "begreper", "Begreper"], ["grafer", "bfs", "BFS"], ["grafer", "dfs", "DFS"], ["grafer", "sykler", "Sykler"], ["grafer", "topologisk", "Topologisk"],
+                ["grafer", "sammenheng", "Sammenheng"], ["grafer", "scc", "Sterke komponenter"], ["grafer", "dijkstra", "Dijkstra"], ["grafer", "mst", "MST"]] },
       { name: "Trær", n: 6, pts: "12–24 p", often: "Alltid",
         items: "En rekursiv treoppgave hvert år: er det et søketre, diameter, laveste felles forfeder. AVL og rotasjoner. Huffman.",
         tip: "Ofte to oppgaver. Oppgi kjøretiden både generelt og for balanserte trær.",
@@ -268,7 +269,7 @@
       { name: "Hashing", n: 5, pts: "8–10 p", often: "Nesten alltid",
         items: "Linear probing eller separate chaining for hånd, pseudokode for innsetting. Hashset som verktøy for lineære løsninger.",
         tip: "Oppgi både forventet O(1) og verste tilfelle O(n).",
-        links: [["hashing", "", "Hashing"], ["sok", "triks", "Array-triks"]] },
+        links: [["hashing", "chaining", "Chaining"], ["hashing", "probing", "Linear probing"], ["hashing", "python", "Python-dict"], ["hashing", "triks", "Hashing som verktøy"], ["sok", "triks", "Array-triks"]] },
       { name: "Søk i array", n: 5, pts: "10–12 p", often: "Nesten alltid",
         items: "Finn duplikat, par eller de k minste. Sorter én gang, søk mange ganger. Modifisert binærsøk.",
         tip: "Kjøretidstrapp: jo raskere, jo flere poeng – og 0 for en treg løsning når en bedre finnes.",
