@@ -104,6 +104,8 @@
       return txt + grenseHTML(l.grense);
     }
     function show(row, n) {
+      // Koden har egen forklaring under seg (attachNotes): da ingen flytende boks oppå de andre linjene.
+      if (box._notes) { hide(); return; }
       var txt = textFor(n);
       if (!txt) { hide(); return; }
       tip.innerHTML = txt;
@@ -265,6 +267,7 @@
     }
     IN.qsa(".pc-line", box).forEach(function (row) {
       var n = +row.getAttribute("data-line");
+      row.classList.remove("has-tip");
       row.tabIndex = 0;
       row.setAttribute("role", "button");
       row.setAttribute("aria-label", "Linje " + n + ": vis forklaring");
