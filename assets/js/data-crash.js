@@ -141,13 +141,13 @@
 
     /* ===================== 2 · DEL 1 ===================== */
     { nr: 2, navn: "Del 1: sant/usant", hvor: "Rett etter oppvarmingen, 22–32 p", steg: [
-      { id: "2a", tittel: "Big-O-drill: kjøretiden til pensumoperasjonene", vekt: 8, min: "E", tid: 15, tidG: 20,
+      { id: "2a", tittel: "Stor O-drill: kjøretiden til pensumoperasjonene", vekt: 8, min: "E", tid: 15, tidG: 20,
         hvorfor: "Del 1 har vært 32, 22 og 26 poeng (2023–2025). Påstandene for de årene er ikke offentlige, men 2021–2022 viser at kjøretid for pensumoperasjoner går igjen, og kjøretid er i tillegg et eget poeng i nesten hver langsvarsoppgave.",
         kjerne: t(
-          "Big-O sier hvor mye lengre tid noe tar når det blir mer å gjøre. Leter du etter et navn i en telefonkatalog, går det fort å slå opp på midten og kaste halvparten hver gang. Å lese hver eneste side går sakte, og det blir verre jo tykkere katalogen er. På eksamen må du kunne hvor fort de vanlige oppskriftene i pensum er, like sikkert som gangetabellen.",
+          "Stor O sier hvor mye lengre tid noe tar når det blir mer å gjøre. Leter du etter et navn i en telefonkatalog, går det fort å slå opp på midten og kaste halvparten hver gang. Å lese hver eneste side går sakte, og det blir verre jo tykkere katalogen er. På eksamen må du kunne hvor fort de vanlige oppskriftene i pensum er, like sikkert som gangetabellen.",
           "<p>Kunne disse utenat: binærsøk O(log n) · heap insert og removeMin O(log n), BuildHeap O(n) · søk i binært søketre O(h), som er O(log n) i et AVL-tre og O(n) i verste fall ellers · hashing forventet O(1), O(n) i verste tilfelle · Merge sort og Heapsort O(n log n) · Quicksort O(n²) i verste fall · Insertion sort O(n²), men O(n) på sortert input · Bucket sort O(N + n) · BFS, DFS og topologisk sortering O(|V| + |E|) · Dijkstra O((|V| + |E|) · log(|V|)) · Prim O(|E| · log(|V|)), og Kruskal like raskt når sjekken «lager kanten en sykel?» er rask, fordi sorteringen av kantene da koster mest · Bellman-Ford O(|V| · |E|).</p>",
           "<p>Regnereglene: behold det største leddet og dropp konstanter. Løkker etter hverandre adderes, løkker inni hverandre multipliseres. Les alltid hvilket tilfelle påstanden gjelder (verste, forventet, amortisert) og hvilken struktur (BST eller AVL). Tabellen i Strategi → Pensum som byggeklosser samler kjøretidene.</p>"),
-        les: [["begreper", "bigo", null, "Begreper → Big-O"], ["strategi", "kjoretid", null, "Strategi → Kjøretidsanalyse"], ["strategi", "eksamensteknikk", "tek-bygg", "Kjøretidstabellen (byggeklosser)"]],
+        les: [["begreper", "bigo", null, "Begreper → Kjøretid & stor O"], ["strategi", "kjoretid", null, "Strategi → Kjøretidsanalyse"], ["strategi", "eksamensteknikk", "tek-bygg", "Kjøretidstabellen (byggeklosser)"]],
         oppskrift: [
           "Les påstanden ord for ord. Hvilket tilfelle: verste, forventet eller amortisert?",
           "Hvilken struktur? Søk er O(h) i et vanlig søketre, men O(log n) i et AVL-tre.",

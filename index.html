@@ -7,7 +7,8 @@
   <title>IN2010 · interaktiv eksamensguide</title>
   <meta name="description" content="Interaktiv eksamensguide for IN2010 – Algoritmer og datastrukturer. Slik ser eksamen ut, og alle eksamensoppgavene fra H2020 til H2025.">
   <script>(function(){try{var d=document.documentElement;var t=localStorage.getItem('in-theme');if(t!=='dark'&&t!=='system')t='light';if(t!=='system')d.setAttribute('data-theme',t);var l=localStorage.getItem('in-level');if(l!=='eli5'&&l!=='teknisk')l='normal';d.setAttribute('data-level',l);}catch(e){document.documentElement.setAttribute('data-theme','light');document.documentElement.setAttribute('data-level','normal');}})();</script>
-  <link rel="stylesheet" href="assets/css/styles.css?v=20261125j">
+  <link rel="stylesheet" href="assets/css/styles.css?v=20261125k">
+  <link rel="stylesheet" href="assets/css/begrep-tips.css?v=20261125k">
 </head>
 <body data-page="index">
   <a class="skip-link" href="#main">Hopp til innhold</a>
@@ -99,10 +100,12 @@
     IN2010-guide · laget for eksamensøving · fungerer frakoblet (file://) og på GitHub Pages.
   </footer>
 
-  <script src="assets/js/core.js?v=20261125j"></script>
-  <script src="assets/js/symboler.js?v=20261125j"></script>
-  <script src="assets/js/data-mock.js?v=20261125j"></script>
-  <script src="assets/js/data-crash.js?v=20261125j"></script>
+  <script src="assets/js/core.js?v=20261125k"></script>
+  <script src="assets/js/symboler.js?v=20261125k"></script>
+  <script src="assets/js/begreper-data.js?v=20261125k"></script>
+  <script src="assets/js/begrep-tips.js?v=20261125k"></script>
+  <script src="assets/js/data-mock.js?v=20261125k"></script>
+  <script src="assets/js/data-crash.js?v=20261125k"></script>
   <script>
   /* Crash course-boksen øverst: samme utregning som løypesiden (IN.crashProgress) */
   (function () {
@@ -242,7 +245,7 @@
         links: [["begreper", "algoritme", "Begreper → Algoritme"]] },
       { key: "d1", part: "Del 1", name: "Sant/usant", pts: "22–32 p", w: 26,
         text: "Mange korte påstander om kjøretid, stabil og in-place, heaper og trær. Rettes automatisk. Feil og ubesvart teller likt, og gjetting gir i snitt 0 – svar på alle, men tenk.",
-        links: [["strategi", "eksamensteknikk&oppg=del1-ovelse", "Del 1-øving (blandet, med poengregel)"], ["sortering", "test", "Sortering"], ["sok", "test", "Søk"], ["heap", "test", "Heap"], ["traer", "test", "Trær"], ["hashing", "test", "Hashing"], ["grafer", "test", "Grafer"], ["begreper", "bigo", "Big-O"]] },
+        links: [["strategi", "eksamensteknikk&oppg=del1-ovelse", "Del 1-øving (blandet, med poengregel)"], ["sortering", "test", "Sortering"], ["sok", "test", "Søk"], ["heap", "test", "Heap"], ["traer", "test", "Trær"], ["hashing", "test", "Hashing"], ["grafer", "test", "Grafer"], ["begreper", "bigo", "Stor O"]] },
       { key: "std", part: "Del 2, først", name: "Standardoppgaven", short: "Første oppg.", pts: "10 p", w: 10,
         text: "Kjør en pensumoperasjon for hånd – innsetting i heap, hashing eller Huffman – forklar den, skriv pseudokode og oppgi kjøretid.",
         links: [["heap", "innsetting", "Heap-innsetting"], ["traer", "huffman", "Huffman", ["t24huf"]], ["hashing", "probing", "Linear probing"], ["hashing", "chaining", "Chaining"], ["hashing", "python", "Python-dict"]] },
@@ -250,7 +253,7 @@
         text: "Ett problem per oppgave, ofte med en liten historie: trær, heap, søk i array, sortering, hashing. Lavere kjøretid gir flere poeng.",
         anchor: "eo-temaer" },
       { key: "graf", part: "Del 2, sist", name: "Grafhistorien", pts: "12–15 p", w: 14,
-        text: "Gjør en historie om til en graf: hva er nodene og kantene? Velg en pensumalgoritme (BFS/DFS, Dijkstra, MST, topologisk sortering) og oppgi kjøretiden.",
+        text: "Gjør en historie om til en graf: hva er nodene og kantene? Velg en pensumalgoritme (BFS/DFS, Dijkstra, minimalt spenntre (MST), topologisk sortering) og oppgi kjøretiden.",
         links: [["grafer", "begreper&oppg=historie", "Fra historie til graf"], ["grafer", "bfs", "BFS"], ["grafer", "dijkstra", "Dijkstra"], ["grafer", "mst", "MST"], ["grafer", "topologisk", "Topologisk sortering"]] }
     ];
     var flowHost = IN.qs("#exam-flow");
@@ -413,14 +416,14 @@
 
     // ===== Blokkene =====
     var BLOCKS = [
-      { page:"begreper",  n:"0", title:"Begreper",  desc:"Algoritme, datastruktur, Big-O, stabil/in-place, ADT, rekursjon.", tasks:3 },
+      { page:"begreper",  n:"0", title:"Begreper",  desc:"Algoritme, datastruktur, stor O, stabil/in-place, ADT, rekursjon.", tasks:3 },
       { page:"lister",    n:"0b", title:"Lister, stakk & kø", desc:"Array vs. lenket liste, dynamisk array (dobling), stakk og kø, nylige søk (LRU).", tasks:1 },
       { page:"sortering", n:"1", title:"Sortering", desc:"Selection, bubble, insertion, gnome, merge, quick, bøtte, radix og heapsort.", tasks:5 },
       { page:"sok",       n:"2", title:"Søk & array-triks", desc:"Rett-frem søk og binærsøk, sorter én gang, finn duplikat, finn k minste, hashtriks.", tasks:4 },
       { page:"heap",      n:"3", title:"Heap / prioritetskø", desc:"Insert, removeMin, BuildHeap, level-order, mediankø, heapsort, bøttekø.", tasks:6 },
-      { page:"traer",     n:"4", title:"Trær & søketrær", desc:"Traversering, BST (CheckBST, InRange), diameter, LCA, AVL/Anti-AVL, Huffman og prefikstre.", tasks:12 },
+      { page:"traer",     n:"4", title:"Trær & søketrær", desc:"Traversering, binære søketrær (BST: CheckBST, InRange), diameter, LCA, AVL/Anti-AVL, Huffman og prefikstre.", tasks:12 },
       { page:"hashing",   n:"5", title:"Hashing", desc:"Hashfunksjon, chaining, linear probing, rehash, Python 3.6-dict, hashing som verktøy.", tasks:6 },
-      { page:"grafer",    n:"6", title:"Grafer", desc:"BFS, DFS, sykler, topsort, SCC, Dijkstra, Bellman-Ford, MST.", tasks:16 },
+      { page:"grafer",    n:"6", title:"Grafer", desc:"BFS, DFS, sykler, topsort, sterkt sammenhengende komponenter (SCC), Dijkstra, Bellman-Ford, MST.", tasks:16 },
       { page:"strategi",  n:"7", title:"Strategi & kompleksitet", desc:"Kjøretidsanalyse, algoritmestrategier, P og NP, eksamensteknikk.", tasks:5 }
     ];
     var blockHost = IN.qs("#block-cards");

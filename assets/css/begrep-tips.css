@@ -1,0 +1,74 @@
+/* ============================================================
+   IN2010 guide · begrep-tips.css
+   Begrepstips (begrep-tips.js) og ordlista på 00-begreper.html.
+   Bygger på .pc-tip i styles.css (flytende boks, farger, kant, skygge) og
+   bruker bare fargetokenene derfra, så lyst og mørkt tema følger med av seg selv.
+   ============================================================ */
+
+/* Begrepet i teksten: diskré prikket understrek, som symbolene (.sym) */
+.bt {
+  cursor: help;
+  text-decoration: underline dotted;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+  text-decoration-color: color-mix(in srgb, currentColor 40%, transparent);
+  -webkit-tap-highlight-color: transparent;
+  border-radius: 2px;
+}
+.bt .sym { text-decoration: none; }
+.bt:hover, .bt.is-open {
+  text-decoration-color: currentColor;
+  background-image: linear-gradient(var(--state-hover), var(--state-hover));
+}
+.bt:focus { outline: none; }
+.bt:focus-visible { outline: 2px solid var(--color-primary); outline-offset: 1px; }
+
+/* Tipset: samme boks som #pc-tip/#sym-tip, smal nok for 375 px */
+.bt-tip {
+  max-width: min(19rem, calc(100vw - 16px));
+  z-index: 215;
+  font-family: var(--font);
+  white-space: normal;
+  overflow-wrap: break-word;
+  text-align: left;
+  pointer-events: auto;             /* .pc-tip slår det av; vi trenger lenken til ordlista */
+}
+.bt-tip > span, .bt-tip > a { display: block; }
+.bt-tip-h { font-weight: 600; margin-bottom: .1rem; }
+.bt-tip-h b { color: var(--color-primary); font-weight: 700; }
+.bt-tip-n { color: var(--color-on-surface-variant); font-style: italic; margin-bottom: .2rem; }
+.bt-tip-a {
+  margin-top: .35rem;
+  font-size: var(--text-xs, .8rem);
+  color: var(--color-primary);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  width: max-content;
+}
+.bt-tip-a:hover { text-decoration-thickness: 2px; }
+
+/* Ordlista */
+.bt-ol-sok { display: flex; flex-direction: column; gap: .3rem; max-width: 26rem; margin: .5rem 0 1rem; font-weight: 600; }
+.bt-ol-sok input {
+  font: inherit; font-weight: 400; padding: .5rem .7rem; min-height: 44px;
+  border: 1px solid var(--color-outline-variant); border-radius: var(--radius-md, 8px);
+  background: var(--color-surface, transparent); color: var(--color-on-surface);
+}
+.bt-ol-sok input:focus-visible { outline: 2px solid var(--color-primary); outline-offset: 1px; }
+.bt-ol { margin: 0 0 1.2rem; }
+.bt-ol dt { margin-top: .75rem; scroll-margin-top: 6rem; }
+.bt-ol dt b { color: var(--color-on-surface); }
+.bt-ol-full { color: var(--color-on-surface-variant); }
+.bt-ol dd { margin: .15rem 0 0; padding-left: .9rem; border-left: 2px solid var(--color-outline-variant); }
+.bt-ol-navn { font-style: italic; }
+.bt-ol-eks, .bt-ol-se { display: block; margin-top: .15rem; font-size: var(--text-sm, .9rem); color: var(--color-on-surface-variant); }
+.bt-ol dt.is-hit, .bt-ol dd.is-hit {
+  background: color-mix(in srgb, var(--color-primary) 14%, transparent);
+  transition: background-color .6s;
+}
+.bt-ol [hidden], .bt-ol-gruppe[hidden] { display: none; }
+
+@media print {
+  .bt { text-decoration: none; }
+  .bt-tip { display: none; }
+}

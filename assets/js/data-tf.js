@@ -1154,7 +1154,7 @@
     {
       "s": "Alle separasjonsnoder i en sammenhengende graf kan finnes med ett DFS i O(|V| + |E|).",
       "answer": true,
-      "explain": "Kursets algoritme gjør dette i ett dybde-først-søk. H2025 knyttet 2-sammenheng til at grafen ikke har separasjonsnoder; per-node-søk blir tregere.",
+      "explain": "Kursets algoritme gjør dette i ett dybde-først søk. H2025 knyttet 2-sammenheng til at grafen ikke har separasjonsnoder; per-node-søk blir tregere.",
       "tema": "separasjonsnoder",
       "kilde": false
     },

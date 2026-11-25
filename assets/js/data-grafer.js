@@ -1049,7 +1049,7 @@
           a: t("Det finnes ingen node over roten som kunne blitt avskåret, så vi må sjekke på en annen måte.",
                "Testen depth[u] ≤ low[v] er alltid sann for roten (dybde 0). Derfor sjekker vi i stedet om roten har mer enn ett barn.",
                "For roten gir low-testen ingen informasjon, siden low ≥ 0 = depth[r] alltid. Antall DFS-barn avgjør.") }),
-      L("return seps", 1, "Nå har vi alle knutepunktene. Fjerner vi ett av dem, faller grafen i flere deler.", "Returner separasjonsnodene.", "G er 2-sammenhengende hvis og bare hvis seps er tom.")
+      L("return seps", 1, "Nå har vi alle separasjonsnodene. Fjerner vi ett av dem, faller grafen i flere deler.", "Returner separasjonsnodene.", "G er 2-sammenhengende hvis og bare hvis seps er tom.")
     ],
     bigO: { best: "O(|V| + |E|)", avg: "O(|V| + |E|)", worst: "O(|V| + |E|)", space: "O(|V|)",
       why: t("Vi går gjennom grafen én gang og noterer litt ekstra underveis. Det tar like lang tid som et vanlig dybde-først søk.", "Ett DFS med O(1) ekstra arbeid per kant.", "Den naive metoden (fjern hver node og sjekk sammenheng) er O(|V| · (|V| + |E|)).") }

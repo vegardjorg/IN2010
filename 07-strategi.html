@@ -7,7 +7,8 @@
   <title>Blokk 7 · Strategi · IN2010</title>
   <meta name="description" content="Strategi i IN2010: les kjøretiden ut av løkker og rekursjon, kjenn igjen algoritmestrategiene kurset bruker, forstå P, NP og reduksjoner, og svar slik sensor belønner – med drilloppgaver og eksamensoppgaver.">
   <script>(function(){try{var d=document.documentElement;var t=localStorage.getItem('in-theme');if(t!=='dark'&&t!=='system')t='light';if(t!=='system')d.setAttribute('data-theme',t);var l=localStorage.getItem('in-level');if(l!=='eli5'&&l!=='teknisk')l='normal';d.setAttribute('data-level',l);}catch(e){document.documentElement.setAttribute('data-theme','light');document.documentElement.setAttribute('data-level','normal');}})();</script>
-  <link rel="stylesheet" href="assets/css/styles.css?v=20261125j">
+  <link rel="stylesheet" href="assets/css/styles.css?v=20261125k">
+  <link rel="stylesheet" href="assets/css/begrep-tips.css?v=20261125k">
 </head>
 <body data-page="strategi">
   <a class="skip-link" href="#main">Hopp til innhold</a>
@@ -102,7 +103,7 @@
 
       <div class="callout uni"><span class="lbl">Universitetsnivå</span>
         <p><b>Definisjonen av O.</b> f(n) er O(g(n)) hvis det finnes en konstant c &gt; 0 slik at f(n) ≤ c · g(n) for alle n som er store nok
-          (altså for alle n ≥ n₀, se <a href="00-begreper.html#fane=bigo">Blokk 0 → Big-O</a>).
+          (altså for alle n ≥ n₀, se <a href="00-begreper.html#fane=bigo">Blokk 0 → Kjøretid &amp; stor O</a>).
           Eksempel: 3n² + 5n + 2 ≤ 4n² så snart n ≥ 6, så 3n² + 5n + 2 er O(n²).</p>
         <p>O er en <b>øvre grense</b>. En algoritme som er O(log n), er derfor også O(n) og O(n²). På eksamen bør du likevel oppgi den <b>laveste</b> klassen du kan begrunne. Å svare O(n²) på en lineær algoritme er ikke feil matematikk, men sensor ser etter kjøretiden løsningen faktisk har, og lavere kjøretid gir mer uttelling.</p>
         <p><b>Rekursjon.</b> Du trenger ikke løse rekurrensligninger på eksamen, og forelesningene bruker dem ikke.
@@ -198,7 +199,7 @@
         <div class="card st-strat">
           <h4>Oversett til noe du kan</h4>
           <p class="small"><b>Idé:</b> skriv om problemet til et problem du allerede har en algoritme for.</p>
-          <p class="small"><b>Fra pensum:</b> gjør historien om til en graf og kjør BFS, Dijkstra eller MST. Snu kantene for å finne avstanden fra alle noder til ett mål på én kjøring (H2024). Samme tanke ligger bak <a href="#fane=pnp">reduksjoner</a>.</p>
+          <p class="small"><b>Fra pensum:</b> gjør historien om til en graf og kjør BFS, Dijkstra eller Prim/Kruskal (minimalt spenntre). Snu kantene for å finne avstanden fra alle noder til ett mål på én kjøring (H2024). Samme tanke ligger bak <a href="#fane=pnp">reduksjoner</a>.</p>
           <p class="small st-verdict"><b>På eksamen</b> kan du bruke pensumalgoritmer som byggeklosser. Si hva de returnerer og hva de koster.</p>
         </div>
       </div>
@@ -580,20 +581,22 @@
     <p class="muted small">IN2010 · Blokk 7 · Strategi. Egne forklaringer og demoer basert på pensum. Eksamensoppgavene er gjengitt ordrett fra eksamensarkene (UiO, IN2010), med kildelinje og eventuelle avvik på hvert kort.</p>
   </footer>
 
-  <script src="assets/js/core.js?v=20261125j"></script>
-  <script src="assets/js/symboler.js?v=20261125j"></script>
-  <script src="assets/js/data-tf.js?v=20261125j"></script>
-  <script src="assets/js/pseudocode.js?v=20261125j"></script>
-  <script src="assets/js/stepplayer.js?v=20261125j"></script>
-  <script src="assets/js/viz-bars.js?v=20261125j"></script>
-  <script src="assets/js/viz-graph.js?v=20261125j"></script>
-  <script src="assets/js/data-algos.js?v=20261125j"></script>
-  <script src="assets/js/data-strategi.js?v=20261125j"></script>
-  <script src="assets/js/viz-hash.js?v=20261125j"></script>
-  <script src="assets/js/data-hashing.js?v=20261125j"></script>
-  <script src="assets/js/perfekt/strategi.js?v=20261125j"></script>
-  <script src="assets/js/perfekt/delt.js?v=20261125j"></script>
-  <script src="assets/js/kort/strategi.js?v=20261125j"></script>
+  <script src="assets/js/core.js?v=20261125k"></script>
+  <script src="assets/js/symboler.js?v=20261125k"></script>
+  <script src="assets/js/begreper-data.js?v=20261125k"></script>
+  <script src="assets/js/begrep-tips.js?v=20261125k"></script>
+  <script src="assets/js/data-tf.js?v=20261125k"></script>
+  <script src="assets/js/pseudocode.js?v=20261125k"></script>
+  <script src="assets/js/stepplayer.js?v=20261125k"></script>
+  <script src="assets/js/viz-bars.js?v=20261125k"></script>
+  <script src="assets/js/viz-graph.js?v=20261125k"></script>
+  <script src="assets/js/data-algos.js?v=20261125k"></script>
+  <script src="assets/js/data-strategi.js?v=20261125k"></script>
+  <script src="assets/js/viz-hash.js?v=20261125k"></script>
+  <script src="assets/js/data-hashing.js?v=20261125k"></script>
+  <script src="assets/js/perfekt/strategi.js?v=20261125k"></script>
+  <script src="assets/js/perfekt/delt.js?v=20261125k"></script>
+  <script src="assets/js/kort/strategi.js?v=20261125k"></script>
   <script>
   (function () {
     "use strict";
@@ -622,7 +625,7 @@
     IN.explain("#intro-kjoretid", t(
       "Vi vil vite hvor mye ekstra arbeid algoritmen får når oppgaven blir større. Får vi dobbelt så mange tall, tar det da dobbelt så lang tid, fire ganger så lang tid, eller bare et lite øyeblikk ekstra?",
       "Du trenger ikke telle hvert eneste steg. Finn det som gjentas mest: løkkene og kallene. Tell hvor mange ganger det skjer, og hva hver gang koster. Kurset regner i verste tilfelle hvis ikke annet står.",
-      "Kurset definerer kjøretid som antall primitive steg som funksjon av n, i verste tilfelle hvis ikke annet sies, og forenkler med O. Gjennomsnittlig tilfelle krever en sannsynlighetsfordeling over input, og du skal ikke regne det ut selv. Når Big-O-boksene i guiden viser «Snitt», er det et kjent resultat du kan oppgi, ikke noe du må vise utregningen for. Forventet og amortisert kjøretid (hashing, dynamiske arrayer) skal du kjenne begrepene for, men ikke utlede. For hashing oppgir du for eksempel forventet O(1) og verste tilfelle O(n)."
+      "Kurset definerer kjøretid som antall primitive steg som funksjon av n, i verste tilfelle hvis ikke annet sies, og forenkler med O. Gjennomsnittlig tilfelle krever en sannsynlighetsfordeling over input, og du skal ikke regne det ut selv. Når kjøretidsboksene i guiden viser «Snitt», er det et kjent resultat du kan oppgi, ikke noe du må vise utregningen for. Forventet og amortisert kjøretid (hashing, dynamiske arrayer) skal du kjenne begrepene for, men ikke utlede. For hashing oppgir du for eksempel forventet O(1) og verste tilfelle O(n)."
     ), { label: "Nivå:" });
 
     (function arketyper() {
@@ -641,7 +644,7 @@
         var info = qs("#arketype-info"); IN.clear(info);
         info.appendChild(el("h4", { style: "margin:.1rem 0 .3rem", text: A[it.key].title + " · " + it.label }));
         info.appendChild(el("p", { class: "small", text: INFO[it.key] }));
-        info.appendChild(el("p", { class: "muted small", html: 'Se hvor ulikt klassene vokser i <a href="00-begreper.html#fane=bigo">Begreper → Kjøretid &amp; Big-O</a>.' }));
+        info.appendChild(el("p", { class: "muted small", html: 'Se hvor ulikt klassene vokser i <a href="00-begreper.html#fane=bigo">Begreper → Kjøretid &amp; stor O</a>.' }));
       });
       IN.oTrappIn(qs("#arketype-btns"), ".btn");   // grå trapp foran hver klasse på knappene
     })();
@@ -968,7 +971,7 @@
         explain: "O er en øvre grense. Men på eksamen skal du oppgi den laveste klassen du kan begrunne." },
       { s: "En O(n²)-algoritme er alltid tregere enn en O(n)-algoritme.", answer: false, blokk: "7",
         explain: "For små n kan konstantene gjøre O(n²)-algoritmen raskest. O sier bare noe om veksten når n blir stor." },
-      { s: "Big-O beskriver alltid verste tilfelle.", answer: false, blokk: "7",
+      { s: "Stor O beskriver alltid verste tilfelle.", answer: false, blokk: "7",
         explain: "Tilfelle og veksttakt er to akser. Rett-frem søk er O(1) i beste og O(n) i verste tilfelle." },
       { s: "Prim og Kruskal er grådige algoritmer.", answer: true, blokk: "7",
         explain: "Begge tar den billigste kanten som er lov akkurat nå, og angrer aldri." },

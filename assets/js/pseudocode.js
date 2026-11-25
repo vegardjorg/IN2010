@@ -331,7 +331,7 @@
   var PROC_TEXT = {
     eli5: "Dette er starten på oppskriften. Vi gir den et navn og sier hva den trenger å få inn for å virke.",
     normal: "Prosedyrens signatur: navnet og parameteren den tar inn.",
-    teknisk: "Prosedyredeklarasjon. Input/Output står over; kjøretiden oppgis i Big-O-boksen."
+    teknisk: "Prosedyredeklarasjon. Input/Output står over; kjøretiden oppgis i boksen «Kjøretid og minne»."
   };
   IN.pseudo.explainer = function (host, algo, opts) {
     if (typeof host === "string") host = IN.qs(host);

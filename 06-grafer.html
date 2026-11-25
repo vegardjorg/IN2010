@@ -7,7 +7,8 @@
   <title>Blokk 6 · Grafer · IN2010</title>
   <meta name="description" content="Grafer i IN2010: begreper, bredde-først og dybde-først søk, topologisk sortering, Dijkstra og Bellman-Ford, minimale spenntrær (Prim og Kruskal), sterkt sammenhengende komponenter, sykler og 2-sammenheng – med stegvise demoer, pseudokode og eksamensoppgaver.">
   <script>(function(){try{var d=document.documentElement;var t=localStorage.getItem('in-theme');if(t!=='dark'&&t!=='system')t='light';if(t!=='system')d.setAttribute('data-theme',t);var l=localStorage.getItem('in-level');if(l!=='eli5'&&l!=='teknisk')l='normal';d.setAttribute('data-level',l);}catch(e){document.documentElement.setAttribute('data-theme','light');document.documentElement.setAttribute('data-level','normal');}})();</script>
-  <link rel="stylesheet" href="assets/css/styles.css?v=20261125j">
+  <link rel="stylesheet" href="assets/css/styles.css?v=20261125k">
+  <link rel="stylesheet" href="assets/css/begrep-tips.css?v=20261125k">
 </head>
 <body data-page="grafer">
   <a class="skip-link" href="#main">Hopp til innhold</a>
@@ -559,18 +560,20 @@
     <p class="muted small">IN2010 · Blokk 6 · Grafer. Egne forklaringer og demoer basert på pensum. Eksamensoppgavene er gjengitt ordrett med kildelinje.</p>
   </footer>
 
-  <script src="assets/js/core.js?v=20261125j"></script>
-  <script src="assets/js/symboler.js?v=20261125j"></script>
-  <script src="assets/js/data-tf.js?v=20261125j"></script>
-  <script src="assets/js/pseudocode.js?v=20261125j"></script>
-  <script src="assets/js/stepplayer.js?v=20261125j"></script>
-  <script src="assets/js/varline.js?v=20261125j"></script>
-  <script src="assets/js/viz-graph.js?v=20261125j"></script>
-  <script src="assets/js/data-algos.js?v=20261125j"></script>
-  <script src="assets/js/data-grafer.js?v=20261125j"></script>
-  <script src="assets/js/perfekt/grafer.js?v=20261125j"></script>
-  <script src="assets/js/perfekt/delt.js?v=20261125j"></script>
-  <script src="assets/js/kort/grafer.js?v=20261125j"></script>
+  <script src="assets/js/core.js?v=20261125k"></script>
+  <script src="assets/js/symboler.js?v=20261125k"></script>
+  <script src="assets/js/begreper-data.js?v=20261125k"></script>
+  <script src="assets/js/begrep-tips.js?v=20261125k"></script>
+  <script src="assets/js/data-tf.js?v=20261125k"></script>
+  <script src="assets/js/pseudocode.js?v=20261125k"></script>
+  <script src="assets/js/stepplayer.js?v=20261125k"></script>
+  <script src="assets/js/varline.js?v=20261125k"></script>
+  <script src="assets/js/viz-graph.js?v=20261125k"></script>
+  <script src="assets/js/data-algos.js?v=20261125k"></script>
+  <script src="assets/js/data-grafer.js?v=20261125k"></script>
+  <script src="assets/js/perfekt/grafer.js?v=20261125k"></script>
+  <script src="assets/js/perfekt/delt.js?v=20261125k"></script>
+  <script src="assets/js/kort/grafer.js?v=20261125k"></script>
   <script>
   (function () {
     "use strict";
@@ -702,7 +705,7 @@
 
     /* ===================== 2-SAMMENHENG ===================== */
     IN.explain("#intro-sammenheng", t(
-      "Finnes det ett knutepunkt som alt avhenger av? Hvis én person i en vennegjeng er den eneste som kjenner folk i to grupper, faller gjengen fra hverandre når den personen ikke kommer.",
+      "Finnes det én separasjonsnode som alt avhenger av? Hvis én person i en vennegjeng er den eneste som kjenner folk i to grupper, faller gjengen fra hverandre når den personen ikke kommer.",
       "En separasjonsnode er en node som deler grafen i flere deler hvis den fjernes. En graf uten slike er 2-sammenhengende. De finnes med ett dybde-først søk som holder styr på depth og low: O(|V| + |E|).",
       "En sammenhengende graf er 2-sammenhengende hvis den fortsatt henger sammen uansett hvilken ene node vi fjerner, altså hvis den ikke har noen separasjonsnoder. Forelesningen viser også en likeverdig beskrivelse: med minst tre noder har hvert par av noder to stier mellom seg som ikke deler andre noder. Separasjonsnodene finnes med depth og low i ett DFS. Roten behandles for seg: den er en separasjonsnode hvis den har mer enn ett barn i DFS-treet."
     ), { label: "Nivå:" });

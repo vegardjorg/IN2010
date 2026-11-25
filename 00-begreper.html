@@ -5,9 +5,10 @@
   <link rel="icon" href="data:,">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Blokk 0 · Begreper · IN2010</title>
-  <meta name="description" content="Grunnbegreper i IN2010: algoritme, datastruktur, Big-O, stabil/in-place, ADT, rekursjon.">
+  <meta name="description" content="Grunnbegreper i IN2010: algoritme, datastruktur, stor O, stabil/in-place, ADT, rekursjon.">
   <script>(function(){try{var d=document.documentElement;var t=localStorage.getItem('in-theme');if(t!=='dark'&&t!=='system')t='light';if(t!=='system')d.setAttribute('data-theme',t);var l=localStorage.getItem('in-level');if(l!=='eli5'&&l!=='teknisk')l='normal';d.setAttribute('data-level',l);}catch(e){document.documentElement.setAttribute('data-theme','light');document.documentElement.setAttribute('data-level','normal');}})();</script>
-  <link rel="stylesheet" href="assets/css/styles.css?v=20261125j">
+  <link rel="stylesheet" href="assets/css/styles.css?v=20261125k">
+  <link rel="stylesheet" href="assets/css/begrep-tips.css?v=20261125k">
 </head>
 <body data-page="begreper">
   <a class="skip-link" href="#main">Hopp til innhold</a>
@@ -16,7 +17,7 @@
   <main id="main" class="wrap">
     <div class="pagehead">
       <h1>Blokk 0 · Begreper</h1>
-      <p class="lead">Fundamentet: hva en algoritme og en datastruktur er, kjøretid og Big-O,
+      <p class="lead">Fundamentet: hva en algoritme og en datastruktur er, kjøretid og stor O,
         stabil/in-place, ADT vs. datastruktur, og rekursjon.</p>
       <div class="badges">
         <span class="badge" data-go="algoritme"><b>Oppvarming</b> · alle år · <span class="pts">2p</span></span>
@@ -25,10 +26,11 @@
 
     <div class="tabs" role="tablist" aria-label="Underemner">
       <button data-tab="algoritme">Algoritme &amp; datastruktur</button>
-      <button data-tab="bigo">Kjøretid &amp; Big-O</button>
+      <button data-tab="bigo">Kjøretid &amp; stor O</button>
       <button data-tab="stabil">Stabil &amp; in-place</button>
       <button data-tab="adt">ADT vs. datastruktur</button>
       <button data-tab="rekursjon">Rekursjon</button>
+      <button data-tab="ordliste">Ordliste</button>
       <button data-tab="test">Sant/usant</button>
     </div>
 
@@ -61,11 +63,11 @@
     <!-- BIG-O -->
     <section data-panel="bigo">
       <div class="callout begrep"><span class="lbl">Begrep</span>
-        <b>Big-O</b> beskriver hvordan kjøretiden vokser når input n blir stor – vi ser bort fra konstanter
+        <b>Stor O</b> (på engelsk <i>Big O</i>) beskriver hvordan kjøretiden vokser når input n blir stor – vi ser bort fra konstanter
         og lavordensledd og bryr oss bare om veksttakten. De vanlige klassene er O(1), O(log n), O(n),
         O(n log n), O(n²) og O(2ⁿ).
         <b>Merk:</b> veksttakt og tilfelle (beste/verste/snitt) er to forskjellige spørsmål. Tilfellet sier
-        <i>hvilken</i> input vi ser på; Big-O sier hvor raskt kjøretiden vokser i <i>det</i> tilfellet. Derfor
+        <i>hvilken</i> input vi ser på; stor O sier hvor raskt kjøretiden vokser i <i>det</i> tilfellet. Derfor
         gir vi gjerne én kjøretid for beste tilfelle (f.eks. O(n)) og en annen for verste (f.eks. O(n²)).</div>
 
       <div class="callout eli5"><span class="lbl">5-åring: lapper og håndhilsing</span>
@@ -209,6 +211,14 @@
         <span class="mono">O(n log n)</span>, og det er mønsteret bak merge sort.</div>
     </section>
 
+    <!-- ORDLISTE: bygges fra IN.BEGREPER og IN.SYMBOLER (begrep-tips.js), samme kilde som tipsene -->
+    <section data-panel="ordliste">
+      <h3>Ordliste</h3>
+      <p class="muted small">Alle forkortelser og begreper på ett sted. De samme forklaringene dukker opp når du holder
+        over eller trykker på et ord med prikket understrek rundt omkring i guiden.</p>
+      <div id="ordliste"></div>
+    </section>
+
     <!-- SANT/USANT -->
     <section data-panel="test">
       <h3>Test deg selv – begreper</h3>
@@ -222,18 +232,21 @@
 
   <footer class="footer">IN2010-guide · Blokk 0 · Begreper</footer>
 
-  <script src="assets/js/core.js?v=20261125j"></script>
-  <script src="assets/js/symboler.js?v=20261125j"></script>
-  <script src="assets/js/data-tf.js?v=20261125j"></script>
-  <script src="assets/js/pseudocode.js?v=20261125j"></script>
-  <script src="assets/js/stepplayer.js?v=20261125j"></script>
-  <script src="assets/js/varline.js?v=20261125j"></script>
-  <script src="assets/js/viz-bars.js?v=20261125j"></script>
-  <script src="assets/js/perfekt/begreper.js?v=20261125j"></script>
-  <script src="assets/js/kort/begreper.js?v=20261125j"></script>
+  <script src="assets/js/core.js?v=20261125k"></script>
+  <script src="assets/js/symboler.js?v=20261125k"></script>
+  <script src="assets/js/begreper-data.js?v=20261125k"></script>
+  <script src="assets/js/begrep-tips.js?v=20261125k"></script>
+  <script src="assets/js/data-tf.js?v=20261125k"></script>
+  <script src="assets/js/pseudocode.js?v=20261125k"></script>
+  <script src="assets/js/stepplayer.js?v=20261125k"></script>
+  <script src="assets/js/varline.js?v=20261125k"></script>
+  <script src="assets/js/viz-bars.js?v=20261125k"></script>
+  <script src="assets/js/perfekt/begreper.js?v=20261125k"></script>
+  <script src="assets/js/kort/begreper.js?v=20261125k"></script>
   <script>
   (function () {
     var IN = window.IN, el = IN.el, qs = IN.qs;
+    if (IN.begrepTips) IN.begrepTips.ordliste("#ordliste");
 
 
     /* ---- Nivådelte forklaringer ---- */
@@ -244,9 +257,9 @@
     }, { label: "Nivå:" });
 
     IN.explain("#ex-bigo", {
-      eli5: "<p>Big-O svarer på: «Når det blir dobbelt så mange ting, hvor mye mer jobb blir det?» O(n) betyr dobbelt så mye jobb. O(n²) betyr fire ganger så mye. 2ⁿ betyr … mye verre!</p>",
-      normal: "<p>Big-O beskriver veksttakten til kjøretiden når n vokser, uten konstanter og lavordensledd – vi skriver f.eks. O(n) eller O(n²) etter hvor raskt arbeidet vokser. Legg merke til at dette er noe annet enn beste/verste/snitt-tilfelle: tilfellet velger <i>hvilken</i> situasjon vi analyserer, mens Big-O sier hvor fort kjøretiden vokser der. Derfor kan vi gi én kjøretid for beste tilfelle (ofte O(n)) og en annen for verste (ofte O(n²)).</p>",
-      teknisk: "<p>Formelt: f(n) = O(g(n)) betyr at f til slutt holder seg under g bortsett fra en konstant faktor – det finnes konstanter c &gt; 0 og n₀ slik at f(n) ≤ c·g(n) for alle n ≥ n₀. I praksis: fra en viss størrelse n₀ og oppover er f aldri mer enn et fast antall ganger (c) g – hva som skjer for små input, og hvor stor den faste faktoren er, teller ikke. Grunnen til at vi dropper konstanter og lavordensledd er at for store n er det det dominerende leddet som avgjør: en algoritme der arbeidet vokser kvadratisk, taper for store n mot en der det vokser som n log n, uansett hvor gode konstantene er. Husk at O bare er en øvre grense: at noe er O(n²), sier ikke at det faktisk vokser kvadratisk, så sammenligningen gjelder den faktiske veksten. Og husk at veksttakt (Big-O) og tilfelle (beste/verste/snitt) er to uavhengige valg – vi kan gi en Big-O for hvilket som helst tilfelle.</p>"
+      eli5: "<p>Stor O svarer på: «Når det blir dobbelt så mange ting, hvor mye mer jobb blir det?» O(n) betyr dobbelt så mye jobb. O(n²) betyr fire ganger så mye. 2ⁿ betyr … mye verre!</p>",
+      normal: "<p>Stor O beskriver veksttakten til kjøretiden når n vokser, uten konstanter og lavordensledd – vi skriver f.eks. O(n) eller O(n²) etter hvor raskt arbeidet vokser. Legg merke til at dette er noe annet enn beste/verste/snitt-tilfelle: tilfellet velger <i>hvilken</i> situasjon vi analyserer, mens stor O sier hvor fort kjøretiden vokser der. Derfor kan vi gi én kjøretid for beste tilfelle (ofte O(n)) og en annen for verste (ofte O(n²)).</p>",
+      teknisk: "<p>Formelt: f(n) = O(g(n)) betyr at f til slutt holder seg under g bortsett fra en konstant faktor – det finnes konstanter c &gt; 0 og n₀ slik at f(n) ≤ c·g(n) for alle n ≥ n₀. I praksis: fra en viss størrelse n₀ og oppover er f aldri mer enn et fast antall ganger (c) g – hva som skjer for små input, og hvor stor den faste faktoren er, teller ikke. Grunnen til at vi dropper konstanter og lavordensledd er at for store n er det det dominerende leddet som avgjør: en algoritme der arbeidet vokser kvadratisk, taper for store n mot en der det vokser som n log n, uansett hvor gode konstantene er. Husk at O bare er en øvre grense: at noe er O(n²), sier ikke at det faktisk vokser kvadratisk, så sammenligningen gjelder den faktiske veksten. Og husk at veksttakt (stor O) og tilfelle (beste/verste/snitt) er to uavhengige valg – vi kan gi en Big-O for hvilket som helst tilfelle.</p>"
     }, { label: "Nivå:" });
 
     IN.explain("#ex-stabil", {
@@ -258,7 +271,7 @@
     IN.explain("#ex-adt", {
       eli5: "<p>En ADT er «hva du kan be om» (legg på, ta av). Datastrukturen er «hvordan det er bygd inni». En stakk kan være bygd av et array ELLER en lenket liste – begge gir samme LIFO-oppførsel.</p>",
       normal: "<p>ADT = grensesnittet (operasjonene og hva de gjør). Datastruktur = implementasjonen. Én ADT kan realiseres av flere datastrukturer med ulike kjøretider.</p>",
-      teknisk: "<p>En ADT spesifiserer operasjoner og deres semantikk uavhengig av representasjon. Ordbok-ADT kan implementeres med balansert BST (O(log n) garantert) eller hashtabell (O(1) forventet). Valget avgjør kjøretidsprofil og egenskaper (ordnet iterasjon vs. ikke).</p>"
+      teknisk: "<p>En ADT spesifiserer operasjoner og deres semantikk uavhengig av representasjon. Ordbok-ADT kan implementeres med balansert binært søketre (BST, O(log n) garantert) eller hashtabell (O(1) forventet). Valget avgjør kjøretidsprofil og egenskaper (ordnet iterasjon vs. ikke).</p>"
     }, { label: "Nivå:" });
 
     IN.explain("#ex-rekursjon", {

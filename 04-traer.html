@@ -7,7 +7,8 @@
   <title>Blokk 4 · Trær · IN2010</title>
   <meta name="description" content="Trær i IN2010: begreper, traverseringer, binære søketrær, diameter, laveste felles forfeder, AVL og rotasjoner, Anti-AVL og Huffman – med stegvise demoer, pseudokode og eksamensoppgaver.">
   <script>(function(){try{var d=document.documentElement;var t=localStorage.getItem('in-theme');if(t!=='dark'&&t!=='system')t='light';if(t!=='system')d.setAttribute('data-theme',t);var l=localStorage.getItem('in-level');if(l!=='eli5'&&l!=='teknisk')l='normal';d.setAttribute('data-level',l);}catch(e){document.documentElement.setAttribute('data-theme','light');document.documentElement.setAttribute('data-level','normal');}})();</script>
-  <link rel="stylesheet" href="assets/css/styles.css?v=20261125j">
+  <link rel="stylesheet" href="assets/css/styles.css?v=20261125k">
+  <link rel="stylesheet" href="assets/css/begrep-tips.css?v=20261125k">
   <style>
     /* Sidelokalt: stakk-kolonner ved siden av treet (fanen «Uten rekursjon»). Bare designtokens fra styles.css. */
     .itv { display: flex; flex-direction: column; gap: .55rem; min-width: 0; }
@@ -139,7 +140,7 @@
       <div class="callout uni"><span class="lbl">Universitetsnivå: høyde og antall noder</span>
         <p>På dybde d kan et binærtre ha høyst 2<sup>d</sup> noder. Et binærtre med høyde h har derfor høyst
           1 + 2 + … + 2<sup>h</sup> = 2<sup>h+1</sup> − 1 noder. Snur vi det, må et binærtre med n noder ha høyde minst ⌊log n⌋.
-          Høyden er høyst n − 1 (en kjede). Søketre-operasjonene i kurset (søk, innsetting, fjerning, FindMin, LCA i søketre) koster O(h), mens traverseringer, Height, Diameter og CheckBST besøker alle noder og koster O(n). Hele poenget med balanserte trær er å presse h ned mot log n.</p>
+          Høyden er høyst n − 1 (en kjede). Søketre-operasjonene i kurset (søk, innsetting, fjerning, FindMin, laveste felles forfeder (LCA) i søketre) koster O(h), mens traverseringer, Height, Diameter og CheckBST besøker alle noder og koster O(n). Hele poenget med balanserte trær er å presse h ned mot log n.</p>
       </div>
 
       <h3>Kjøretider på ett sted</h3>
@@ -151,7 +152,7 @@
             <th data-tip="Kjøretiden i verste fall. For vanlige søketrær er det en skjev kjede med høyde n − 1.">Verst</th>
             <th data-tip="Hvis treet er balansert (høyde O(log n)), som et AVL-tre.">Balansert</th></tr></thead>
           <tbody>
-            <tr><td>Søk / innsetting / fjerning i BST</td>
+            <tr><td>Søk / innsetting / fjerning i binært søketre (BST)</td>
               <td data-tip="Svaret ligger i roten (søk), eller treet er tomt (innsetting).">O(1)</td>
               <td data-tip="Én sti fra roten og ned, altså O(h). For en kjede er h = n − 1.">O(n)</td>
               <td data-tip="h = O(log n), så én sti er O(log n).">O(log n)</td></tr>
@@ -684,19 +685,21 @@
     <p class="muted small">IN2010 · Blokk 4 · Trær. Egne forklaringer og demoer basert på pensum. Eksamensoppgavene er gjengitt ordrett fra eksamensarkene (UiO, IN2010), med kildelinje og eventuelle avvik på hvert kort.</p>
   </footer>
 
-  <script src="assets/js/core.js?v=20261125j"></script>
-  <script src="assets/js/varline.js?v=20261125j"></script>
-  <script src="assets/js/symboler.js?v=20261125j"></script>
-  <script src="assets/js/data-tf.js?v=20261125j"></script>
-  <script src="assets/js/pseudocode.js?v=20261125j"></script>
-  <script src="assets/js/stepplayer.js?v=20261125j"></script>
-  <script src="assets/js/viz-bars.js?v=20261125j"></script>
-  <script src="assets/js/viz-tree.js?v=20261125j"></script>
-  <script src="assets/js/data-algos.js?v=20261125j"></script>
-  <script src="assets/js/data-traer.js?v=20261125j"></script>
-  <script src="assets/js/perfekt/traer.js?v=20261125j"></script>
-  <script src="assets/js/perfekt/delt.js?v=20261125j"></script>
-  <script src="assets/js/kort/traer.js?v=20261125j"></script>
+  <script src="assets/js/core.js?v=20261125k"></script>
+  <script src="assets/js/varline.js?v=20261125k"></script>
+  <script src="assets/js/symboler.js?v=20261125k"></script>
+  <script src="assets/js/begreper-data.js?v=20261125k"></script>
+  <script src="assets/js/begrep-tips.js?v=20261125k"></script>
+  <script src="assets/js/data-tf.js?v=20261125k"></script>
+  <script src="assets/js/pseudocode.js?v=20261125k"></script>
+  <script src="assets/js/stepplayer.js?v=20261125k"></script>
+  <script src="assets/js/viz-bars.js?v=20261125k"></script>
+  <script src="assets/js/viz-tree.js?v=20261125k"></script>
+  <script src="assets/js/data-algos.js?v=20261125k"></script>
+  <script src="assets/js/data-traer.js?v=20261125k"></script>
+  <script src="assets/js/perfekt/traer.js?v=20261125k"></script>
+  <script src="assets/js/perfekt/delt.js?v=20261125k"></script>
+  <script src="assets/js/kort/traer.js?v=20261125k"></script>
   <script>
   (function () {
     "use strict";

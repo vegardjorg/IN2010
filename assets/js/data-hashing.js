@@ -175,7 +175,7 @@
         eli5: "… men først: er det kanskje vår egen nøkkel som ligger der?", normal: "Ligger nøkkelen her fra før?", teknisk: "Samme nøkkel skal overskrives, ikke legges inn to ganger." },
       { code: "break", indent: 3, eli5: "Ja! Da stopper vi her og bytter bare verdien.", normal: "Stopp: vi skal overskrive på denne plassen.", teknisk: "Hopp ut av løkka med i på nøkkelens plass." },
       { code: "i ← (i + 1) mod N", indent: 2, eli5: "Plassen var opptatt av en annen. Vi går ett skritt til høyre. Fra den siste plassen går vi tilbake til den første.", normal: "Kollisjon: gå til neste plass, rundt til 0 etter siste plass.",
-        teknisk: "Lineær probing: hjemmeplass, så +1, +2, … (mod N).", grense: MODN },
+        teknisk: "Linear probing: hjemmeplass, så +1, +2, … (mod N).", grense: MODN },
       { code: "A[i] ← (k, v)", indent: 1, eli5: "Legg paret på plassen vi stoppet på.", normal: "Enten en ledig plass, eller plassen der k lå fra før.",
         teknisk: "Én skriving. Kostnaden er antall prøvde plasser." },
       { code: "return A", indent: 1, eli5: "Ferdig! Paret ligger nå i tabellen.", normal: "Ferdig.", teknisk: "Ferdig. Kostnaden var antall prøvde plasser, og det er forventet O(1) når Load factor holdes lav." }
@@ -210,7 +210,7 @@
     lines: [
       { code: "i ← h(k, N)", indent: 1, eli5: "Finn nøkkelen først, akkurat som ved oppslag.", normal: "Start på hjemmeplassen til k.", teknisk: "Samme startpunkt som innsetting og oppslag." },
       { code: "while A[i] ≠ null and A[i].key ≠ k do", indent: 1, eli5: "Gå videre til vi finner den eller en tom plass.", normal: "Let som ved oppslag.", teknisk: "Samme søk som oppslaget, bare skrevet som én løkkebetingelse. Løkka stopper fordi arrayet ikke er fullt." },
-      { code: "i ← (i + 1) mod N", indent: 2, eli5: "Plassen var opptatt av en annen. Vi går ett skritt til høyre. Fra den siste plassen går vi tilbake til den første.", normal: "Neste plass.", teknisk: "Lineær probing videre i segmentet.", grense: MODN },
+      { code: "i ← (i + 1) mod N", indent: 2, eli5: "Plassen var opptatt av en annen. Vi går ett skritt til høyre. Fra den siste plassen går vi tilbake til den første.", normal: "Neste plass.", teknisk: "Linear probing videre i segmentet.", grense: MODN },
       { code: "if A[i] = null then", indent: 1, eli5: "Kom vi til en tom plass? Da var nøkkelen aldri her.", normal: "Traff vi en ledig plass, finnes ikke k.", teknisk: "En ledig plass betyr at k aldri ble skjøvet forbi hit. Da finnes ikke k i tabellen." },
       { code: "return A", indent: 2, eli5: "Da er det ingenting å slette.", normal: "Ingenting å slette.", teknisk: "Ingen endring: tabellen er som før, og n er uendret." },
       { code: "A[i] ← null", indent: 1, eli5: "Ta den bort. Nå er det et hull her.", normal: "Fjern paret. Plass i er nå et hull.",
@@ -250,7 +250,7 @@
       { code: "else if A[i].key = k then", indent: 2, eli5: "Bor nøkkelen allerede her? Da skal vi bare bytte verdien.", normal: "Ligger k her fra før?", teknisk: "Et merke har ingen nøkkel. Derfor sjekker vi merket først, og leser key bare på ekte par." },
       { code: "A[i] ← (k, v)", indent: 3, eli5: "Bytt ut den gamle verdien med den nye.", normal: "Overskriv.", teknisk: "Overskriving: n er uendret, og vi får ingen duplikat." },
       { code: "return A", indent: 3, eli5: "Ferdig! Vi byttet ut den gamle verdien.", normal: "Ferdig.", teknisk: "Ferdig. Vi gikk bare fram til plassen der nøkkelen lå." },
-      { code: "i ← (i + 1) mod N", indent: 2, eli5: "Plassen var opptatt av en annen. Vi går ett skritt til høyre. Fra den siste plassen går vi tilbake til den første.", normal: "Neste plass.", teknisk: "Lineær probing videre, forbi både andre nøkler og merker.", grense: MODN },
+      { code: "i ← (i + 1) mod N", indent: 2, eli5: "Plassen var opptatt av en annen. Vi går ett skritt til høyre. Fra den siste plassen går vi tilbake til den første.", normal: "Neste plass.", teknisk: "Linear probing videre, forbi både andre nøkler og merker.", grense: MODN },
       { code: "if p ≠ null then i ← p", indent: 1, eli5: "Fant vi et merke, bruker vi den plassen.", normal: "Gjenbruk det første merket hvis vi fant et.", teknisk: "Kortere probing neste gang." },
       { code: "A[i] ← (k, v)", indent: 1, eli5: "Legg paret her. Nøkkelen fantes ikke fra før.", normal: "Sett inn.", teknisk: "Én skriving, enten i det første merket eller i den ledige plassen. n øker med 1, og et gjenbrukt merke forsvinner." }
     ],
@@ -267,7 +267,7 @@
       { code: "while A[i] ≠ null do", indent: 1, eli5: "Vi stopper bare ved helt tomme plasser. En «slettet»-lapp betyr at vi må lete videre.", normal: "Et merke er ikke null, så vi går forbi det.", teknisk: "Det er hele poenget med merket." },
       { code: "if A[i] ≠ DELETED and A[i].key = k then", indent: 2, eli5: "Er dette nøkkelen vi leter etter? Plasser med slettemerke hopper vi over.", normal: "Sjekk nøkkelen hvis plassen ikke er et merke.", teknisk: "Et merke har ingen nøkkel, så vi sjekker merket før vi leser key." },
       { code: "return A[i].value", indent: 3, eli5: "Funnet! Vi gir tilbake verdien som hører til nøkkelen.", normal: "Funnet.", teknisk: "Vellykket oppslag." },
-      { code: "i ← (i + 1) mod N", indent: 2, eli5: "Ikke denne. Vi går ett skritt videre, også forbi plasser med slettemerke.", normal: "Neste plass.", teknisk: "Lineær probing videre, forbi både andre nøkler og merker.", grense: MODN },
+      { code: "i ← (i + 1) mod N", indent: 2, eli5: "Ikke denne. Vi går ett skritt videre, også forbi plasser med slettemerke.", normal: "Neste plass.", teknisk: "Linear probing videre, forbi både andre nøkler og merker.", grense: MODN },
       { code: "return null", indent: 1, eli5: "Vi kom til en helt tom plass. Hadde nøkkelen vært i tabellen, ville vi ha møtt den før dette. Den finnes ikke.", normal: "k finnes ikke.", teknisk: "Mislykket oppslag. Merkene gjør at vi kan måtte gå forbi flere plasser før vi treffer null." }
     ],
     bigO: { best: "O(1)", avg: "O(1) forventet", worst: "O(n)", space: "O(1) ekstra",
@@ -284,7 +284,7 @@
       { code: "A[i] ← DELETED", indent: 3, eli5: "Sett en lapp «slettet» på plassen i stedet for å tømme den.", normal: "Marker plassen som slettet. Den er ikke null, så oppslag går videre forbi den.",
         teknisk: "Ingen elementer flyttes. Til gjengjeld blir merkene liggende til neste rehash." },
       { code: "return A", indent: 3, eli5: "Ferdig! Nøkkelen er borte, og lappen sørger for at de andre fortsatt kan finnes.", normal: "Ferdig.", teknisk: "Ferdig etter søket. n går ned med 1, og antall merker går opp med 1." },
-      { code: "i ← (i + 1) mod N", indent: 2, eli5: "Plassen var opptatt av en annen. Vi går ett skritt til høyre. Fra den siste plassen går vi tilbake til den første.", normal: "Neste plass.", teknisk: "Lineær probing videre.", grense: MODN },
+      { code: "i ← (i + 1) mod N", indent: 2, eli5: "Plassen var opptatt av en annen. Vi går ett skritt til høyre. Fra den siste plassen går vi tilbake til den første.", normal: "Neste plass.", teknisk: "Linear probing videre.", grense: MODN },
       { code: "return A", indent: 1, eli5: "Vi kom til en tom plass uten å finne nøkkelen. Da er det ingenting å slette.", normal: "k finnes ikke. Tabellen er uendret.",
         teknisk: "Mislykket sletting: verken n eller merkene endres." }
     ],
@@ -309,7 +309,7 @@
       { code: "if A[i].key = k then", indent: 2, eli5: "Bor nøkkelen allerede her? Da skal vi bare bytte verdien.", normal: "Ligger k her fra før?", teknisk: "Samme nøkkel skal overskrives, ikke legges inn to ganger." },
       { code: "A[i] ← (k, v)", indent: 3, eli5: "Bytt ut den gamle verdien med den nye.", normal: "Overskriv.", teknisk: "Overskriving: n er uendret." },
       { code: "return", indent: 3, eli5: "Ferdig! Vi byttet ut verdien, så antallet i tabellen er det samme.", normal: "Ferdig (n uendret).", teknisk: "Ferdig uten å øke n." },
-      { code: "i ← (i + 1) mod N", indent: 2, eli5: "Plassen var opptatt av en annen. Vi går ett skritt til høyre. Fra den siste plassen går vi tilbake til den første.", normal: "Neste plass.", teknisk: "Lineær probing videre.", grense: MODN },
+      { code: "i ← (i + 1) mod N", indent: 2, eli5: "Plassen var opptatt av en annen. Vi går ett skritt til høyre. Fra den siste plassen går vi tilbake til den første.", normal: "Neste plass.", teknisk: "Linear probing videre.", grense: MODN },
       { code: "A[i] ← (k, v)", indent: 1, eli5: "Legg paret på den ledige plassen.", normal: "Sett inn på den ledige plassen.", teknisk: "Én skriving på den ledige plassen." },
       { code: "n ← n + 1", indent: 1, eli5: "Nå er det én til i tabellen. Vi teller, så vi vet når den blir for full.", normal: "Tell opp antall par.", teknisk: "n må holdes oppdatert, ellers blir Load factor-sjekken på linje 2 feil neste gang." }
     ],
@@ -353,7 +353,7 @@
       { code: "e ← entries[indices[i]]", indent: 2, eli5: "Tallet sier hvor i lista paret ligger.", normal: "Følg indeksen til paret i entries.", teknisk: "Ett ekstra oppslag, O(1)." },
       { code: "if e.key = k then", indent: 2, eli5: "Er dette nøkkelen vi leter etter, og ikke bare en annen som havnet på samme sted?", normal: "Sammenlign nøkkelen i entries.", teknisk: "Nøkkelen ligger i entries, så vi må følge indeksen for å kunne sammenligne." },
       { code: "return e.value", indent: 3, eli5: "Funnet! Vi gir tilbake verdien som hører til nøkkelen.", normal: "Funnet.", teknisk: "Vellykket oppslag: probing i indices pluss ett oppslag i entries per prøvd plass." },
-      { code: "i ← (i + 1) mod N", indent: 2, eli5: "Ikke den rette. Vi går videre til neste plass i den store tabellen med hull.", normal: "Neste plass i indices.", teknisk: "Lineær probing videre i indices.", grense: MODN },
+      { code: "i ← (i + 1) mod N", indent: 2, eli5: "Ikke den rette. Vi går videre til neste plass i den store tabellen med hull.", normal: "Neste plass i indices.", teknisk: "Linear probing videre i indices.", grense: MODN },
       { code: "return null", indent: 1, eli5: "Vi kom til en tom plass i den store tabellen. Hadde nøkkelen vært her, ville vi ha møtt den før dette. Den finnes ikke.", normal: "Ledig plass i indices: k finnes ikke.", teknisk: "Mislykket oppslag, forventet O(1) prøvde plasser." }
     ],
     bigO: { best: "O(1)", avg: "O(1) forventet", worst: "O(n)", space: "O(1) ekstra",
@@ -371,7 +371,7 @@
       { code: "if e.key = k then", indent: 2, eli5: "Er det samme nøkkel? Da skal vi bare bytte verdien.", normal: "Finnes k fra før?", teknisk: "Samme nøkkel skal overskrives, ikke legges inn to ganger." },
       { code: "entries[indices[i]] ← (k, v)", indent: 3, eli5: "Bytt verdien der den står i lista.", normal: "Overskriv i entries. Rekkefølgen beholdes.", teknisk: "indices endres ikke." },
       { code: "return", indent: 3, eli5: "Ferdig! Verdien er byttet, og paret står på samme plass i lista.", normal: "Ferdig.", teknisk: "Ferdig. n er uendret." },
-      { code: "i ← (i + 1) mod N", indent: 2, eli5: "Ikke den rette. Vi går videre til neste plass i den store tabellen.", normal: "Neste plass i indices.", teknisk: "Lineær probing videre i indices.", grense: MODN },
+      { code: "i ← (i + 1) mod N", indent: 2, eli5: "Ikke den rette. Vi går videre til neste plass i den store tabellen.", normal: "Neste plass i indices.", teknisk: "Linear probing videre i indices.", grense: MODN },
       { code: "indices[i] ← |entries|", indent: 1, eli5: "Skriv ned hvor i lista det nye paret kommer til å ligge.", normal: "Den ledige plassen i indices får indeksen til det nye paret.", teknisk: "Plassen i indices lagrer bare et tall, indeksen til paret, ikke selve paret.",
         grense: { q: "Hvorfor |entries| og ikke |entries| − 1?", a: t(
           "Lista teller fra 0. Har den 3 par (0, 1, 2), får det nye paret nummer 3.",
