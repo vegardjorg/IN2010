@@ -1180,3 +1180,76 @@ a.a4-block:hover { border-color: var(--color-primary); color: var(--color-primar
   .a4-seg { font-size: 10.5px; padding: 0 .15rem; }
   .a4-rare { padding-left: .6rem; }
 }
+
+/* === Blokk 6 · Grafer === */
+/* Grafvisualisering (IN.vizGraph, viz-graph.js) og sidelokale elementer i 06-grafer.html */
+:root { --gv-k4: #6a5089; --gv-k5: #00796b; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --gv-k4: #b9a0dd; --gv-k5: #4db6ac; } }
+:root[data-theme="dark"] { --gv-k4: #b9a0dd; --gv-k5: #4db6ac; }
+
+.gv-host .sp-stage { height: auto; min-height: 240px; display: block; padding: var(--d-sm); }
+.gv { display: flex; flex-wrap: wrap; gap: .5rem 1rem; align-items: flex-start; min-width: 0; }
+.gv-fig { flex: 1 1 16rem; min-width: 0; }
+.gv-side { flex: 1 1 11rem; min-width: 0; display: flex; flex-direction: column; gap: .35rem; }
+.gv-svg { display: block; width: 100%; height: auto; margin: 0 auto; overflow: visible; }
+.exam-fig .gv-svg { margin: 0 auto; }
+
+.gv-e { fill: none; stroke: var(--color-outline); stroke-width: 2; }
+.gv-e.is-tree { stroke: var(--c-target); stroke-width: 3.5; }
+.gv-e.is-done { stroke: var(--c-sorted); stroke-width: 3.5; }
+.gv-e.is-hot  { stroke: var(--c-compare); stroke-width: 4.5; }
+.gv-e.is-back { stroke: var(--c-swap); stroke-width: 3.5; stroke-dasharray: 7 4; }
+.gv-e.is-dim  { opacity: .3; stroke-dasharray: 4 4; }
+.gv-e.is-cand { stroke: var(--c-min); stroke-width: 3; stroke-dasharray: 2 4; }
+.gv-arr { fill: var(--color-outline); }
+.gv-arr.is-tree { fill: var(--c-target); }
+.gv-arr.is-done { fill: var(--c-sorted); }
+.gv-arr.is-hot  { fill: var(--c-compare); }
+.gv-arr.is-back { fill: var(--c-swap); }
+.gv-arr.is-dim  { opacity: .3; }
+.gv-arr.is-cand { fill: var(--c-min); }
+
+.gv-w rect { fill: var(--color-surface); stroke: var(--color-outline-variant); stroke-width: 1; }
+.gv-w text { fill: var(--color-on-surface); font: 600 12px var(--font-mono); dominant-baseline: central; }
+.gv-w.is-hot rect { stroke: var(--c-compare); stroke-width: 2; }
+.gv-w.is-tree rect, .gv-w.is-done rect { stroke: var(--c-target); }
+.gv-w.is-dim { opacity: .45; }
+
+.gv-n circle { fill: var(--color-surface-container-high); stroke: var(--c-default); stroke-width: 2; }
+.gv-n .k { fill: var(--color-on-surface); font: 600 13px var(--font-mono); dominant-baseline: central; }
+.gv-n .k.sm { font-size: 10px; }
+.gv-n .k.bx { font-size: 11px; font-weight: 500; }
+.gv-n rect.gv-box { fill: var(--color-surface-container-high); stroke: var(--c-default); stroke-width: 2; }
+.gv-n.is-cur rect.gv-box  { fill: var(--c-compare); stroke: var(--c-compare); }
+.gv-n.is-done rect.gv-box { fill: var(--c-sorted); stroke: var(--c-sorted); }
+.gv-n.is-seen circle   { stroke: var(--c-target); stroke-width: 3.5; }
+.gv-n.is-queued circle { stroke: var(--c-compare); stroke-width: 3; stroke-dasharray: 4 3; }
+.gv-n.is-cur circle    { fill: var(--c-compare); stroke: var(--c-compare); }
+.gv-n.is-done circle   { fill: var(--c-sorted); stroke: var(--c-sorted); }
+.gv-n.is-warn circle   { fill: var(--c-swap); stroke: var(--c-swap); }
+.gv-n.is-src circle    { fill: var(--c-target); stroke: var(--c-target); }
+.gv-n.is-dim           { opacity: .35; }
+.gv-k0 circle { fill: var(--c-target);  stroke: var(--c-target); }
+.gv-k1 circle { fill: var(--c-sorted);  stroke: var(--c-sorted); }
+.gv-k2 circle { fill: var(--c-compare); stroke: var(--c-compare); }
+.gv-k3 circle { fill: var(--c-min);     stroke: var(--c-min); }
+.gv-k4 circle { fill: var(--gv-k4);     stroke: var(--gv-k4); }
+.gv-k5 circle { fill: var(--gv-k5);     stroke: var(--gv-k5); }
+.gv-n.gv-k.is-cur circle { stroke: var(--color-on-surface); stroke-width: 3.5; }
+.gv-n.is-cur .k, .gv-n.is-done .k, .gv-n.is-warn .k, .gv-n.is-src .k, .gv-n.gv-k .k { fill: var(--tv-on); }
+.gv-lab { fill: var(--color-primary); font: 700 11px var(--font-mono); }
+
+.gv-row { line-height: 1.6; }
+.gv-row .tv-chip s { opacity: .6; }
+.gv-tabwrap { overflow-x: auto; max-width: 100%; }
+.gv-tab { border-collapse: collapse; font: var(--text-xs) var(--font-mono); }
+.gv-tab th, .gv-tab td { border: 1px solid var(--color-outline-variant); padding: .1rem .45rem; text-align: center; }
+.gv-tab th { background: var(--color-surface-container-low); font-weight: 600; }
+.gv-tab .is-hi { background: color-mix(in srgb, var(--c-compare) 22%, transparent); }
+.gv-tab caption { caption-side: top; text-align: left; font-size: var(--text-xs); font-weight: 600; color: var(--color-on-surface-variant); }
+.gv-note { color: var(--color-on-surface-variant); }
+.gv-mini { border: 1px solid var(--color-outline-variant); border-radius: var(--radius-lg); padding: .4rem; background: var(--color-surface); }
+.gv-mini .gv-svg { max-height: 16rem; }
+.gv-sep-out { font-size: var(--text-sm); margin-top: .4rem; }
+/* Lange graf-kjøretider (O((|V| + |E|) · log(|V|))) må kunne brytes i de smale cellene */
+[data-page="grafer"] .bigo-compact .bigo-val { white-space: normal; overflow-wrap: anywhere; }
