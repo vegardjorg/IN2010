@@ -368,48 +368,6 @@
     }
   };
 
-  /* ---------- H2025 · Oppgave 5 · Level-order (12 poeng) ----------
-     Samme nøkkel brukes av kortet på 03-heap.html (perfekt/heap.js). Filene lastes aldri på samme side. */
-  IN.PERFEKT["H2025-5"] = {
-    type: "eksamen",
-    svar: [
-      { del: "(a)", tekst: "<p>En binær heap lagret i et array står allerede i level-order: roten på plass 0, barna på plass 1 og 2, barnebarna på plass 3–6, og så videre. Vi kopierer arrayet over i en liste.</p>",
-        kode: { name: "LevelOrderHeap", params: "A", input: "En binær heap, representert ved et array A med n elementer", output: "En liste med elementene i heapen i level-order",
-          lines: [L("L ← empty list", 1), L("for i ← 0 to n − 1 do", 1), L("append A[i] to L", 2), L("return L", 1)] },
-        poeng: ["at heap-arrayet allerede er i level-order (opptil 2p)"] },
-      { del: "(b)", tekst: "<p>Bredde først med en <b>kø</b>: legg roten i køen, ta ut én node om gangen, legg elementet bakerst i lista, og legg barna som ikke er null bakerst i køen. Et tre har ingen sykler, så vi trenger ikke et visited-sett.</p>",
-        kode: "levelOrderBST",
-        etter: "<p>For treet på arket gir dette 10, 15, 5, 12, 17, 7, 2. Se steg-demoen i dette kortet.</p>",
-        fasitVerdi: "10, 15, 5, 12, 17, 7, 2",
-        poeng: ["kø, ikke stakk (stakk gir 3p trekk)", "null-sjekk av barna (mangler den, opptil 2p trekk)", "en riktig algoritme (opptil 6p)"] },
-      { del: "(c)", tekst: "<p>Begge er <b>O(n)</b>. (a) kopierer n elementer. I (b) legges hver node i køen og tas ut én gang, og Enqueue, Dequeue og append er O(1).</p>", kjoretid: "O(n) for begge", poeng: ["O(n) for begge (1p)"] },
-      { del: "(d)", tekst: "<p>Output-treet er <b>likt</b> input-treet. Level-order setter inn roten først, så barna, så barnebarna. Hver node settes altså inn etter alle forfedrene sine, og søket ned treet følger de samme valgene som i input-treet. Den havner derfor på samme plass.</p>", poeng: ["riktig svar (opptil 3p). Oppgaven krever ikke begrunnelse"] }
-    ],
-    hvorfor: {
-      eli5: "<p>I et heap-array står tallene allerede i riktig rekkefølge. I et tre med pekere bruker vi en kø, så vi tar ett nivå om gangen.</p>",
-      normal: "<p>Svaret treffer det sensor trekker for: kø og ikke stakk, og null-sjekk av barna. I (d) holder det å si at trærne er like. Vi har likevel tatt med hvorfor.</p>",
-      teknisk: "<p>Køen er FIFO, så nodene på dybde d tas ut før nodene på dybde d + 1. I (d) er invarianten at når u settes inn, er alle forfedrene til u allerede satt inn på sine plasser. Da gjør Insert de samme sammenligningene som stien til u i input-treet.</p>"
-    },
-    sensor: {
-      kilde: "Kilde: sensorveiledning IN2010 H2025, oppgave 5",
-      deler: [
-        { fasit: "<p>Merk at output for algoritmene under er en liste, men det er en liten detalj som ikke er vesentlig for algoritmene. Vi trekker ikke poeng for dette alene, men det kan være med på å trekke i samspill med andre unøyaktigheter.</p>" },
-        { del: "(a)", fasit: "<p>En heap er allerede i level-order, så det er tilstrekkelig å returnere heapen som en liste.</p>",
-          kode: { name: "LevelOrderHeap", params: "A", lines: [L("list ← an empty list", 1), L("for i ← 0 to n − 1 do", 1), L("append A[i] to list", 2), L("return list", 1)] },
-          kriterier: ["Inntil 2 poeng."] },
-        { del: "(b)", fasit: "<p>Dette gjøres enklest ved hjelp av et bredde-først søk fra rotnoden. Siden input er et tre er det ikke nødvendig å bruke et visited-set.</p>",
-          kode: { name: "LevelOrderBST", params: "v", lines: [L("list ← an empty list", 1), L("queue ← an empty queue", 1), L("if v ≠ null then", 1), L("queue.enqueue(v)", 2),
-            L("while queue is not empty do", 1), L("u ← queue.dequeue()", 2), L("append u.element to list", 2), L("if u.left ≠ null then", 2), L("queue.enqueue(u.left)", 3),
-            L("if u.right ≠ null then", 2), L("queue.enqueue(u.right)", 3), L("return list", 1)] },
-          kriterier: ["Inntil 6 poeng.", "Inntil 2 poeng trekk for manglende null-sjekker (altså, ikke ta høyde for at en node mangler venstre/høyre barn).",
-            "Trekk 3 poeng for bruk av stack i stedet for kø (som gir dybde først, i stedet for bredde først).", "Vi trekker ikke for overflødig bruk av visited-set (men det trekker litt ned på helhetsinntrykket)."] },
-        { del: "(c)", fasit: "<p>Begge er O(n), siden de flytter elementene over i en liste.</p>", kriterier: ["Inntil 1 poeng for riktig kjørekompleksitet på begge algoritmer."] },
-        { del: "(d)", fasit: "<p>Input-treet og output-treet er like. Roten vil plasseres først, så vil dens to barn plasseres, og deretter deres barn og så videre.</p>",
-          kriterier: ["Inntil 3 poeng for riktig svar.", "Oppgaven krever ikke en begrunnelse."] }
-      ]
-    }
-  };
-
   /* ---------- H2024 · Oppgave 2 · Huffman-trær (10 poeng) ---------- */
   IN.PERFEKT["H2024-2"] = {
     type: "eksamen",

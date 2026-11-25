@@ -5,8 +5,7 @@
    - svar: vårt eget fullpoengssvar på kursnivå.
    - sensor: sensorveiledningen ORDRETT, med kildelinje. Ingen andre ordrette
      kilder (forelesning, ukesoppgaver, lærebok) hører hjemme her.
-   - H2020-7 er en delt nøkkel: kortene finnes også på 07-strategi.html ((a) og (c)).
-     Denne fila eier oppføringen og må lastes FØR perfekt/strategi.js der begge lastes.
+   - H2020-7 (Subanagram) vises også på 07-strategi.html og 01-sortering.html og står i perfekt/delt.js.
      Figurer tegnes bare når viz-hash.js er lastet (ikke på 07).
    ============================================================ */
 (function () {
@@ -229,73 +228,6 @@
         "<p>Den mest vesentlige forskjellen mellom Strategi 1 og Strategi 2 er at Strategi 2 er treg dersom k er stor. Men hvis dette ikke er tilfelle (som for eksempel kan bety at k &lt; n) så vil Strategi 2 være mer effektiv enn Strategi 1, fordi en hashing har en del høyere konstantfaktorer som følge av rehashing og kollisjonshåndtering. I tillegg er det alltid en (svært liten) sjanse for at vi får mange kollisjoner, som gjenspeiles i analysen for verste tilfelle.</p>" +
         "<p>Merk: Det var en liten feil i Strategi 2, der vi lot størrelsen på B må være k, snarere enn k + 1.</p>",
       merknad: "Sensorveiledningen gir ingen poengfordeling for denne oppgaven. Eksamensarket slik det er gjengitt her, har «array of size k + 1», altså den rettede versjonen."
-    }
-  };
-
-  /* ---------- H2020 · Oppgave 7 · Subanagram (a)–(c) ----------
-     Delt nøkkel: 07-strategi.html viser (a) og (c) med deler. (d) hører til sorteringsblokken. */
-  P["H2020-7"] = {
-    type: "eksamen",
-    svar: [
-      { del: "(a)",
-        tekst: "<p><b>O(s · w).</b> Kopien av W i linje 2 er O(w). Løkka i linje 3 går s ganger, én gang per bokstav i S. " +
-          "I hver runde sjekker linje 4 om c er i r, og linje 5 fjerner kanskje en forekomst. r har høyst w bokstaver, så hver runde er O(w). " +
-          "Totalt O(w + s · w) = O(s · w).</p>",
-        kjoretid: "O(s · w)",
-        poeng: ["riktig svaralternativ (4p)"] },
-      { del: "(b)",
-        tekst: "<p>Vi lager en frekvenstabell for S også, og sjekker at S har minst like mange av hver bokstav som W trenger. Har S for få av én bokstav, er W ikke et subanagram.</p>",
-        kode: "hsSubanagram",
-        etter: "<p>FreqTable(W) er O(w) og FreqTable(S) er O(s). Løkka går w ganger med to O(1)-oppslag. Totalt O(w + s).</p>",
-        kjoretid: "O(w + s)",
-        poeng: ["to frekvenstabeller brukt på fornuftig vis, i O(w + s)", "F.get(c) > G.get(c), ikke snudd (ellers −2)", "W og S ikke byttet om (ellers −2)", "sjekker subanagram, ikke anagram (ellers bare 2p totalt)"] },
-      { del: "(c)",
-        tekst: "<ul>" +
-          "<li><b>Hva de avhenger av.</b> Strategi 1 er O(d · (w + s)) og avhenger av d, w og s. Strategi 2 er O(2ˢ) og avhenger bare av s, men eksponentielt.</li>" +
-          "<li><b>Rimelige antagelser.</b> Ordene i en ordbok er korte, og ordboka er stor, så d er mye større enn w. Bokstavene S en Scrabble-spiller har, er også få, så s er liten.</li>" +
-          "<li><b>Strategi 1.</b> Med disse antagelsene dominerer d: hver spørring går gjennom hele ordboka. Til gjengjeld påvirkes kjøretiden lite av hvor lang S er.</li>" +
-          "<li><b>Strategi 2.</b> 2ˢ vokser svært raskt med s, men slipper å gå gjennom ordboka. Så lenge S er kort og D er stor, lønner Strategi 2 seg. Hvor grensen går, avhenger av d og w og avgjøres best ved å måle.</li>" +
-          "<li><b>Forarbeidet.</b> Build sorterer hvert ord, så den er litt dyrere enn én kjøring av Strategi 1. Men den kjøres bare én gang, og kostnaden fordeles på alle spørringene.</li>" +
-          "<li><b>Konklusjon.</b> Strategi 2 for korte S, Strategi 1 for lange S.</li></ul>",
-        poeng: ["at Strategi 2 lønner seg når S er liten og D er stor (3p)", "velskrevet tekst (1p)", "drøfting med argumenter (1p)", "rimelige antagelser (1p)", "bruk O-notasjon og definer variablene (−1 uten O, −3 for n uten definisjon)"] }
-    ],
-    hvorfor: {
-      eli5: "<p>I (a) teller du hvor mange runder løkka går, og hvor mye hver runde koster. I (b) teller du bokstavene i begge ordene og sjekker at du har nok av hver. I (c) sier du hva hver strategi er bra og dårlig til, og når du ville valgt hver av dem.</p>",
-      normal: "<p>(a) er et flervalg, og riktig valg gir hele poengsummen. I (b) gir to frekvenstabeller og én løkke full uttelling, så lenge sammenligningen går riktig vei. I (c) er hovedpoenget (3 av 6) å si at Strategi 2 lønner seg når S er liten og ordboka stor.</p>",
-      teknisk: "<p>(a): kostnaden er skjult i hjelpeoperasjonene. «c is in r» og «remove» er lineære i |r| ≤ w, og de kalles s ganger. (b): to lineære tellinger og w oppslag i O(1) gir O(w + s). (c): O(d · (w + s)) mot O(2ˢ) er en avveining mellom lineær avhengighet av ordboka og eksponentiell avhengighet av s. Med d stor og s liten vinner den eksponentielle.</p>"
-    },
-    sensor: {
-      kilde: "Kilde: sensorveiledning IN2010 H2020, oppgave 7",
-      deler: [
-        { del: "(a)",
-          fasit: "<ul><li>O(w + s)</li><li>O(s²)</li><li>O(w log(s))</li><li>O(s · w)</li><li>O(w²)</li></ul>" },
-        { del: "(b)",
-          fasit: "<p>Å bygge en frekvenstabell gjøres på lineær tid. En fin måte å løse denne oppgaven er å lage en frekvenstabell for begge strengene (som kan gjøres i O(w + s)) og sjekke at det for hver bokstav i W er minst like mange av den bokstaven i S:</p>",
-          kode: { name: "IsSubanagramOf2", params: "W, S",
-            lines: [L("Fw ← FreqTable(W)", 1), L("Fs ← FreqTable(S)", 1), L("for c ∈ W do", 1), L("if Fw.get(c) > Fs.get(c) then", 2), L("return false", 3), L("return true", 1)] },
-          etter: "<p>Det finnes mange andre fremgangsmåter her, der man for eksempel heller dekrementerer hver bokstav i S fra frekvenstabellen til W, og sjekker at summen ender opp med å bli 0 eller mindre. Første linje i prosedyren IsSubanagramOf2 er veiledene, men den kan godt fjernes (hvis de for eksempel heller belager seg på en frekvenstabell for S).</p>" +
-            "<p>Alle varianter av denne fremgangsmåten (altså benytter seg av en eller to frekvenstabeller på fornuftig vis) kan gi full uttelling dersom pseudokoden er lett forståelig og presis.</p>" +
-            "<p>Vi trekker poeng for uklarheter og upresise svar. Dersom koden ikke kjører i O(w + s) får man ingen poeng.</p>",
-          kriterier: "<p>Veiledende poengfordeling:</p><ul>" +
-            "<li>Minus 2 poeng for å bytte om &lt; og &gt; (altså sjekke om Fw.get(c) &lt; Fs.get(c))</li>" +
-            "<li>Minus 2 poeng for å bytte om S og W (ett sted)</li>" +
-            "<li>Totalt 2 poeng for å sjekke om frekvensene er like/ulike, altså sjekke for anagram istedenfor subanagram</li></ul>" },
-        { del: "(c)",
-          fasit: "<p>Dette er en oppgave som går ut på å gjøre rimelige antagelser og anvende dem til å si noe fornuftig om hvilken fremgangsmåte man bør bruke. Dette er den oppgaven fra eksamenssettet hvor sensoren er nødt til å anvende mest skjønn i poengsettingen. Tanken bak oppgaven er å få studenten til å reflektere over hvilken fremgangsmåte man bør velge i lys av kjøretidskarakteristikkene til de to strategiene. Det bør legges vekt på at teksten er godt skrevet (dette betyr ikke at det skal trekkes poeng for enkle skrivefeil, men at teksten må være tydelig og enkel å forstå; en fin tommelfingerregel er at en setning man ikke forstår etter to gjennomlesninger ignoreres). Under lister vi noen refleksjoner vi ønsker å se.</p>" +
-            "<p>En viktig observasjon er at SubanagramsOf1 er avhengig av både d, w og s, men SubanagramsOf2 kun er avhengig av s.</p>" +
-            "<p>Man kan forvente at ord i en ordliste er forholdsvis korte, mens ordlisten selv er stor til sammenligning. Strengen S (som er bokstavene man har tilgjengelig til å forme ord fra) kan man også forvente er forholdsvis kort. Da vil d være det dominerende leddet for SubanagramsOf1, fordi at man for et enkelt oppslag er nødt til å søke gjennom hele ordlisten. En fordel med SubanagramsOf1 er at kjøretiden påvirkes i liten grad av størrelsen på inputstrengen S; altså vil ikke kjøretiden påvirkes dramatisk dersom en bruker skriver inn en kort tekststreng S, til sammenligning med en lang tekststreng.</p>" +
-            "<p>Prosedyren SubanagramsOf2 er kun avhengig av størrelsen på S, men til gjengjeld er kjøretiden eksponensiell med hensyn til s. Vi vet at eksponensiell tid sjeldent er en god ting. Men det er viktig å huske på at S antageligvis er ganske liten, og ordboken er veldig stor til sammenligning. Dersom vi setter en fast størrelse for d og w (altså størrelsen på ordlista og det lengste ordet i ordlista), så er spørsmålet hvor stor s må bli før det lønner seg å gå gjennom hele ordboken. Dette besvares enklest eksperimentelt (og våre eksperimenter tilsier at for ordboken sowpods så går denne grensen rundt s = 17). Det vi uansett kan si sikkert er at kjøretiden til SubanagramsOf2 vil vokse dramatisk, men dersom vi antar at størrelsen på S holder seg rimelig liten, så kan dette fremdeles være en god strategi.</p>" +
-            "<p>For å kunne bruke SubanagramsOf2 må vi først bygge en datastruktur som har litt verre kjøretid enn SubanagramsOf1 (fordi vi sorterer ordene). Et fint pragmatisk argument er at dette vil kun gjøres en gang (når serveren starter opp), og under antagelsen om at ordene er korte, er denne kostnaden neglisjerbar.</p>" +
-            "<p>Merk at dette er en drøftningsoppgave av en grunn: det finnes ikke et enkelt fasitsvar. Dersom man skal implementere dette vil man måtte avgjøre strategi eksperimentelt; dersom man ikke setter noen begrensninger på bokstavene brukeren har tilgjengelig S, så vil man kanskje ønske å benytte strategi 2 dersom s &lt; 17 og strategi 1 ellers.</p>",
-          kriterier: "<p>Veiledende poengfordeling:</p><ul>" +
-            "<li>3 poeng for å nevne at strategi 2 lønner seg hvis S er liten og D er stor</li>" +
-            "<li>1 poeng for en velskreven teskt</li>" +
-            "<li>1 poeng for å drøfte og argumentere for påstandene</li>" +
-            "<li>1 poeng for å gjøre rimelige antagelser</li>" +
-            "<li>Minus 1 poeng for å ikke ha noen referanse til O-notasjonen (men snakker generelt om at «når ordboka er stor» og «ordene korte»).</li>" +
-            "<li>Minus 3 poeng for å snakke om n uten definisjon; her er jo det hele poenget</li></ul>" }
-      ],
-      merknad: "For (a) gjentar sensorveiledningen bare de fem svaralternativene og sier ikke hvilket som er riktig. Svaret O(s · w) i vårt svar er regnet ut av oss. I (b) kaller vi tabellene F og G (F er gitt i oppgaven), mens sensor kaller dem Fw og Fs. Deloppgave (c) vurderes etter skjønn: det finnes ikke ett fasitsvar, og vårt svar er ett eksempel som dekker kriteriene."
     }
   };
 })();

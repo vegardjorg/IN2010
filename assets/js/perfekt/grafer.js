@@ -5,9 +5,7 @@
    - svar: vårt eget fullpoengssvar på kursnivå (samme på alle nivåer).
    - sensor: sensorveiledningen ORDRETT, med kildelinje. Ingen andre ordrette
      kilder (forelesning, ukesoppgaver, lærebok) hører hjemme her.
-   - H2020-8 er en delt nøkkel (07-strategi.html viser (a) og (b)). Denne fila
-     setter hele oppgaven (a)–(h); perfekt/strategi.js setter den bare hvis den
-     mangler. Lastes begge, må denne lastes først.
+   - H2020-8 (Fire typer grafer) vises også på 07-strategi.html og står i perfekt/delt.js.
    ============================================================ */
 (function () {
   "use strict";
@@ -38,100 +36,6 @@
     return '<div class="gr-pf-tab"><table class="et-tab"><tr>' + head.map(function (x) { return "<th>" + x + "</th>"; }).join("") + "</tr>" +
       rows.map(function (r) { return "<tr>" + r.map(function (c, i) { return i ? "<td>" + c + "</td>" : '<th style="text-align:left">' + c + "</th>"; }).join("") + "</tr>"; }).join("") + "</table></div>";
   }
-
-  /* ---------- H2020 · Oppgave 8 · Fire typer grafer (38 poeng) ---------- */
-  function sq(edges) {
-    return { directed: false, nodes: [N("A", 0, 0), N("B", 90, 0), N("C", 0, 90), N("D", 90, 90)],
-      edges: edges.map(function (e) { var diag = e[0] + e[1] === "AD" || e[0] + e[1] === "BC"; return [e[0], e[1], e[2], diag ? { t: 0.3 } : null]; }) };
-  }
-  var S20 = sq([["A", "B", 8], ["C", "D", 8], ["A", "C", 3], ["B", "D", 3], ["A", "D", 1], ["B", "C", 1]]);
-  P["H2020-8"] = {
-    type: "eksamen",
-    intro: "<p>Grafene er urettede, og en kant skrives {u, v}. Sertifikatet C er et array med indeksene 0, …, N − 1.</p>",
-    svar: [
-      { del: "(a)",
-        tekst: "<p>Sertifikatet C er en foreslått rekkefølge av husene. Vi sjekker at hvert par av noder som står etter hverandre i C, har en kant i G, <b>også paret fra den siste noden tilbake til den første</b>. Mangler én kant, svarer vi NEI. Finnes alle, svarer vi JA. Oppgaven lover at hver node står nøyaktig én gang i C, så det trenger vi ikke sjekke.</p>",
-        kode: "type2Verifier",
-        etter: "<p>(i + 1) mod N gir 0 når i = N − 1. Da sjekker den siste runden kanten fra C[N − 1] tilbake til C[0], og det er den som skiller en sykel fra en sti. Verifikatoren leter aldri etter en sykel selv. Den sjekker bare forslaget.</p>",
-        kjoretid: "N = |V| runder med ett kantoppslag hver: O(|V|) med nabomatrise, O(|V| + |E|) med naboliste. Begge er polynomielle",
-        fasitVerdi: "JA",
-        poeng: ["sjekke at hver kant i C er en kant i G, også den siste tilbake til start", "signatur og oversiktlig svar"] },
-      { del: "(b)",
-        tekst: "<p>Type2Verifier kjører i polynomiell tid. Får vi en JA-instans av Type2 sammen med et sertifikat C, kan vi altså verifisere JA-svaret i polynomiell tid. Det er definisjonen av at et avgjørelsesproblem er i NP.</p>",
-        poeng: ["koble den polynomielle verifikatoren til definisjonen av NP"] },
-      { del: "(c)",
-        tekst: "<p>En hamiltonsk sykel går innom alle nodene. Fjerner vi én node v, blir resten av sykelen en sti som fortsatt går innom alle de andre nodene, så grafen er fortsatt sammenhengende. Med andre ord kan to noder alltid nå hverandre på to måter: hver sin vei rundt sykelen, og bare den ene av dem kan gå gjennom v. Det bruker at grafen er urettet. Da finnes det ingen separasjonsnode, og grafen er 2-sammenhengende.</p>",
-        poeng: ["sykelen gir to veier mellom alle par av noder (én hver vei rundt)", "nevne at grafen er urettet"] },
-      { del: "(d)",
-        tekst: "<p>C er en sykel som inneholder alle nodene, også s og t. Vi finner plassen til s i C, og går så rundt sykelen den ene veien til vi treffer t. Etterpå går vi den andre veien. De to stiene bruker hver sin bue av sykelen, så de deler bare s og t.</p>",
-        kode: "twoPaths",
-        etter: "<p>Eksempel (steg-demoen i dette kortet): C = [A, B, C, D, E, F], s = B og t = E gir stiene B, C, D, E og B, A, F, E.</p>",
-        kjoretid: "O(|V|). Hver løkke går høyst N = |V| runder",
-        fasitVerdi: "B, C, D, E og B, A, F, E",
-        poeng: ["sti én vei", "sti motsatt vei", "modulo (eller lignende) for å gå syklisk", "ryddig oppsett og signatur"] },
-      { del: "(e)",
-        tekst: "<p>For hvert par av noder beholder vi den letteste av kantene fra T1–T4:</p>" +
-          tab(["Kant", "Fra", "Vekt i S"], [["{A, B}", "T1 (10), T2 (8)", "<b>8</b>"], ["{A, C}", "T1, T2, T3 (3)", "<b>3</b>"], ["{A, D}", "T1, T3, T4 (1)", "<b>1</b>"],
-            ["{B, C}", "T1, T2, T4 (1)", "<b>1</b>"], ["{B, D}", "T1, T2, T3 (3)", "<b>3</b>"], ["{C, D}", "T1 (10), T2 (8)", "<b>8</b>"]]),
-        fig: gfig(S20, "S: den sammenslåtte grafen", {}, 0.9),
-        poeng: ["riktig vekt på alle seks kantene"] },
-      { del: "(f)",
-        tekst: "<ul>" +
-          "<li><b>Nei, ikke nødvendigvis.</b> Mange kanter har samme vekt. Et minimalt spenntre er bare garantert unikt når alle kantvektene er forskjellige, og her kan for eksempel to kanter med vekt 3 være like gode valg.</li>" +
-          "<li><b>Nei.</b> G4 er av type 4, altså ikke sammenhengende. Et spenntre må nå alle nodene, så vi trenger minst én kant som ikke er fra G4.</li>" +
-          "<li><b>Ja.</b> G3 er et tre som når alle nodene. Uten G4 er kantene fra G3 (vekt 3) de billigste i G. Kruskal tar dem først, og de lager aldri en sykel fordi G3 er et tre. Etter dem er treet ferdig, så det minimale spenntreet er nøyaktig G3. (Hver kant med høyere vekt ville lukket en sykel, så den er ikke med.)</li>" +
-          "<li><b>3.</b> Kruskal stopper når siste kant er valgt. Den kanten kobler sammen de to siste trærne. Den kan ikke være fra G4, fordi G4 ikke er sammenhengende og alle G4-kantene tas først. G3 er et spenntre, så for enhver todeling av nodene finnes det en G3-kant (vekt 3) mellom de to delene. Den siste kanten er derfor billigst mulig blant kantene mellom de to siste trærne, altså vekt 3.</li></ul>",
-        fasitVerdi: "3",
-        poeng: ["riktig svar med en kort, generell begrunnelse på hvert punkt (ikke bare ut fra eksempelgrafene)"] },
-      { del: "(g)",
-        tekst: "<ul><li><b>Type 1 med vekt 10: en algoritme som bare returnerer 10.</b> Grafen er komplett, så det går en kant direkte fra s til t. Den korteste stien er alltid den ene kanten. O(1).</li>" +
-          "<li><b>Type 2 med vekt 8: BFS.</b> Alle kantene har samme vekt, så den korteste stien er den med færrest kanter. BFS finner den i O(|V| + |E|), og lengden er 8 · antall kanter. Dijkstra gir også riktig svar, men er tregere.</li></ul>" +
-          "<p class=\"small muted\">Vi antar at s ≠ t.</p>",
-        poeng: ["riktig algoritme for type 1", "riktig algoritme for type 2"] },
-      { del: "(h)",
-        tekst: "<p>Først slår vi sammen kantmengdene og beholder den letteste kanten for hvert par. Så kjører vi Dijkstra fra A:</p>" +
-          tab(["Node", "A", "B", "C", "D", "E", "F", "G", "H"], [["Avstand fra A", "0", "2", "2", "1", "4", "7", "8", "10"]]) +
-          "<ul><li>D: A–D (1)</li><li>B: A–D–B (1 + 1)</li><li>C: A–D–C (1 + 1). Kanten A–C har vekt 3, så den er dårligere.</li><li>E: A–D–E (1 + 3)</li>" +
-          "<li>F: A–D–E–F (4 + 3). Kanten A–F har vekt 8.</li><li>G: A–D–E–F–G (7 + 1)</li><li>H: A–H (10). Via G blir det 8 + 3 = 11, og via E 4 + 8 = 12.</li></ul>",
-        fasitVerdi: "A 0, B 2, C 2, D 1, E 4, F 7, G 8, H 10",
-        poeng: ["riktig avstand til alle åtte nodene"] }
-    ],
-    hvorfor: {
-      eli5: "<p>Oppgaven er lang, men hver del spør om én ting. Svar kort på det den spør om, og begrunn med én eller to setninger.</p>",
-      normal: "<p>Svarene er de samme som i sensorveiledningen. I (a) og (d) er det modulo-regningen som gir de siste poengene, og i (f) må begrunnelsene gjelde generelle grafer, ikke bare eksempelgrafene fra (e). Ellers gir sensor bare halv uttelling.</p>",
-      teknisk: "<p>(a)–(b) tester hva en verifikator er og hvorfor den viser at Type2 er i NP. (c)–(d) bruker at en hamiltonsk sykel gir to veier mellom alle par. (e)–(h) tester minimale spenntrær (unikhet, kuttegenskapen) og korteste stier (BFS når alle vekter er like, Dijkstra ellers).</p>"
-    },
-    sensor: {
-      kilde: "Kilde: sensorveiledning IN2010 H2020, oppgave 8",
-      deler: [
-        { del: "(a)",
-          kode: PC("Type2Verifier", "G, C", "En graf G og et array av noder C", "Returner JA hvis C viser at G er av type 2, NEI ellers",
-            [[1, "(V, E) ← G"], [1, "N ← |C|"], [1, "for i ← 0 to N − 1 do"], [2, "if (C[i], C[(i + 1) mod N]) ∉ E then"], [3, "return NEI"], [1, "return JA"]]),
-          etter: "<p>Det viktige i denne oppgaven er at man sjekker at etterfølgende par av noder i C svarer til kanter i G. Det er også nødvendig å sjekke at siste og første node i C utgjør en kant i G; dette gjør vi i siste iterasjon av loopen, der i = N − 1, hvor vi da sjekker om (C[N - 1], C[0]) er en kant i G (fordi N mod N = 0).</p>",
-          kriterier: "<p>Veiledende poengfordeling:</p><ul><li>5 poeng for å sjekke om e ∈ E(C) ⇒ e ∈ E(G); minus 1 poeng om de glemmer siste kant</li><li>2 poeng for signatur og generell oversiktlig besvarelse</li><li>Ingen poeng for å finne en generell sykel, f.eks. ved hjelp av BFS/DFS</li></ul>" },
-        { del: "(b)", fasit: "<p>Type2Verifier kjører i polynomiell tid. Derfor kan JA-instanser av Type2 verifiseres i polynomiell tid. Dette er kravet for å være i NP.</p>" },
-        { del: "(c)", fasit: "<p>Hvis grafen inneholder en hamiltonsk sykel kan alle noder nå alle andre på minst to måter. Dette er ved å følge sykelen «den ene eller den andre» veien. Her bruker vi at grafen er urettet.</p>" },
-        { del: "(d)",
-          fasit: "<p>Siden C er et sertifikat for at G inneholder en hamiltonsk sykel, så utgjør C en sykel som inneholder alle noder i G. Det vil si at vi har en sykel som nødvendigvis inneholder både s og t. Alt vi trenger å gjøre er å finne s og så følge sykelen i begge retninger til vi finner t, hvor hver retning svarer til en distinkt sti mellom s og t.</p>",
-          kode: PC("TwoPaths", "G, C, s, t", null, null,
-            [[1, "N ← |C|"], [1, "si ← 0"], [1, "while C[si] ≠ s do"], [2, "si ← si + 1"], [1, "i ← si"], [1, "while C[i] ≠ t do"], [2, "print(C[i])"], [2, "i ← (i + 1) mod N"],
-             [1, "print(C[i])"], [1, "i ← si"], [1, "while C[i] ≠ t do"], [2, "print(C[i])"], [2, "i ← (i − 1) mod N"], [1, "print(C[i])"]]),
-          kriterier: "<p>Veiledene poengfordeling:</p><ul><li>2 poeng for sti en vei</li><li>2 poeng for sti motsatt vei</li><li>2 poeng for å huske modulo-operator eller lignende for å få til syklisk iterasjon</li><li>2 poeng for riktig oppsett (signatur/ryddig svar)</li><li>Ingen poeng for å finne alle stier i G ved hjelp av DFS</li><li>1-2 poeng hvis de finner 2 mulige distinkte stier og stopper etter det.</li></ul>" },
-        { del: "(e)", fasit: "<p>[Figur i sensorveiledningen: grafen S med vektene A–B 8, C–D 8, A–C 3, B–D 3, A–D 1 og B–C 1.]</p>" },
-        { del: "(f)",
-          fasit: "<ul><li>Nei, det er ikke garantert fordi flere kantar kan ha samme vekt. Et unikt minimalt spenntre er bare garantert når ingen kanter har samme vekt.</li>" +
-            "<li>Nei, fordi G4 ikke er sammenhengende. Poenget med spenntreet er at det skal spenne ut grafen, vi må derfor bruke andre kanter enn kun de fra G4.</li>" +
-            "<li>Ja. Dette er fordi G3 er av type 3 og derfor er et tre. Hvis G4 ikke inneholder noen kanter, vil alle de billigste kantene være i G3 så spenntreet er derfor også minimalt.</li>" +
-            "<li>3. Kruskal terminerer når siste kant er valgt, og det er den billigste kanten som forbinder de to siste spenntrærne (T1 og T2). Denne kanten kan ikke være i G4 som forklart i punkt 2 over. Siden G3 er et spenntre, som forklart i punkt 3, må det finnes en kant som forbinder enhver ikke-triviell todeling av nodene. Dette er fordi hvis det var mulig å lage T1 og T2 uten at det fantes en slik kant i G3 så hadde ikke G3 vært et spenntre.</li></ul>",
-          kriterier: "<p>Kun halv uttelling hvis studenten forklarer ut fra grafene fra forrige deloppgave istedenfor for en generell graf. Manglende begrunnelse gir ikke uttelling.</p>" },
-        { del: "(g)",
-          fasit: "<ul><li>Type 1, vekt 10: En algoritme som bare returnerer 10</li><li>Type 2, vekt 8: BFS</li></ul>" +
-            "<p>Merk at det er en liten svakhet i oppgaven her, hvor vi burde spesifisert at s ≠ t. Det er allikevel ikke direkte feil, fordi en sti ikke kan inneholde samme node flere ganger; altså er det å gå fra s til s ikke en sti.</p>" },
-        { del: "(h)", fasit: "<p>A 0 · B 2 · C 2 · D 1 · E 4 · F 7 · G 8 · H 10</p>" }
-      ],
-      merknad: "Poengene står på eksamensarket. Sensor skriver kanten som et par (C[i], C[(i + 1) mod N]); vi skriver {…}, slik kurset skriver en urettet kant. I (d) skriver sensor (i − 1) mod N og mener matematisk modulo (resultatet er alltid mellom 0 og N − 1); vi skriver (i − 1 + N) mod N for å gjøre det entydig. I (e) er svaret en figur og i (g) avkryssede alternativer i sensorveiledningen. Her står de som tekst."
-    }
-  };
 
   /* ---------- H2020 · Oppgave 3 · Grafegenskaper (8 poeng) ---------- */
   var H20_3 = [
@@ -439,7 +343,7 @@
       { del: "(a)", tekst: "<p>En <b>urettet graf</b> G = (V, E): <b>nodene</b> er personene i nettverket (du selv er s), og det går en <b>kant</b> {u, v} mellom to personer som er venner. Musikksmaken ligger ikke i grafen, men i ordboka M.</p>", poeng: ["noder = personer, kanter = vennskap"] },
       { del: "(b)", tekst: "<p>Vi gjør et <b>bredde-først søk</b> fra s og stopper ved dybde k. BFS tar nodene lag for lag, så avstanden dist[v] er antall venneledd. Fra noder på avstand k går vi ikke videre. Underveis teller vi hvor mange som liker jazz og hvor mange som liker klassisk.</p>",
         kode: "jazzOrClassical", fasitVerdi: "jazz",
-        etter: "<p class=\"small muted\">Vårt råd: bruk BFS her. Et dybde-først søk med en felles visited kan i noen grafer merke en venn som besøkt via en lang vei, og så ikke gå videre fra den når den senere kunne vært nådd med færre ledd.</p>",
+        etter: "<p class=\"small muted\">Tips: bruk BFS her. Et dybde-først søk med en felles visited kan i noen grafer merke en venn som besøkt via en lang vei, og så ikke gå videre fra den når den senere kunne vært nådd med færre ledd.</p>",
         kjoretid: "O(|V| + |E|) i verste fall, men bare delen av grafen innen k ledd blir sett på",
         poeng: ["traversering fra s som stopper ved dybde k", "tell jazz og klassisk", "ikke en full traversering"] },
       { del: "(c)", tekst: "<p><b>Bredde-først søk (BFS).</b> Det besøker nodene lag for lag: først alle på avstand 1 (dine venner), så alle på avstand 2, og så videre.</p>", poeng: ["BFS"] }

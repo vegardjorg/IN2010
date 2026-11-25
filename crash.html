@@ -7,7 +7,7 @@
   <title>Crash course · IN2010</title>
   <meta name="description" content="Crash course i IN2010: en løype i eksamensrekkefølge, vektet etter forventede eksamenspoeng. Velg Ekspress, Standard eller Grundig, og følg stegene med kjerne, oppskrift, eksempel, eksamenskort og sjekk.">
   <script>(function(){try{var d=document.documentElement;var t=localStorage.getItem('in-theme');if(t!=='dark'&&t!=='system')t='light';if(t!=='system')d.setAttribute('data-theme',t);var l=localStorage.getItem('in-level');if(l!=='eli5'&&l!=='teknisk')l='normal';d.setAttribute('data-level',l);}catch(e){document.documentElement.setAttribute('data-theme','light');document.documentElement.setAttribute('data-level','normal');}})();</script>
-  <link rel="stylesheet" href="assets/css/styles.css?v=20261125i">
+  <link rel="stylesheet" href="assets/css/styles.css?v=20261125j">
 </head>
 <body data-page="crash">
   <a class="skip-link" href="#main">Hopp til innhold</a>
@@ -92,29 +92,29 @@
 
   <footer class="footer">IN2010-guide · Crash course</footer>
 
-  <script src="assets/js/core.js?v=20261125i"></script>
-  <script src="assets/js/symboler.js?v=20261125i"></script>
-  <script src="assets/js/data-tf.js?v=20261125i"></script>
-  <script src="assets/js/pseudocode.js?v=20261125i"></script>
+  <script src="assets/js/core.js?v=20261125j"></script>
+  <script src="assets/js/symboler.js?v=20261125j"></script>
+  <script src="assets/js/data-tf.js?v=20261125j"></script>
+  <script src="assets/js/pseudocode.js?v=20261125j"></script>
   <!-- Steg-demoer i mock-kortene (IN.mountExamDemo): spiller, alle visualiseringer og generatorene -->
-  <script src="assets/js/stepplayer.js?v=20261125i"></script>
-  <script src="assets/js/viz-bars.js?v=20261125i"></script>
-  <script src="assets/js/viz-buckets.js?v=20261125i"></script>
-  <script src="assets/js/viz-tree.js?v=20261125i"></script>
-  <script src="assets/js/viz-hash.js?v=20261125i"></script>
-  <script src="assets/js/viz-graph.js?v=20261125i"></script>
-  <script src="assets/js/viz-list.js?v=20261125i"></script>
-  <script src="assets/js/data-algos.js?v=20261125i"></script>
-  <script src="assets/js/data-heap.js?v=20261125i"></script>
-  <script src="assets/js/data-sok.js?v=20261125i"></script>
-  <script src="assets/js/data-traer.js?v=20261125i"></script>
-  <script src="assets/js/data-hashing.js?v=20261125i"></script>
-  <script src="assets/js/data-grafer.js?v=20261125i"></script>
-  <script src="assets/js/data-lister.js?v=20261125i"></script>
-  <script src="assets/js/data-strategi.js?v=20261125i"></script>
-  <script src="assets/js/perfekt/mock.js?v=20261125i"></script>
-  <script src="assets/js/data-mock.js?v=20261125i"></script>
-  <script src="assets/js/data-crash.js?v=20261125i"></script>
+  <script src="assets/js/stepplayer.js?v=20261125j"></script>
+  <script src="assets/js/viz-bars.js?v=20261125j"></script>
+  <script src="assets/js/viz-buckets.js?v=20261125j"></script>
+  <script src="assets/js/viz-tree.js?v=20261125j"></script>
+  <script src="assets/js/viz-hash.js?v=20261125j"></script>
+  <script src="assets/js/viz-graph.js?v=20261125j"></script>
+  <script src="assets/js/viz-list.js?v=20261125j"></script>
+  <script src="assets/js/data-algos.js?v=20261125j"></script>
+  <script src="assets/js/data-heap.js?v=20261125j"></script>
+  <script src="assets/js/data-sok.js?v=20261125j"></script>
+  <script src="assets/js/data-traer.js?v=20261125j"></script>
+  <script src="assets/js/data-hashing.js?v=20261125j"></script>
+  <script src="assets/js/data-grafer.js?v=20261125j"></script>
+  <script src="assets/js/data-lister.js?v=20261125j"></script>
+  <script src="assets/js/data-strategi.js?v=20261125j"></script>
+  <script src="assets/js/perfekt/mock.js?v=20261125j"></script>
+  <script src="assets/js/data-mock.js?v=20261125j"></script>
+  <script src="assets/js/data-crash.js?v=20261125j"></script>
   <script>
   (function () {
     "use strict";
@@ -145,7 +145,28 @@
       h.push("fra=crash"); h.push("steg=" + stepId);
       return (HREF[page] || (/\.html$/.test(page) ? page : page + ".html")) + "#" + h.join("&");
     }
-    function kortHref(k, stepId) { var c = C.kort[k]; return c ? link(c[0], c[1], c[6], stepId) : "#"; }
+    function kortHref(k, stepId) { var c = C.kort[k]; return c ? link(c[0], c[1], c[6], stepId) + "&kort=" + k : "#"; }
+    function kortTittel(k) { var c = C.kort[k]; return c ? c[2] + " " + c[4] : k; }
+    /* Kortnøkkel → stegene der kortet står (oppgaver eller ekstra), for «også i steg …» i køen */
+    var KORT_STEG = {};
+    STEPS.forEach(function (s) {
+      (s.oppgaver || []).concat(s.ekstra || []).forEach(function (k) {
+        var key = kortKey(k); if (!key) return;
+        var l = KORT_STEG[key] = KORT_STEG[key] || [];
+        if (l.indexOf(s.id) < 0) l.push(s.id);
+      });
+    });
+
+    /* ---------- Eksamenskortene i stegene ----------
+       Kortene bygges fra de samme definisjonene som temasidene (assets/js/kort/<side>.js).
+       Filene for et tema lastes først når et steg med kort fra det temaet åpnes. */
+    function kortScripts(side) {
+      return ["assets/js/varline.js", "assets/js/perfekt/" + side + ".js", "assets/js/perfekt/delt.js", "assets/js/kort/" + side + ".js"];
+    }
+    var SIDE_P = {};
+    function loadSide(side) {
+      return SIDE_P[side] || (SIDE_P[side] = IN.loadScripts(kortScripts(side)).catch(function (e) { delete SIDE_P[side]; throw e; }));
+    }
 
     /* ---------- Toppen: lengde, totaler, fortsett ---------- */
     function buildLenPicker() {
@@ -181,13 +202,24 @@
     function setLength(L, src) {
       if (!LEN[L]) return;
       var changed = state().lengde !== L;
+      // Åpne steg blir stående synlige (og på samme sted på skjermen), også om de ikke er med i den nye lengden
+      var open = qsa("details.cr-step[open]").filter(function (d) { return !d.hidden; }), anchor = null, top0 = 0, kept = [];
+      open.forEach(function (d) {
+        var id = d.getAttribute("data-step"), r = d.getBoundingClientRect();
+        if (changed && !inLen(BYID[id], L)) { forced[id] = true; kept.push(id); }
+        if (!anchor && r.bottom > stickyOff() && r.top < window.innerHeight) { anchor = d; top0 = r.top; }
+      });
+      var foc = document.activeElement;
       if (changed) setState({ lengde: L });
       render();
+      if (anchor) { var dy = anchor.getBoundingClientRect().top - top0; if (Math.abs(dy) > 1) window.scrollTo({ top: window.pageYOffset + dy, behavior: "instant" }); }
+      if (foc && foc !== document.activeElement && document.contains(foc)) try { foc.focus({ preventScroll: true }); } catch (e) {}
       if (!changed) return;
       var pr = CP(L), txt;
       if (!pr.startet) txt = LEN[L].navn + ": " + pr.antallSteg + " steg, ca. " + fmtTid(pr.minutter) + ".";
       else txt = "Byttet til " + LEN[L].navn + ": " + pr.antallSteg + " steg, du har fullført " + pr.ferdigeSteg + " av dem." +
         (pr.ferdigeUtenfor ? " " + pr.ferdigeUtenfor + " fullførte steg utenfor " + LEN[L].navn + " er lagret." : "");
+      if (kept.length) txt += " Steg " + kept.join(", ") + " er ikke med i " + LEN[L].navn + ", men står åpent til du lukker det.";
       var top = qs("#cr-len-note"), sn = qs("#cr-stick-note");
       top.textContent = txt;
       sn.textContent = src === "stick" ? txt : "";
@@ -306,10 +338,31 @@
         return;
       }
       pr.ko.forEach(function (id) {
-        var s = BYID[id];
-        var a = el("a", { href: "#steg=" + s.id, text: "Steg " + s.id + " · " + s.tittel });
-        host.appendChild(el("li", {}, [a, el("span", { class: "cr-pts", text: s.vekt + " p" })]));
+        var s = BYID[id], why = queueWhy(id, (pr.status[id] && pr.status[id].hvorfor) || []);
+        var a = el("a", { href: "#steg=" + s.id + (why.kort ? "&kort=" + why.kort : ""), text: "Steg " + s.id + " · " + s.tittel });
+        host.appendChild(el("li", {}, [a, el("span", { class: "cr-pts", text: s.vekt + " p" }),
+          why.txt ? el("span", { class: "cr-qwhy small muted", text: why.txt }) : null]));
       });
+    }
+    /* Hvorfor steget står i køen: «Øv mer på H2021 Binære heaps (også i steg 4b)» */
+    function queueWhy(id, list) {
+      var txt = [], seen = {}, first = null;
+      list.forEach(function (w) {
+        if (w.type === "kort") {
+          var wk = kortKey(w.id);                 // samme oppgave kan stå med to kort-id-er (H2025-5)
+          if (seen[wk]) return; seen[wk] = 1;
+          if (!first) first = w.id;
+          var other = (KORT_STEG[kortKey(w.id)] || []).filter(function (x) { return x !== id; });
+          txt.push("Øv mer på " + kortTittel(w.id) + (other.length ? " (også i steg " + other.join(", ") + ")" : ""));
+        } else if (w.type === "steg") {
+          if (!seen._s) txt.push("Du merket steget «Må øve mer»");
+          seen._s = 1;
+        } else if (w.type === "mock") {
+          if (!seen._m) txt.push("Øv mer på mock-oppgavene");
+          seen._m = 1;
+        }
+      });
+      return { txt: txt.join(" · "), kort: first };
     }
 
     /* ---------- Etapper og steg ---------- */
@@ -364,9 +417,13 @@
       d.appendChild(sum);
       var body = el("div", { class: "cr-sbody" });
       d.appendChild(body);
+      d._ensure = function () {
+        if (!d._built) { d._built = true; d._builtL = state().lengde; d._kortP = buildBody(s, body); }
+        return d._kortP || Promise.resolve();
+      };
       d.addEventListener("toggle", function () {
         if (!d.open) return;
-        if (!d._built) { d._built = true; d._builtL = state().lengde; buildBody(s, body); }
+        d._ensure();
         if (state().sist !== s.id) setState({ sist: s.id });
         try { history.replaceState(null, "", "#steg=" + s.id); } catch (e) {}
       });
@@ -381,6 +438,8 @@
       });
       return ul;
     }
+    /* Ett kort i «Din tur»: først en lenke (reserve), som byttes ut med selve kortet når filene er lastet.
+       Kort uten definisjon (f.eks. sant/usant-testene) blir stående som lenke. */
     function kortItem(k, s) {
       var c = C.kort[k]; if (!c) return null;
       var key = kortKey(k);
@@ -389,7 +448,99 @@
         el("span", { class: "cr-ktit", text: c[4] }),
         el("span", { class: "cr-pts", text: c[5] + " p" })
       ]);
-      return el("li", { class: "cr-kli" }, [a, el("span", { class: "cr-kstat small", "data-kort": key })]);
+      return el("li", { class: "cr-kli", "data-kid": k, "data-pkey": key }, [a, el("span", { class: "cr-kstat small", "data-kort": key })]);
+    }
+    function mountCards(s, body) {
+      var lis = qsa("li.cr-kli[data-kid]", body);
+      var sides = [];
+      lis.forEach(function (li) { var c = C.kort[li.getAttribute("data-kid")]; if (c && sides.indexOf(c[0]) < 0) sides.push(c[0]); });
+      if (!sides.length || !IN.kortData) return Promise.resolve();
+      lis.forEach(function (li) { li.classList.add("is-loading"); });
+      return sides.reduce(function (p, side) {
+        return p.then(function () {
+          return loadSide(side).then(function () {
+            lis.forEach(function (li) { var c = C.kort[li.getAttribute("data-kid")]; if (c && c[0] === side) inlineCard(s, li); });
+          }, function () {
+            lis.forEach(function (li) { var c = C.kort[li.getAttribute("data-kid")]; if (c && c[0] === side) li.classList.remove("is-loading"); });
+          });
+        });
+      }, Promise.resolve()).then(function () { paintCards(body); });
+    }
+    function inlineCard(s, li) {
+      li.classList.remove("is-loading");
+      var k = li.getAttribute("data-kid"), c = C.kort[k];
+      var test = c && c[7] && c[7].indexOf("kort:") !== 0;     // «kortet» er en test (tf:…): blir lenke
+      var e = c && !test ? IN.kortData.find(c[0], c[6]) : null;
+      if (!e) return;
+      clear(li);
+      li.classList.add("is-inline");
+      var card;
+      try { card = IN.kortData.build(li, e, { variant: "flat", utenId: true, progressKey: kortKey(k) }); }
+      catch (er) { clear(li); li.classList.remove("is-inline"); li.appendChild(kortItemFallback(k, s)); return; }
+      card.setAttribute("data-kid", k);
+      // Bare ett kort åpent om gangen i et steg
+      card.addEventListener("toggle", function () {
+        if (!card.open) return;
+        var stepBody = li.closest(".cr-sbody");
+        qsa("details.examtask[open]", stepBody).forEach(function (o) { if (o !== card) o.open = false; });
+      });
+      li.appendChild(el("p", { class: "cr-kles small" }, el("a", { href: kortHref(k, s.id), text: "Les mer på emnesiden →" })));
+    }
+    function kortItemFallback(k, s) {
+      var c = C.kort[k];
+      return el("a", { href: kortHref(k, s.id), class: "cr-kort" }, [
+        el("span", { class: "et-year", text: c[2] }), el("span", { class: "cr-ktit", text: c[4] }), el("span", { class: "cr-pts", text: c[5] + " p" })
+      ]);
+    }
+    /* Etter «Fikk det til»: en linje rett under kortet som peker videre */
+    function nextPrompt(li) {
+      var old = qs(".cr-nextp", li); if (old) old.remove();
+      var key = li.getAttribute("data-pkey"), all = P.all();
+      if (kortStatus(all[key]) !== "ok" || !li.classList.contains("is-inline")) return;
+      var ul = li.parentNode, stepEl = li.closest(".cr-step"), s = stepEl && BYID[stepEl.getAttribute("data-step")];
+      if (!s) return;
+      var sibs = qsa(":scope > li.cr-kli", ul), i = sibs.indexOf(li), nxt = null;
+      for (var j = 1; j < sibs.length && !nxt; j++) {
+        var cand = sibs[(i + j) % sibs.length];
+        if (kortStatus(all[cand.getAttribute("data-pkey")]) !== "ok") nxt = cand;
+      }
+      var row = el("div", { class: "cr-nextp", role: "status" });
+      if (nxt) {
+        var b = el("button", { class: "btn sm primary", type: "button", text: "Neste oppgave: " + kortTittel(nxt.getAttribute("data-kid")) + " ↓" });
+        b.addEventListener("click", function () { openCard(stepEl, nxt.getAttribute("data-kid")); });
+        row.appendChild(el("span", { class: "small", text: "✓ Lagret." }));
+        row.appendChild(b);
+      } else {
+        var done = CP.statusAll(state().lengde)[s.id].done;
+        row.appendChild(el("span", { class: "small", text: done ? "✓ Lagret. Steget er dekket." : "✓ Lagret. Alle kortene her er merket." }));
+        var nb = el("button", { class: "btn sm primary", type: "button", text: "Neste steg →" });
+        nb.addEventListener("click", function () { goNext(s, nb); });
+        row.appendChild(nb);
+      }
+      li.appendChild(row);
+    }
+    function openCard(stepEl, k) {
+      var li = qs('li.cr-kli[data-kid="' + k + '"]', stepEl); if (!li) return false;
+      var ex = li.closest("details.cr-ekstra"); if (ex) ex.open = true;
+      var card = qs("details.examtask", li);
+      if (card) card.open = true;
+      scrollToEl(li, card ? qs("summary", card) : qs("a", li));
+      return true;
+    }
+    function goNext(s, btn) {
+      var list = stepsIn(state().lengde), idx = list.indexOf(s), n = list[idx + 1] || null;
+      if (!n) { btn.textContent = "Dette var siste steg i løypa"; btn.disabled = true; return; }
+      var cur = document.getElementById("steg-" + s.id); if (cur) cur.open = false;
+      openStep(n.id, true);
+    }
+    /* Ferdig-regelen for steget, på én linje (samme regler som IN.crashProgress) */
+    function doneRule(s) {
+      if (s.spesial === "mock") return "Ferdig når minst " + Math.round(100 * C.mockAndel) + " % av mock-kortene i valgt lengde er merket «Fikk det til».";
+      var n = (s.oppgaver || []).filter(function (k) { return kortKey(k); }).length, deler = [];
+      if (n) deler.push(n === 1 ? "oppgaven under er merket «Fikk det til»" : "alle de " + n + " oppgavene under er merket «Fikk det til»");
+      if (s.sjekk && s.sjekk.length) deler.push(s.sjekk.length === 1 ? "sjekken er bestått" : "én av sjekkene er bestått");
+      if (!n) deler.push("du har merket steget «Fikk det til»");
+      return "Ferdig når " + deler.join(", eller ") + ". «Må øve mer» setter steget i repetisjonskøen.";
     }
 
     function buildBody(s, body) {
@@ -399,6 +550,7 @@
         el("div", { class: "lbl", text: "Hvorfor" + (s.vekt ? " · ~" + s.vekt + " poeng" : "") }),
         el("p", { html: s.hvorfor })
       ]));
+      body.appendChild(el("p", { class: "cr-regel small", text: doneRule(s) }));
       // 2 Kjernen
       body.appendChild(h3("Kjernen på 2 minutter"));
       var kh = el("div", { class: "cr-kjerne" });
@@ -440,10 +592,12 @@
         }
         if (s.mangler) body.appendChild(el("p", { class: "cr-mangler small", text: (s.mangler === true ? "Et eget øvingskort for dette mangler ennå." : s.mangler) }));
       }
-      // 6 Sjekk
-      body.appendChild(h3(s.sjekk && s.sjekk.length ? "Sjekk" : "Egenvurdering"));
+      // 6 Sjekk. Steg med kort merkes på kortene; «Hele steget» vises der bare hvis den er brukt før (teller fortsatt).
+      var kortSteg = (s.oppgaver || []).some(function (k) { return kortKey(k); });
+      var legacy = kortSteg && P && P.get("crash:steg:" + s.id) && P.get("crash:steg:" + s.id).status;
+      if ((s.sjekk && s.sjekk.length) || !kortSteg || legacy) body.appendChild(h3(s.sjekk && s.sjekk.length ? "Sjekk" : "Egenvurdering"));
       (s.sjekk || []).forEach(function (c, i) { buildCheck(s, c, i, body); });
-      body.appendChild(selfMark(s));
+      if (!kortSteg || legacy) body.appendChild(selfMark(s, legacy));
       // 7 Feller
       if (s.feller && s.feller.length) {
         body.appendChild(el("div", { class: "callout felle cr-feller" }, [
@@ -453,16 +607,11 @@
       }
       // Neste
       var nx = el("button", { class: "btn sm cr-next", type: "button", text: "Neste steg →" });
-      nx.addEventListener("click", function () {
-        var list = stepsIn(state().lengde), idx = list.indexOf(s), n = null;
-        for (var j = idx + 1; j < list.length; j++) { n = list[j]; break; }
-        if (!n) { nx.textContent = "Dette var siste steg i løypa"; nx.disabled = true; return; }
-        var cur = document.getElementById("steg-" + s.id); if (cur) cur.open = false;
-        openStep(n.id, true);
-      });
+      nx.addEventListener("click", function () { goNext(s, nx); });
       body.appendChild(el("div", { class: "cr-nextrow" }, nx));
       paintCards(body);
       paintChecks(s, body);
+      return mountCards(s, body);
     }
 
     /* Sjekk-varianter */
@@ -531,7 +680,7 @@
           (ok ? "" : " (trenger " + Math.round(ter * 100) + " %).");
       });
     }
-    function selfMark(s) {
+    function selfMark(s, legacy) {
       var key = "crash:steg:" + s.id;
       var wrap = el("div", { class: "et-self cr-self", role: "group", "aria-label": "Egenvurdering av steget" });
       var bOk = el("button", { class: "btn sm et-self-ok", type: "button", text: "✓ Fikk det til" });
@@ -542,7 +691,7 @@
       }
       bOk.addEventListener("click", function () { pick("ok"); });
       bOv.addEventListener("click", function () { pick("ovmer"); });
-      wrap.appendChild(el("span", { class: "et-self-q muted small", text: "Hele steget:" }));
+      wrap.appendChild(el("span", { class: "et-self-q muted small", text: legacy ? "Hele steget (merket tidligere, teller fortsatt):" : "Hele steget:" }));
       wrap.appendChild(bOk); wrap.appendChild(bOv);
       wrap._paint = function (all) {
         var r = all[key], v = r && r.status;
@@ -559,6 +708,11 @@
         sp.textContent = v === "ok" ? "✓ Fikk det til" : v === "ovmer" ? "↻ Øv mer" : "";
       });
       qsa(".cr-self", root).forEach(function (w) { if (w._paint) w._paint(all); });
+      qsa("li.cr-kli.is-inline", root).forEach(function (li) {
+        var has = qs(".cr-nextp", li), ok = kortStatus(all[li.getAttribute("data-pkey")]) === "ok";
+        if (!ok && has) has.remove();
+        else if (ok && has) nextPrompt(li);    // oppdater teksten (neste kort kan ha endret seg)
+      });
     }
 
     /* Mock-steget (etappe 3) */
@@ -630,7 +784,7 @@
       tbl.appendChild(el("thead", {}, el("tr", {}, [el("th", { text: "Nr." }), el("th", { text: "Oppgave" }), el("th", { text: "Poeng" }), el("th", { text: "Tid" })])));
       var tb = el("tbody");
       G.rader.forEach(function (r) {
-        var href = r.kort ? kortHref(r.kort, s.id) : link(r.lenke[0], r.lenke[1], r.lenke[2], s.id);
+        var href = r.kort ? "#steg=" + s.id + "&kort=" + r.kort : link(r.lenke[0], r.lenke[1], r.lenke[2], s.id);   // kortene står under tabellen
         var stat = el("span", { class: "cr-kstat small" });
         if (r.kort) stat.setAttribute("data-kort", kortKey(r.kort));
         var tr = el("tr", {}, [
@@ -643,6 +797,9 @@
         tb.appendChild(tr);
       });
       tbl.appendChild(tb); tw.appendChild(tbl); body.appendChild(tw);
+      var kl = el("ul", { class: "cr-klist cr-gp-kort" });
+      G.rader.forEach(function (r) { if (r.kort) { var li = kortItem(r.kort, s); if (li) kl.appendChild(li); } });
+      body.appendChild(kl);
 
       var rows = qsa("tr", tb), timer = null, startAt = 0, used = 0, running = false;
       function total() { var v = parseInt(inp.value, 10); return (isFinite(v) && v > 0 ? v : totP * G.minPerPoeng) * 60; }
@@ -710,7 +867,7 @@
           qs(".cr-tid", d).textContent = minutes(s, L) + " min";
           if (d._built && s.spesial === "mock" && d._builtL !== L) {
             // Mock-lista deler kortene i «med» og «utenfor» etter lengden: bygg på nytt etter et bytte
-            var body = qs(".cr-sbody", d); clear(body); d._builtL = L; buildBody(s, body);
+            var body = qs(".cr-sbody", d); clear(body); d._builtL = L; d._kortP = buildBody(s, body);
           }
           if (d._built) { paintCards(d); paintChecks(s, d); paintMockKrav(s, d); }
         });
@@ -722,13 +879,19 @@
     }
 
     /* ---------- Åpne steg (dyplenke #steg=…) ---------- */
-    function openStep(id, scroll) {
+    function openStep(id, scroll, kort) {
       var s = BYID[id]; if (!s) return;
       var L = state().lengde;
       if (!inLen(s, L)) { forced[id] = true; render(); }
       var d = document.getElementById("steg-" + id); if (!d) return;
       d.hidden = false;
       d.open = true;
+      var p = d._ensure();
+      if (kort) {
+        // Dyplenke til et kort i steget (#steg=…&kort=…): vent til kortene er bygd, åpne kortet og rull dit
+        p.then(function () { if (!openCard(d, kort) && scroll) scrollToEl(d, qs("summary", d)); });
+        return;
+      }
       if (!scroll) return;
       var go = function () {
         var top = d.getBoundingClientRect().top + window.pageYOffset - stickyOff();
@@ -738,8 +901,8 @@
       try { d.querySelector("summary").focus({ preventScroll: true }); } catch (e) {}
     }
     function fromHash() {
-      var m = location.hash.match(/steg=([\w-]+)/);
-      if (m && BYID[m[1]]) openStep(m[1], true);
+      var m = location.hash.match(/steg=([\w-]+)/), k = location.hash.match(/kort=([\w-]+)/);
+      if (m && BYID[m[1]]) openStep(m[1], true, k && C.kort[k[1]] ? k[1] : null);
     }
 
     /* ---------- Overføring og nullstilling ---------- */
@@ -790,13 +953,22 @@
         var a = e.target.closest && e.target.closest('a[href^="#steg="]');
         if (!a) return;
         e.preventDefault();
-        var id = a.getAttribute("href").slice(6);
-        try { history.replaceState(null, "", "#steg=" + id); } catch (er) {}
-        openStep(id, true);
+        var h = a.getAttribute("href"), id = (h.match(/steg=([\w-]+)/) || [])[1], k = (h.match(/kort=([\w-]+)/) || [])[1];
+        try { history.replaceState(null, "", h); } catch (er) {}
+        openStep(id, true, k && C.kort[k] ? k : null);
       });
       var pend = null;
       function soon() { if (pend) return; pend = setTimeout(function () { pend = null; render(); }, 30); }
       document.addEventListener("in:progress", soon);
+      // «Fikk det til» på et kort i et steg: vis veien videre rett under kortet
+      document.addEventListener("in:progress", function (e) {
+        var key = e.detail && e.detail.key; if (!key || key.indexOf("kort:") !== 0) return;
+        qsa("li.cr-kli.is-inline").forEach(function (li) {
+          if (li.getAttribute("data-pkey") !== key) return;
+          var c = qs("details.examtask", li);
+          if (c && c.open) nextPrompt(li);
+        });
+      });
       window.addEventListener("storage", function (e) { if (!e.key || e.key === P.KEY) soon(); });
       window.addEventListener("hashchange", fromHash);
       fromHash();

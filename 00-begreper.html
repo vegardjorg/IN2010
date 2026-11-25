@@ -7,7 +7,7 @@
   <title>Blokk 0 · Begreper · IN2010</title>
   <meta name="description" content="Grunnbegreper i IN2010: algoritme, datastruktur, Big-O, stabil/in-place, ADT, rekursjon.">
   <script>(function(){try{var d=document.documentElement;var t=localStorage.getItem('in-theme');if(t!=='dark'&&t!=='system')t='light';if(t!=='system')d.setAttribute('data-theme',t);var l=localStorage.getItem('in-level');if(l!=='eli5'&&l!=='teknisk')l='normal';d.setAttribute('data-level',l);}catch(e){document.documentElement.setAttribute('data-theme','light');document.documentElement.setAttribute('data-level','normal');}})();</script>
-  <link rel="stylesheet" href="assets/css/styles.css?v=20261125i">
+  <link rel="stylesheet" href="assets/css/styles.css?v=20261125j">
 </head>
 <body data-page="begreper">
   <a class="skip-link" href="#main">Hopp til innhold</a>
@@ -46,7 +46,7 @@
       <h3>Forklaring</h3>
       <div id="ex-algoritme"></div>
 
-      <div class="callout snarvei"><span class="lbl">Vårt råd</span>
+      <div class="callout snarvei"><span class="lbl">Eksamenstips</span>
         Få med at en algoritme er presis og entydig, at den tar slutt, og at den går fra input til output.
         For en datastruktur: at den organiserer data, og at valget avhenger av hvilke operasjoner som skal gå fort.
         Oppgaven under står likt på hver eksamen fra H2020 til H2025.</div>
@@ -222,14 +222,15 @@
 
   <footer class="footer">IN2010-guide · Blokk 0 · Begreper</footer>
 
-  <script src="assets/js/core.js?v=20261125i"></script>
-  <script src="assets/js/symboler.js?v=20261125i"></script>
-  <script src="assets/js/data-tf.js?v=20261125i"></script>
-  <script src="assets/js/pseudocode.js?v=20261125i"></script>
-  <script src="assets/js/stepplayer.js?v=20261125i"></script>
-  <script src="assets/js/varline.js?v=20261125i"></script>
-  <script src="assets/js/viz-bars.js?v=20261125i"></script>
-  <script src="assets/js/perfekt/begreper.js?v=20261125i"></script>
+  <script src="assets/js/core.js?v=20261125j"></script>
+  <script src="assets/js/symboler.js?v=20261125j"></script>
+  <script src="assets/js/data-tf.js?v=20261125j"></script>
+  <script src="assets/js/pseudocode.js?v=20261125j"></script>
+  <script src="assets/js/stepplayer.js?v=20261125j"></script>
+  <script src="assets/js/varline.js?v=20261125j"></script>
+  <script src="assets/js/viz-bars.js?v=20261125j"></script>
+  <script src="assets/js/perfekt/begreper.js?v=20261125j"></script>
+  <script src="assets/js/kort/begreper.js?v=20261125j"></script>
   <script>
   (function () {
     var IN = window.IN, el = IN.el, qs = IN.qs;
@@ -266,31 +267,8 @@
       teknisk: "<p>Hvert kall løser en mindre utgave av samme problem og har sine egne lokale variabler. For å finne kjøretiden teller vi kall og arbeid per kall: fakultet gjør n kall med O(1) arbeid hver, altså O(n).</p>"
     }, { label: "Nivå:" });
 
-    /* ---- Eksamen: oppvarmingen (oppgave 1, lik H2020–H2025), ordrett med kildelinje.
-       Vårt svar og sensorveiledningen står i assets/js/perfekt/begreper.js. ---- */
-    IN.examTasks("#exam-oppvarming", [{
-      key: "H2025-1", year: "H2025", oppgave_nr: "Oppgave 1", title: "Algoritme og datastruktur", points: 2,
-      kilde: "Oppgavetekst: UiO, IN2010, H2020–H2025, oppgave 1 (samme tekst alle år)",
-      ark: "Oppvarming", ordrett: true,
-      oppgave: IN.oppg({
-        parts: [
-          { t: "Hva er en algoritme? Svar kort (maks fire setninger)." },
-          { t: "Hva er en datastruktur? Svar kort (maks fire setninger)." }
-        ],
-        outro: "<p>Vi er ikke ute etter et «fasitsvar». Vi er ute etter å høre din forståelse av begrepene, og alle rimelige svar gir full uttelling.</p>"
-      }),
-      avvik: "Arket gir 2 poeng for hele oppgaven og fordeler dem ikke på (a) og (b). Derfor står det ingen poeng ved deloppgavene.",
-      losning: [
-        "<b>(a)</b> Få med at en algoritme er en presis og entydig oppskrift med endelig mange steg, som løser et problem: fra input til riktig output. Et eksempel, som binærsøk, viser at du kan bruke begrepet.",
-        "<b>(b)</b> Få med at en datastruktur er en måte å organisere data på, og at vi velger den etter hvilke operasjoner som skal gå fort. Et eksempel: en heap gir raskt det minste elementet."
-      ],
-      kjerne: "<p>Algoritmen er <i>hva vi gjør</i>, datastrukturen er <i>hvordan dataene ligger</i>. Et godt valg av datastruktur gjør algoritmen raskere.</p>",
-      tips: [
-        "Hold deg til fire setninger per deloppgave. Det er det oppgaven ber om.",
-        "Ifølge sensorveiledningen gir alle rimelige svar full uttelling. Du mister poeng hvis du lar oppgaven stå tom, skriver noe som er direkte feil, eller har vesentlige feil i deler av svaret.",
-        "Bland ikke datastruktur og ADT: ADT-en sier hvilke operasjoner som finnes, datastrukturen hvordan de lages. Se fanen ADT."
-      ]
-    }]);
+    /* ---- Eksamen: oppvarmingen (oppgave 1). Kortet står i assets/js/kort/begreper.js. ---- */
+    IN.kortData.render("begreper");
 
     /* ---- Quiz: algoritme ---- */
     IN.quiz("#quiz-algoritme", [

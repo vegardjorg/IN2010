@@ -14,8 +14,9 @@
 
   /* Eksamenskortene på sidene: [side, fane, år, oppgavenr., tittel, poeng, element-id]
      Samme tall og id-er som oppgavekartet på forsiden (index.html, tabellen X).
-     Fremdriftsnøkkelen til et kort er kort:<side>:<element-id>. Et valgfritt 8. felt gir en annen
-     nøkkel når «kortet» egentlig er en test (da teller beste resultat ≥ terskel som «ok»). */
+     Fremdriftsnøkkelen til et kort er kort:<side>:<element-id>, den samme som kortet får på temasiden
+     (IN.kortData.progressKey). Et valgfritt 8. felt gir en annen nøkkel: når «kortet» egentlig er en test
+     (da teller beste resultat ≥ terskel som «ok»), eller når samme oppgave står på to sider og deler én post. */
   var KORT = {
     s20sub:  ["sortering", "bucket",     "H2020", "7d", "SortSubanagrams", 6, "exam-h2020-7d"],
     s21stab: ["sortering", "bucket",     "H2021", "2",  "Stabilitet", 3, "exam-h2021-2"],
@@ -31,7 +32,7 @@
     h22tf:   ["heap",      "test",       "H2022", "5",  "Prioritetskøer og binære heaps (sant/usant)", 10, "exam-test"],
     h23ins:  ["heap",      "innsetting", "H2023", "2",  "Innsetting i heap", 10, "exam-innsetting"],
     h24med:  ["heap",      "median",     "H2024", "7",  "Mediankø", 12, "exam-median"],
-    h25lvl:  ["heap",      "levelorder", "H2025", "5",  "Level-order", 12, "exam-levelorder"],
+    h25lvl:  ["heap",      "levelorder", "H2025", "5",  "Level-order", 12, "exam-levelorder", "kort:traer:exam-h2025-4"],
     t20bst:  ["traer",     "bst",        "H2020", "2",  "Binære søketrær", 4, "exam-h2020-2"],
     t21rng:  ["traer",     "bst",        "H2021", "8",  "Verdier i et intervall (InRange)", 10, "exam-h2021-8"],
     t22chk:  ["traer",     "bst",        "H2022", "11", "Er treet et søketre? (CheckBST)", 10, "exam-h2022-10"],
@@ -670,7 +671,7 @@
         sjekk: [{ type: "tf", fra: [["sortering", ["Gnome sort", "Insertion sort", "Selection sort", "Quicksort", "Heapsort", "in-place"]]], maks: 9 }],
         feller: [
           "Å bare beskrive koden uten å sammenligne med pensum.",
-          "Kjøretid uten begrunnelse. Riktig kjøretid ga opptil 2 p (2023). Vårt råd: nevn også beste tilfelle (O(n) på sortert input), for det viser slektskapet med Insertion sort."
+          "Kjøretid uten begrunnelse. Riktig kjøretid ga opptil 2 p (2023). Tips: nevn også beste tilfelle (O(n) på sortert input), for det viser slektskapet med Insertion sort."
         ] }
     ] },
 
@@ -1000,12 +1001,13 @@
     return L === "G" ? true : L === "S" ? r <= 1 : r === 0;
   }
 
-  /* Status for ett steg: { done, queue, started, via } */
+  /* Status for ett steg: { done, queue, started, via, hvorfor }
+     hvorfor: det som holder steget i repetisjonskøen, [{ type: "kort", id } | { type: "steg" } | { type: "mock", id }] */
   function stepStatus(s, all, L) {
-    var okT = 0, ovT = 0, started = false, via = null;
+    var okT = 0, ovT = 0, started = false, via = null, ov = [];
     var self = all["crash:steg:" + s.id];
     if (self && self.status === "ok") { okT = self.t || 1; via = "egenvurdering"; }
-    if (self && self.status === "ovmer") ovT = self.t || 1;
+    if (self && self.status === "ovmer") { ovT = self.t || 1; ov.push({ type: "steg", t: ovT }); }
     if (self && self.status) started = true;
     (s.sjekk || []).forEach(function (c, i) {
       var rec = all[checkKey(s, i, c)];
@@ -1014,7 +1016,6 @@
       if (ratio(rec) >= (c.terskel || C.terskel)) { okT = Math.max(okT, rec.t || 1); via = via || "sjekk"; }
     });
     var cards = (s.oppgaver || []).map(kortKey).filter(Boolean);
-    var extra = (s.ekstra || []).map(kortKey).filter(Boolean);
     var allOk = cards.length > 0, cardOkT = 0;
     cards.forEach(function (k) {
       var r = all[k];
@@ -1022,20 +1023,22 @@
       else allOk = false;
     });
     if (allOk) { okT = Math.max(okT, cardOkT); via = via || "kort"; }
-    cards.concat(extra).forEach(function (k) {
-      var r = all[k];
-      if (kortStatus(r) === "ovmer") { ovT = Math.max(ovT, r.t || 1); started = true; }
+    (s.oppgaver || []).concat(s.ekstra || []).forEach(function (id) {
+      var k = kortKey(id), r = k && all[k];
+      if (kortStatus(r) === "ovmer") { ovT = Math.max(ovT, r.t || 1); started = true; ov.push({ type: "kort", id: id, t: r.t || 1 }); }
     });
     if (s.spesial === "mock") {
       var ms = mockList().filter(function (m) { return mockInLen(m, L); }), n = 0, last = 0;
       ms.forEach(function (m) {
         var r = all["kort:crash:" + m.id];
         if (r && r.status === "ok") { n++; last = Math.max(last, r.t || 1); started = true; }
-        if (r && r.status === "ovmer") { ovT = Math.max(ovT, r.t || 1); started = true; }
+        if (r && r.status === "ovmer") { ovT = Math.max(ovT, r.t || 1); started = true; ov.push({ type: "mock", id: m.id, t: r.t || 1 }); }
       });
       if (ms.length && n >= Math.ceil(ms.length * C.mockAndel)) { okT = Math.max(okT, last); via = via || "kort"; }
     }
-    return { done: okT > 0, queue: ovT > okT, started: started, via: via };
+    var queue = ovT > okT;
+    return { done: okT > 0, queue: queue, started: started, via: via,
+      hvorfor: queue ? ov.filter(function (x) { return x.t > okT; }).map(function (x) { return x.id ? { type: x.type, id: x.id } : { type: x.type }; }) : [] };
   }
   function statusAll(L, all) {
     all = all || allRecs();

@@ -529,7 +529,7 @@ th.has-tip { text-decoration: underline dotted; text-underline-offset: 3px;
 /* ---------- Callouts ----------
    Bare tre typer har farget flate: felle (rød), sensor/eksamen (gul) og begrep (blå).
    Resten er en nøytral strek med merkelapp; strekens stil skiller dem (fargen gjør det ikke):
-   5-åring prikket, teknisk/universitetsnivå stiplet, eksempel heltrukket, vårt råd heltrukket med →. */
+   5-åring prikket, teknisk/universitetsnivå stiplet, eksempel heltrukket, eksamenstips heltrukket med →. */
 .callout {
   border-left: 3px solid var(--color-outline); border-radius: 0;
   padding: .15rem 0 .15rem .8rem; margin: .9rem 0;
@@ -813,8 +813,20 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
 .otr i { width: 3px; background: var(--color-outline-variant); border-radius: 1px; }
 .otr i:nth-child(1) { height: 20%; } .otr i:nth-child(2) { height: 36%; } .otr i:nth-child(3) { height: 52%; }
 .otr i:nth-child(4) { height: 68%; } .otr i:nth-child(5) { height: 84%; } .otr i:nth-child(6) { height: 100%; }
+/* Fargeskala grønn → gul → rød. Fargen sitter bare på trinnene; O-teksten står nøytral ved siden av. */
+:root { --o1: #2e8540; --o2: #6a9a1f; --o3: #b08d00; --o4: #d4740c; --o5: #c94a1a; --o6: #b3261e; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --o1: #6fcf7f; --o2: #a8d45a; --o3: #e8c64a; --o4: #f4a64a; --o5: #f47f5a; --o6: #f2726a; } }
+:root[data-theme="dark"] { --o1: #6fcf7f; --o2: #a8d45a; --o3: #e8c64a; --o4: #f4a64a; --o5: #f47f5a; --o6: #f2726a; }
+.otr[data-o="1"] { --otr-c: var(--o1); } .otr[data-o="2"] { --otr-c: var(--o2); } .otr[data-o="3"] { --otr-c: var(--o3); }
+.otr[data-o="4"] { --otr-c: var(--o4); } .otr[data-o="5"] { --otr-c: var(--o5); } .otr[data-o="6"] { --otr-c: var(--o6); }
 .otr[data-o="1"] i:nth-child(-n+1), .otr[data-o="2"] i:nth-child(-n+2), .otr[data-o="3"] i:nth-child(-n+3),
-.otr[data-o="4"] i:nth-child(-n+4), .otr[data-o="5"] i:nth-child(-n+5), .otr[data-o="6"] i:nth-child(-n+6) { background: var(--color-on-surface-variant); }
+.otr[data-o="4"] i:nth-child(-n+4), .otr[data-o="5"] i:nth-child(-n+5), .otr[data-o="6"] i:nth-child(-n+6) { background: var(--otr-c); }
+/* Visningsvalg (IN.oVisning): «O med farger» = fargede trinn foran (standard), «O» = bare notasjonen */
+:root[data-ovis="o"] .otr { display: none; }
+.ovis-switch { margin: .2rem 0 .4rem; gap: .3rem; font-size: 13px; flex-wrap: nowrap; }
+.ovis-switch .btn { padding: .15rem .55rem; font-size: 13px; min-height: 0; }
+.ovis-switch .ovis-lbl { color: var(--color-on-surface-variant); }
 .cmp-table td .otr { vertical-align: -.05em; }
 
 /* Parsons fast prosedyre-linje */
@@ -1573,12 +1585,15 @@ body[data-page="strategi"] .bigo-compact .bigo-val { white-space: normal; overfl
 .et-self-q{margin-right:.2rem}
 .et-self .btn[aria-pressed="true"].et-self-ok{background:var(--color-tone-ok);color:var(--color-on-tone-ok);border-color:var(--color-on-tone-ok)}
 .et-self .btn[aria-pressed="true"].et-self-ov{background:var(--color-surface);color:var(--color-on-surface);border:1px dashed var(--color-on-surface-variant);font-weight:600}
-.crash-ret{position:fixed;left:50%;bottom:max(12px,env(safe-area-inset-bottom));transform:translateX(-50%);z-index:60;display:flex;align-items:center;gap:.2rem;max-width:calc(100vw - 32px);background:var(--color-primary);color:var(--color-on-primary);border-radius:999px;box-shadow:0 4px 14px rgba(0,0,0,.25);padding:.2rem .3rem .2rem .9rem;font-size:.9rem}
-.crash-ret-a{color:inherit;text-decoration:none;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding:.35rem 0}
+/* «← Tilbake til løypa» (core.js initCrashReturn): fast linje under menyen, i flyten, så den aldri dekker innhold */
+.crash-ret{position:sticky;top:52px;z-index:47;background:var(--color-primary);color:var(--color-on-primary)}
+.crash-ret-in{max-width:var(--maxw);margin:0 auto;display:flex;align-items:center;gap:.3rem;padding:2px var(--d-md);min-height:38px;box-sizing:border-box;font-size:.9rem}
+.crash-ret-a{flex:1 1 auto;min-width:0;color:inherit;text-decoration:none;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding:.35rem 0}
 .crash-ret-a:hover,.crash-ret-a:focus-visible{text-decoration:underline}
-.crash-ret-x{background:transparent;border:0;color:inherit;font-size:1.2rem;line-height:1;min-width:36px;min-height:36px;border-radius:50%;cursor:pointer}
+.crash-ret-a:focus-visible,.crash-ret-x:focus-visible{outline:2px solid var(--color-on-primary);outline-offset:2px}
+.crash-ret-x{flex:none;background:transparent;border:0;color:inherit;font-size:1.2rem;line-height:1;min-width:36px;min-height:36px;border-radius:50%;cursor:pointer}
 .crash-ret-x:hover,.crash-ret-x:focus-visible{background:rgba(255,255,255,.18)}
-body.has-crash-ret{padding-bottom:64px}
+@media (max-width:520px){.crash-ret-in{padding:2px 12px}}
 /* Melding om ny versjon (core.js initVersionCheck) */
 .ny-versjon{position:fixed;right:16px;bottom:max(16px,env(safe-area-inset-bottom));z-index:61;display:flex;align-items:center;gap:.5rem;max-width:calc(100vw - 32px);
   background:var(--color-surface-container-lowest);color:var(--color-on-surface);border:1px solid var(--color-outline-variant);border-radius:var(--radius-md);
@@ -1586,7 +1601,6 @@ body.has-crash-ret{padding-bottom:64px}
 .ny-versjon .btn{flex:none}
 .ny-versjon-x{flex:none;background:transparent;border:0;color:inherit;font-size:1.2rem;line-height:1;min-width:32px;min-height:32px;border-radius:50%;cursor:pointer}
 .ny-versjon-x:hover,.ny-versjon-x:focus-visible{background:var(--color-surface-container)}
-body.has-crash-ret .ny-versjon{bottom:72px}
 @media (max-width:520px){.ny-versjon{left:16px;right:16px;justify-content:space-between}}
 @media print{.ny-versjon{display:none}}
 @media print{.crash-ret,.et-self{display:none}}
@@ -1761,6 +1775,17 @@ body.has-crash-ret .ny-versjon{bottom:72px}
 .cr-ktit { font-weight: 600; overflow-wrap: anywhere; }
 .cr-kstat.ok { color: var(--color-on-tone-ok); font-weight: 600; }
 .cr-kstat.q { color: var(--color-on-surface); font-weight: 600; padding: 0 .4rem; border: 1px dashed var(--color-on-surface-variant); border-radius: 999px; background: var(--color-surface); }
+/* Kortene inline i stegene (crash.html bygger dem fra assets/js/kort/<side>.js) */
+.cr-kli.is-loading .cr-kort { opacity: .75; }
+.cr-kli.is-inline { display: block; min-width: 0; }
+.cr-kli.is-inline + .cr-kli.is-inline .examtask.et-flat { border-top: 0; }
+.cr-kli.is-inline .examtask { margin: 0; }
+.cr-kles { margin: .25rem 0 .6rem; text-align: right; }
+.cr-nextp { display: flex; flex-wrap: wrap; align-items: center; gap: .4rem .6rem; margin: .1rem 0 .7rem; padding: .45rem .6rem;
+  background: var(--color-tone-ok); color: var(--color-on-tone-ok); border-radius: var(--radius-md); }
+.cr-nextp .btn { white-space: normal; text-align: left; }
+.cr-regel { margin: .5rem 0 .2rem; padding: .35rem .6rem; border-left: 3px solid var(--color-primary); background: var(--color-surface-container-low); border-radius: 0 var(--radius-md) var(--radius-md) 0; }
+.cr-qwhy { display: block; }
 .cr-ekstra { margin: .5rem 0; }
 .cr-ekstra > summary { cursor: pointer; font-weight: 600; font-size: var(--text-sm); padding: .3rem 0; }
 .cr-mangler { border-left: 3px solid var(--color-on-tone-caution); background: var(--color-tone-caution); color: var(--color-on-tone-caution); padding: .4rem .6rem; border-radius: 0 var(--radius) var(--radius) 0; }

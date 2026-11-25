@@ -12,17 +12,6 @@
   IN.PERFEKT = IN.PERFEKT || {};
 
   function L(code, indent) { return { code: code, indent: indent }; }
-  // H2020-7 deles med andre temaer (hashing/strategi har andre deloppgaver): slå sammen i stedet for å overskrive
-  function merge(key, obj) {
-    var ex = IN.PERFEKT[key];
-    if (!ex) { IN.PERFEKT[key] = obj; return; }
-    ex.svar = (ex.svar || []).concat(obj.svar || []);
-    if (obj.sensor && obj.sensor.deler) {
-      ex.sensor = ex.sensor || { deler: [] };
-      ex.sensor.deler = (ex.sensor.deler || []).concat(obj.sensor.deler);
-    }
-    if (!ex.hvorfor) ex.hvorfor = obj.hvorfor;
-  }
 
   /* ---------- H2023 · Oppgave 4 · Gnome sort (10 poeng) ---------- */
   IN.PERFEKT["H2023-4"] = {
@@ -168,61 +157,4 @@
       merknad: "Sensorveiledningen gir bare svarene og ingen poengfordeling for de tre deloppgavene. Oppgaven gir 3 poeng til sammen."
     }
   };
-
-  /* ---------- H2020 · Oppgave 7 (d) · Sortering av subanagrammer (6 poeng) ---------- */
-  merge("H2020-7", {
-    type: "eksamen",
-    svar: [
-      {
-        del: "(d)",
-        tekst: "<p>Ordene er allerede sortert alfabetisk. Det er det minst viktige kriteriet. Nå skal de sorteres på det viktigste, lengden, med en <b>stabil</b> sortering, så ord med lik lengde forblir alfabetiske. Lengden er et lite heltall, så bøttesortering passer.</p>" +
-          "<p>Bøttene ligger i et hashmap fra lengde til liste, så bare lengder som faktisk finnes, får en bøtte. Hvert ord legges <b>bakerst</b> i bøtta for sin lengde. Så går vi gjennom lengdene i <b>synkende</b> rekkefølge og skriver ordene tilbake, forfra i hver bøtte.</p>" +
-          "<p><b>Kjøretid:</b> O(N log N + n), der N er antall ulike lengder. Vi sorterer bare de N nøklene. Siden N ≤ n, er dette aldri verre enn O(n log n), og for ord fra en ordbok er N lite.</p>",
-        kode: "sortSubanagrams",
-        fasitVerdi: "algorithm, logarithm, alright, right, math, git",
-        kjoretid: "O(N log N + n), N ≤ n",
-        poeng: ["en god løsning med bøttesortering gir full uttelling (6p)", "uspesifiserte kategorier (bøtter) kan koste opptil 3p", "sortert fra kortest til lengst koster 1p", "en stabil O(n log n)-sortering på lengde gir opptil 4p, og en stabil O(n²)-sortering opptil 2p"]
-      }
-    ],
-    hvorfor: {
-      eli5: "<p>Ordene står alfabetisk. Vi legger dem i én kasse per ordlengde, alltid bakerst. Så tømmer vi kassene fra den med de lengste ordene til den med de korteste. Siden vi la ordene bakerst og tar dem ut forfra, står ord med like mange bokstaver fortsatt alfabetisk.</p>",
-      normal: "<p>Svaret kjenner igjen mønsteret «sortert på det minst viktige, sorter stabilt på det viktigste», velger bøttesortering på lengde og passer på de to tingene sensor trekker for: bøttene er spesifisert (lengden er nøkkelen), og rekkefølgen er lengst først. Kjøretiden er begrunnet med at bare de N ulike lengdene sorteres.</p>",
-      teknisk: "<p>Med hashmap som bøtter slipper vi å lage én bøtte for hver lengde opp til den lengste (den kan i prinsippet være lenger enn n). Prisen er at nøklene må sorteres: O(N log N) for N ≤ n nøkler. Fordelingen og samlingen er O(n). Stabiliteten gjør at den alfabetiske rekkefølgen overlever som sekundær orden, slik som i radix sort.</p>"
-    },
-    sensor: {
-      kilde: "Kilde: sensorveiledning IN2010 H2020, oppgave 7",
-      deler: [
-        {
-          del: "(d)",
-          fasit: "<p>Dette lukter bucket sort!</p>",
-          kode: {
-            name: "SortSubanagrams", params: "A",
-            input: "Et array A av størrelse n som inneholder strenger",
-            output: "Et array med de samme n strengene sortert etter lengde der ord av samme lengde er sortert alfabetisk",
-            lines: [
-              L("B ← empty hashmap", 1),
-              L("for i ← 0 to n − 1 do", 1),
-              L("k ← A[i].length", 2),
-              L("if B[k] = null then", 2),
-              L("B[k] ← empty list", 3),
-              L("append A[i] to B[k]", 2),
-              L("", 1),
-              L("j ← 0", 1),
-              L("for keys k of B in descending order do", 1),
-              L("for x in B[k] do", 2),
-              L("A[j] ← x", 3),
-              L("j ← j + 1", 3),
-              L("return A", 1)
-            ]
-          },
-          kriterier: "<p>Denne løsningen er en tilpasset bucket sort, der vi bruker et hashmap for å oppbevare bøttene. Dette fordi den lengste strengen i arrayet kan være lenger enn størrelsen av arrayet selv (selv om dette ikke er sannsynlig gitt konteksten). Siden vi traverserer nøklene i hashmapet i avtagende rekkefølge gir dette O(N log(N) + n) kjøretid, der N er antall nøkler. Merk at N ≤ n fordi vi ikke kan ha flere ulike lengder enn vi har strenger. Denne løsningen er minst like bra som en n log(n) algoritme, og i konteksten av strenger i en ordbok vil det være langt raskere enn en n log(n) algoritme.</p>" +
-            "<ul><li>En god løsning med bucket sort gir full uttelling.<ul><li>Vi trekker opptil 3 poeng dersom kategoriene er uspesifisert.</li><li>Vi trekker 1 poeng dersom strengene er sortert fra kortest til lengst.</li><li>Vi trekker ikke for bruk av arrays som bøtter.</li></ul></li>" +
-            "<li>Vi gir opptil 4 poeng for en stabil sorteringsalgoritme i O(n log(n)) med sortering på lengde.</li>" +
-            "<li>Vi gir opptil 2 poeng for en stabil sorteringsalgoritme i O(n²).</li>" +
-            "<li>Vi gir opptil 2 poeng for andre løsninger som vil fungere og er godt presentert.<ul><li>Dette gjelder ikke dersom noen finner på en god løsning som vi ikke har tenkt på ennå.</li></ul></li></ul>"
-        }
-      ],
-      merknad: "Linje 8 i sensors kode er tom i originalen. Den er tatt med, så linjenumrene stemmer med sensorveiledningen."
-    }
-  });
 })();
