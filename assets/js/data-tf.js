@@ -1370,6 +1370,106 @@
       "tema": "grafstrategi",
       "kilde": false
     }
+  ],
+  "lister": [
+    {
+      "s": "En stakk tar ut det elementet som ble lagt inn sist.",
+      "answer": true,
+      "explain": "Stakk er LIFO: push og pop skjer i samme ende. En kø er FIFO: vi tar ut i motsatt ende av der vi setter inn.",
+      "tema": "stakk og kø",
+      "kilde": false
+    },
+    {
+      "s": "For å sjekke om tagger i et HTML-dokument er riktig nøstet, holder det å telle at det er like mange åpne- som lukketagger.",
+      "answer": false,
+      "explain": "Rekkefølgen betyr noe: «&lt;/div&gt;&lt;div&gt;» har like mange av hver, men lukker før den åpner. Sensor i H2020 ga bare 1 poeng for bare å sjekke antallet.",
+      "tema": "stakk og kø",
+      "kilde": false
+    },
+    {
+      "s": "I GoodTags med stakk må vi til slutt sjekke at stakken er tom.",
+      "answer": true,
+      "explain": "Ligger det noe igjen, er en tagg åpnet uten å bli lukket. Å glemme sluttsjekken ga trekk i H2020.",
+      "tema": "stakk og kø",
+      "kilde": false
+    },
+    {
+      "s": "Get(L, i) på en lenket liste tar O(n) i verste tilfelle.",
+      "answer": true,
+      "explain": "Vi må gå fra L.first og følge next-pekere i ganger før vi står på riktig node (NodeAt). For i nær n − 1 blir det nesten n steg.",
+      "tema": "lenket liste",
+      "kilde": false
+    },
+    {
+      "s": "Get(D, i) på et dynamisk array tar O(n), fordi elementene ligger etter hverandre.",
+      "answer": false,
+      "explain": "Det er nettopp fordi elementene ligger etter hverandre i minnet at vi kan regne ut hvor plass i er. Oppslaget er O(1).",
+      "tema": "dynamisk array",
+      "kilde": false
+    },
+    {
+      "s": "Når vi har en peker til noden v, er InsertAfter(v, e) O(1) i en lenket liste.",
+      "answer": true,
+      "explain": "Vi lager én ny node og endrer et fast antall pekere. Det er å finne v som kan koste O(n).",
+      "tema": "lenket liste",
+      "kilde": false
+    },
+    {
+      "s": "Å fjerne det første elementet i et dynamisk array er O(1).",
+      "answer": false,
+      "explain": "Alle de andre elementene må flyttes én plass til venstre, så det er O(n). Å fjerne det siste er O(1).",
+      "tema": "dynamisk array",
+      "kilde": false
+    },
+    {
+      "s": "PushBack på et fullt dynamisk array tar O(n), fordi alt må kopieres over i et dobbelt så stort array.",
+      "answer": true,
+      "explain": "EnsureCapacity lager et nytt array med dobbel størrelse og kopierer alle D.n elementene. De andre gangene er PushBack O(1).",
+      "tema": "dynamisk array",
+      "kilde": false
+    },
+    {
+      "s": "I en enkeltlenket liste med peker til siste node er det O(1) å fjerne det siste elementet.",
+      "answer": false,
+      "explain": "Å legge til bakerst blir O(1) med en siste-peker, men for å fjerne den siste må vi finne den nest siste, og da må vi gå fra starten: O(n). En dobbeltlenket liste har prev og løser det på O(1).",
+      "tema": "lenket liste",
+      "kilde": false
+    },
+    {
+      "s": "En kø kan implementeres slik at både enqueue og dequeue er O(1).",
+      "answer": true,
+      "explain": "For eksempel med en lenket liste med pekere til både første og siste node: sett inn bakerst, ta ut forrest.",
+      "tema": "stakk og kø",
+      "kilde": false
+    },
+    {
+      "s": "Sjekken av velformaterte tagger med stakk har kjøretid O(n²), fordi hver lukketagg sammenlignes med stakken.",
+      "answer": false,
+      "explain": "Hver lukketagg sammenlignes bare med det øverste elementet, og push og pop er O(1). Én gjennomgang av n tagger gir O(n).",
+      "tema": "stakk og kø",
+      "kilde": false
+    },
+    {
+      "s": "n PushBack-er på et dynamisk array som dobler størrelsen, koster O(n) til sammen.",
+      "answer": true,
+      "explain": "Kopieringene blir 1 + 2 + 4 + … < 2n, pluss én skriving per innsetting. Det gir O(1) i snitt per PushBack (amortisert). Du trenger ikke kunne utlede dette selv, bare forstå begrepet.",
+      "tema": "dynamisk array",
+      "kilde": false
+    },
+    {
+      "s": "Binærsøk på en sortert lenket liste er like raskt som binærsøk på et sortert array.",
+      "answer": false,
+      "explain": "Hvert «hopp til midten» koster O(n) i en lenket liste, så vi ender på O(n log n), som er verre enn et vanlig rett-frem søk i O(n).",
+      "tema": "lenket liste",
+      "kilde": false
+    },
+    {
+      "s": "Med et hashmap fra nøkkel til node og en dobbeltlenket liste kan «flytt nøkkelen fremst, og kast den eldste når det er fullt» gjøres på forventet O(1).",
+      "answer": true,
+      "explain": "Hashmapet finner noden på forventet O(1), og å ta ut og sette inn en node i en dobbeltlenket liste er O(1). Slik er løsningen på «nylige søk» i ukesoppgave 08 (ofte kalt LRU-cache).",
+      "tema": "nylige søk (LRU)",
+      "kilde": false
+    }
   ]
 };
 })();

@@ -1,0 +1,663 @@
+<!doctype html>
+<html lang="nb">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Crash course · IN2010</title>
+  <meta name="description" content="Crash course i IN2010: en løype i eksamensrekkefølge, vektet etter forventede eksamenspoeng. Velg Ekspress, Standard eller Grundig, og følg stegene med kjerne, oppskrift, eksempel, eksamenskort og sjekk.">
+  <script>(function(){try{var d=document.documentElement;var t=localStorage.getItem('in-theme');if(t&&t!=='system')d.setAttribute('data-theme',t);var l=localStorage.getItem('in-level')||'normal';d.setAttribute('data-level',l);}catch(e){document.documentElement.setAttribute('data-level','normal');}})();</script>
+  <link rel="stylesheet" href="assets/css/styles.css">
+</head>
+<body data-page="crash">
+  <a class="skip-link" href="#main">Hopp til innhold</a>
+  <header id="topnav"></header>
+
+  <main id="main" class="wrap">
+    <div class="pagehead">
+      <h1>Crash course</h1>
+      <p class="lead">En løype gjennom pensum i samme rekkefølge som eksamen, vektet etter hvor mange poeng hvert tema
+        pleier å gi. Velg hvor lang tid du har, og følg stegene ett for ett. Hvert steg har samme oppbygning:
+        hvorfor det er viktig, kjernen på to minutter, oppskriften sensor ser etter, et gjennomgått eksempel,
+        eksamensoppgaver, en kort sjekk og fellene som koster poeng.</p>
+    </div>
+
+    <section class="card cr-top" id="cr-top" aria-label="Din fremdrift">
+      <p class="cr-headline" id="cr-headline" aria-live="polite"></p>
+      <div class="cr-bar big" aria-hidden="true"><span id="cr-bar-fill"></span></div>
+      <p class="cr-sub small muted" id="cr-sub"></p>
+
+      <div class="cr-len" role="radiogroup" aria-label="Lengde på løypa" id="cr-len"></div>
+      <p class="small muted cr-len-txt" id="cr-len-txt"></p>
+
+      <div class="cr-actions">
+        <button class="btn primary" type="button" id="cr-fortsett">Fortsett der du slapp</button>
+      </div>
+      <p class="small muted" id="cr-fortsett-txt"></p>
+    </section>
+
+    <section class="card cr-queue" id="cr-queue" aria-labelledby="cr-queue-h">
+      <h2 id="cr-queue-h">Repetisjonskø</h2>
+      <p class="small muted">Steg og kort du har merket «Må øve mer», med de tyngste først. Et steg forsvinner
+        fra køen når du klarer sjekken eller merker det «Fikk det til» igjen.</p>
+      <ol class="cr-qlist" id="cr-qlist"></ol>
+    </section>
+
+    <div id="cr-etapper"></div>
+
+    <section class="card cr-tools" aria-labelledby="cr-tools-h">
+      <h2 id="cr-tools-h">Flytt eller nullstill fremdriften</h2>
+      <p class="small muted">Fremdriften lagres bare i denne nettleseren. Med en overføringskode kan du ta den med
+        fra mobilen til PC-en eller omvendt. Ingenting sendes til noen server.</p>
+      <details class="cr-transfer">
+        <summary>Eksporter eller importer</summary>
+        <div class="cr-transfer-body">
+          <div class="cr-tr-row">
+            <button class="btn sm" type="button" id="cr-export">Lag overføringskode</button>
+            <button class="btn sm ghost" type="button" id="cr-copy" hidden>Kopier</button>
+          </div>
+          <label class="small" for="cr-code">Overføringskode</label>
+          <textarea id="cr-code" class="cr-code" rows="3" spellcheck="false" autocomplete="off" placeholder="Lim inn en kode fra en annen enhet her, eller lag en ny over."></textarea>
+          <div class="cr-tr-row">
+            <button class="btn sm primary" type="button" id="cr-import">Importer koden</button>
+          </div>
+          <p class="small" id="cr-tr-msg" role="status" aria-live="polite"></p>
+          <p class="small muted">Ved import beholdes det nyeste resultatet for hver oppgave. Ingenting du har gjort på denne enheten blir borte.</p>
+        </div>
+      </details>
+      <div class="cr-tr-row">
+        <button class="btn sm cr-reset" type="button" id="cr-reset">Nullstill fremdrift</button>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">IN2010-guide · Crash course</footer>
+
+  <script src="assets/js/core.js"></script>
+  <script src="assets/js/data-tf.js"></script>
+  <script src="assets/js/pseudocode.js"></script>
+  <script src="assets/js/data-algos.js"></script>
+  <script src="assets/js/data-mock.js"></script>
+  <script src="assets/js/data-crash.js"></script>
+  <script>
+  (function () {
+    "use strict";
+    var IN = window.IN, C = IN.CRASH;
+    if (!C) return;
+    var el = IN.el, qs = IN.qs, qsa = IN.qsa, clear = IN.clear;
+    var P = IN.progress;
+    var CP = IN.crashProgress;          // felles regler (data-crash.js), samme som forsiden
+    var LEN = {}; C.lengder.forEach(function (L) { LEN[L.id] = L; });
+    var HREF = {}; IN.PAGES.forEach(function (p) { HREF[p.id] = p.href; });
+    var STEPS = CP.steps, BYID = CP.byId;
+    var state = CP.state, inLen = CP.inLen, stepsIn = CP.stepsIn, minutes = CP.minutes;
+    var checkKey = CP.checkKey, kortKey = CP.kortKey, kortStatus = CP.kortStatus;
+    var mockList = CP.mockList, mockInLen = CP.mockInLen;
+    var SANN = { "høy": 0, "middels": 1, "lav": 2 };
+    function setState(patch) { if (P) P.set("crash:state", patch); }
+    function fmtTid(m) {
+      if (m < 60) return m + " min";
+      var h = Math.floor(m / 60), r = m % 60;
+      return h + " t" + (r ? " " + r + " min" : "");
+    }
+
+    /* ---------- Lenker ---------- */
+    function link(page, fane, oppg, stepId) {
+      var h = [];
+      if (fane) h.push("fane=" + fane);
+      if (oppg) h.push("oppg=" + oppg);
+      h.push("fra=crash"); h.push("steg=" + stepId);
+      return (HREF[page] || (/\.html$/.test(page) ? page : page + ".html")) + "#" + h.join("&");
+    }
+    function kortHref(k, stepId) { var c = C.kort[k]; return c ? link(c[0], c[1], c[6], stepId) : "#"; }
+
+    /* ---------- Toppen: lengde, totaler, fortsett ---------- */
+    function buildLenPicker() {
+      var host = qs("#cr-len"); clear(host);
+      C.lengder.forEach(function (L) {
+        var mins = stepsIn(L.id).reduce(function (a, s) { return a + minutes(s, L.id); }, 0);
+        var b = el("button", { class: "seg-btn cr-len-btn", type: "button", role: "radio", "data-len": L.id,
+          html: "<b>" + L.navn + "</b><span>" + L.omtrent + " · ≈ " + fmtTid(mins) + "</span>" });
+        b.addEventListener("click", function () { setState({ lengde: L.id }); render(); });
+        host.appendChild(b);
+      });
+      host.addEventListener("keydown", function (ev) {
+        var dir = ev.key === "ArrowRight" ? 1 : ev.key === "ArrowLeft" ? -1 : 0;
+        if (!dir) return;
+        ev.preventDefault();
+        var ids = C.lengder.map(function (L) { return L.id; });
+        var ni = (ids.indexOf(state().lengde) + dir + ids.length) % ids.length;
+        setState({ lengde: ids[ni] }); render();
+        qsa(".cr-len-btn", host)[ni].focus();
+      });
+    }
+
+    function paintTop(pr) {
+      var L = pr.lengde;
+      qs("#cr-headline").innerHTML = "Du har dekket <b>" + pr.alle100 + "</b> av ~100 forventede eksamenspoeng.";
+      qs("#cr-bar-fill").style.width = pr.prosent + "%";
+      qs("#cr-sub").textContent = pr.lengdeNavn + "-løypa: " + pr.dekket + " av " + pr.total + " poeng (" + pr.prosent + " %), " +
+        pr.ferdigeSteg + " av " + pr.antallSteg + " steg. Løypa dekker " + pr.total + " av ~100 forventede poeng.";
+      qsa(".cr-len-btn").forEach(function (b) {
+        var on = b.getAttribute("data-len") === L;
+        b.classList.toggle("on", on); b.setAttribute("aria-checked", on ? "true" : "false");
+        b.setAttribute("tabindex", on ? "0" : "-1");
+      });
+      qs("#cr-len-txt").textContent = LEN[L].tekst;
+      var f = pr.fortsett, btn = qs("#cr-fortsett"), txt = qs("#cr-fortsett-txt");
+      if (f) {
+        btn.disabled = false; btn.dataset.go = f.id;
+        btn.textContent = (pr.sist ? "Fortsett: " : "Start: ") + "steg " + f.id + " · " + f.tittel;
+        txt.textContent = "";
+      } else {
+        btn.disabled = true; btn.dataset.go = "";
+        btn.textContent = "Alle stegene i " + pr.lengdeNavn + " er dekket";
+        txt.textContent = "Bra! Ta repetisjonskøen, eller velg en lengre løype.";
+      }
+    }
+
+    function paintQueue(pr) {
+      var host = qs("#cr-qlist"); clear(host);
+      if (!pr.ko.length) {
+        host.appendChild(el("li", { class: "muted small cr-qempty", text: "Tom. Merk et steg eller et eksamenskort «Må øve mer», så havner det her." }));
+        return;
+      }
+      pr.ko.forEach(function (id) {
+        var s = BYID[id];
+        var a = el("a", { href: "#steg=" + s.id, text: "Steg " + s.id + " · " + s.tittel });
+        host.appendChild(el("li", {}, [a, el("span", { class: "cr-pts", text: s.vekt + " p" })]));
+      });
+    }
+
+    /* ---------- Etapper og steg ---------- */
+    var showAll = {};   // etappe-nr → vis steg utenfor valgt lengde
+    var forced = {};    // steg-id → vist selv om utenfor lengde (dyplenke)
+    var built = false;
+
+    function statusIcon(x) {
+      if (x.queue) return { cls: "q", txt: "↻", lbl: "Må øves mer" };
+      if (x.done) return { cls: "ok", txt: "✓", lbl: "Dekket" };
+      if (x.started) return { cls: "half", txt: "◐", lbl: "Påbegynt" };
+      return { cls: "todo", txt: "", lbl: "Ikke startet" };
+    }
+
+    function buildEtapper() {
+      var host = qs("#cr-etapper"); clear(host);
+      C.etapper.forEach(function (e) {
+        var sec = el("section", { class: "card cr-etappe", id: "etappe-" + e.nr, "aria-labelledby": "etappe-h-" + e.nr });
+        var head = el("div", { class: "cr-ehead" }, [
+          el("h2", { id: "etappe-h-" + e.nr, html: '<span class="cr-enr">' + e.nr + "</span> " + e.navn }),
+          el("span", { class: "cr-ehvor small muted", text: e.hvor })
+        ]);
+        sec.appendChild(head);
+        sec.appendChild(el("div", { class: "cr-ebar-row" }, [
+          el("div", { class: "cr-bar", "aria-hidden": "true" }, el("span", { class: "cr-ebar-fill" })),
+          el("span", { class: "cr-ecount small muted" })
+        ]));
+        var list = el("div", { class: "cr-steps" });
+        e.steg.forEach(function (s) { list.appendChild(buildStep(s)); });
+        sec.appendChild(list);
+        var tog = el("button", { class: "btn sm ghost cr-etog", type: "button" });
+        tog.addEventListener("click", function () { showAll[e.nr] = !showAll[e.nr]; render(); });
+        sec.appendChild(tog);
+        host.appendChild(sec);
+      });
+      built = true;
+    }
+
+    function buildStep(s) {
+      var d = el("details", { class: "cr-step", id: "steg-" + s.id, "data-step": s.id });
+      var sum = el("summary", { class: "cr-ssum" }, [
+        el("span", { class: "cr-sico", "aria-hidden": "true" }),
+        el("span", { class: "cr-sid", text: s.id }),
+        el("span", { class: "cr-stit", text: s.tittel }),
+        el("span", { class: "cr-smeta" }, [
+          s.vekt ? el("span", { class: "cr-pts", text: s.vekt + " p" }) : null,
+          el("span", { class: "cr-tid small muted" }),
+          el("span", { class: "cr-min", title: "Med fra " + LEN[s.min].navn, text: s.min })
+        ]),
+        el("span", { class: "sr-only cr-sstat" })
+      ]);
+      d.appendChild(sum);
+      var body = el("div", { class: "cr-sbody" });
+      d.appendChild(body);
+      d.addEventListener("toggle", function () {
+        if (!d.open) return;
+        if (!d._built) { d._built = true; buildBody(s, body); }
+        if (state().sist !== s.id) setState({ sist: s.id });
+        try { history.replaceState(null, "", "#steg=" + s.id); } catch (e) {}
+      });
+      return d;
+    }
+
+    function h3(t) { return el("h3", { class: "cr-h", text: t }); }
+    function linkList(arr, s) {
+      var ul = el("ul", { class: "cr-links" });
+      arr.forEach(function (l) {
+        ul.appendChild(el("li", {}, el("a", { href: link(l[0], l[1], l[2], s.id), text: l[3] || "Åpne" })));
+      });
+      return ul;
+    }
+    function kortItem(k, s) {
+      var c = C.kort[k]; if (!c) return null;
+      var key = kortKey(k);
+      var a = el("a", { href: kortHref(k, s.id), class: "cr-kort" }, [
+        el("span", { class: "et-year", text: c[2] }),
+        el("span", { class: "cr-ktit", text: c[4] }),
+        el("span", { class: "cr-pts", text: c[5] + " p" })
+      ]);
+      return el("li", { class: "cr-kli" }, [a, el("span", { class: "cr-kstat small", "data-kort": key })]);
+    }
+
+    function buildBody(s, body) {
+      var L = state().lengde;
+      // 1 Hvorfor
+      body.appendChild(el("div", { class: "callout sensor cr-hvorfor" }, [
+        el("div", { class: "lbl", text: "Hvorfor" + (s.vekt ? " · ~" + s.vekt + " poeng" : "") }),
+        el("p", { html: s.hvorfor })
+      ]));
+      // 2 Kjernen
+      body.appendChild(h3("Kjernen på 2 minutter"));
+      var kh = el("div", { class: "cr-kjerne" });
+      body.appendChild(kh);
+      IN.explain(kh, s.kjerne, { label: "Nivå:" });
+      if (s.les && s.les.length) {
+        body.appendChild(el("p", { class: "small muted cr-lesmer", text: "Vil du ha mer? Les i fanen:" }));
+        body.appendChild(linkList(s.les, s));
+      }
+      // 3 Oppskrift
+      if (s.oppskrift && s.oppskrift.length) {
+        body.appendChild(h3("Oppskrift: slik får du full pott"));
+        body.appendChild(el("ol", { class: "cr-ol", html: s.oppskrift.map(function (x) { return "<li>" + x + "</li>"; }).join("") }));
+      }
+      // 4 Eksempel
+      if (s.eksempel && s.eksempel.length) {
+        body.appendChild(h3("Gjennomgått eksempel"));
+        body.appendChild(linkList(s.eksempel, s));
+      }
+      // 5 Din tur
+      if (s.spesial === "mock") buildMock(s, body);
+      else if (s.spesial === "generalprove") buildGeneral(s, body);
+      else if ((s.oppgaver && s.oppgaver.length) || (s.ekstra && s.ekstra.length) || s.mangler) {
+        body.appendChild(h3("Din tur"));
+        if (s.oppgaver && s.oppgaver.length) {
+          body.appendChild(el("p", { class: "small muted", text: "Løs på papir først og åpne løsningen etterpå. Merk kortet nederst med «Fikk det til» eller «Må øve mer»." }));
+          var ul = el("ul", { class: "cr-klist" });
+          s.oppgaver.forEach(function (k) { var li = kortItem(k, s); if (li) ul.appendChild(li); });
+          body.appendChild(ul);
+        }
+        if (s.ekstra && s.ekstra.length) {
+          var ex = el("details", { class: "cr-ekstra" });
+          if (L === "G") ex.open = true;
+          ex.appendChild(el("summary", { text: "Flere oppgaver (Grundig): " + s.ekstra.length }));
+          var ul2 = el("ul", { class: "cr-klist" });
+          s.ekstra.forEach(function (k) { var li = kortItem(k, s); if (li) ul2.appendChild(li); });
+          ex.appendChild(ul2);
+          body.appendChild(ex);
+        }
+        if (s.mangler) body.appendChild(el("p", { class: "cr-mangler small", text: (s.mangler === true ? "Et eget øvingskort for dette mangler ennå." : s.mangler) }));
+      }
+      // 6 Sjekk
+      body.appendChild(h3("Sjekk"));
+      (s.sjekk || []).forEach(function (c, i) { buildCheck(s, c, i, body); });
+      body.appendChild(selfMark(s));
+      // 7 Feller
+      if (s.feller && s.feller.length) {
+        body.appendChild(el("div", { class: "callout felle cr-feller" }, [
+          el("div", { class: "lbl", text: "Feller som koster poeng" }),
+          el("ul", { html: s.feller.map(function (x) { return "<li>" + x + "</li>"; }).join("") })
+        ]));
+      }
+      // Neste
+      var nx = el("button", { class: "btn sm cr-next", type: "button", text: "Neste steg →" });
+      nx.addEventListener("click", function () {
+        var list = stepsIn(state().lengde), idx = list.indexOf(s), n = null;
+        for (var j = idx + 1; j < list.length; j++) { n = list[j]; break; }
+        if (!n) { nx.textContent = "Dette var siste steg i løypa"; nx.disabled = true; return; }
+        var cur = document.getElementById("steg-" + s.id); if (cur) cur.open = false;
+        openStep(n.id, true);
+      });
+      body.appendChild(el("div", { class: "cr-nextrow" }, nx));
+      paintCards(body);
+      paintChecks(s, body);
+    }
+
+    /* Sjekk-varianter */
+    function tfItems(c) {
+      var groups = [];
+      (c.fra || []).forEach(function (f) {
+        var pool = (IN.TF_GEN && IN.TF_GEN[f[0]]) || [];
+        f[1].forEach(function (tema) {
+          groups.push(pool.filter(function (it) { return it.tema === tema; }));
+        });
+      });
+      // Rund-robin over temaene, så alle temaene blir med (deterministisk)
+      var out = [], i = 0, maks = c.maks || 8, more = true;
+      while (out.length < maks && more) {
+        more = false;
+        groups.forEach(function (g) { if (i < g.length && out.length < maks) { out.push(g[i]); more = true; } });
+        i++;
+      }
+      return out;
+    }
+    function buildCheck(s, c, i, body) {
+      var hid = "sjekk-" + s.id + "-" + i;
+      var wrap = el("div", { class: "cr-check", "data-ck": checkKey(s, i, c), "data-terskel": c.terskel || C.terskel });
+      var res = el("p", { class: "cr-ckres small", "aria-live": "polite" });
+      if (c.type === "quiz") {
+        var host = el("div", { id: hid, class: "cr-quiz" });
+        wrap.appendChild(host);
+        var again = el("button", { class: "btn sm ghost", type: "button", text: "↺ Prøv igjen" });
+        again.addEventListener("click", function () { IN.quiz(host, c.items); });
+        wrap.appendChild(el("div", { class: "cr-ckbar" }, [res, again]));
+        body.appendChild(wrap);
+        IN.quiz(host, c.items);
+      } else if (c.type === "tf") {
+        var items = tfItems(c);
+        var th = el("div", { id: hid, class: "cr-tf" });
+        wrap.appendChild(el("p", { class: "small muted", text: "Svar Sant eller Usant på hver påstand og trykk «Sjekk svar». Minst " + Math.round(100 * (c.terskel || C.terskel)) + " % riktige regnes som dekket." }));
+        wrap.appendChild(th);
+        wrap.appendChild(el("div", { class: "cr-ckbar" }, res));
+        body.appendChild(wrap);
+        if (items.length) IN.tfTest(th, items, { id: hid });
+        else th.appendChild(el("p", { class: "muted small", text: "Påstandene kunne ikke lastes." }));
+      } else if (c.type === "parsons") {
+        var ph = el("div", { id: hid, class: "cr-parsons" });
+        if (c.tekst) wrap.appendChild(el("p", { class: "small", text: c.tekst }));
+        wrap.appendChild(ph);
+        wrap.appendChild(el("div", { class: "cr-ckbar" }, res));
+        body.appendChild(wrap);
+        var algo = IN.algos && IN.algos[c.algo];
+        if (algo && IN.pseudo && IN.pseudo.parsons) IN.pseudo.parsons(ph, algo, {});
+        else ph.appendChild(el("p", { class: "muted small", text: "Øvelsen kunne ikke lastes." }));
+      } else if (c.type === "ekstern") {
+        wrap.appendChild(el("p", { text: c.tekst }));
+        if (c.lenke) wrap.appendChild(el("p", {}, el("a", { class: "btn sm primary", href: link(c.lenke[0], c.lenke[1], c.lenke[2], s.id), text: "Åpne øvingen" })));
+        wrap.appendChild(el("div", { class: "cr-ckbar" }, res));
+        body.appendChild(wrap);
+      }
+    }
+    function paintChecks(s, root) {
+      var all = P ? P.all() : {};
+      qsa(".cr-check", root).forEach(function (w) {
+        var rec = all[w.getAttribute("data-ck")], r = qs(".cr-ckres", w);
+        if (!r) return;
+        var ter = parseFloat(w.getAttribute("data-terskel")) || C.terskel;
+        if (!rec || !rec.max) { r.textContent = ""; r.className = "cr-ckres small"; return; }
+        var b = rec.best != null ? rec.best : rec.score || 0, ok = b / rec.max >= ter;
+        r.className = "cr-ckres small " + (ok ? "ok" : "no");
+        r.textContent = (ok ? "✓ Bestått. " : "Ikke bestått ennå. ") + "Beste forsøk: " + Math.round(b * 10) / 10 + " av " + rec.max +
+          (ok ? "" : " (trenger " + Math.round(ter * 100) + " %).");
+      });
+    }
+    function selfMark(s) {
+      var key = "crash:steg:" + s.id;
+      var wrap = el("div", { class: "et-self cr-self", role: "group", "aria-label": "Egenvurdering av steget" });
+      var bOk = el("button", { class: "btn sm et-self-ok", type: "button", text: "✓ Fikk det til" });
+      var bOv = el("button", { class: "btn sm et-self-ov", type: "button", text: "↻ Må øve mer" });
+      function pick(v) {
+        var r = P.get(key);
+        P.set(key, { status: r && r.status === v ? null : v });
+      }
+      bOk.addEventListener("click", function () { pick("ok"); });
+      bOv.addEventListener("click", function () { pick("ovmer"); });
+      wrap.appendChild(el("span", { class: "et-self-q muted small", text: "Hele steget:" }));
+      wrap.appendChild(bOk); wrap.appendChild(bOv);
+      wrap._paint = function (all) {
+        var r = all[key], v = r && r.status;
+        bOk.setAttribute("aria-pressed", v === "ok" ? "true" : "false");
+        bOv.setAttribute("aria-pressed", v === "ovmer" ? "true" : "false");
+      };
+      return wrap;
+    }
+    function paintCards(root) {
+      var all = P ? P.all() : {};
+      qsa("[data-kort]", root).forEach(function (sp) {
+        var v = kortStatus(all[sp.getAttribute("data-kort")]);
+        sp.className = "cr-kstat small" + (v === "ok" ? " ok" : v === "ovmer" ? " q" : "");
+        sp.textContent = v === "ok" ? "✓ Fikk det til" : v === "ovmer" ? "↻ Øv mer" : "";
+      });
+      qsa(".cr-self", root).forEach(function (w) { if (w._paint) w._paint(all); });
+    }
+
+    /* Mock-steget (etappe 3) */
+    function buildMock(s, body) {
+      body.appendChild(h3("Din tur: mock-oppgaver"));
+      var ms = mockList();
+      var host = el("div", { class: "cr-mock" });
+      body.appendChild(host);
+      if (!ms.length) {
+        host.appendChild(el("p", { class: "muted", text: "Mock-oppgavene kommer snart. Ta 3a–3d i mellomtiden." }));
+        return;
+      }
+      ms.sort(function (a, b) { return (SANN[a.sannsynlighet] || 0) - (SANN[b.sannsynlighet] || 0); });
+      var L = state().lengde;
+      var inside = ms.filter(function (m) { return mockInLen(m, L); }), outside = ms.filter(function (m) { return !mockInLen(m, L); });
+      host.appendChild(el("p", { class: "small muted cr-mock-krav" }));
+      function one(m, into) {
+        var meta = el("div", { class: "cr-mock-meta" }, [
+          el("span", { class: "tag cr-sann " + (m.sannsynlighet === "høy" ? "hoy" : m.sannsynlighet === "middels" ? "mid" : "lav"), text: "Sannsynlighet: " + (m.sannsynlighet || "?") }),
+          el("span", { class: "small", text: [m.tema, m.operasjon].filter(Boolean).join(" · ") }),
+          m.side && m.side.page ? el("a", { class: "small", href: link(m.side.page, m.side.fane, null, s.id), text: "Les om temaet" }) : null
+        ]);
+        into.appendChild(meta);
+        if (m.begrunnelse) into.appendChild(el("p", { class: "small muted cr-mock-why", html: m.begrunnelse }));
+        if (m.eli5) into.appendChild(el("div", { class: "callout eli5 small", html: m.eli5 }));
+        var d = {}; for (var k in m) if (Object.prototype.hasOwnProperty.call(m, k)) d[k] = m[k];
+        IN.examTask(into, d);
+      }
+      inside.forEach(function (m) { one(m, host); });
+      if (outside.length) {
+        var ex = el("details", { class: "cr-ekstra" });
+        ex.appendChild(el("summary", { text: "Flere mock-oppgaver utenfor valgt lengde: " + outside.length }));
+        var inner = el("div");
+        outside.forEach(function (m) { one(m, inner); });
+        ex.appendChild(inner);
+        host.appendChild(ex);
+      }
+      paintMockKrav(s, body);
+    }
+    function paintMockKrav(s, root) {
+      var p = qs(".cr-mock-krav", root); if (!p) return;
+      var L = state().lengde, all = P ? P.all() : {};
+      var ms = mockList().filter(function (m) { return mockInLen(m, L); });
+      var n = ms.filter(function (m) { var r = all["kort:crash:" + m.id]; return r && r.status === "ok"; }).length;
+      var need = Math.ceil(ms.length * C.mockAndel);
+      p.textContent = "I " + LEN[L].navn + " er " + ms.length + " mock-kort med. Steget er dekket når minst " + need +
+        " av dem er merket «Fikk det til» (nå: " + n + ").";
+    }
+
+    /* Generalprøven (etappe 11) med enkel tidtaker (lagres ikke) */
+    function buildGeneral(s, body) {
+      var G = C.generalprove;
+      body.appendChild(h3("Din tur: hele " + G.eksamen + " i rekkefølge"));
+      var totP = G.rader.reduce(function (a, r) { return a + r.p; }, 0);
+      var ctl = el("div", { class: "cr-timer" });
+      var inp = el("input", { type: "number", min: "30", max: "600", step: "10", value: String(totP * G.minPerPoeng), id: "cr-gp-min", class: "cr-gp-min", inputmode: "numeric" });
+      var disp = el("output", { class: "cr-clock", "aria-live": "off", for: "cr-gp-min" });
+      var bStart = el("button", { class: "btn sm primary", type: "button", text: "Start tidtaker" });
+      var bReset = el("button", { class: "btn sm ghost", type: "button", text: "Nullstill" });
+      ctl.appendChild(el("div", { class: "cr-tr-row" }, [
+        el("label", { class: "small", for: "cr-gp-min", text: "Total tid (minutter):" }), inp
+      ]));
+      ctl.appendChild(el("div", { class: "cr-tr-row" }, [disp, bStart, bReset]));
+      ctl.appendChild(el("p", { class: "small muted", text: "Varigheten på eksamen står ikke i kildene våre. Forslaget er 2 minutter per poeng. Sjekk den faktiske tiden i eksamensinformasjonen. Tidtakeren lagres ikke." }));
+      body.appendChild(ctl);
+
+      var tw = el("div", { class: "table-wrap" });
+      var tbl = el("table", { class: "cmp-table cr-gp" });
+      tbl.appendChild(el("thead", {}, el("tr", {}, [el("th", { text: "Nr." }), el("th", { text: "Oppgave" }), el("th", { text: "Poeng" }), el("th", { text: "Tid" })])));
+      var tb = el("tbody");
+      G.rader.forEach(function (r) {
+        var href = r.kort ? kortHref(r.kort, s.id) : link(r.lenke[0], r.lenke[1], r.lenke[2], s.id);
+        var stat = el("span", { class: "cr-kstat small" });
+        if (r.kort) stat.setAttribute("data-kort", kortKey(r.kort));
+        var tr = el("tr", {}, [
+          el("td", { text: r.nr }),
+          el("td", {}, [el("a", { href: href, text: r.tittel }), " ", stat]),
+          el("td", { text: r.p + " p" }),
+          el("td", { class: "cr-gp-t" })
+        ]);
+        tr._p = r.p;
+        tb.appendChild(tr);
+      });
+      tbl.appendChild(tb); tw.appendChild(tbl); body.appendChild(tw);
+
+      var rows = qsa("tr", tb), timer = null, startAt = 0, used = 0, running = false;
+      function total() { var v = parseInt(inp.value, 10); return (isFinite(v) && v > 0 ? v : totP * G.minPerPoeng) * 60; }
+      function alloc() {
+        var T = total() / 60, acc = 0;
+        rows.forEach(function (tr) {
+          var m = Math.round(T * tr._p / totP);
+          tr._from = acc; acc += T * tr._p / totP; tr._to = acc;
+          qs(".cr-gp-t", tr).textContent = m + " min";
+        });
+      }
+      function fmt(sec) {
+        sec = Math.max(0, Math.round(sec));
+        var h = Math.floor(sec / 3600), m = Math.floor((sec % 3600) / 60), x = sec % 60;
+        return (h ? h + ":" + (m < 10 ? "0" : "") : "") + m + ":" + (x < 10 ? "0" : "") + x;
+      }
+      function elapsed() { return used + (running ? (Date.now() - startAt) / 1000 : 0); }
+      function tick() {
+        var e = elapsed(), left = total() - e, em = e / 60;
+        disp.textContent = left > 0 ? fmt(left) + " igjen" : "Tiden er ute";
+        disp.classList.toggle("ute", left <= 0);
+        rows.forEach(function (tr) {
+          var on = (running || used > 0) && em >= tr._from && em < tr._to;
+          tr.classList.toggle("cr-now", on);
+        });
+        if (left <= 0 && running) { used = total(); running = false; clearInterval(timer); bStart.textContent = "Start tidtaker"; }
+      }
+      bStart.addEventListener("click", function () {
+        if (running) { used = elapsed(); running = false; clearInterval(timer); bStart.textContent = "Fortsett"; }
+        else { if (elapsed() >= total()) used = 0; startAt = Date.now(); running = true; timer = setInterval(tick, 1000); bStart.textContent = "Pause"; }
+        inp.disabled = running || used > 0;
+        tick();
+      });
+      bReset.addEventListener("click", function () {
+        running = false; used = 0; clearInterval(timer); bStart.textContent = "Start tidtaker"; inp.disabled = false; tick();
+      });
+      inp.addEventListener("input", function () { alloc(); tick(); });
+      alloc(); tick();
+    }
+
+    /* ---------- Maling av status (uten å bygge stegene på nytt) ---------- */
+    function render() {
+      var pr = IN.crashProgress(), L = pr.lengde, st = pr.status;
+      paintTop(pr);
+      paintQueue(pr);
+      C.etapper.forEach(function (e, ei) {
+        var sec = document.getElementById("etappe-" + e.nr); if (!sec) return;
+        var es = pr.etapper[ei];
+        var out = e.steg.length - es.antallSteg;
+        var n = es.antallSteg, nd = es.ferdigeSteg;
+        qs(".cr-ebar-fill", sec).style.width = (n ? Math.round(100 * nd / n) : 0) + "%";
+        qs(".cr-ecount", sec).textContent = n
+          ? nd + " av " + n + " steg" + (es.total ? " · " + es.dekket + " av " + es.total + " p" : "")
+          : "Ikke med i " + LEN[L].navn;
+        sec.classList.toggle("cr-utenfor", !n);
+        e.steg.forEach(function (s) {
+          var d = document.getElementById("steg-" + s.id);
+          var vis = inLen(s, L) || showAll[e.nr] || forced[s.id];
+          d.hidden = !vis;
+          d.classList.toggle("cr-ekstra-steg", !inLen(s, L));
+          var x = st[s.id], ic = statusIcon(x), ico = qs(".cr-sico", d);
+          ico.className = "cr-sico " + ic.cls; ico.textContent = ic.txt;
+          qs(".cr-sstat", d).textContent = ic.lbl;
+          d.classList.toggle("is-done", x.done);
+          qs(".cr-tid", d).textContent = minutes(s, L) + " min";
+          if (d._built) { paintCards(d); paintChecks(s, d); paintMockKrav(s, d); }
+        });
+        var tog = qs(".cr-etog", sec);
+        tog.hidden = !out; tog.style.display = out ? "" : "none";
+        tog.textContent = showAll[e.nr] ? "Skjul steg utenfor " + LEN[L].navn : "Vis " + out + " steg utenfor " + LEN[L].navn;
+      });
+    }
+
+    /* ---------- Åpne steg (dyplenke #steg=…) ---------- */
+    function openStep(id, scroll) {
+      var s = BYID[id]; if (!s) return;
+      var L = state().lengde;
+      if (!inLen(s, L)) { forced[id] = true; render(); }
+      var d = document.getElementById("steg-" + id); if (!d) return;
+      d.hidden = false;
+      d.open = true;
+      if (!scroll) return;
+      var go = function () {
+        var top = d.getBoundingClientRect().top + window.pageYOffset - IN.stickyH();
+        window.scrollTo({ top: Math.max(0, top), behavior: "instant" });
+      };
+      setTimeout(go, 30); setTimeout(go, 350);
+      try { d.querySelector("summary").focus({ preventScroll: true }); } catch (e) {}
+    }
+    function fromHash() {
+      var m = location.hash.match(/steg=([\w-]+)/);
+      if (m && BYID[m[1]]) openStep(m[1], true);
+    }
+
+    /* ---------- Overføring og nullstilling ---------- */
+    function initTools() {
+      var code = qs("#cr-code"), msg = qs("#cr-tr-msg"), copy = qs("#cr-copy");
+      qs("#cr-export").addEventListener("click", function () {
+        code.value = P.exportCode();
+        copy.hidden = false;
+        msg.textContent = "Koden er laget. Kopier den og lim den inn på den andre enheten.";
+        code.select();
+      });
+      copy.addEventListener("click", function () {
+        var done = function () { msg.textContent = "Kopiert."; };
+        try {
+          if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(code.value).then(done, function () { code.select(); document.execCommand("copy"); done(); });
+          else { code.select(); document.execCommand("copy"); done(); }
+        } catch (e) { msg.textContent = "Kunne ikke kopiere automatisk. Merk teksten og kopier selv."; }
+      });
+      qs("#cr-import").addEventListener("click", function () {
+        var v = code.value.trim();
+        if (!v) { msg.textContent = "Lim inn en kode først."; return; }
+        msg.textContent = P.importCode(v) ? "Importert. Fremdriften er oppdatert." : "Koden kunne ikke leses. Sjekk at hele koden er med.";
+      });
+      qs("#cr-reset").addEventListener("click", function () {
+        if (!window.confirm("Nullstille all fremdrift? Dette sletter løypa, egenvurderingene på eksamenskortene og testresultatene på alle sidene i guiden, på denne enheten. Det kan ikke angres, med mindre du har en overføringskode.")) return;
+        try {
+          for (var i = localStorage.length - 1; i >= 0; i--) {
+            var k = localStorage.key(i);
+            if (k && k.indexOf("in-tf:sjekk-") === 0) localStorage.removeItem(k);
+          }
+        } catch (e) {}
+        P.clear();
+        location.hash = "";
+        location.reload();
+      });
+    }
+
+    /* ---------- Oppstart ---------- */
+    function start() {
+      if (!P) return;
+      buildLenPicker();
+      buildEtapper();
+      render();
+      initTools();
+      qs("#cr-fortsett").addEventListener("click", function () {
+        var id = this.dataset.go; if (id) openStep(id, true);
+      });
+      document.addEventListener("click", function (e) {
+        var a = e.target.closest && e.target.closest('a[href^="#steg="]');
+        if (!a) return;
+        e.preventDefault();
+        var id = a.getAttribute("href").slice(6);
+        try { history.replaceState(null, "", "#steg=" + id); } catch (er) {}
+        openStep(id, true);
+      });
+      var pend = null;
+      function soon() { if (pend) return; pend = setTimeout(function () { pend = null; render(); }, 30); }
+      document.addEventListener("in:progress", soon);
+      window.addEventListener("storage", function (e) { if (!e.key || e.key === P.KEY) soon(); });
+      window.addEventListener("hashchange", fromHash);
+      fromHash();
+    }
+    if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", start);
+    else start();
+  })();
+  </script>
+</body>
+</html>

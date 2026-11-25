@@ -1009,6 +1009,7 @@
       function lever() {
         levert = true; render();
         var c = counts(), half = N / 2, p = poeng(c.r, N);
+        if (IN.progress) IN.progress.solved("del1", "del1-ovelse", p, N);
         IN.clear(res);
         res.appendChild(el("div", { class: "callout sensor", id: "del1-resultat" }, [
           el("span", { class: "lbl", text: "Din poengsum i del 1" }),

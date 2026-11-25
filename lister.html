@@ -1,0 +1,690 @@
+<!doctype html>
+<html lang="nb">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lister &amp; stakk · IN2010</title>
+  <meta name="description" content="Lister i IN2010: arrayer, dynamiske arrayer, enkelt- og dobbeltlenkede lister, stakk, kø og deque, nylige søk (LRU) og eksamensoppgaven om velformaterte tagger – med stegvise demoer, pseudokode og sant/usant.">
+  <script>(function(){try{var d=document.documentElement;var t=localStorage.getItem('in-theme');if(t&&t!=='system')d.setAttribute('data-theme',t);var l=localStorage.getItem('in-level')||'normal';d.setAttribute('data-level',l);}catch(e){document.documentElement.setAttribute('data-level','normal');}})();</script>
+  <link rel="stylesheet" href="assets/css/styles.css">
+</head>
+<body data-page="lister">
+  <a class="skip-link" href="#main">Hopp til innhold</a>
+  <header id="topnav"></header>
+
+  <main id="main" class="wrap">
+    <div class="pagehead">
+      <h1>Lister &amp; stakk</h1>
+      <p class="lead">De enkleste datastrukturene i kurset, og byggeklossene i nesten alt annet.
+        Her ser du hvordan en liste kan lages med et dynamisk array eller med lenkede noder, hvorfor de har ulike kjøretider,
+        og hvordan stakk og kø bygges på toppen. Til slutt: eksamensoppgaven om velformaterte tagger, og «nylige søk» med hashmap og lenket liste.</p>
+      <div class="badges">
+        <span class="badge" data-go="stakk" data-card="h2020-9"><b>H2020</b> · Velformaterte tagger · <span class="pts">12p</span></span>
+      </div>
+    </div>
+
+    <div class="tabs" role="tablist" aria-label="Emner om lister og stakk">
+      <button data-tab="begreper">Lister</button>
+      <button data-tab="dynamisk">Dynamisk array</button>
+      <button data-tab="lenket">Lenkede lister</button>
+      <button data-tab="stakk">Stakk &amp; kø</button>
+      <button data-tab="lru">Nylige søk (LRU)</button>
+      <button data-tab="test">Sant/usant</button>
+    </div>
+
+    <!-- ===================== LISTER ===================== -->
+    <section data-panel="begreper">
+      <div class="callout begrep"><span class="lbl">Begrep: liste</span>
+        <p>En <b>liste</b> er en endelig samling elementer i en bestemt rekkefølge. <b>Indeksen</b> til et element er hvor mange elementer som står foran det,
+          så en liste med n elementer har indeksene 0, 1, …, n − 1. De fire grunnoperasjonene er
+          <code>Get(L, i)</code> (les plass i), <code>Set(L, i, e)</code> (bytt ut plass i), <code>Add(L, i, e)</code> (sett inn på plass i og skyv resten bakover)
+          og <code>Remove(L, i)</code> (fjern plass i og tett hullet).</p>
+      </div>
+      <div id="intro-begreper"></div>
+
+      <div class="grid cols-2">
+        <div class="callout eli5"><span class="lbl">5-åring: hylle eller tog?</span>
+          <p>Du kan ordne lekene dine på en <b>hylle</b> med nummererte plasser. Da finner du plass nummer 7 med en gang, men vil du sette noe inn først, må alle de andre flyttes.
+            Eller du kan koble dem sammen som et <b>tog</b>: hver vogn holder i den neste. Å hekte på en ny vogn går fort, men vil du finne vogn nummer 7, må du telle deg fram fra starten.</p>
+        </div>
+        <div class="callout eksempel"><span class="lbl">Eksempel: det du allerede bruker</span>
+          <p>Python sin <code>list</code> og Java sin <code>ArrayList</code> er dynamiske arrayer.
+            Derfor er <code>xs[i]</code> og <code>xs.append(x)</code> raske, mens <code>xs.insert(0, x)</code> og <code>xs.pop(0)</code> må flytte alt.</p>
+        </div>
+      </div>
+
+      <h3>Liste er en ADT, array og lenket liste er datastrukturer</h3>
+      <p>Lista sier bare <i>hva</i> vi kan gjøre (Get, Set, Add, Remove). Hvordan det gjøres, avgjøres av datastrukturen under.
+        Kurset viser to måter: et <b>dynamisk array</b>, der elementene ligger etter hverandre i minnet, og en <b>lenket liste</b>, der hvert element ligger i en egen node som peker videre.
+        Mer om skillet mellom ADT og datastruktur finner du på <a href="00-begreper.html#fane=adt">Begreper</a>.</p>
+      <div class="grid cols-2">
+        <div class="card">
+          <h4 style="margin:.2rem 0 .3rem">Array</h4>
+          <ul>
+            <li>Fast lengde N, bestemt når arrayet lages.</li>
+            <li>Elementene ligger etter hverandre i minnet.</li>
+            <li><code>A[i]</code> og <code>|A|</code> er O(1).</li>
+            <li>Kan ikke vokse. Det er det dynamiske arrayet løser.</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h4 style="margin:.2rem 0 .3rem">Lenket liste</h4>
+          <ul>
+            <li>Hver node har et element (<code>v.elem</code>) og en peker til neste node (<code>v.next</code>).</li>
+            <li>Lista holder bare en peker til første node, <code>L.first</code>. Tom liste: <code>null</code>.</li>
+            <li>Å hekte inn og ut noder er O(1), men å finne plass i krever at vi går dit: O(n).</li>
+          </ul>
+        </div>
+      </div>
+      <div class="callout uni"><span class="lbl">Universitetsnivå: hvorfor A[i] er O(1)</span>
+        <p>Fordi alle plassene er like store og ligger etter hverandre, kan maskinen regne ut hvor plass i ligger: startadressen pluss i ganger størrelsen på én plass.
+          Det er én regneoperasjon, uansett hvor stort arrayet er. En lenket liste har ingen slik formel: nodene kan ligge hvor som helst, og den eneste veien til node i går via de i nodene foran.</p>
+      </div>
+
+      <h3 id="tbl-ops">Kjøretider å kunne utenat</h3>
+      <p class="muted small">Tabellen er fra ukesoppgave 1. «Fullt» betyr at det dynamiske arrayet ikke har ledig plass, så neste innsetting må doble.
+        Trykk på <b>Øv</b> for å skjule svarene, og trykk på en celle for å se den.</p>
+      <div class="btn-row" style="margin:.2rem 0 .5rem"><button class="btn sm" type="button" id="ops-drill">Øv: skjul svarene</button></div>
+      <div class="table-wrap">
+        <table class="cmp-table ls-ops" id="ops-table">
+          <thead><tr><th>Datastruktur</th><th>addFirst</th><th>removeFirst</th><th>addLast</th><th>removeLast</th><th>getFirst</th><th>getLast</th><th>get(i)</th></tr></thead>
+          <tbody>
+            <tr><td>Dynamisk array</td><td>n</td><td>n</td><td data-tip="PushBack: det er ledig plass, så vi skriver på D.A[D.n].">1</td><td>1</td><td>1</td><td>1</td><td>1</td></tr>
+            <tr><td>Dynamisk array (fullt)</td><td>n</td><td>n</td><td data-tip="EnsureCapacity må lage et dobbelt så stort array og kopiere alle n elementene.">n</td><td>1</td><td>1</td><td>1</td><td>1</td></tr>
+            <tr><td>Enkeltlenket liste</td><td>1</td><td>1</td><td>n</td><td>n</td><td>1</td><td>n</td><td data-tip="NodeAt må følge i next-pekere fra L.first.">n</td></tr>
+            <tr><td>Enkeltlenket med siste-peker</td><td>1</td><td>1</td><td data-tip="Med en peker til siste node kan vi hekte på bakerst direkte.">1</td><td data-tip="Vi må finne den nest siste noden for å sette next til null, og det krever at vi går fra starten.">n</td><td>1</td><td>1</td><td>n</td></tr>
+            <tr><td>Dobbeltlenket liste</td><td>1</td><td>1</td><td>1</td><td data-tip="prev-pekeren gir oss den nest siste noden direkte.">1</td><td>1</td><td>1</td><td>n</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="muted small">Alle tallene betyr O(…): 1 er O(1) og n er O(n).</p>
+
+      <div class="callout felle"><span class="lbl">Felle: binærsøk på lenket liste</span>
+        <p>Binærsøk er O(log n) bare fordi vi kan hoppe rett til midten. I en lenket liste koster hvert hopp O(n), så binærsøk blir O(n log n), verre enn å gå gjennom lista én gang.
+          På en sortert lenket liste bruker du derfor rett-frem søk.</p>
+      </div>
+      <div id="quiz-begreper"></div>
+    </section>
+
+    <!-- ===================== DYNAMISK ARRAY ===================== -->
+    <section data-panel="dynamisk" hidden>
+      <div class="callout begrep"><span class="lbl">Begrep: dynamisk array</span>
+        <p>Et dynamisk array D består av et vanlig array <code>D.A</code> og et tall <code>D.n</code>, som er hvor mange elementer som faktisk er i bruk.
+          Elementene ligger på plass 0 til D.n − 1, og resten av D.A er ledig. <b>Kapasiteten</b> <code>|D.A|</code> er hvor mange plasser arrayet har.
+          Når det blir fullt, lages et nytt array med dobbelt så mange plasser, og alt kopieres over.</p>
+      </div>
+      <div id="intro-dynamisk"></div>
+
+      <h3>PushBack, EnsureCapacity og PopBack</h3>
+      <p>Følg med på telleren «kopieringer totalt». Når en PushBack er ferdig, er den alltid mindre enn «2 · PushBack-er».</p>
+      <div id="demo-pushback"></div>
+
+      <div class="callout uni"><span class="lbl">Universitetsnivå: amortisert O(1)</span>
+        <p>Én PushBack kan koste O(n), når alt må kopieres. Men det skjer bare når D.n er 1, 2, 4, 8, … Setter vi inn n elementer, blir kopieringene til sammen 1 + 2 + 4 + …, og det er færre enn 2n,
+          så alle de n innsettingene koster O(n) til sammen. Fordelt på n innsettinger er det O(1) hver. Det kalles <b>amortisert</b> kjøretid.
+          (Med «9 × PushBack» i demoen: 1 + 2 + 4 + 8 = 15 kopieringer, under 2 · 9 = 18.)
+          Du trenger ikke kunne utlede slike analyser selv, bare forstå begrepet. Det dukker opp igjen ved rehash i hashing
+          (se <a href="05-hashing.html#fane=kjoretid&amp;oppg=hs-amort">grafen over kostnad per innsetting</a>).</p>
+      </div>
+      <div class="callout felle"><span class="lbl">Felle: å øke med én plass</span>
+        <p>Hvis EnsureCapacity bare la til én plass (eller et fast antall), måtte vi kopiere nesten hver gang. n PushBack-er ville kostet 1 + 2 + 3 + … + n, altså O(n²).
+          Det er doblingen som gjør at kopieringene blir sjeldne.</p>
+      </div>
+
+      <h3>Add og Remove: sett inn og fjern på plass i</h3>
+      <p>For å sette inn på plass i må alt fra i og bakover flyttes én plass til høyre. Å fjerne plass i er det motsatte: alt bak i flyttes én plass til venstre.
+        Jo nærmere starten, jo mer må flyttes.</p>
+      <div id="demo-addremove"></div>
+      <div class="grid cols-2">
+        <div class="callout snarvei"><span class="lbl">Snarvei: baklengs eller forlengs?</span>
+          <p><b>Add</b> flytter <b>baklengs</b> (fra D.n − 1 ned til i), så vi aldri skriver over et element før det er flyttet.
+            <b>Remove</b> flytter <b>forlengs</b> (fra i opp til D.n − 2), av samme grunn.</p>
+        </div>
+        <div class="callout eksempel"><span class="lbl">Eksempel: Python</span>
+          <p><code>xs.append(x)</code> er PushBack og <code>xs.pop()</code> er PopBack, begge O(1) (append amortisert).
+            <code>xs.insert(0, x)</code> og <code>xs.pop(0)</code> er Add og Remove på plass 0, og de er O(n).</p>
+        </div>
+      </div>
+      <div id="quiz-dynamisk"></div>
+    </section>
+
+    <!-- ===================== LENKEDE LISTER ===================== -->
+    <section data-panel="lenket" hidden>
+      <div class="callout begrep"><span class="lbl">Begrep: node og lenket liste</span>
+        <p>En <b>node</b> v har et element <code>v.elem</code> og en peker <code>v.next</code> til neste node, eller <code>null</code> hvis den er sist.
+          En <b>enkeltlenket liste</b> L holder bare <code>L.first</code>, den første noden. Er lista tom, er L.first <code>null</code>.</p>
+      </div>
+      <div id="intro-lenket"></div>
+
+      <h3>Finn, sett inn og fjern</h3>
+      <p>Alle de fire listeoperasjonene trenger først noden på plass i, og den finner vi bare ved å gå fra starten. Selve innsettingen og fjerningen er O(1).
+        Hver boks viser elementet og hva <code>next</code> peker på, så du ser pekerne endre seg ett steg av gangen.</p>
+      <div id="demo-lenket"></div>
+      <div class="grid cols-2">
+        <div class="callout felle"><span class="lbl">Felle: rekkefølgen på pekerne</span>
+          <p>I InsertAfter må <code>u.next ← v.next</code> komme før <code>v.next ← u</code>. Gjør vi det motsatt, peker u på seg selv, og resten av lista er borte.</p>
+        </div>
+        <div class="callout felle"><span class="lbl">Felle: «å fjerne node i»</span>
+          <p>I en enkeltlenket liste kan vi ikke fjerne en node bare ved å ha en peker til den. Vi trenger noden <i>foran</i>, fordi det er dens next som må endres.
+            Derfor heter operasjonen RemoveAfter(v).</p>
+        </div>
+      </div>
+
+      <h3 id="dobbel">Dobbeltlenket liste med hode og hale</h3>
+      <div class="callout begrep"><span class="lbl">Begrep: prev, hode og hale</span>
+        <p>I en <b>dobbeltlenket liste</b> har hver node også en peker <code>v.prev</code> til noden foran, og lista holder både første og siste node.
+          Det blir enklere med to tomme hjelpenoder, <b>hode- og halenoder</b>: <b>hodet</b> <code>L.head</code> helt først og <b>halen</b> <code>L.tail</code> helt sist. Ingen av dem bærer et element, og de blir liggende så lenge lista finnes.
+          Det første elementet ligger da i <code>L.head.next</code> og det siste i <code>L.tail.prev</code>. Peker <code>L.head.next</code> rett på <code>L.tail</code>, er lista tom.
+          Hver ekte node har alltid en node foran og en bak, så vi slipper spesialtilfeller med null.</p>
+      </div>
+      <div id="demo-dobbel"></div>
+      <div class="grid cols-2">
+        <div class="callout eksempel"><span class="lbl">Eksempel: fjern bakerst (ukesoppgave 1)</span>
+          <p><b>Enkeltlenket:</b> vi må gå fra L.first fram til den nest siste noden for å sette next til null. Det er O(n), selv om vi har en peker til siste node.<br>
+            <b>Dobbeltlenket:</b> den siste er <code>L.tail.prev</code>, og RemoveNode er to pekerendringer. O(1).</p>
+        </div>
+        <div class="callout snarvei"><span class="lbl">Snarvei: InsertBefore gratis</span>
+          <p>Med prev-pekere får vi InsertBefore(v, e) ved å kalle InsertAfter(v.prev, e). Med hode og hale finnes v.prev alltid.</p>
+        </div>
+      </div>
+      <div class="callout uni"><span class="lbl">Universitetsnivå: hva koster prev?</span>
+        <p>Én ekstra peker per node i minne, og omtrent dobbelt så mange pekerendringer per innsetting og fjerning. Til gjengjeld blir removeLast og RemoveNode(v) O(1).
+          Lista er fortsatt en lenket liste, så get(i) er O(n). (Man kan starte fra den enden som er nærmest, men det er fortsatt O(n).)</p>
+      </div>
+      <div id="quiz-lenket"></div>
+    </section>
+
+    <!-- ===================== STAKK & KØ ===================== -->
+    <section data-panel="stakk" hidden>
+      <div class="grid cols-2">
+        <div class="callout begrep"><span class="lbl">Begrep: stakk (LIFO)</span>
+          <p>En <b>stakk</b> (engelsk <i>stack</i>) er en liste vi bare legger til i og tar ut fra på ett sted, toppen.
+            <code>push(x)</code> legger x øverst, og <code>pop()</code> tar ut det øverste. Det som ble lagt inn sist, kommer ut først: <b>LIFO</b>, last in, first out.</p>
+        </div>
+        <div class="callout begrep"><span class="lbl">Begrep: kø (FIFO)</span>
+          <p>En <b>kø</b> (engelsk <i>queue</i>) setter inn i den ene enden og tar ut i den andre.
+            <code>enqueue(x)</code> stiller x bakerst, og <code>dequeue()</code> tar ut den forreste. Det som kom først, kommer ut først: <b>FIFO</b>, first in, first out.</p>
+        </div>
+      </div>
+      <div id="intro-stakk"></div>
+
+      <h3 id="demo-stakk-ko">Prøv selv: samme input, ulik rekkefølge ut</h3>
+      <div class="card">
+        <p class="muted small" style="margin-top:0">«Sett inn» gjør push på stakken og enqueue i køen med samme tall. «Ta ut» gjør pop og dequeue. Se hvem som kommer ut.</p>
+        <div class="ls-lab-form">
+          <label for="lab-val" class="small">Tall</label>
+          <input id="lab-val" type="number" value="1" aria-label="Tall å sette inn">
+          <button class="btn primary sm" type="button" id="lab-in">Sett inn</button>
+          <button class="btn sm" type="button" id="lab-out">Ta ut</button>
+          <button class="btn sm" type="button" id="lab-reset">↺ Nullstill</button>
+        </div>
+        <div class="ls-lab">
+          <div id="lab-stack"></div>
+          <div id="lab-queue"></div>
+        </div>
+        <p class="ls-lab-log muted" id="lab-log" aria-live="polite"></p>
+      </div>
+
+      <h3>Implementasjon: begge får O(1)</h3>
+      <div class="table-wrap">
+        <table class="cmp-table ls-prose">
+          <thead><tr><th>ADT</th><th>Med dynamisk array</th><th>Med lenket liste</th></tr></thead>
+          <tbody>
+            <tr><td>Stakk</td><td>push = PushBack, pop = PopBack. O(1) (push amortisert).</td><td>Toppen er L.first: push og pop er innsetting og fjerning fremst, O(1).</td></tr>
+            <tr><td>Kø</td><td>enqueue = PushBack, men dequeue = Remove(D, 0) må flytte alt: O(n). Ikke bruk dette naivt.</td><td>Med peker til både første og siste node: enqueue bakerst og dequeue forrest, begge O(1).</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="grid cols-2">
+        <div class="callout begrep"><span class="lbl">Begrep: deque</span>
+          <p>En <b>deque</b> (double-ended queue) kan sette inn og ta ut effektivt i begge ender. Den kan brukes både som stakk og som kø.
+            Innlevering 1 bygger videre på idéen med «Teque», som i tillegg kan sette inn i midten.
+            En dobbeltlenket liste med hode og hale er en deque, og en array-basert deque kan i tillegg slå opp på indeks.</p>
+        </div>
+        <div class="callout eksempel"><span class="lbl">Eksempel: hvor stakk og kø dukker opp</span>
+          <ul>
+            <li><b>Bredde-først søk (BFS)</b> bruker en kø. I Python er det vanlig å bruke <code>collections.deque</code> med <code>append</code> og <code>popleft</code>, begge O(1). Se <a href="06-grafer.html#fane=bfs">BFS</a>.</li>
+            <li><b>Dybde-først søk (DFS)</b> bruker en stakk, enten en egen stakk eller kallstakken via rekursjon. Se <a href="06-grafer.html#fane=dfs">DFS</a> og <a href="00-begreper.html#fane=rekursjon">kallstakken</a>.</li>
+            <li><b>Velformaterte tagger</b> (eksamen H2020), rett under.</li>
+          </ul>
+        </div>
+      </div>
+
+      <h3 id="tagger">Velformaterte tagger med stakk</h3>
+      <p>En HTML-tagg som <code>&lt;div&gt;</code> åpner noe, og <code>&lt;/div&gt;</code> lukker det. Taggene kan ligge inni hverandre, men den som ble åpnet sist, må lukkes først.
+        Det er nettopp LIFO. Med bare én type tagg holder det å telle hvor mange som står åpne. Med flere typer må vi huske <i>hvilke</i> som står åpne, i rekkefølge: en stakk.</p>
+      <div class="grid cols-2">
+        <div class="callout eli5"><span class="lbl">5-åring: bokser i bokser</span>
+          <p>Du legger en boks i en boks i en boks. Skal du lukke dem, må du lukke den innerste først. Prøver du å lukke den store boksen mens en liten fortsatt er åpen inni, går det ikke.</p>
+        </div>
+        <div class="callout eksempel"><span class="lbl">Eksempel</span>
+          <p><code>&lt;div&gt;&lt;p&gt;&lt;/p&gt;&lt;/div&gt;</code> er velformatert.
+            <code>&lt;div&gt;&lt;p&gt;&lt;/div&gt;&lt;/p&gt;</code> er det ikke når taggene skal være nøstet, som var meningen i eksamensoppgaven: her krysser de. (Oppgaveteksten tillot faktisk også kryssing, se tipsene på eksamenskortet.)
+            <code>&lt;/div&gt;&lt;div&gt;</code> er ikke velformatert uansett, selv om det er like mange av hver.</p>
+        </div>
+      </div>
+      <h4>Bare div-tagger: tell (9a)</h4>
+      <div id="demo-divs"></div>
+      <h4>Alle slags tagger: stakk (9b)</h4>
+      <div id="demo-tags"></div>
+      <div class="callout felle"><span class="lbl">Felle: to sjekker, ikke én</span>
+        <p>Både telleren og stakken trenger to sjekker: <b>underveis</b> (lukker vi noe som ikke er åpent, eller feil type?) og <b>til slutt</b> (står noe fortsatt åpent?).
+          Å glemme én av dem er den vanligste feilen, og sensor trakk for begge.</p>
+      </div>
+      <h4>Pusle sammen GoodTags</h4>
+      <div class="card" id="parsons-tags"></div>
+
+      <h3>Eksamen</h3>
+      <div id="exam-h2020-9"></div>
+      <div id="quiz-stakk"></div>
+    </section>
+
+    <!-- ===================== NYLIGE SØK (LRU) ===================== -->
+    <section data-panel="lru" hidden>
+      <div class="callout begrep"><span class="lbl">Begrep: nylige søk</span>
+        <p>En nettside skal vise de N siste søkene, med det nyeste først. Søker noen på noe som allerede står i lista, flyttes det fremst. Er lista full, faller det eldste ut.
+          Operasjonen <code>update(key)</code> skal ta forventet O(1). Oppgaven er fra ukesoppgave 8 (hashing), og samme idé kalles ofte en <b>LRU-cache</b> (least recently used):
+          kast det som er brukt for lengst siden. Navnet LRU brukes ikke i kurset, men du møter det i praksis.</p>
+      </div>
+      <div id="intro-lru"></div>
+
+      <div class="table-wrap">
+        <table class="cmp-table ls-prose">
+          <thead><tr><th>Bare …</th><th>Godt til</th><th>Problemet</th></tr></thead>
+          <tbody>
+            <tr><td>Hashmap</td><td>«Har vi søkt på dette?» på forventet O(1)</td><td>Husker ingen rekkefølge, så vi vet ikke hva som er eldst.</td></tr>
+            <tr><td>Lenket liste</td><td>Holder rekkefølgen, flytte en node er O(1)</td><td>Å finne nøkkelen i lista krever rett-frem søk, O(N).</td></tr>
+            <tr><td>Begge</td><td colspan="2">Hashmapet går fra nøkkel til <b>noden</b> i lista. Da finner vi noden på forventet O(1), og kan flytte den på O(1).</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Demo: update(key)</h3>
+      <div id="demo-lru"></div>
+      <div class="grid cols-2">
+        <div class="callout felle"><span class="lbl">Felle: glemme hashmapet</span>
+          <p>Når den eldste kastes ut av lista, må den også fjernes fra hashmapet. Ellers tror vi senere at nøkkelen fortsatt er der, og peker på en node som ikke lenger er i lista.</p>
+        </div>
+        <div class="callout felle"><span class="lbl">Felle: enkeltlenket liste</span>
+          <p>For å ta ut en node midt i lista på O(1) trenger vi noden foran den. Det gir bare en dobbeltlenket liste. Med enkeltlenket liste blir update O(N).</p>
+        </div>
+      </div>
+      <div class="callout uni"><span class="lbl">Universitetsnivå: detaljer fra løsningsforslaget</span>
+        <p>Løsningsforslaget til ukesoppgaven lager hashmapet med plass til 2N nøkler fra start, så det aldri trenger rehash. Det bruker bare én ekstra node som både hode og hale
+          (lista er sirkulær, så forrige node før hodet er den siste). Det er samme idé som hode og hale her: ingen spesialtilfeller med null.</p>
+      </div>
+      <p class="muted small">Dette har ikke vært eksamensoppgave i 2020–2025, men det kombinerer to ting som går igjen: hashmap og dobbeltlenket liste.</p>
+      <div id="quiz-lru"></div>
+    </section>
+
+    <!-- ===================== SANT/USANT ===================== -->
+    <section data-panel="test" hidden>
+      <h3>Sant eller usant?</h3>
+      <p class="muted small">Ta stilling til hver påstand, og sjekk svarene. Forklaringen viser hvorfor.</p>
+      <div id="tf-lister"></div>
+
+      <h3 style="margin-top:2rem">Test deg selv – lister og stakk</h3>
+      <p class="muted small">Disse påstandene har aldri stått på eksamen. De er laget ut fra forelesningen, ukesoppgavene og H2020 oppgave 9 med sensorveiledning.
+        De oftest testede står først.</p>
+      <div data-tf-gen="lister"></div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <p class="muted small">IN2010 · Lister &amp; stakk. Egne forklaringer og demoer basert på pensum. Eksamensoppgaven er gjengitt med egne ord.</p>
+  </footer>
+
+  <script src="assets/js/core.js"></script>
+  <script src="assets/js/data-tf.js"></script>
+  <script src="assets/js/pseudocode.js"></script>
+  <script src="assets/js/stepplayer.js"></script>
+  <script src="assets/js/viz-list.js"></script>
+  <script src="assets/js/data-algos.js"></script>
+  <script src="assets/js/data-lister.js"></script>
+  <script>
+  (function () {
+    "use strict";
+    var IN = window.IN, qs = IN.qs, qsa = IN.qsa, el = IN.el, A = IN.algos, G = IN.gen, LS = IN.ls;
+    function t(e, n, k) { return { eli5: e, normal: n, teknisk: k }; }
+    var esc = LS.esc;
+
+    /* ---------- Fellesoppsett for demoer ---------- */
+    var LEGEND = [
+      { cls: "compare", label: "Ser på nå" },
+      { cls: "min", label: "Skrevet / flyttet / ny" },
+      { cls: "sorted", label: "I bruk" },
+      { cls: "target", label: "Funnet / endret peker" },
+      { cls: "swap", label: "Tømt / feil" }
+    ];
+    /* Demo med én eller flere pseudokoder. Steg med linje 100·a + l lyser opp linje l i pseudokode nr. a. */
+    function mountOps(host, cfg) {
+      if (typeof host === "string") host = qs(host);
+      var player = el("div", { class: "ls-host" });
+      var right = el("div", { class: "hs-pcs" }, [el("h4", { style: "margin:.2rem 0 .4rem", text: "Pseudokode (følger demoen)" })]);
+      var det = el("details", { class: "card" }, [el("summary", { html: "<b>Koden, linje for linje</b> (" + cfg.algos.map(function (k) { return esc(A[k].name); }).join(", ") + ")" })]);
+      var multi = cfg.algos.length > 1;
+      var hs = cfg.algos.map(function (key) {
+        var box = el("div", { class: "hs-pc" }), pc = el("div");
+        if (multi) box.appendChild(el("h5", { class: "hs-pc-title", text: A[key].title }));
+        box.appendChild(pc); right.appendChild(box);
+        var hd = IN.pseudo.render(pc, A[key], { head: !multi });
+        var bo = IN.pseudo.bigO(A[key], { compact: true }); if (bo) box.appendChild(bo);
+        var ex = el("div"); if (multi) det.appendChild(el("h5", { style: "margin:.8rem 0 .3rem", text: A[key].title })); det.appendChild(ex);
+        IN.pseudo.explainer(ex, A[key], {});
+        return { box: box, hd: hd };
+      });
+      host.appendChild(el("div", { class: "grid cols-2" }, [el("div", {}, [player]), right]));
+      host.appendChild(det);
+      var handle = {
+        highlight: function (n) {
+          var a = multi ? Math.floor(n / 100) - 1 : 0, l = multi ? n % 100 : n;
+          right.classList.add("has-on");
+          hs.forEach(function (h, i) { if (i === a) { h.hd.highlight(l); h.box.classList.add("on"); } else { h.hd.clear(); h.box.classList.remove("on"); } });
+        },
+        clear: function () { right.classList.remove("has-on"); hs.forEach(function (h) { h.hd.clear(); h.box.classList.remove("on"); }); }
+      };
+      return IN.stepPlayer(player, {
+        generate: G[cfg.gen], presets: cfg.presets,
+        render: function (s, ctx) { IN.vizList(ctx.stage, s); },
+        pseudo: handle, legend: cfg.legend || LEGEND,
+        parseInput: cfg.parseInput, inputLabel: cfg.inputLabel, customInput: cfg.parseInput ? true : false
+      });
+    }
+    function push(vs) { return vs.map(function (v) { return { op: "push", v: v }; }); }
+
+    /* ===================== LISTER ===================== */
+    IN.explain("#intro-begreper", t(
+      "En liste er bare ting i en rekkefølge: den første, den andre, den tredje … Vi kan be om en bestemt plass, bytte ut noe, sette inn noe eller ta bort noe. Spørsmålet er hvordan vi lagrer det, for det bestemmer hva som går fort.",
+      "Lista er en ADT med Get, Set, Add og Remove. Med et dynamisk array er Get og Set O(1), men Add og Remove O(n), fordi elementer må flyttes. Med en lenket liste er det å hekte inn og ut O(1), men alle fire er O(n), fordi vi først må gå til plass i.",
+      "Liste-ADT-en: Get(L, i), Set(L, i, e), Add(L, i, e), Remove(L, i) med 0 ≤ i &lt; n (for Add: 0 ≤ i ≤ n). Dynamisk array: Get/Set O(1), Add/Remove O(n − i). Lenket liste: alle O(i) på grunn av NodeAt, mens operasjonen på selve noden er O(1)."
+    ), { label: "Nivå:" });
+    IN.tips(qs("#ops-table"));
+    (function drill() {
+      var tbl = qs("#ops-table"), btn = qs("#ops-drill");
+      qsa("tbody td", tbl).forEach(function (td, i) {
+        if (td.cellIndex === 0) return;
+        td.classList.add("v", td.textContent.trim() === "1" ? "o1" : "on");
+        td.setAttribute("data-ans", td.textContent.trim());
+        td.addEventListener("click", function () { if (tbl.classList.contains("drill")) td.classList.toggle("shown"); });
+        td.addEventListener("keydown", function (e) { if ((e.key === "Enter" || e.key === " ") && tbl.classList.contains("drill")) { e.preventDefault(); td.classList.toggle("shown"); } });
+      });
+      btn.addEventListener("click", function () {
+        var on = !tbl.classList.contains("drill");
+        tbl.classList.toggle("drill", on);
+        qsa("td.v", tbl).forEach(function (td) { td.classList.remove("shown"); if (on) td.setAttribute("tabindex", "0"); else td.removeAttribute("tabindex"); });
+        btn.textContent = on ? "Vis alle svarene" : "Øv: skjul svarene";
+      });
+    })();
+    IN.quiz("#quiz-begreper", [
+      { q: "Hvilken operasjon er O(1) på et dynamisk array, men O(n) på en enkeltlenket liste?", options: ["addFirst", "get(i)", "removeFirst", "getFirst"], answer: 1,
+        explain: "Arrayet kan regne ut hvor plass i ligger. Lista må følge i pekere fra starten." },
+      { q: "Hvilken operasjon er O(1) på en enkeltlenket liste, men O(n) på et dynamisk array?", options: ["get(i)", "addLast", "addFirst", "getLast"], answer: 2,
+        explain: "I lista lager vi en ny første node. I arrayet må alle elementene flyttes én plass til høyre." },
+      { q: "Hva er indeksen til et element i en liste?", options: ["Adressen i minnet", "Antall elementer foran det", "Antall elementer etter det", "n − 1"], answer: 1,
+        explain: "Det første elementet har ingen foran seg og får indeks 0. Det siste har n − 1 foran seg." },
+      { q: "Du skal gjøre mange oppslag på tilfeldige plasser i, og bare legge til bakerst. Hva velger du?", options: ["Enkeltlenket liste", "Dobbeltlenket liste", "Dynamisk array", "Det er likegyldig"], answer: 2,
+        explain: "get(i) er O(1) og PushBack amortisert O(1). I begge lenkede listene er get(i) O(n)." }
+    ]);
+
+    /* ===================== DYNAMISK ARRAY ===================== */
+    IN.explain("#intro-dynamisk", t(
+      "Tenk på en hylle med et fast antall plasser. Blir den full, kjøper du en ny hylle som er dobbelt så lang, og flytter alle tingene over. Det er tungt der og da, men så har du god plass lenge.",
+      "PushBack skriver på plass D.n og øker D.n. Er arrayet fullt, dobler EnsureCapacity kapasiteten og kopierer alt først. Én PushBack kan altså koste O(n), men i snitt koster den O(1).",
+      "Invariant: 0 ≤ D.n ≤ |D.A|, og elementene ligger på 0, …, D.n − 1. Dobling gir at n PushBack-er fra tomt koster O(n) totalt (amortisert O(1) hver). Get, Set, PushBack og PopBack er O(1) (PushBack amortisert), Add og Remove er O(D.n − i)."
+    ), { label: "Nivå:" });
+    mountOps("#demo-pushback", {
+      algos: ["lsPushBack", "lsEnsureCapacity", "lsPopBack"], gen: "lsDynPush",
+      presets: {
+        "9 × PushBack (start med 1 plass)": [{ cap: 1, ops: push([4, 8, 15, 16, 23, 42, 7, 9, 3]) }],
+        "Start med 4 plasser": [{ cap: 4, ops: push([1, 2, 3, 4, 5, 6]) }],
+        "PushBack og PopBack": [{ cap: 2, ops: push([5, 6, 7]).concat([{ op: "pop" }, { op: "pop" }, { op: "push", v: 8 }]) }]
+      },
+      parseInput: function (s) {
+        var ops = String(s).split(/[,\s]+/).map(function (x) { x = x.trim(); if (/^-?\d+$/.test(x)) return { op: "push", v: parseInt(x, 10) }; if (/^pop$/i.test(x)) return { op: "pop" }; return null; }).filter(Boolean).slice(0, 12);
+        return ops.length ? [{ cap: 1, ops: ops }] : [];
+      },
+      inputLabel: "f.eks. 5, 3, 8, pop, 2"
+    });
+    mountOps("#demo-addremove", {
+      algos: ["lsAdd", "lsRemove"], gen: "lsDynAddRem",
+      presets: {
+        "Sett inn fremst": [{ items: [3, 1, 4, 1, 5], cap: 8, ops: [{ op: "add", i: 0, v: 9 }] }],
+        "Sett inn i midten": [{ items: [3, 1, 4, 1, 5], cap: 8, ops: [{ op: "add", i: 2, v: 9 }] }],
+        "Fjern fremst": [{ items: [3, 1, 4, 1, 5], cap: 8, ops: [{ op: "rem", i: 0 }] }],
+        "Fjern bakerst": [{ items: [3, 1, 4, 1, 5], cap: 8, ops: [{ op: "rem", i: 4 }] }],
+        "Fullt, så Add": [{ items: [3, 1, 4, 1], cap: 4, ops: [{ op: "add", i: 1, v: 9 }] }]
+      },
+      parseInput: function (s) {
+        var ops = String(s).split(/[,;\s]+/).map(function (x) {
+          var m = /^\+(\d+)=(-?\d+)$/.exec(x.trim()); if (m) return { op: "add", i: +m[1], v: +m[2] };
+          var r = /^-(\d+)$/.exec(x.trim()); if (r) return { op: "rem", i: +r[1] };
+          return null;
+        }).filter(Boolean).slice(0, 6);
+        return ops.length ? [{ items: [3, 1, 4, 1, 5], cap: 8, ops: ops }] : [];
+      },
+      inputLabel: "på 3, 1, 4, 1, 5: f.eks. +1=9, -0"
+    });
+    IN.quiz("#quiz-dynamisk", [
+      { q: "Et dynamisk array har |D.A| = 4 og D.n = 4. Hva skjer ved PushBack(D, e)?",
+        options: ["e overskriver det siste elementet", "Et nytt array med 5 plasser lages, og alt kopieres", "Et nytt array med 8 plasser lages, de 4 elementene kopieres, og e skrives på plass 4", "Det gir feil, fordi arrayet er fullt"], answer: 2,
+        explain: "EnsureCapacity dobler kapasiteten og kopierer D.n = 4 elementer. Så skrives e på D.A[4], og D.n blir 5." },
+      { q: "D.n = 6. Hvor mange elementer flyttes av Add(D, 0, e)?", options: ["0", "1", "5", "6"], answer: 3,
+        explain: "Alle elementene på plass 0 til 5 flyttes én plass til høyre: D.n − i = 6." },
+      { q: "Hvorfor dobler EnsureCapacity størrelsen i stedet for å legge til én plass?",
+        options: ["For å spare minne", "For at Get skal bli O(1)", "Da blir kopieringene sjeldne nok til at n PushBack-er koster O(n) til sammen", "Fordi et array må ha en toerpotens som størrelse"], answer: 2,
+        explain: "Med dobling blir kopieringene 1 + 2 + 4 + … &lt; 2n. Med én plass ekstra hver gang blir det O(n²)." },
+      { q: "Hva koster Remove(D, D.n − 1)?", options: ["O(1)", "O(log n)", "O(n)", "O(n²)"], answer: 0,
+        explain: "Løkka går fra i = D.n − 1 til D.n − 2, altså null ganger. Bare den siste plassen tømmes." }
+    ]);
+
+    /* ===================== LENKEDE LISTER ===================== */
+    IN.explain("#intro-lenket", t(
+      "Et tog: hver vogn holder i den neste. Vil du ha vogn nummer 3, må du begynne foran og telle. Men å hekte på en ny vogn der du står, går kjapt: du kobler bare om to kroker.",
+      "NodeAt(L, i) går fra L.first og følger next i ganger: O(n). InsertAfter og RemoveAfter endrer bare et par pekere: O(1). Derfor er Get, Set, Add og Remove O(n) på en lenket liste, men av en annen grunn enn i arrayet.",
+      "Kostnaden ligger i navigasjonen, ikke i endringen. Gitt en node v er InsertAfter(v, e) og RemoveAfter(v) O(1), men posisjonsbaserte operasjoner koster O(i) for NodeAt. Fordelen er at ingen elementer flyttes."
+    ), { label: "Nivå:" });
+    mountOps("#demo-lenket", {
+      algos: ["lsNodeAt", "lsInsertAfter", "lsRemoveAfter"], gen: "lsSingly",
+      presets: {
+        "Get(L, 3)": [{ items: [7, 2, 9, 4, 5], ops: [{ op: "get", i: 3 }] }],
+        "Sett inn 8 etter plass 1": [{ items: [7, 2, 9, 4, 5], ops: [{ op: "insAfter", i: 1, v: 8 }] }],
+        "Fjern etter plass 0": [{ items: [7, 2, 9, 4, 5], ops: [{ op: "remAfter", i: 0 }] }],
+        "Sett inn bakerst": [{ items: [7, 2, 9], ops: [{ op: "insAfter", i: 2, v: 6 }] }]
+      }
+    });
+    mountOps("#demo-dobbel", {
+      algos: ["lsDInsertAfter", "lsRemoveNode"], gen: "lsDoubly",
+      presets: {
+        "Sett inn X etter B": [{ items: ["A", "B", "C"], ops: [{ op: "ins", after: 1, v: "X" }] }],
+        "Fjern B": [{ items: ["A", "B", "C"], ops: [{ op: "del", i: 1 }] }],
+        "Fjern den siste": [{ items: ["A", "B", "C"], ops: [{ op: "del", last: true }] }],
+        "Sett inn fremst": [{ items: ["A", "B"], ops: [{ op: "ins", after: -1, v: "X" }] }]
+      }
+    });
+    IN.quiz("#quiz-lenket", [
+      { q: "Hvor mange ganger følger NodeAt(L, 4) en next-peker?", options: ["3", "4", "5", "n"], answer: 1,
+        explain: "Løkka går for j = 0 til i − 1 = 3, altså 4 runder. Vi starter på node 0 og ender på node 4." },
+      { q: "I InsertAfter (enkeltlenket) setter vi v.next ← u <i>før</i> u.next ← v.next. Hva skjer?",
+        options: ["Ingenting, rekkefølgen er likegyldig", "u.next blir u, og resten av lista etter v er borte", "u havner først i lista", "Lista blir dobbeltlenket"], answer: 1,
+        explain: "Når v.next allerede er u, setter u.next ← v.next pekeren til u selv. Vi har mistet pekeren til resten." },
+      { q: "Hvorfor er removeLast O(n) i en enkeltlenket liste, selv med peker til siste node?",
+        options: ["Fordi den siste noden må kopieres", "Fordi vi må finne den nest siste noden, og det krever at vi går fra starten", "Fordi lista må sorteres", "Den er ikke det, den er O(1)"], answer: 1,
+        explain: "Den nest siste skal få next = null, og vi kommer bare til den forfra. Med prev-pekere finner vi den nest siste direkte som L.tail.prev.prev, O(1)." },
+      { q: "Når er en dobbeltlenket liste med hode og hale tom?", options: ["Når L.head = null", "Når L.head.next = L.tail", "Når L.tail.next = null", "Når L.head.prev = L.tail"], answer: 1,
+        explain: "Hode og hale fjernes aldri. Ligger det ingen node mellom dem, er lista tom." }
+    ]);
+
+    /* ===================== STAKK & KØ ===================== */
+    IN.explain("#intro-stakk", t(
+      "En stakk er som en stabel med tallerkener: du legger på og tar av øverst. En kø er som køen i kantina: den som kom først, får mat først.",
+      "Stakk: push og pop i samme ende (LIFO). Kø: enqueue i den ene enden, dequeue i den andre (FIFO). Begge kan lages med O(1) per operasjon, med lenket liste eller (for stakk) med dynamisk array.",
+      "Stakk og kø er ADT-er: de sier hvilken rekkefølge elementene kommer ut i, ikke hvordan de lagres. Begge er spesialtilfeller av liste der vi bare bruker endene, og derfor kan alle operasjonene være O(1) (push på dynamisk array amortisert)."
+    ), { label: "Nivå:" });
+
+    (function lab() {
+      var st = [], q = [], log = qs("#lab-log"), val = qs("#lab-val");
+      function draw(lastIn, outS, outQ) {
+        IN.vizList("#lab-stack", { parts: [{ type: "stack", label: "Stakk (LIFO)", items: st, mark: { top: lastIn ? "push" : null }, out: outS, outLabel: "pop()" }] });
+        IN.vizList("#lab-queue", { parts: [{ type: "queue", label: "Kø (FIFO)", items: q, mark: { back: lastIn ? "push" : null }, out: outQ, outLabel: "dequeue()" }] });
+      }
+      qs("#lab-in").addEventListener("click", function () {
+        if (st.length >= 8) { log.textContent = "Det holder med 8 elementer her."; return; }
+        var v = parseInt(val.value, 10); if (isNaN(v)) v = st.length + 1;
+        st.push(v); q.push(v); draw(true);
+        log.textContent = "push(" + v + ") og enqueue(" + v + ").";
+        val.value = String(v + 1);
+      });
+      qs("#lab-out").addEventListener("click", function () {
+        if (!st.length) { log.textContent = "Begge er tomme."; draw(false); return; }
+        var a = st.pop(), b = q.shift(); draw(false, a, b);
+        log.textContent = "pop() gir " + a + " (sist inn), dequeue() gir " + b + " (først inn).";
+      });
+      qs("#lab-reset").addEventListener("click", function () { st = [1, 2, 3]; q = [1, 2, 3]; val.value = "4"; draw(false); log.textContent = "Satt inn 1, 2 og 3 i begge."; });
+      st = [1, 2, 3]; q = [1, 2, 3]; val.value = "4"; draw(false);
+      log.textContent = "Satt inn 1, 2 og 3 i begge. Trykk «Ta ut».";
+    })();
+
+    function tags(s) { return LS.parseTags(s); }
+    mountOps("#demo-divs", {
+      algos: ["lsGoodDivs"], gen: "lsDivs",
+      presets: {
+        "Nøstet, riktig": tags("<div> <div> </div> <div> </div> </div>"),
+        "Lukker for tidlig": tags("<div> </div> </div> <div>"),
+        "Ikke lukket": tags("<div> <div> </div>")
+      },
+      parseInput: function (s) { return LS.parseTags(s, true); }, inputLabel: "f.eks. div div /div /div"
+    });
+    mountOps("#demo-tags", {
+      algos: ["lsGoodTags"], gen: "lsTags",
+      presets: {
+        "Riktig nøstet": tags("<html> <div> <p> </p> </div> <p> </p> </html>"),
+        "Kryssende tagger": tags("<div> <p> </div> </p>"),
+        "Lukker uten å åpne": tags("<p> </p> </div>"),
+        "Ikke lukket": tags("<div> <p> </p>")
+      },
+      parseInput: function (s) { return LS.parseTags(s); }, inputLabel: "f.eks. div p /p /div"
+    });
+    IN.pseudo.parsons("#parsons-tags", A.lsGoodTags, {});
+
+    /* ---------- Eksamen (gjengitt med egne ord) ---------- */
+    function sol(items, algos, o) {
+      o = o || {};
+      var d = el("div");
+      if (o.intro) d.appendChild(el("p", { html: o.intro }));
+      var ol = el("ol", { class: "et-parts" }); items.forEach(function (x) { ol.appendChild(el("li", { html: x })); }); d.appendChild(ol);
+      if (o.figs) d.appendChild(IN.oppg({ figs: o.figs }));
+      (algos || []).forEach(function (key) {
+        d.appendChild(el("h5", { style: "margin:.8rem 0 .3rem", text: "Pseudokode: " + A[key].name }));
+        var h = el("div"); d.appendChild(h); IN.pseudo.render(h, A[key], {});
+      });
+      return d;
+    }
+    function demoLink(fane, demo, txt) { return '<p class="small muted">Prøv selv: <a href="#fane=' + fane + "&amp;oppg=" + demo + '">' + txt + "</a>.</p>"; }
+    function stepAt(gen, input, pred) { var s = G[gen](input); for (var i = 0; i < s.length; i++) if (pred(s[i])) return s[i]; return s[s.length - 1]; }
+    function listFig(step, cap) { return { cls: "wide", cap: cap, draw: function (h) { IN.vizList(h, { parts: step.parts }, { compact: true }); } }; }
+
+    var EX_OK = tags("<div> <p> </p> <div> </div> </div>");
+    var figMid = stepAt("lsTags", EX_OK, function (s) { return s.line === 5 && s.parts[0].cur === 3; });
+    var EXAM = {
+      "h2020-9": { year: "H2020", title: "Velformaterte tagger", oppgave_nr: "Oppgave 9", points: 12,
+        oppgave: IN.oppg({
+          intro: "<p>En nettside er skrevet for hånd i HTML, og noen har vært slurvete: noen <code>&lt;div&gt;</code>-tagger blir aldri lukket, og noen <code>&lt;/div&gt;</code> lukker noe som aldri ble åpnet. " +
+            "Kravet er at hver tagg som åpnes, senere blir lukket av en tagg av samme type, og at ingen tagg blir lukket uten å ha vært åpnet. Da er taggene <b>velformaterte</b>.</p>" +
+            "<p>Du får taggene som et array A med n elementer, i den rekkefølgen de står i dokumentet. All annen tekst er fjernet.</p>",
+          parts: [
+            { t: "Anta at A bare inneholder strengene <code>\"&lt;div&gt;\"</code> og <code>\"&lt;/div&gt;\"</code>. Skriv en algoritme <code>GoodDivs(A)</code> i pseudokode som returnerer true hvis taggene er velformaterte, og false ellers.", p: 4 },
+            { t: "Nå kan A inneholde alle slags tagger. Du kan bruke <code>isOpen(tag)</code>, som sier om taggen er en åpnetagg, og <code>TagType(tag)</code>, som gir typen: <code>TagType(\"&lt;div&gt;\")</code> gir \"div\", og <code>TagType(\"&lt;/p&gt;\")</code> gir \"p\". Skriv <code>GoodTags(A)</code> i pseudokode. Hint: tenk nøye på valget av datastruktur.", p: 8 }
+          ],
+          outro: demoLink("stakk", "demo-tags", "stakkdemoen for tagger")
+        }),
+        losning: sol([
+          "Tell hvor mange div-er som står åpne. Øk telleren ved <code>&lt;div&gt;</code> og senk den ved <code>&lt;/div&gt;</code>. " +
+            "Blir telleren negativ underveis, har vi lukket noe som ikke var åpent: returner false. Til slutt er taggene velformaterte bare hvis telleren er 0. Én gjennomgang: <b>O(n)</b> tid og O(1) minne.",
+          "Med flere typer holder ikke én felles teller: da ville <code>&lt;div&gt;&lt;/p&gt;</code> sluppet gjennom. Den tiltenkte tolkningen (se tipsene) er at taggene også skal være nøstet, så <code>&lt;div&gt;&lt;p&gt;&lt;/div&gt;&lt;/p&gt;</code> skal gi false selv om antallet stemmer. Da må vi huske <i>hvilke</i> tagger som står åpne, og den sist åpnede må lukkes først. " +
+            "Det er en <b>stakk</b>: push hver åpnetagg. Ved en lukketagg må stakken ikke være tom, og toppen må ha samme type (vi popper og sammenligner med TagType). Til slutt må stakken være tom. " +
+            "<b>Kjøretid:</b> n runder, og push, pop, isOpen og TagType er O(1). Totalt <b>O(n)</b>, med O(n) ekstra minne i verste tilfelle. En riktig løsning på (b) løser også (a)."
+        ], ["lsGoodDivs", "lsGoodTags"], { figs: [listFig(figMid, "Underveis i et riktig eksempel: <code>&lt;p&gt;</code> er lukket, og <code>&lt;div&gt;</code> ble nettopp åpnet inni den ytre div-en")] }),
+        kjerne: "<p>Den sist åpnede taggen må lukkes først: det er LIFO, altså en stakk. Telleren i (a) er egentlig en stakk der bare høyden betyr noe, fordi alle taggene er av samme type.</p>",
+        tips: [
+          "Å bare sjekke at det er like mange åpne- som lukketagger ga 1 poeng totalt. Det samme ga det å bare sjekke at hver &lt;div&gt; følges rett etter av en &lt;/div&gt;.",
+          "Glemmer du å sjekke underveis at det ikke lukkes flere enn som er åpnet, trekkes 2 poeng. Glemmer du sluttsjekken (alt lukket til slutt), trekkes 1 poeng. (b) ble vurdert på samme måte.",
+          "Oppgaveteksten var teknisk sett så åpen at kryssende tagger kunne regnes som velformaterte, så en løsning med én teller per taggtype kunne også gi full pott. Stakkløsningen er den tiltenkte, og den du bør skrive.",
+          "Oppgi kjøretiden, O(n), og si kort hvorfor: én gjennomgang med O(1) per tagg."
+        ] }
+    };
+    Object.keys(EXAM).forEach(function (id) { if (qs("#exam-" + id)) IN.examTasks("#exam-" + id, [EXAM[id]]); });
+
+    IN.quiz("#quiz-stakk", [
+      { q: "Tom stakk: push(1), push(2), push(3), pop(), push(4), pop(), pop(). Hva gir den siste pop()?", options: ["1", "2", "3", "4"], answer: 1,
+        explain: "Første pop gir 3, så kommer 4 øverst og poppes, og den siste pop gir 2." },
+      { q: "Tom kø: enqueue(1), enqueue(2), enqueue(3), dequeue(), enqueue(4), dequeue(), dequeue(). Hva gir den siste dequeue()?", options: ["1", "2", "3", "4"], answer: 2,
+        explain: "Køen gir ut i samme rekkefølge som de kom inn: 1, 2, 3. 4 står bakerst." },
+      { q: "Hvilken struktur bruker bredde-først søk (BFS)?", options: ["Stakk", "Kø", "Heap", "Hashmap"], answer: 1,
+        explain: "BFS besøker nodene i den rekkefølgen de ble oppdaget: FIFO. DFS bruker en stakk (eller rekursjon)." },
+      { q: "Hva returnerer GoodTags (med stakk) for <code>&lt;div&gt; &lt;p&gt; &lt;/div&gt; &lt;/p&gt;</code>?", options: ["true", "false"], answer: 1,
+        explain: "Ved &lt;/div&gt; ligger &lt;p&gt; øverst. Typene er ulike, så taggene krysser." },
+      { q: "En kø lages med et dynamisk array: enqueue = PushBack, dequeue = Remove(D, 0). Hva koster dequeue?", options: ["O(1)", "O(log n)", "O(n)", "O(1) amortisert"], answer: 2,
+        explain: "Remove på plass 0 flytter alle de andre elementene. Bruk heller en lenket liste med første- og siste-peker, eller en deque." }
+    ]);
+
+    /* ===================== NYLIGE SØK (LRU) ===================== */
+    IN.explain("#intro-lru", t(
+      "Tenk på en liten tavle med plass til tre ord. Hver gang noen søker, skriver du ordet øverst. Står det der fra før, flytter du det opp. Er tavla full, visker du ut det nederste. For å slippe å lete etter ordet, har du en huskeliste som sier nøyaktig hvor på tavla hvert ord står.",
+      "Hashmapet M går fra nøkkel til node i en dobbeltlenket liste L med nyeste først. update(key): finnes key, ta noden ut av L. Ellers, hvis det er fullt, fjern den siste noden fra både L og M. Sett så inn key fremst og oppdater M. Alt er forventet O(1).",
+      "Invariant: nøklene i M og i L er de samme, |M| ≤ N, og L er sortert etter siste bruk. Hashmapet gir forventet O(1)-oppslag på noden, og dobbeltlenkingen gir O(1) RemoveNode og innsetting etter hodet."
+    ), { label: "Nivå:" });
+    mountOps("#demo-lru", {
+      algos: ["lsUpdate"], gen: "lsRecent",
+      presets: {
+        "N = 3: is, sol, bad, is, ski, sol": [{ N: 3, keys: ["is", "sol", "bad", "is", "ski", "sol"] }],
+        "N = 2: a, b, a, c": [{ N: 2, keys: ["a", "b", "a", "c"] }],
+        "Samme søk to ganger": [{ N: 3, keys: ["kart", "kart"] }]
+      },
+      parseInput: function (s) {
+        var N = 3, keys = [];
+        String(s).split(/[,\s]+/).forEach(function (x) {
+          x = x.trim(); if (!x) return;
+          var m = /^N\s*=\s*(\d+)$/i.exec(x); if (m) { N = Math.max(1, Math.min(6, +m[1])); return; }
+          keys.push(x.slice(0, 12));
+        });
+        keys = keys.slice(0, 10);
+        return keys.length ? [{ N: N, keys: keys }] : [];
+      },
+      inputLabel: "f.eks. N=3, katt, hund, katt, fisk"
+    });
+    IN.quiz("#quiz-lru", [
+      { q: "Hvorfor trenger vi både et hashmap og en lenket liste?", options: ["Hashmapet sorterer nøklene", "Hashmapet finner noden raskt, og lista holder rekkefølgen", "Lista gjør oppslag raskere", "Vi trenger bare hashmapet"], answer: 1,
+        explain: "Hashmapet alene husker ingen rekkefølge, og lista alene krever rett-frem søk for å finne nøkkelen." },
+      { q: "Hvorfor må lista være dobbeltlenket?", options: ["For å kunne ta ut en node vi har en peker til, på O(1)", "For å kunne slå opp på indeks", "For å spare minne", "For å kunne sortere den"], answer: 0,
+        explain: "RemoveNode(v) trenger noden foran v. Den har vi bare med prev-pekere." },
+      { q: "N = 2. Vi kjører update(a), update(b), update(a), update(c). Hva ligger igjen, nyeste først?", options: ["c, b", "c, a", "a, c", "b, a"], answer: 1,
+        explain: "Etter update(a) igjen er rekkefølgen a, b. Da er b eldst og kastes når c kommer: c, a." }
+    ]);
+
+    /* ===================== SANT/USANT ===================== */
+    IN.tfTest("#tf-lister", [
+      { s: "En liste med n elementer har indeksene 1 til n.", answer: false, tema: "liste", kilde: false,
+        explain: "Indeksen er antall elementer foran, så den første har indeks 0 og den siste n − 1." },
+      { s: "Et vanlig array kan vokse når det blir fullt.", answer: false, tema: "array", kilde: false,
+        explain: "Et array har fast lengde. Det dynamiske arrayet later som det vokser ved å lage et nytt, større array og kopiere." },
+      { s: "PopBack på et dynamisk array er O(1).", answer: true, tema: "dynamisk array", kilde: false,
+        explain: "Vi leser og tømmer plass D.n − 1 og senker D.n. Ingen andre elementer flyttes." },
+      { s: "Add(D, i, e) flytter elementene forlengs, fra plass i og bakover.", answer: false, tema: "dynamisk array", kilde: false,
+        explain: "Add flytter baklengs, fra D.n − 1 ned til i. Forlengs ville vi overskrive elementer før de er flyttet." },
+      { s: "En enkeltlenket liste trenger bare en peker til første node.", answer: true, tema: "lenket liste", kilde: false,
+        explain: "L.first er nok for å nå alle nodene. En siste-peker gjør addLast raskere, men er ikke nødvendig." },
+      { s: "I en dobbeltlenket liste med hode og hale kan RemoveNode(v) gjøres på O(1).", answer: true, tema: "lenket liste", kilde: false,
+        explain: "v.prev og v.next finnes alltid, og vi endrer bare to pekere." },
+      { s: "Hode- og halenoden i en dobbeltlenket liste inneholder det første og det siste elementet.", answer: false, tema: "lenket liste", kilde: false,
+        explain: "Hode- og halenodene holder ingen elementer selv. Første element er L.head.next og siste er L.tail.prev." },
+      { s: "Både stakk og kø er ADT-er, og kan lages med lenket liste.", answer: true, tema: "stakk og kø", kilde: false,
+        explain: "Stakk: sett inn og ta ut fremst. Kø: sett inn bakerst og ta ut fremst (med siste-peker). Alt O(1)." },
+      { s: "Dybde-først søk kan bruke en stakk i stedet for rekursjon.", answer: true, tema: "stakk og kø", kilde: false,
+        explain: "Rekursjonen bruker kallstakken. En egen stakk erstatter bare den ene stakken med en annen." },
+      { s: "For GoodDivs (bare div-tagger) holder det å sjekke at telleren er 0 til slutt.", answer: false, tema: "stakk og kø", kilde: false,
+        explain: "«&lt;/div&gt; &lt;div&gt;» gir 0 til slutt, men lukker før det åpner. Vi må også sjekke at telleren aldri blir negativ underveis." }
+    ], { id: "lister-tf" });
+  })();
+  </script>
+</body>
+</html>

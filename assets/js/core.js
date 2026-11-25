@@ -43,8 +43,10 @@
   /* ---------- Sider / navigasjon ---------- */
   IN.PAGES = [
     { id: "index",      href: "index.html",        label: "Forside",     ready: true },
+    { id: "crash",      href: "crash.html",        label: "Crash course", ready: true },
     { id: "pseudokode", href: "pseudokode.html",   label: "Pseudokode",  ready: true },
     { id: "begreper",   href: "00-begreper.html",  label: "0 · Begreper", ready: true },
+    { id: "lister",     href: "lister.html",       label: "Lister & stakk", ready: true },
     { id: "sortering",  href: "01-sortering.html", label: "1 · Sortering", ready: true },
     { id: "sok",        href: "02-sok.html",       label: "2 · Søk",     ready: true },
     { id: "heap",       href: "03-heap.html",      label: "3 · Heap",    ready: true },
@@ -350,6 +352,16 @@
     if (typeof host === "string") host = qs(host);
     if (!host) return;
     clear(host);
+    // Fremdrift: når alle spørsmålene er besvart → quiz:<side>:<id>
+    var qid = host.id;
+    if (!qid) {
+      var pan = host.closest && host.closest("[data-panel]");
+      var pre = pan ? pan.getAttribute("data-panel") + "-" : "";
+      IN.quiz._n = IN.quiz._n || {};
+      IN.quiz._n[pre] = (IN.quiz._n[pre] || 0) + 1;
+      qid = pre + "quiz" + IN.quiz._n[pre];
+    }
+    var answered = 0, right = 0;
     questions.forEach(function (item, qi) {
       var card = el("div", { class: "quiz-q" });
       card.appendChild(el("div", { class: "qtext", html: item.q }));
@@ -365,6 +377,8 @@
               qsa(".quiz-opt", card)[item.answer].classList.add("correct");
             }
             exp.classList.add("show");
+            answered++; if (oi === item.answer) right++;
+            if (answered === questions.length && IN.progress) IN.progress.solved("quiz", qid, right, questions.length);
           }
         });
       });
@@ -448,7 +462,11 @@
       if (checked) updateScore();
       render();
     }
-    function doCheck() { checked = true; persist(); render(); updateScore(); }
+    function doCheck() {
+      checked = true; persist(); render(); updateScore();
+      var c = counts(), tid = opts.id || host.id;
+      if (IN.progress && tid) IN.progress.solved("tf", tid, c.right, c.total);
+    }
     function doReset() { answers = {}; checked = false; keyShown = false; expShown = false; bKey.textContent = "Vis alle fasit"; bExp.textContent = "Vis alle forklaringer"; persist(); render(); updateScore(); }
 
     function render() {
@@ -560,10 +578,43 @@
     section("Løsningsgjennomgang", "losning", htmlFromListish(d.losning, true));
     if (d.kjerne) section("Kjernepoeng", "kjerne", htmlFromListish(d.kjerne, false));
     section("Eksamenstips", "tips", htmlFromListish(d.tips, false));
+    body.appendChild(selfAssess(card, d));
     card.appendChild(body);
     host.appendChild(card);
     return card;
   };
+
+  /* Egenvurdering nederst i hvert eksamenskort → kort:<side>:<id> {status:"ok"|"ovmer"}.
+     Id-en hentes når den trengs: kortets egen id, ellers nærmeste forelder med id. */
+  function selfAssess(card, d) {
+    var wrap = el("div", { class: "et-self", role: "group", "aria-label": "Hvordan gikk oppgaven?" });
+    function key() {
+      var id = card.id || ((card.parentElement && card.parentElement.closest("[id]")) || {}).id;
+      if (!id) id = "t-" + String((d.year || "") + "-" + (d.title || "")).toLowerCase().replace(/[^a-z0-9æøå]+/g, "-");
+      return "kort:" + IN.pageId() + ":" + id;
+    }
+    var bOk = el("button", { class: "btn sm et-self-ok", type: "button", text: "✓ Fikk det til" });
+    var bOv = el("button", { class: "btn sm et-self-ov", type: "button", text: "↻ Må øve mer" });
+    function paint() {
+      var r = IN.progress && IN.progress.get(key()), s = r && r.status;
+      bOk.setAttribute("aria-pressed", s === "ok" ? "true" : "false");
+      bOv.setAttribute("aria-pressed", s === "ovmer" ? "true" : "false");
+    }
+    function pick(s) {
+      if (!IN.progress) return;
+      var r = IN.progress.get(key());
+      IN.progress.set(key(), { status: r && r.status === s ? null : s });   // trykk igjen = angre
+      paint();
+    }
+    bOk.addEventListener("click", function () { pick("ok"); });
+    bOv.addEventListener("click", function () { pick("ovmer"); });
+    wrap.appendChild(el("span", { class: "et-self-q muted small", text: "Hvordan gikk det?" }));
+    wrap.appendChild(bOk); wrap.appendChild(bOv);
+    card.addEventListener("toggle", function () { if (card.open) paint(); });
+    setTimeout(paint, 0);
+    return wrap;
+  }
+  IN._selfAssess = selfAssess;
 
   /* ---------- Oppgavetekst med figurer og merkede deloppgaver ----------
      IN.oppg({ intro: html, figs: [{ draw: fn(host), cap: html, cls: "code"|"wide" }],
@@ -664,6 +715,50 @@
     set: function (k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
   };
 
+  /* ---------- Fremdrift: felles register for alle sider (localStorage) ----------
+     Nøkler: kort:<side>:<kort-id> {status:"ok"|"ovmer"} · quiz|tf|parsons|del1:<side>:<id> {score,max,best,last}
+     crash:… brukes av løypesiden. Alle endringer sender document-hendelsen "in:progress" {key, rec}.
+     Domenet (vegardjorg.github.io) deles med andre repoer, derfor prefikset in2010:. */
+  IN.pageId = function () { return (document.body && document.body.getAttribute("data-page")) || "index"; };
+  (function () {
+    var KEY = "in2010:fremdrift:v1";
+    function load() { try { var o = JSON.parse(IN.store.get(KEY, "{}")); return (o && typeof o === "object" && !Array.isArray(o)) ? o : {}; } catch (e) { return {}; } }
+    function save(all) { IN.store.set(KEY, JSON.stringify(all)); }
+    function emit(key, rec) { try { document.dispatchEvent(new CustomEvent("in:progress", { detail: { key: key, rec: rec } })); } catch (e) {} }
+    IN.progress = {
+      KEY: KEY,
+      get: function (k) { return load()[k] || null; },
+      all: load,
+      set: function (k, patch) {
+        var a = load(), rec = a[k] || {};
+        Object.keys(patch || {}).forEach(function (p) { if (patch[p] === null) delete rec[p]; else rec[p] = patch[p]; });
+        rec.t = Date.now(); a[k] = rec; save(a); emit(k, rec); return rec;
+      },
+      /* Løst oppgave/test: score og max er beste forsøk (målt som andel), last er siste andel */
+      solved: function (kind, id, score, max) {
+        if (!id || !max) return null;
+        var k = kind + ":" + IN.pageId() + ":" + id, old = load()[k] || {};
+        var r = score / max, oldR = old.max ? (old.best != null ? old.best : old.score || 0) / old.max : -1;
+        var patch = { last: Math.round(r * 1000) / 1000 };
+        if (r >= oldR) { patch.score = score; patch.best = score; patch.max = max; }
+        return IN.progress.set(k, patch);
+      },
+      clear: function () { try { localStorage.removeItem(KEY); } catch (e) {} emit(null, null); },
+      exportCode: function () { try { return btoa(unescape(encodeURIComponent(JSON.stringify(load())))); } catch (e) { return ""; } },
+      importCode: function (s) {
+        try {
+          var o = JSON.parse(decodeURIComponent(escape(atob(String(s).replace(/\s+/g, "")))));
+          if (!o || typeof o !== "object" || Array.isArray(o)) return false;
+          var a = load();
+          Object.keys(o).forEach(function (k) {   // nyeste vinner per nøkkel
+            if (o[k] && typeof o[k] === "object" && (!a[k] || (o[k].t || 0) >= (a[k].t || 0))) a[k] = o[k];
+          });
+          save(a); emit(null, null); return true;
+        } catch (e) { return false; }
+      }
+    };
+  })();
+
   /* Høyden på de faste linjene øverst (meny + ev. nivålinje) når de står fast, + litt luft */
   IN.stickyH = function () {
     var h = 0;
@@ -704,12 +799,32 @@
     if (href.slice(i) === location.hash && IN.revealOppg) { e.preventDefault(); IN.revealOppg(); }
   });
 
+  /* Kom du fra crash course-løypa (#…&fra=crash&steg=9d)? Vis «← Tilbake til løypa»
+     så lenge du er i denne fanen/økta (sessionStorage), til du lukker den. */
+  function initCrashReturn() {
+    var KEY = "in2010:crash-retur", m = location.hash.match(/fra=crash(?:&steg=([\w-]+))?/), steg;
+    try {
+      if (IN.pageId() === "crash") { sessionStorage.removeItem(KEY); return; }
+      if (m) sessionStorage.setItem(KEY, m[1] || "");
+      steg = sessionStorage.getItem(KEY);
+    } catch (e) { steg = m ? (m[1] || "") : null; }
+    if (steg == null) return;
+    var chip = el("div", { class: "crash-ret", role: "navigation", "aria-label": "Crash course" });
+    chip.appendChild(el("a", { class: "crash-ret-a", href: "crash.html" + (steg ? "#steg=" + steg : ""),
+      text: "← Tilbake til løypa" + (steg ? " · steg " + steg : "") }));
+    chip.appendChild(el("button", { class: "crash-ret-x", type: "button", "aria-label": "Skjul tilbake-knappen", text: "×",
+      onclick: function () { try { sessionStorage.removeItem(KEY); } catch (e) {} chip.remove(); } }));
+    document.body.appendChild(chip);
+    document.body.classList.add("has-crash-ret");
+  }
+
   /* ---------- Oppstart ---------- */
   function boot() {
     buildNav();
     buildLevelBar();
     IN.tabs(document);
     initBadges();
+    initCrashReturn();
     // Genererte sant/usant-påstander (data-tf.js): <div data-tf-gen="sortering"></div>
     qsa("[data-tf-gen]").forEach(function (host) {
       var sek = host.getAttribute("data-tf-gen");

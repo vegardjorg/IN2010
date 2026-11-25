@@ -28,6 +28,8 @@
         </dl>
       </header>
 
+      <section class="crash-box" id="crash-box" aria-label="Crash course"></section>
+
       <section class="a4-exam" aria-labelledby="eo-h">
         <h2 id="eo-h">Slik ser eksamen ut</h2>
         <div id="exam-flow"></div>
@@ -94,6 +96,41 @@
   </footer>
 
   <script src="assets/js/core.js"></script>
+  <script src="assets/js/data-mock.js"></script>
+  <script src="assets/js/data-crash.js"></script>
+  <script>
+  /* Crash course-boksen øverst: samme utregning som løypesiden (IN.crashProgress) */
+  (function () {
+    var IN = window.IN, el = IN.el, host = IN.qs("#crash-box");
+    if (!host || !IN.crashProgress) { if (host) host.hidden = true; return; }
+    function paint() {
+      var P; try { P = IN.crashProgress(); } catch (e) { host.hidden = true; return; }
+      IN.clear(host);
+      var started = P.ferdigeSteg > 0 || P.ovmer > 0 || !!P.sist;
+      host.appendChild(el("div", { class: "crash-box-h" }, [
+        el("span", { class: "crash-box-t", text: "Crash course" }),
+        el("span", { class: "tag", text: P.lengdeNavn })
+      ]));
+      if (!started) {
+        host.appendChild(el("p", { html: "En vektet løype gjennom alt som er sannsynlig på eksamen, i samme rekkefølge som eksamen: kort forklaring, oppskrift for full pott, gamle eksamensoppgaver og mock-oppgaver. Velg <b>Ekspress</b> (~3 t), <b>Standard</b> (~1 dag) eller <b>Grundig</b> (~1 uke)." }));
+        host.appendChild(el("a", { class: "btn primary", href: "crash.html", text: "Start løypa →" }));
+        return;
+      }
+      host.appendChild(el("p", { class: "crash-box-num", html: "Du har dekket <b>" + P.dekket + " av " + P.total + "</b> forventede eksamenspoeng (" + P.prosent + " %) · " + P.ferdigeSteg + " av " + P.antallSteg + " steg" }));
+      var bar = el("div", { class: "crash-box-bar", role: "progressbar", "aria-valuemin": "0", "aria-valuemax": "100", "aria-valuenow": String(P.prosent), "aria-label": "Fremdrift i løypa" });
+      bar.appendChild(el("span", { style: "width:" + Math.max(0, Math.min(100, P.prosent)) + "%" }));
+      host.appendChild(bar);
+      var row = el("div", { class: "btn-row" });
+      if (P.fortsett) row.appendChild(el("a", { class: "btn primary", href: P.fortsett.href, text: "Fortsett: " + P.fortsett.tittel + " →" }));
+      else row.appendChild(el("a", { class: "btn primary", href: "crash.html", text: "Alt i løypa er dekket – åpne løypa →" }));
+      if (P.ovmer) row.appendChild(el("a", { class: "btn", href: "crash.html#cr-queue", text: "↻ " + P.ovmer + " i repetisjonskøen" }));
+      host.appendChild(row);
+    }
+    paint();
+    document.addEventListener("in:progress", paint);
+    window.addEventListener("storage", function (e) { if (!e.key || e.key === IN.progress.KEY) paint(); });
+  })();
+  </script>
   <script>
   (function () {
     var IN = window.IN, el = IN.el;
@@ -163,7 +200,8 @@
       g25syk:  ["grafer",    "sykler",     "H2025", "3",  "Sykler i grafer", 11, "exam-h2025-2"],
       g25kol:  ["grafer",    "mst",        "H2025", "7",  "Kollektivtilbudet i Oslo", 15, "exam-h2025-6"],
       // Strategi
-      p21pnp:  ["strategi",  "pnp",        "H2021", "6",  "Beregnbarhet og kompleksitet (P og NP)", 8, "exam-h2021-6"],
+      l20tag:  ["lister",    "stakk",      "H2020", "9",  "Velformaterte tagger (stakk)", 12, "exam-h2020-9"],
+      p21pnp:  ["strategi",  "pnp",       "H2021", "6",  "Beregnbarhet og kompleksitet (P og NP)", 8, "exam-h2021-6"],
       p22tf:   ["strategi",  "kjoretid",   "H2022", "2",  "Litt av hvert (sant/usant)", 10, "exam-h2022-2"]
     };
     var ICON = '<svg viewBox="0 0 12 12" aria-hidden="true" focusable="false">' +
@@ -259,7 +297,7 @@
       { name: "Trær", n: 6, pts: "12–24 p", often: "Alltid",
         items: "En rekursiv treoppgave hvert år: er det et søketre, diameter, laveste felles forfeder. AVL og rotasjoner. Huffman.",
         tip: "Ofte to oppgaver. Oppgi kjøretiden både generelt og for balanserte trær.",
-        links: [["traer", "trav", "Traversering"], ["traer", "bst", "BST"], ["traer", "diameter", "Diameter"], ["traer", "lca", "LCA"],
+        links: [["traer", "trav", "Traversering"], ["traer", "iterativ&oppg=trav-iterativ", "Uten rekursjon (stakk)"],["traer", "bst", "BST"], ["traer", "diameter", "Diameter"], ["traer", "lca", "LCA"],
                 ["traer", "avl", "AVL"], ["traer", "antiavl", "Anti-AVL"], ["traer", "huffman", "Huffman"]] },
       { name: "Heap og prioritetskø", n: 5, pts: "6–20 p", often: "Nesten alltid",
         items: "Insert og RemoveMin for hånd. Bygg noe nytt oppå en heap: mediankø, bøttekø.",
@@ -315,7 +353,7 @@
       ["H20", "7",  "Subanagrammer: kjøretid, frekvenstabell, strategi (a–c)", 17, "hashing", "triks", "x20sub"],
       ["H20", "7d", "SortSubanagrams (bøttesortering)", 6, "sortering", "bucket", "s20sub"],
       ["H20", "8",  "Type 2-grafer: NP, stier, Kruskal, korteste vei (a–h)", 38, "grafer", "mst", "g20t2"],
-      ["H20", "9",  "Velformede tagger (stakk)", 12, null, ""],
+      ["H20", "9",  "Velformaterte tagger (stakk)", 12, "lister", "stakk", "l20tag"],
       ["H21", "1",  "Oppvarming", 2, "begreper", "algoritme"],
       ["H21", "2",  "Stabilitet", 3, "sortering", "bucket", "s21stab"],
       ["H21", "3",  "Litt sortering (sant/usant)", 10, "sortering", "test", "s21tf"],
@@ -383,6 +421,7 @@
     // ===== Blokkene =====
     var BLOCKS = [
       { page:"begreper",  n:"0", title:"Begreper",  desc:"Algoritme, datastruktur, Big-O, stabil/in-place, ADT, rekursjon.", tasks:3 },
+      { page:"lister",    n:"0b", title:"Lister, stakk & kø", desc:"Array vs. lenket liste, dynamisk array (dobling), stakk og kø, nylige søk (LRU).", tasks:1 },
       { page:"sortering", n:"1", title:"Sortering", desc:"Selection, bubble, insertion, gnome, merge, quick, bøtte, radix og heapsort.", tasks:5 },
       { page:"sok",       n:"2", title:"Søk & array-triks", desc:"Rett-frem søk og binærsøk, sorter én gang, finn duplikat, finn k minste, hashtriks.", tasks:4 },
       { page:"heap",      n:"3", title:"Heap / prioritetskø", desc:"Insert, removeMin, BuildHeap, level-order, mediankø, heapsort, bøttekø.", tasks:6 },

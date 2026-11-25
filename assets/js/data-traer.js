@@ -317,6 +317,171 @@
   });
 
   /* ============================================================
+     ITERATIVE TRAVERSERINGER (egen stakk i stedet for kallstakken)
+     Bygger på ukesoppgavene til Forelesning 03 («skriv om uten rekursjon»),
+     med samme løsningsidé: preorder med én stakk (høyre før venstre),
+     postorder med to stakker, inorder med en markør v og én stakk.
+     ============================================================ */
+  reg(IN.algos, "iterativePreorder", {
+    title: "Preorder uten rekursjon (egen stakk)",
+    name: "IterativePreorder", params: "v",
+    input: "Roten v til et binærtre (kan være null)",
+    output: "Ingenting – nodene besøkes i preorder, samme rekkefølge som den rekursive Preorder",
+    lines: [
+      { code: "S ← new Stack", indent: 1,
+        eli5: "Vi lager en tom bunke med huskelapper. På hver lapp står en node vi ikke har rukket å se på ennå.",
+        normal: "En tom stakk S. Den holder nodene vi har funnet, men ikke besøkt ennå.",
+        teknisk: "S gjør jobben kallstakken gjorde i den rekursive versjonen: den husker hva som gjenstår. Stakken er LIFO, akkurat som prosedyrekall." },
+      { code: "if v ≠ null then Push(S, v)", indent: 1,
+        eli5: "Roten legges øverst i bunken, hvis treet ikke er tomt.",
+        normal: "Start med roten på stakken. Et tomt tre gir tom stakk, og løkka kjører ikke.",
+        teknisk: "Dette tilsvarer det første kallet Preorder(rot)." },
+      { code: "while S is not empty do", indent: 1,
+        eli5: "Så lenge det ligger lapper i bunken, er vi ikke ferdige.",
+        normal: "Gjenta til stakken er tom. Da er alle nodene besøkt.",
+        teknisk: "Hver node legges på og tas av nøyaktig én gang, så løkka går n ganger." },
+      { code: "u ← Pop(S)", indent: 2,
+        eli5: "Vi tar den øverste lappen, altså den vi la sist.",
+        normal: "Ta ut noden som ble lagt på sist.",
+        teknisk: "LIFO gir dybde først: den sist oppdagede noden behandles først, slik et rekursivt kall ville gjort." },
+      { code: "Visit(u)", indent: 2,
+        eli5: "Vi hilser på noden med en gang, før barna. Det er det som gjør det til preorder.",
+        normal: "Behandle u før barna, som i den rekursive Preorder.",
+        teknisk: "Noden besøkes idet den tas av stakken, før noe i subtreet. Det er preorder-egenskapen." },
+      { code: "if u.right ≠ null then Push(S, u.right)", indent: 2,
+        eli5: "Har noden et høyre barn, legger vi det i bunken først. Det skal vente lengst.",
+        normal: "Legg høyre barn på stakken først, hvis det finnes.",
+        teknisk: "Høyre barn må ligge under venstre barn på stakken, så det tas ut etter hele venstre subtre.",
+        grense: { q: "Hvorfor høyre før venstre, og ikke omvendt?",
+          a: t("Bunken gir alltid tilbake den lappen vi la sist. Vil vi ha venstre barn først, må det legges sist, altså oppå det høyre.",
+               "En stakk tar ut det som ble lagt på sist. Skal venstre barn besøkes først (som i rekursiv preorder), må det pushes etter høyre barn. Bytter du rekkefølgen, får du node – høyre – venstre, altså en speilvendt preorder.",
+               "Push snur rekkefølgen. Push(høyre), Push(venstre) gir Pop(venstre) først, og hele venstre subtre er ferdig før høyre barn kommer til toppen igjen. Speilvendt rekkefølge er nøyaktig det postorder-løsningen med to stakker utnytter.") } },
+      { code: "if u.left ≠ null then Push(S, u.left)", indent: 2,
+        eli5: "Så legger vi det venstre barnet øverst. Det er det neste vi ser på.",
+        normal: "Legg venstre barn på stakken sist, så det tas ut neste gang.",
+        teknisk: "Null-sjekken holder null ute av stakken, akkurat som i LevelOrder. Uten den måtte vi sjekke u ≠ null etter Pop." }
+    ],
+    bigO: { best: "O(n)", avg: "O(n)", worst: "O(n)", space: "O(h)",
+      why: t("Hver node legges i bunken én gang og tas ut én gang. I bunken ligger bare de høyre barna som venter, høyst omtrent ett per etasje.",
+             "Hver node pushes og poppes nøyaktig én gang, og hver av delene er O(1). Stakken holder høyst ett ventende høyre barn per nivå på veien ned, pluss noden vi står i, altså høyst h + 1 noder.",
+             "n Push og n Pop à O(1) gir O(n). Stakken inneholder de ventende høyre barna langs stien fra roten, så den har høyst h + 1 elementer: O(log n) for et balansert tre og O(n) for en kjede. Samme minne i O som kallstakken, men i noen trær er S mye mindre.") }
+  });
+
+  reg(IN.algos, "iterativeInorder", {
+    title: "Inorder uten rekursjon (markør og stakk)",
+    name: "IterativeInorder", params: "v",
+    input: "Roten v til et binærtre (kan være null)",
+    output: "Ingenting – nodene besøkes i inorder, samme rekkefølge som den rekursive Inorder",
+    lines: [
+      { code: "S ← new Stack", indent: 1,
+        eli5: "Vi lager en tom bunke. Der legger vi nodene vi må tilbake til senere.",
+        normal: "En tom stakk S. Den husker nodene som venter på at venstre subtre deres skal bli ferdig.",
+        teknisk: "S holder de nodene der den rekursive Inorder har et kall som venter på at Inorder(v.left) skal returnere. Kall som venter på høyre subtre trenger vi ikke huske: de har ingenting igjen å gjøre." },
+      { code: "while v ≠ null or S is not empty do", indent: 1,
+        eli5: "Vi fortsetter så lenge vi står på en node, eller har noen lapper igjen i bunken.",
+        normal: "Gjenta så lenge det er mer å gjøre: enten står markøren v på en node, eller så venter det noder på stakken.",
+        teknisk: "v er markøren: noden vi står på nå. Løkka stopper først når vi har falt av treet og ingen forfedre venter.",
+        grense: { q: "Hvorfor «or», og ikke bare «while S is not empty»?",
+          a: t("Helt i starten er bunken tom, men vi står på roten. Og når vi har tatt den siste lappen og gått til høyre, kan bunken være tom mens det fortsatt er noder igjen der vi står.",
+               "Stakken er tom i to situasjoner der vi likevel ikke er ferdige: helt i starten (v er roten), og rett etter at roten er tatt av stakken og vi har gått til høyre (hele høyre subtre gjenstår). Med bare «S is not empty» stopper løkka med en gang, eller den hopper over høyre subtre til roten.",
+               "Tilstanden er (v, S): v er subtreet vi ikke har startet på, og S er forfedrene som venter. Vi er ferdige bare når begge er tomme. Å sjekke bare S mister høyre subtre til hver node som tas av en stakk som blir tom. Å kreve begge («and») stopper i første runde.") } },
+      { code: "if v ≠ null then", indent: 2,
+        eli5: "Står vi på en node?",
+        normal: "Står markøren på en node, går vi videre ned mot venstre.",
+        teknisk: "Grenen «gå ned til venstre» tilsvarer det rekursive kallet Inorder(v.left)." },
+      { code: "Push(S, v)", indent: 3,
+        eli5: "Vi kan ikke hilse på noden ennå, for alt til venstre skal komme først. Vi legger den i bunken så vi finner tilbake.",
+        normal: "Legg v på stakken. Vi må tilbake hit når venstre subtre er ferdig.",
+        teknisk: "Stakken tar vare på v til venstre subtre er ferdig. Det er dette hintet i ukesoppgave 3 peker mot." },
+      { code: "v ← v.left", indent: 3,
+        eli5: "Så går vi ett steg ned til venstre.",
+        normal: "Gå til venstre barn. Det kan være null.",
+        teknisk: "Vi går hele venstrekanten ned, én node per runde. Alle nodene på veien havner på stakken." },
+      { code: "else", indent: 2,
+        eli5: "Står vi på ingenting, har vi gått så langt til venstre som det går.",
+        normal: "v er null: det er ikke mer til venstre. Nå skal vi tilbake.",
+        teknisk: "Venstre subtre til noden øverst på stakken er ferdig. Det er her rekursjonen ville returnert fra Inorder(v.left)." },
+      { code: "v ← Pop(S)", indent: 3,
+        eli5: "Vi tar den øverste lappen. Det er den nærmeste noden vi har latt vente.",
+        normal: "Hent noden øverst på stakken. Hele venstre subtre til den er besøkt.",
+        teknisk: "Toppen av S er den dypeste ventende forfaren, altså den neste noden i inorder." },
+      { code: "Visit(v)", indent: 3,
+        eli5: "Nå hilser vi på den, for alt til venstre er ferdig.",
+        normal: "Besøk v, mellom venstre og høyre subtre.",
+        teknisk: "I et binært søketre gir dette stigende rekkefølge, som i den rekursive Inorder." },
+      { code: "v ← v.right", indent: 3,
+        eli5: "Så går vi over til høyre side av noden og gjør det samme der.",
+        normal: "Fortsett i høyre subtre. Er det tomt, blir v null, og neste runde tar vi en ny lapp fra bunken.",
+        teknisk: "Høyre subtre behandles som et nytt tre fra start. Noden selv trenger ikke tilbake på stakken, for det gjenstår ingenting i den." }
+    ],
+    bigO: { best: "O(n)", avg: "O(n)", worst: "O(n)", space: "O(h)",
+      why: t("Hver node legges i bunken én gang og tas ut én gang. I bunken ligger bare nodene på veien ned som venter på oss.",
+             "Hver node pushes og poppes nøyaktig én gang, og vi følger hver kant høyst én gang nedover. Stakken holder bare forfedre som venter, altså høyst h + 1 noder.",
+             "Løkka går nøyaktig 2n runder: n runder med Push og n runder med Pop, hver O(1). Det gir O(n) tid. Stakken er en del av stien fra roten, så O(h) minne, som kallstakken i den rekursive Inorder.") }
+  });
+
+  reg(IN.algos, "iterativePostorder", {
+    title: "Postorder uten rekursjon (to stakker)",
+    name: "IterativePostorder", params: "v",
+    input: "Roten v til et binærtre (kan være null)",
+    output: "Ingenting – nodene besøkes i postorder, samme rekkefølge som den rekursive Postorder",
+    lines: [
+      { code: "S ← new Stack", indent: 1,
+        eli5: "Vi lager en bunke med noder vi skal se på.",
+        normal: "Arbeidsstakken S, som i iterativ preorder.",
+        teknisk: "S driver en preorder-lignende gjennomgang." },
+      { code: "R ← new Stack", indent: 1,
+        eli5: "Og en ekstra bunke der vi samler nodene i omvendt rekkefølge.",
+        normal: "Resultatstakken R. Den snur rekkefølgen til slutt.",
+        teknisk: "Kursets hint: bruk to stakker. R snur rekkefølgen fra den første løkka." },
+      { code: "if v ≠ null then Push(S, v)", indent: 1,
+        eli5: "Roten legges i den første bunken.",
+        normal: "Start med roten på S, hvis treet ikke er tomt.",
+        teknisk: "Samme start som IterativePreorder." },
+      { code: "while S is not empty do", indent: 1,
+        eli5: "Så lenge det er noe i den første bunken …",
+        normal: "Første løkke: gå gjennom alle nodene.",
+        teknisk: "Kjører n ganger." },
+      { code: "u ← Pop(S)", indent: 2,
+        eli5: "Vi tar den øverste noden.",
+        normal: "Ta ut noden som ble lagt på sist.",
+        teknisk: "Rekkefølgen nodene tas ut i her, er node – høyre – venstre: en speilvendt preorder." },
+      { code: "Push(R, u)", indent: 2,
+        eli5: "Vi hilser ikke ennå. Vi legger noden i den andre bunken.",
+        normal: "Legg u på R i stedet for å besøke den.",
+        teknisk: "R får nodene i rekkefølgen node – høyre – venstre. Tatt av fra toppen blir det venstre – høyre – node, som er postorder." },
+      { code: "if u.left ≠ null then Push(S, u.left)", indent: 2,
+        eli5: "Venstre barn legges i den første bunken først …",
+        normal: "Legg venstre barn på S først.",
+        teknisk: "Venstre under høyre på S, så høyre tas ut først.",
+        grense: { q: "Hvorfor venstre før høyre her, når preorder gjorde det motsatt?",
+          a: t("Her vil vi samle nodene baklengs. Da må høyre komme ut av bunken før venstre, og da må venstre legges i først.",
+               "Første løkke skal gi node – høyre – venstre, som R snur til venstre – høyre – node. Høyre må derfor ut av S før venstre, og da må venstre pushes først. Med preorder-rekkefølgen her ville R gitt høyre – venstre – node, som er feil.",
+               "Postorder er det speilvendte av «node – høyre – venstre». Denne preorder-varianten får vi ved å pushe venstre før høyre. R snur hele sekvensen, så resultatet blir venstre – høyre – node.") } },
+      { code: "if u.right ≠ null then Push(S, u.right)", indent: 2,
+        eli5: "… og høyre barn oppå, så det kommer ut først.",
+        normal: "Legg høyre barn på S sist, så det tas ut neste gang.",
+        teknisk: "Null-sjekk som før." },
+      { code: "while R is not empty do", indent: 1,
+        eli5: "Nå tømmer vi den andre bunken.",
+        normal: "Andre løkke: ta nodene av R.",
+        teknisk: "Kjører n ganger." },
+      { code: "u ← Pop(R)", indent: 2,
+        eli5: "Den som ligger øverst, la vi sist. Den tar vi først.",
+        normal: "Ta øverste node fra R.",
+        teknisk: "Toppen av R er den siste noden fra første løkke, altså den første i postorder." },
+      { code: "Visit(u)", indent: 2,
+        eli5: "Nå hilser vi, og rekkefølgen blir barna før forelderen.",
+        normal: "Besøk u. Nodene kommer i postorder.",
+        teknisk: "Roten ble pushet på R først og ligger nederst, så den besøkes sist, slik postorder krever." }
+    ],
+    bigO: { best: "O(n)", avg: "O(n)", worst: "O(n)", space: "O(n)",
+      why: t("Hver node går gjennom begge bunkene én gang. Men den andre bunken må holde alle nodene før vi kan begynne å hilse.",
+             "Hver node pushes og poppes én gang på S og én gang på R: O(n). R inneholder alle n nodene etter første løkke, så ekstra minne er O(n), mer enn O(h) for den rekursive Postorder.",
+             "2n Push og 2n Pop à O(1) gir O(n). S alene er O(h), men R må holde alle n nodene før første Visit, så totalt O(n) minne. Det finnes varianter med én stakk og O(h) minne, men de er mer fiklete. To stakker er det kursets ukesoppgave foreslår.") }
+  });
+
+  /* ============================================================
      BINÆRT SØKETRE
      ============================================================ */
   var HBIGO = function (op) {
@@ -1147,6 +1312,187 @@
     var seq = visited.map(function (v) { return v.k; }).join(", ");
     snap(null, null, t("Køen er tom. Vi tok ett nivå om gangen: " + seq + ".", "Ferdig. Level-order: " + seq + ".",
       "Level-order = [" + seq + "]. n Enqueue + n Dequeue: O(n)."), "Ferdig");
+    return steps;
+  });
+
+  /* ---------- Iterative traverseringer: egen stakk ----------
+     Ekstra stegfelt (tegnes av sidens renderIter):
+       stacks: [{ label, items:[tekst | {t, note}], out }]   bunn → topp; out = nettopp tatt av
+       vars:   [[navn, verdi]]                                statuspiller, f.eks. v = h
+       visited:[k]                                            besøksrekkefølgen så langt */
+  function kOf(v) { return v.k; }
+  function idOf(v) { return v.id; }
+  function seqOf(a) { return a.map(kOf).join(", "); }
+  function topOf(S) { return S.length ? S[S.length - 1].k : null; }
+  function stackTxt(S) { return S.length ? seqOf(S) + " (" + topOf(S) + " øverst)" : "tom"; }
+
+  reg(IN.gen, "iterativePreorder", function (input) {
+    var o = norm(input), root = treeOf(o), steps = [], S = [], vis = [];
+    function snap(line, cur, text, tag, out) {
+      steps.push({ line: line, tree: cl(root), text: text, tag: tag, visited: vis.map(kOf),
+        stacks: [{ label: "Stakk S", items: S.map(kOf), out: out ? out.k : null }],
+        marks: { cur: cur ? cur.id : null, queued: S.map(idOf), done: vis.map(idOf) } });
+    }
+    snap(2, null, t("Vi lager en tom bunke med huskelapper. Den skal huske hvilke noder som venter.",
+      "S ← tom stakk.", "S ← new Stack. Den tar over jobben til kallstakken."), "Start");
+    if (root) {
+      S.push(root);
+      snap(3, root, t("Roten " + root.k + " legges i bunken.", "Push(S, " + root.k + ").",
+        "Push(S, rot). Tilsvarer det første kallet Preorder(" + root.k + ")."), "Push " + root.k);
+    }
+    while (S.length) {
+      var u = S.pop();
+      snap(5, u, t("Vi tar den øverste lappen: " + u.k + ".", "Pop(S) gir u = " + u.k + ". Stakken er nå " + stackTxt(S) + ".",
+        "u ← " + u.k + ", den sist pushede noden. Stakken: " + stackTxt(S) + "."), "Pop " + u.k, u);
+      vis.push(u);
+      var leaf = !u.l && !u.r;
+      snap(6, u, t("Vi hilser på " + u.k + " med en gang." + (leaf ? " Den har ingen barn, så ingen nye lapper." : ""),
+        "Besøk " + u.k + "." + (leaf ? " Ingen barn å legge på stakken." : ""),
+        "Visit(" + u.k + ") før barna: preorder." + (leaf ? " Begge null-sjekkene feiler." : "")), "Besøk " + u.k);
+      if (!leaf) {
+        var txt;
+        if (u.l && u.r) {
+          S.push(u.r); S.push(u.l);
+          txt = t("Først legger vi " + u.r.k + " (høyre), så " + u.l.k + " (venstre) oppå. Da ligger " + u.l.k + " øverst og blir neste.",
+            "Push høyre (" + u.r.k + "), så venstre (" + u.l.k + "). " + u.l.k + " ligger øverst og tas ut først.",
+            "Push(" + u.r.k + "), Push(" + u.l.k + "). LIFO gjør at hele venstre subtre er ferdig før " + u.r.k + " kommer til toppen.");
+        } else if (u.r) {
+          S.push(u.r);
+          txt = t(u.k + " har bare et høyre barn, " + u.r.k + ". Det legges i bunken.", "Bare høyre barn: Push(S, " + u.r.k + ").", "u.left = null, så bare Push(" + u.r.k + ").");
+        } else {
+          S.push(u.l);
+          txt = t(u.k + " har bare et venstre barn, " + u.l.k + ". Det legges i bunken.", "Bare venstre barn: Push(S, " + u.l.k + ").", "u.right = null, så bare Push(" + u.l.k + ").");
+        }
+        snap(u.l ? 8 : 7, u, txt, "Push barn");
+      }
+    }
+    var seq = seqOf(vis);
+    snap(4, null, t("Bunken er tom, så vi er ferdige. Rekkefølgen ble " + seq + ", akkurat som med rekursjon.",
+      "S er tom, løkka stopper. Preorder: " + seq + ".",
+      "S er tom. Preorder = [" + seq + "], samme som den rekursive. n Push + n Pop: O(n)."), "Ferdig");
+    return steps;
+  });
+
+  reg(IN.gen, "iterativeInorder", function (input) {
+    var o = norm(input), root = treeOf(o), steps = [], S = [], vis = [], v = root;
+    function snap(line, cur, text, tag, out) {
+      steps.push({ line: line, tree: cl(root), text: text, tag: tag, visited: vis.map(kOf),
+        stacks: [{ label: "Stakk S", items: S.map(kOf), out: out ? out.k : null }],
+        vars: [["v", v ? v.k : "null"]],
+        marks: { cur: cur ? cur.id : null, path: v && (!cur || v.id !== cur.id) ? [v.id] : [], queued: S.map(idOf), done: vis.map(idOf) } });
+    }
+    snap(2, null, t("Vi lager en tom bunke. Vi står på roten" + (root ? ", " + root.k : "") + ".",
+      "S ← tom stakk. Markøren v starter i roten.", "S tom, v = rot. Tilstanden (v, S) betyr: subtreet v er ikke påbegynt, nodene på S venter."), "Start");
+    while (v || S.length) {
+      if (v) {
+        var w = v;
+        S.push(w); v = w.l;
+        snap(6, w, t("Vi kan ikke hilse på " + w.k + " ennå, for alt til venstre skal komme først. " + w.k + " legges i bunken, og vi går til venstre" + (v ? ", til " + v.k + "." : ". Der er det tomt."),
+          "Push(S, " + w.k + "), v ← " + w.k + ".left = " + (v ? v.k : "null") + ".",
+          w.k + " venter på venstre subtre. Push, og gå ned venstrekanten: v = " + (v ? v.k : "null") + "."), "Push " + w.k);
+      } else {
+        var u = S.pop(); v = u;
+        snap(8, u, t("Det er tomt her. Vi tar den øverste lappen: " + u.k + ". Alt til venstre for den er ferdig.",
+          "v er null, så else: v ← Pop(S) = " + u.k + ". Venstre subtre til " + u.k + " er ferdig.",
+          "v = null: venstre subtre til toppen av S er ferdig. Pop gir " + u.k + ", den neste i inorder."), "Pop " + u.k, u);
+        vis.push(u);
+        snap(9, u, t("Nå hilser vi på " + u.k + ".", "Besøk " + u.k + ".", "Visit(" + u.k + ") mellom subtrærne."), "Besøk " + u.k);
+        v = u.r;
+        snap(10, u, t(v ? "Så går vi over til høyre side, til " + v.k + ", og gjør det samme der." : u.k + " har ingen høyre side. Neste runde tar vi en ny lapp fra bunken" + (S.length ? "." : ", hvis det er noen igjen."),
+          "v ← " + u.k + ".right = " + (v ? v.k : "null") + "." + (v ? " Høyre subtre startes som et nytt tre." : ""),
+          "v ← " + (v ? v.k : "null") + ". " + u.k + " er ferdig og skal ikke tilbake på stakken." + (!v && !S.length ? " v = null og S tom: løkka stopper." : "")), "Høyre");
+      }
+    }
+    var seq = seqOf(vis);
+    snap(3, null, t("Vi står på ingenting og bunken er tom. Ferdig! Rekkefølgen ble " + seq + ".",
+      "v = null og S er tom, løkka stopper. Inorder: " + seq + ".",
+      "Inorder = [" + seq + "], samme som den rekursive. 2n runder med O(1) arbeid: O(n)."), "Ferdig");
+    return steps;
+  });
+
+  reg(IN.gen, "iterativePostorder", function (input) {
+    var o = norm(input), root = treeOf(o), steps = [], S = [], R = [], vis = [];
+    function snap(line, cur, text, tag, outS, outR) {
+      steps.push({ line: line, tree: cl(root), text: text, tag: tag, visited: vis.map(kOf),
+        stacks: [{ label: "Stakk S", items: S.map(kOf), out: outS ? outS.k : null },
+                 { label: "Stakk R", items: R.map(kOf), out: outR ? outR.k : null }],
+        marks: { cur: cur ? cur.id : null, queued: S.map(idOf), path: R.map(idOf), done: vis.map(idOf) } });
+    }
+    snap(3, null, t("Vi lager to tomme bunker: S for nodene vi skal se på, og R der vi samler dem.",
+      "S og R er tomme stakker.", "To stakker, som kursets hint foreslår. R skal snu rekkefølgen."), "Start");
+    if (root) {
+      S.push(root);
+      snap(4, root, t("Roten " + root.k + " legges i S.", "Push(S, " + root.k + ").", "Push(S, rot)."), "Push " + root.k);
+    }
+    while (S.length) {
+      var u = S.pop(); R.push(u);
+      snap(7, u, t("Vi tar " + u.k + " fra S. Vi hilser ikke ennå, men legger den i R.",
+        "Pop(S) gir " + u.k + ", og Push(R, " + u.k + ").",
+        u.k + " flyttes fra S til R. R er nå " + stackTxt(R) + "."), "Til R: " + u.k, u, null);
+      if (u.l || u.r) {
+        var p = [];
+        if (u.l) { S.push(u.l); p.push(u.l.k); }
+        if (u.r) { S.push(u.r); p.push(u.r.k); }
+        snap(u.r ? 9 : 8, u, t(p.length === 2 ? "Barna legges i S: først " + p[0] + " (venstre), så " + p[1] + " (høyre) oppå." : "Barnet " + p[0] + " legges i S.",
+          "Push " + p.join(", så ") + " på S." + (p.length === 2 ? " Høyre ligger øverst." : ""),
+          "Push " + p.join(", ") + ". Høyre tas ut før venstre, så R får node – høyre – venstre."), "Push barn");
+      }
+    }
+    if (root) {
+      snap(10, null, t("S er tom. Alle nodene ligger nå i R. Den øverste er den vi la sist.",
+        "S er tom. R (bunn → topp): " + seqOf(R) + ".",
+        "R bunn → topp = " + seqOf(R) + " (node – høyre – venstre). Tatt av fra toppen blir det postorder."), "Snu med R");
+    }
+    while (R.length) {
+      var x = R.pop(); vis.push(x);
+      snap(12, x, t("Vi tar " + x.k + " fra toppen av R og hilser.", "Pop(R) gir " + x.k + ". Besøk " + x.k + ".",
+        "Visit(" + x.k + ")."), "Besøk " + x.k, null, x);
+    }
+    var seq = seqOf(vis);
+    snap(10, null, t("Begge bunkene er tomme. Rekkefølgen ble " + seq + ": barna før forelderen.",
+      "R er tom. Postorder: " + seq + ".",
+      "Postorder = [" + seq + "], samme som den rekursive. O(n) tid, men R holdt alle n nodene: O(n) minne."), "Ferdig");
+    return steps;
+  });
+
+  /* Rekursjon som skjult stakk: kallstakken til Preorder og stakken S i IterativePreorder,
+     side om side i hvert Visit. Besøksrekkefølgen er den samme, så stegene følger hverandre. */
+  reg(IN.gen, "preorderStacks", function (input) {
+    var o = norm(input), root = treeOf(o), steps = [], vis = [];
+    function inSub(a, x) { var f = false; each(a, function (n) { if (n === x) f = true; }); return f; }
+    // Iterativ: S rett etter Pop(x) for hver x, i besøksrekkefølge
+    var Ss = [], S = root ? [root] : [];
+    while (S.length) { var u = S.pop(); Ss.push(S.slice()); if (u.r) S.push(u.r); if (u.l) S.push(u.l); }
+    // Rekursiv: stien fra roten til x er kallstakken (bunn → topp)
+    var order = [], paths = [];
+    (function rec(v, path) { if (!v) return; var p = path.concat([v]); order.push(v); paths.push(p); rec(v.l, p); rec(v.r, p); })(root, []);
+    function frames(p) {
+      return p.map(function (a, i) {
+        var x = p[p.length - 1], note;
+        if (i === p.length - 1) note = "besøker " + a.k;
+        else if (a.l && inSub(a.l, x)) note = a.r ? "venter: høyre (" + a.r.k + ")" : "venter: bare retur";
+        else note = "venter: bare retur";
+        return { t: "Preorder(" + a.k + ")", note: note };
+      });
+    }
+    function snap(text, tag, cur, fr, s) {
+      steps.push({ line: null, tree: cl(root), text: text, tag: tag, visited: vis.map(kOf),
+        stacks: [{ label: "Kallstakk (rekursiv)", items: fr, wide: true }, { label: "Stakk S (iterativ)", items: s.map(kOf) }],
+        marks: { cur: cur ? cur.id : null, queued: s.map(idOf), done: vis.map(idOf) } });
+    }
+    snap(t("Vi kjører begge versjonene på samme tre og stopper hver gang de hilser på en node.",
+      "Til venstre: kallene som står på kallstakken i rekursiv Preorder. Til høyre: stakken S i IterativePreorder. Begge stopper ved hver Visit.",
+      "Vi sammenligner tilstanden i hver Visit. Kallstakken lagrer en ramme per aktivt kall (med v og hvor kallet skal fortsette). S lagrer bare nodene som ikke er påbegynt."), "Start", null, [], []);
+    order.forEach(function (x, i) {
+      vis.push(x);
+      var fr = frames(paths[i]), s = Ss[i], waits = fr.filter(function (f) { return /høyre/.test(f.note); }).length;
+      snap(t("Begge hilser på " + x.k + " nå. Kallstakken har " + fr.length + " kall oppå hverandre. Bunken S har " + s.length + " " + (s.length === 1 ? "lapp" : "lapper") + ": de høyre barna som venter.",
+        "Visit(" + x.k + "). Kallstakken: " + fr.length + " rammer, og " + waits + " av dem venter på et høyre barn. S: " + (s.length ? seqOf(s) : "tom") + ". Det er nøyaktig de samme høyre barna.",
+        "Visit(" + x.k + "): dybde " + (fr.length - 1) + ", så " + fr.length + " rammer. S = [" + seqOf(s) + "] er de ventende høyre barna, altså bare den delen av rammene som har arbeid igjen."), "Besøk " + x.k, x, fr, s);
+    });
+    snap(t("Ferdig. Begge hilste i samme rekkefølge: " + seqOf(vis) + ". Kallstakken og bunken husket det samme arbeidet, bare på hver sin måte.",
+      "Samme rekkefølge: " + seqOf(vis) + ". Rekursjonen bruker kallstakken. Den iterative versjonen bruker en stakk vi har laget selv.",
+      "Samme preorder: [" + seqOf(vis) + "]. Begge er O(h) i verste fall. I en kjede vokser kallstakken til n, mens S holder seg på høyst ett element."), "Ferdig", null, [], []);
     return steps;
   });
 

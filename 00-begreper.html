@@ -194,7 +194,9 @@
       <div id="ex-rekursjon"></div>
 
       <h3>Kallstakk – fakultet n!</h3>
-      <p class="muted small">Se hvordan kallene legger seg oppå hverandre til basis, og «foldes» tilbake.</p>
+      <p class="muted small">På vei <b>ned</b> legger hvert kall seg oppå stakken og venter med et uferdig regnestykke
+        (<span class="mono">4 · ?</span>). Ved basis snur det. På vei <b>opp</b> får hvert kall svaret fra kallet over, fyller
+        inn spørsmålstegnet og gir sitt svar videre ned. Følg regnestykket under stakken: det vokser innover og krymper igjen.</p>
       <div class="grid cols-2">
         <div><div id="rk-player"></div></div>
         <div><div id="rk-pseudo"></div></div>
@@ -377,51 +379,80 @@
       ]
     };
     var rkHandle = IN.pseudo.render("#rk-pseudo", factAlgo, {});
+    /* Hver ramme husker sin egen n og hva den venter på. Uttrykket under stakken viser hele
+       regnestykket: det vokser innover på vei ned (4 · (3 · (2 · 1))) og krymper på vei opp (4 · 6 → 24). */
     function genFact(input) {
       var n = Array.isArray(input) ? (input[0] || 4) : input;
       n = Math.max(1, Math.min(7, n));
       var steps = [], stack = [];
       function t(a, b, c) { return { eli5: a, normal: b, teknisk: c }; }
-      function snap(line, text, tag) { steps.push({ line: line, stack: stack.slice(), text: text, tag: tag }); }
+      function copy() { return stack.map(function (f) { var o = {}; for (var k in f) o[k] = f[k]; return o; }); }
+      // Uttrykket: rammene under toppen venter på «k · (…)», toppen bidrar med inner
+      function expr(inner) {
+        var s = inner;
+        for (var i = stack.length - 2; i >= 0; i--) s = stack[i].n + " · " + (/·/.test(s) ? "(" + s + ")" : s);
+        return s;
+      }
+      function snap(line, text, tag, inner, mark) {
+        steps.push({ line: line, stack: copy(), text: text, tag: tag, expr: expr(mark ? "<mark>" + inner + "</mark>" : inner) });
+      }
       (function down(k) {
-        stack.push({ n: k, state: "kaller" });
-        var res;
+        stack.push({ n: k, phase: "ny" });
+        var top = stack[stack.length - 1], res;
         if (k <= 1) {
-          stack[stack.length - 1].state = "=1"; stack[stack.length - 1].val = 1;
-          snap(3, t("Fakultet(" + k + ") er basis: svaret er 1. Nå snur vi og folder tilbake.",
-            "Basistilfelle n ≤ 1 → returnerer 1.", "Basis: return 1."), "Basis");
+          top.phase = "basis"; top.ret = 1;
+          snap(3, t("Fakultet(" + k + ") er den minste dukken: svaret er bare 1. Ingen nye kall. Nå kan alle som venter, regne seg ferdig – fra toppen og ned.",
+            "Basistilfellet: n = " + k + " ≤ 1, så kallet returnerer 1 uten å kalle videre. Nå snur vi.",
+            "Basis: n ≤ 1 ⇒ return 1. Ingen nye rammer; nå starter returfasen."), "Basis", "1", true);
           res = 1;
         } else {
-          snap(4, t("For å regne " + k + "! må vi først vite (" + (k - 1) + ")!. Rammen for " + k + " venter mens vi kaller videre.",
-            "Kaller Fakultet(" + (k - 1) + "); rammen for " + k + " legges på stakken.",
-            "Push ramme n=" + k + "; rekursivt kall Fakultet(n−1)."), "Kaller " + (k - 1));
+          top.phase = "venter";
+          snap(4, t("For å regne " + k + "! trenger vi (" + (k - 1) + ")! først. Fakultet(" + k + ") skriver «" + k + " · ?» på lappen sin og venter, mens et nytt kall legges oppå.",
+            "n = " + k + " > 1: Fakultet(" + k + ") må vente på Fakultet(" + (k - 1) + "). Den husker «" + k + " · ?» og et nytt kall legges på toppen av stakken.",
+            "Rekursivt kall Fakultet(" + (k - 1) + "): ny ramme pushes. Rammen n=" + k + " ligger igjen med uferdig uttrykk " + k + " · ?."),
+            "Kaller (" + (k - 1) + ")", k + " · Fakultet(" + (k - 1) + ")", false);
           var r = down(k - 1);
           res = k * r;
-          stack[stack.length - 1].state = "=" + res; stack[stack.length - 1].val = res;
-          snap(4, t("Nå vet vi (" + (k - 1) + ")! = " + r + ". Da er " + k + "! = " + k + " · " + r + " = " + res + ". Rammen tas av stakken.",
-            "Fakultet(" + (k - 1) + ")=" + r + " → " + k + "·" + r + "=" + res + "; pop ramme.",
-            "Fold tilbake: " + k + "·" + r + "=" + res + "; pop."), "Folder " + res);
+          top.phase = "retur"; top.got = r; top.ret = res;
+          snap(4, t("Svaret " + r + " kommer tilbake fra kallet over. Nå kan Fakultet(" + k + ") fylle inn spørsmålstegnet: " + k + " · " + r + " = " + res + ". Den gir " + res + " videre ned og forsvinner.",
+            "Fakultet(" + (k - 1) + ") returnerte " + r + ". Nå regner Fakultet(" + k + ") ut " + k + " · " + r + " = " + res + " og returnerer det til den som kalte.",
+            "Retur: " + k + " · " + r + " = " + res + "; return " + res + ", rammen poppes."), "Returnerer " + res, String(res), true);
         }
         stack.pop();
         return res;
       })(n);
-      steps.push({ line: null, stack: [], text: t("Ferdig! " + n + "! er regnet ut.", "Ferdig – stakken er tom.", "Terminert; alle rammer er poppet."), tag: "Ferdig" });
+      steps.push({ line: null, stack: [], text: t("Ferdig! " + n + "! = " + res0(n) + ". Alle lappene er brukt opp.",
+        "Ferdig: " + n + "! = " + res0(n) + ", og stakken er tom.", "Alle rammer er poppet; resultat " + res0(n) + ". " + n + " kall, O(1) arbeid hver: O(n)."),
+        tag: "Ferdig", expr: "<mark>" + res0(n) + "</mark>", done: n, val: res0(n) });
       return steps;
     }
+    function res0(n) { var r = 1; for (var i = 2; i <= n; i++) r *= i; return r; }
     IN.stepPlayer("#rk-player", {
       generate: genFact,
       presets: { "4!": [4], "5!": [5], "3!": [3], "6!": [6] },
       render: function (step, ctx) {
         var stage = ctx.stage; IN.clear(stage);
         var wrap = el("div", { class: "callstack" });
-        // tegn stakken nedenfra og opp (eldste nederst)
-        step.stack.slice().reverse().forEach(function (fr) {
-          var cls = "frame" + (fr.state && fr.state.charAt(0) === "=" ? " ret" : "");
-          wrap.appendChild(el("div", { class: cls,
-            html: '<span class="mono">Fakultet(' + fr.n + ')</span> <span class="muted">' + (fr.state || "") + '</span>' }));
+        // .callstack er column-reverse: første ramme (eldste) havner nederst, nyeste øverst
+        step.stack.forEach(function (fr, i) {
+          var isTop = i === step.stack.length - 1, right;
+          if (fr.phase === "basis") right = "n ≤ 1 → <b>1</b> <span class=\"cs-ret\">↩ 1</span>";
+          else if (fr.phase === "retur") right = fr.n + " · <b>" + fr.got + "</b> = <b>" + fr.ret + "</b> <span class=\"cs-ret\">↩ " + fr.ret + "</span>";
+          else right = fr.n + " · <span class=\"cs-q\">?</span> <span class=\"muted small\">venter på Fakultet(" + (fr.n - 1) + ")</span>";
+          wrap.appendChild(el("div", { class: "frame" + (fr.phase === "basis" || fr.phase === "retur" ? " ret" : "") + (isTop ? " top" : ""),
+            html: '<span class="mono cs-name">Fakultet(' + fr.n + ')</span><span class="cs-body">' + right + "</span>" }));
         });
-        if (!step.stack.length) wrap.appendChild(el("div", { class: "muted", text: "(stakken er tom – ferdig)" }));
-        stage.appendChild(wrap);
+        if (!step.stack.length) wrap.appendChild(el("div", { class: "frame ret top", html: '<span class="mono cs-name">' + step.done + "!</span><span class=\"cs-body\">= <b>" + step.val + "</b></span>" }));
+        var col = el("div", { class: "cs-wrap" }, [
+          el("div", { class: "cs-end muted small", text: "↑ toppen: kallet som jobber nå" }),
+          wrap,
+          el("div", { class: "cs-end muted small", text: "bunnen: første kall" })
+        ]);
+        stage.appendChild(col);
+        stage.appendChild(el("div", { class: "cs-expr" }, [
+          el("span", { class: "muted small", text: "Regnestykket så langt: " }),
+          el("span", { class: "mono", html: step.expr })
+        ]));
       },
       pseudo: rkHandle,
       initial: [4]

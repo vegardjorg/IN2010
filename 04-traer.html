@@ -7,6 +7,26 @@
   <meta name="description" content="Trær i IN2010: begreper, traverseringer, binære søketrær, diameter, laveste felles forfeder, AVL og rotasjoner, Anti-AVL og Huffman – med stegvise demoer, pseudokode og eksamensoppgaver.">
   <script>(function(){try{var d=document.documentElement;var t=localStorage.getItem('in-theme');if(t&&t!=='system')d.setAttribute('data-theme',t);var l=localStorage.getItem('in-level')||'normal';d.setAttribute('data-level',l);}catch(e){document.documentElement.setAttribute('data-level','normal');}})();</script>
   <link rel="stylesheet" href="assets/css/styles.css">
+  <style>
+    /* Sidelokalt: stakk-kolonner ved siden av treet (fanen «Uten rekursjon»). Bare designtokens fra styles.css. */
+    .itv { display: flex; flex-direction: column; gap: .55rem; min-width: 0; }
+    .itv-row { display: flex; flex-wrap: wrap; gap: .75rem 1rem; align-items: flex-start; justify-content: center; }
+    .itv-tree { flex: 1 1 210px; min-width: 0; }
+    .itv-side { flex: 0 1 auto; display: flex; flex-wrap: wrap; gap: .75rem; align-items: flex-start; justify-content: center; max-width: 100%; }
+    .itv-stack { display: flex; flex-direction: column; min-width: 4.6rem; max-width: 100%; }
+    .itv-stack.wide { min-width: 10rem; }
+    .itv-lbl { font-size: var(--text-xs); font-weight: 600; color: var(--color-on-surface-variant); text-align: center; margin-bottom: .25rem; }
+    .itv-cells { display: flex; flex-direction: column; justify-content: flex-end; gap: 3px; min-height: 2.1rem; padding: 3px 4px 4px;
+      border: 2px solid var(--color-outline); border-top: 0; border-radius: 0 0 var(--radius) var(--radius); }
+    .itv-cell { display: flex; flex-direction: column; align-items: center; padding: .12rem .45rem; border-radius: var(--radius);
+      border: 1px solid var(--color-outline-variant); background: var(--color-surface-container); font: 600 13px var(--font-mono); color: var(--color-on-surface); }
+    .itv-cell.top { border-color: var(--c-compare); box-shadow: inset 0 -2px 0 var(--c-compare); }
+    .itv-out { align-self: center; margin-bottom: 3px; padding: 0 .45rem; border: 1px dashed var(--color-outline); border-radius: var(--radius);
+      font: 400 12px var(--font-mono); color: var(--color-on-surface-variant); }
+    .itv-note { font: 400 11px var(--font); color: var(--color-on-surface-variant); }
+    .itv-empty { font-size: var(--text-xs); font-style: italic; color: var(--color-on-surface-variant); text-align: center; padding: .15rem 0; }
+    .itv-cap { font-size: var(--text-xs); color: var(--color-on-surface-variant); text-align: center; }
+  </style>
 </head>
 <body data-page="traer">
   <a class="skip-link" href="#main">Hopp til innhold</a>
@@ -33,6 +53,7 @@
     <div class="tabs" role="tablist" aria-label="Emner om trær">
       <button data-tab="begreper">Begreper</button>
       <button data-tab="trav">Traverseringer</button>
+      <button data-tab="iterativ">Uten rekursjon</button>
       <button data-tab="bst">Binært søketre</button>
       <button data-tab="diameter">Diameter</button>
       <button data-tab="lca">Felles forfeder</button>
@@ -206,6 +227,7 @@
         <p>De rekursive traverseringene bruker <b>kallstakken</b> som en skjult stakk, så de går i dybden først. Ekstra minne er O(h).
           Level-order bruker en eksplisitt <b>kø</b> og går i bredden. Køen kan holde et helt nivå, så minnet er O(n) i verste fall.
           Pre- og postorder gir mening for generelle trær (besøk alle barna i rekkefølge). Inorder krever et binærtre, fordi «midten» bare er definert når det er et venstre og et høyre barn.</p>
+        <p class="small">Vil du se stakken med egne øyne? Fanen <a href="#fane=iterativ&amp;oppg=trav-iterativ">Uten rekursjon</a> skriver om pre-, in- og postorder med en stakk vi styrer selv.</p>
       </div>
       <div class="callout felle"><span class="lbl">Felle: sortert inorder og kø</span>
         <p>Inorder gir sortert rekkefølge <b>bare</b> i et binært søketre. Og level-order trenger en <b>kø</b>: med en stakk får du en dybde-først-rekkefølge.</p>
@@ -223,6 +245,106 @@
 
       <h3>Øv selv: sett linjene i riktig rekkefølge</h3>
       <div id="parsons-level"></div>
+    </section>
+
+    <!-- ===================== UTEN REKURSJON (iterative traverseringer) ===================== -->
+    <section data-panel="iterativ" hidden>
+      <div class="callout begrep" id="trav-iterativ"><span class="lbl">Begrep: iterativ traversering</span>
+        <p>En <b>iterativ</b> traversering besøker nodene i nøyaktig samme rekkefølge som den rekursive, men prosedyren kaller ikke seg selv.
+          I stedet bruker vi en <b>stakk</b> S som vi styrer selv. <code>Push(S, v)</code> legger v øverst, og <code>Pop(S)</code> tar ut den som ble lagt på sist (LIFO: sist inn, først ut).</p>
+      </div>
+      <div id="intro-iter"></div>
+      <div class="grid cols-2">
+        <div class="callout eli5"><span class="lbl">5-åring: en bunke med huskelapper</span>
+          <p>Du skal innom alle rommene i et stort hus, men du har ingen hukommelse. Derfor har du en bunke med lapper.
+            Hver gang du ser en dør du ikke rekker å gå gjennom nå, skriver du den på en lapp og legger lappen øverst i bunken.
+            Når du står fast, tar du den øverste lappen. Det er den døra du så sist, og den er nærmest der du står.</p>
+          <p>Rekursjon gjør det samme, bare at datamaskinen holder bunken for deg.</p>
+        </div>
+        <div class="callout eksempel"><span class="lbl">Eksempel: kurstreet i preorder</span>
+          <p>Stakken S (bunn → topp) mellom hver Pop, med kurstreet:</p>
+          <p><code>e</code> → <code>g f</code> → <code>g i h</code> → <code>g i</code> → <code>g</code> → <code>j</code> → tom.</p>
+          <p class="small">Nodene tas ut i rekkefølgen <code>e f h i g j</code>, akkurat som den rekursive Preorder. Legg merke til at <code>g</code> ligger nederst og venter mens hele venstre subtre blir ferdig.</p>
+        </div>
+      </div>
+      <p class="muted small">Dette bygger på kursets ukesoppgaver om traversering av trær (temaet balanserte søketrær), der oppgaven er å skrive om preorder, postorder og inorder uten rekursjon.
+        Løsningene under følger samme idé: én stakk for preorder, to stakker for postorder, og en markør pluss én stakk for inorder.
+        Ingen eksamen fra H2020 til H2025 har bedt om en traversering uten rekursjon, men ideen er den samme som dybde-først søk med egen stakk i
+        <a href="06-grafer.html#fane=dfs">Blokk 6 · Grafer</a>.</p>
+
+      <h3 id="iter-kallstakk">Rekursjon er en skjult stakk</h3>
+      <p>Når en prosedyre kaller seg selv, må datamaskinen huske hvor den skal fortsette når kallet er ferdig.
+        Den legger en <b>ramme</b> på <b>kallstakken</b> for hvert kall: hvilken node kallet gjelder, og hvilken linje det står på.
+        Det siste kallet som startet, er det første som blir ferdig. Det er LIFO, altså en stakk.
+        Derfor kan vi bytte ut rekursjonen med en stakk vi lager selv. Vi bytter bare én stakk med en annen.
+        <span class="muted small">(Mer om kallstakken: <a href="00-begreper.html#fane=rekursjon">Blokk 0 · Rekursjon</a>.)</span></p>
+      <div id="intro-kallstakk"></div>
+      <div class="tv-host" id="demo-kallstakk"></div>
+      <div class="callout uni"><span class="lbl">Universitetsnivå: hva rammene husker</span>
+        <p>En ramme på kallstakken husker mer enn en node: den husker også <i>hvor</i> i prosedyren kallet skal fortsette.
+          I Preorder står en ramme enten og venter på å kalle Preorder(v.right), eller så har den bare retur igjen.
+          Stakken S i IterativePreorder lagrer bare det som faktisk gjenstår: de høyre barna som ikke er påbegynt.
+          Begge er O(h) i verste fall, men i en kjede vokser kallstakken til n rammer mens S aldri har mer enn ett element.</p>
+      </div>
+
+      <h3 id="iter-demo">Steg for steg med egen stakk</h3>
+      <p class="muted small">Treet til venstre, stakken til høyre. Stiplet gul ring: noden ligger på stakken. Blå ring: markøren v (inorder) eller stakken R (postorder). Grønn: besøkt.</p>
+      <div class="tv-switch" role="group" aria-label="Velg iterativ traversering" data-switch="iter" id="iter-switch">
+        <button class="btn sm" type="button" data-sub="pre" aria-pressed="true">Preorder</button>
+        <button class="btn sm" type="button" data-sub="in" aria-pressed="false">Inorder</button>
+        <button class="btn sm" type="button" data-sub="post" aria-pressed="false">Postorder (to stakker)</button>
+      </div>
+      <div data-subs="iter">
+        <div data-sub="pre" id="demo-ipre"></div>
+        <div data-sub="in" id="demo-iin" hidden>
+          <p class="small">Inorder er den vanskeligste å skrive om: en node skal ikke besøkes før venstre subtre er ferdig. Stakken tar vare på noden mens vi er nede til venstre (ukesoppgave 3 hinter om det samme).</p>
+        </div>
+        <div data-sub="post" id="demo-ipost" hidden>
+          <p class="small">Kursets hint for postorder er å bruke to stakker. Den første løkka er en speilvendt preorder (node – høyre – venstre). Stakken R snur den til venstre – høyre – node.</p>
+        </div>
+      </div>
+      <div class="callout felle"><span class="lbl">Felle: rekkefølgen på Push, og hvor Visit står</span>
+        <p>I IterativePreorder må høyre barn pushes <b>før</b> venstre. Ellers kommer høyre subtre først.
+          Det hjelper heller ikke å bare flytte <code>Visit(u)</code> for å få inorder eller postorder: når u tas av stakken, er ingen av barna behandlet ennå.
+          Derfor trenger inorder markøren v, og postorder den andre stakken.</p>
+      </div>
+
+      <h3 id="iter-ko">Samme løkke, annen beholder</h3>
+      <p>Legg IterativePreorder ved siden av LevelOrder. Bytt <code>Queue</code> med <code>Stack</code>, Enqueue/Dequeue med Push/Pop, og bytt rekkefølgen på barna.
+        Da er de to prosedyrene den samme. Det er beholderen som bestemmer rekkefølgen: kø gir bredde først, stakk gir dybde først.</p>
+      <div class="grid cols-2">
+        <div><h4 style="margin:.2rem 0 .4rem">IterativePreorder (stakk)</h4><div id="pc-ipre-cmp"></div></div>
+        <div><h4 style="margin:.2rem 0 .4rem">LevelOrder (kø)</h4><div id="pc-level-cmp"></div></div>
+      </div>
+      <div class="callout sensor"><span class="lbl">Sensortips (H2025)</span>
+        <p>H2025 ba om level-order for et søketre. Sensorveiledningen trakk 3 poeng for stakk i stedet for kø, fordi det gir dybde først og ikke bredde først.
+          Ser du at de to prosedyrene over bare skiller seg i beholderen, er det lett å huske hvorfor. Se <a href="#fane=trav&amp;oppg=exam-h2025-4">oppgaven under Traverseringer</a>.</p>
+      </div>
+
+      <h3 id="iter-kjoretid">Kjøretid og minne</h3>
+      <p class="muted small">h er høyden: O(log n) for et balansert tre og n − 1 for en kjede. O(h) kan derfor bli O(n).</p>
+      <div class="table-wrap">
+        <table class="cmp-table" id="tbl-iter">
+          <thead><tr><th>Variant</th><th>Tid</th><th>Ekstra minne</th><th>Hva ligger på stakken eller i køen?</th></tr></thead>
+          <tbody>
+            <tr><td>Rekursiv pre-, in- og postorder</td><td>O(n)</td><td>O(h)</td><td>Kallstakken: én ramme per node på stien fra roten til der vi er</td></tr>
+            <tr><td>IterativePreorder</td><td>O(n)</td><td>O(h)</td><td>Høyre barn som venter, høyst ett per nivå pluss noden vi står i</td></tr>
+            <tr><td>IterativeInorder</td><td>O(n)</td><td>O(h)</td><td>Forfedre som venter på at venstre subtre skal bli ferdig</td></tr>
+            <tr><td>IterativePostorder (to stakker)</td><td>O(n)</td><td>O(n)</td><td>R holder alle nodene før det første besøket</td></tr>
+            <tr><td>LevelOrder (kø)</td><td>O(n)</td><td>O(n)</td><td>Et helt nivå kan stå i køen samtidig</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="callout uni"><span class="lbl">Universitetsnivå: hvorfor gidde, når O er den samme?</span>
+        <p>Den iterative versjonen er ikke raskere i O. Begge besøker hver node én gang. Forskjellen er hvor stakken ligger.
+          Kallstakken har en fast, ganske liten grense i mange språk (for eksempel Java og Python), så et veldig dypt tre, som en kjede med en million noder, kan gi <i>stack overflow</i>.
+          En stakk vi lager selv, ligger i vanlig minne og kan vokse så mye som trengs. Dybde-først søk i grafer skrives om på samme måte.</p>
+      </div>
+
+      <h3 id="iter-ov">Øv selv</h3>
+      <div id="quiz-iter"></div>
+      <h4 id="iter-parsons" style="margin:1.2rem 0 .4rem">Sett linjene i riktig rekkefølge: IterativeInorder</h4>
+      <div id="parsons-iinorder"></div>
     </section>
 
     <!-- ===================== BINÆRT SØKETRE ===================== -->
@@ -857,6 +979,109 @@
     mountDemo("#demo-level", { algo: "levelOrder", presets: TRAV_P, inputLabel: "tall → BST, f.eks. 5,3,8,1" });
     IN.pseudo.parsons("#parsons-level", A.levelOrder);
 
+    /* ===================== UTEN REKURSJON ===================== */
+    // Stakk-kolonne: items er bunn → topp, tegnes med toppen øverst. out = nettopp tatt av.
+    function stackCol(col) {
+      var box = el("div", { class: "itv-stack" + (col.wide ? " wide" : "") });
+      var items = col.items || [];
+      box.appendChild(el("div", { class: "itv-lbl", text: col.label }));
+      if (col.out != null) box.appendChild(el("div", { class: "itv-out", text: "↑ " + col.out, title: "Nettopp tatt av", "aria-label": "Nettopp tatt av: " + col.out }));
+      var cells = el("div", { class: "itv-cells", role: "list",
+        "aria-label": col.label + (items.length ? ", " + items.length + " elementer, øverst først" : ", tom") });
+      if (!items.length) cells.appendChild(el("div", { class: "itv-empty", text: "(tom)" }));
+      for (var i = items.length - 1; i >= 0; i--) {
+        var it = items[i], c = el("div", { class: "itv-cell" + (i === items.length - 1 ? " top" : ""), role: "listitem" });
+        c.appendChild(el("span", { text: typeof it === "object" ? it.t : String(it) }));
+        if (it && it.note) c.appendChild(el("span", { class: "itv-note", text: it.note }));
+        cells.appendChild(c);
+      }
+      box.appendChild(cells);
+      return box;
+    }
+    function renderIter(stage, s) {
+      var wrap = el("div", { class: "itv" }), row = el("div", { class: "itv-row" });
+      var treeHost = el("div", { class: "itv-tree" }), side = el("div", { class: "itv-side" });
+      (s.stacks || []).forEach(function (c) { side.appendChild(stackCol(c)); });
+      row.appendChild(treeHost); row.appendChild(side); wrap.appendChild(row);
+      if (s.vars && s.vars.length) {
+        var pl = el("div", { class: "pills", style: "justify-content:center" });
+        s.vars.forEach(function (v) { pl.appendChild(el("span", { class: "pill", html: '<span class="k">' + esc(v[0]) + "</span> " + esc(v[1]) })); });
+        wrap.appendChild(pl);
+      }
+      wrap.appendChild(el("div", { class: "itv-cap", text: "Toppen av stakken står øverst (gul kant). ↑ viser elementet som nettopp ble tatt av." }));
+      wrap.appendChild(infoRow({ label: "Besøkt", items: s.visited || [] }));
+      IN.clear(stage); stage.appendChild(wrap);
+      vizTree(treeHost, { tree: s.tree, marks: s.marks }, { ariaLabel: "Treet som traverseres" });
+    }
+    var RING = "transparent;border:2px dashed var(--c-compare)", BLUERING = "transparent;border:2px solid var(--c-target)";
+    function mountIter(host, cfg) {
+      if (typeof host === "string") host = qs(host);
+      var algo = A[cfg.algo];
+      var player = el("div", { class: "tv-host" }), pc = el("div"), exp = el("div");
+      var right = el("div", {}, [el("h4", { style: "margin:.2rem 0 .4rem", text: "Pseudokode (følger demoen)" }), pc]);
+      host.appendChild(el("div", { class: "grid cols-2" }, [el("div", {}, [player]), right]));
+      host.appendChild(el("details", { class: "card" }, [el("summary", { html: "<b>Koden, linje for linje</b> (" + esc(algo.name) + ")" }), exp]));
+      var handle = IN.pseudo.render(pc, algo, {});
+      var bo = IN.pseudo.bigO(algo, { compact: true }); if (bo) right.appendChild(bo);
+      IN.pseudo.explainer(exp, algo, {});
+      return IN.stepPlayer(player, {
+        generate: G[cfg.algo], presets: cfg.presets, pseudo: handle,
+        render: function (s, ctx) { renderIter(ctx.stage, s); },
+        legend: cfg.legend, parseInput: parseKeys, inputLabel: "tall → BST, f.eks. 5,3,8,1"
+      });
+    }
+    var ITER_P = { "Kurstreet": KURS, "BST 50…80": BST7.slice(), "Kjede 1–5": [1, 2, 3, 4, 5] };
+    var LEG_S = [{ cls: "compare", label: "Gjeldende node" }, { color: RING, label: "Ligger på S" }, { cls: "sorted", label: "Besøkt" }];
+
+    IN.explain("#intro-iter", t(
+      "<p>Når vi går gjennom treet med rekursjon, husker datamaskinen hvor vi har vært og hvor vi skal tilbake. Den bruker en bunke som vi ikke ser.</p>" +
+      "<p>Her tar vi fram bunken og passer på den selv. Vi legger noder øverst i bunken når de må vente, og tar alltid den øverste når vi skal videre. Rekkefølgen nodene blir hilst på, blir nøyaktig den samme som før.</p>",
+      "Hver rekursiv traversering kan skrives om med en løkke og en stakk S. Stakken husker nodene som venter. Preorder trenger én stakk, inorder en stakk og en markør v, og postorder to stakker. Alle er O(n), som de rekursive.",
+      "Rekursive kall behandles LIFO, så kallstakken er en stakk. Å skrive om til en løkke er å bytte den implisitte kallstakken med en eksplisitt stakk vi styrer selv. Tiden er fortsatt O(n). Minnet er O(h) for preorder og inorder, og O(n) for postorder med to stakker, fordi den andre stakken holder alle nodene."
+    ), { label: "Nivå:" });
+
+    IN.explain("#intro-kallstakk", t(
+      "Under kjører vi begge versjonene samtidig og stopper hver gang de hilser på en node. Til venstre ser du bunken datamaskinen har for rekursjonen. Til høyre ser du bunken vi har laget selv.",
+      "Demoen stopper ved hver Visit i både rekursiv Preorder og IterativePreorder. Kallstakken har én ramme per node på stien fra roten. Stakken S har bare de høyre barna som ingen har begynt på ennå.",
+      "Sammenlign tilstandene i hver Visit. Rammene som «venter på høyre» svarer nøyaktig til elementene i S. Rammene som bare har retur igjen, har ingen motpart i S, og det er derfor S kan være mindre enn kallstakken."
+    ), { label: "Nivå:" });
+    IN.stepPlayer("#demo-kallstakk", {
+      generate: G.preorderStacks, presets: ITER_P,
+      render: function (s, ctx) { renderIter(ctx.stage, s); },
+      legend: [{ cls: "compare", label: "Besøkes nå" }, { color: RING, label: "Ligger på S" }, { cls: "sorted", label: "Besøkt" }],
+      parseInput: parseKeys, inputLabel: "tall → BST, f.eks. 5,3,8,1"
+    });
+
+    mountIter("#demo-ipre", { algo: "iterativePreorder", presets: ITER_P, legend: LEG_S });
+    mountIter("#demo-iin", { algo: "iterativeInorder", presets: ITER_P,
+      legend: [{ cls: "compare", label: "Gjeldende node" }, { color: BLUERING, label: "Markøren v" }, { color: RING, label: "Ligger på S" }, { cls: "sorted", label: "Besøkt" }] });
+    mountIter("#demo-ipost", { algo: "iterativePostorder", presets: ITER_P,
+      legend: [{ cls: "compare", label: "Gjeldende node" }, { color: RING, label: "Ligger på S" }, { color: BLUERING, label: "Ligger på R" }, { cls: "sorted", label: "Besøkt" }] });
+    IN.pseudo.render("#pc-ipre-cmp", A.iterativePreorder, {});
+    IN.pseudo.render("#pc-level-cmp", A.levelOrder, {});
+
+    IN.quiz("#quiz-iter", [
+      { q: "Hvorfor kan en rekursiv traversering alltid skrives om med en stakk?",
+        options: ["Fordi trær ikke har sykler", "Fordi rekursive kall blir ferdige i omvendt rekkefølge av når de startet (LIFO), så kallstakken er selv en stakk", "Fordi en stakk er raskere enn rekursjon", "Det går bare for binærtrær"], answer: 1,
+        explain: "Det siste kallet som startet, er det første som returnerer. Det er nøyaktig LIFO. Den iterative versjonen bytter den skjulte kallstakken med en stakk vi styrer selv. Den blir ikke raskere i O." },
+      { q: "I IterativePreorder pusher vi høyre barn før venstre barn. Hva skjer om vi bytter rekkefølgen?",
+        options: ["Ingenting, rekkefølgen blir den samme", "Vi får level-order", "Vi får node – høyre – venstre, en speilvendt preorder", "Vi får postorder"], answer: 2,
+        explain: "Stakken gir tilbake det som ble lagt på sist. Pusher vi venstre først, tas høyre ut først, og hele høyre subtre kommer før venstre. Snur vi den sekvensen, får vi postorder. Det er trikset i løsningen med to stakker." },
+      { q: "IterativeInorder kjører på kurstreet (e med barna f og g, f med h og i, g med j). Hva ligger på stakken rett etter at h er tatt av og besøkt?",
+        options: ["Ingenting", "e og f, med f øverst", "f og i, med i øverst", "e, f og h, med h øverst"], answer: 1,
+        explain: "På vei ned venstrekanten ble e, f og h pushet. h tas av og besøkes. Da ligger e og f igjen. f er øverst og er den neste i inorder." },
+      { q: "Du bytter stakken i IterativePreorder med en kø, og legger venstre barn inn før høyre. Hvilken rekkefølge får du?",
+        options: ["Preorder", "Inorder", "Level-order", "Postorder"], answer: 2,
+        explain: "Da er prosedyren nøyaktig LevelOrder. Køen gir nodene tilbake i den rekkefølgen de ble funnet, altså nivå for nivå. Det er beholderen som avgjør om det blir dybde først eller bredde først." },
+      { q: "Hvor mye ekstra minne bruker IterativePostorder med to stakker?",
+        options: ["O(1)", "O(log n) alltid", "O(h)", "O(n)"], answer: 3,
+        explain: "Stakken S holder seg på O(h), men R må holde alle n nodene før det første besøket. Totalt O(n). Den rekursive Postorder bruker bare O(h) til kallstakken." },
+      { q: "Hvilken påstand om iterativ og rekursiv traversering er riktig?",
+        options: ["Den iterative er O(log n), den rekursive O(n)", "Begge er O(n). Den iterative unngår grensen på kallstakken i språk som har en slik grense", "Den iterative trenger ikke ekstra minne", "Den rekursive er O(n²) fordi den kaller seg selv to ganger"], answer: 1,
+        explain: "Begge besøker hver node én gang, så begge er O(n). Den iterative bruker også ekstra minne, men stakken ligger i vanlig minne og ikke på kallstakken. To kall per node gir ikke O(n²): hvert kall gjelder et eget subtre, så totalt blir det ett kall per node pluss null-kallene." }
+    ]);
+    IN.pseudo.parsons("#parsons-iinorder", A.iterativeInorder);
+
     /* ===================== BST ===================== */
     IN.explain("#intro-bst", t(
       "<p>Et binært søketre er som leken «høyere eller lavere». Står du ved en node og leter etter et mindre tall, går du til venstre. Leter du etter et større tall, går du til høyre.</p>" +
@@ -1342,7 +1567,11 @@
       { s: "Setter vi inn elementene i et BST i level-order-rekkefølge, får vi samme tre.", answer: true, blokk: "4",
         explain: "Hver node settes inn etter alle forfedrene sine, så den følger samme sti og havner på samme plass (H2025 d)." },
       { s: "Et binærtre med høyde h har høyst 2<sup>h</sup> noder.", answer: false, blokk: "4",
-        explain: "Høyst 2<sup>h+1</sup> − 1 noder: 1 + 2 + … + 2<sup>h</sup>." }
+        explain: "Høyst 2<sup>h+1</sup> − 1 noder: 1 + 2 + … + 2<sup>h</sup>." },
+      { s: "En rekursiv preorder bruker ikke noe ekstra minne utover selve treet.", answer: false, blokk: "4",
+        explain: "Hvert kall legger en ramme på kallstakken. Den kan bli h + 1 dyp, så ekstra minne er O(h). Det er den samme stakken en iterativ versjon gjør synlig." },
+      { s: "Preorder kan skrives uten rekursjon ved å bruke en stakk og pushe høyre barn før venstre barn.", answer: true, blokk: "4",
+        explain: "Stakken gir tilbake det som ble lagt på sist. Pushes høyre først, tas venstre ut først, og rekkefølgen blir node – venstre – høyre som i den rekursive." }
     ], { id: "traer-tf" });
 
     switches();

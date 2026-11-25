@@ -408,6 +408,7 @@
             ? "Riktig rekkefølge! (Innrykket avviker litt fra fasiten, men det teller ikke her.)"
             : "Riktig! Rekkefølgen stemmer.")
         : "Ikke helt – se de røde linjene (rekkefølgen).";
+      if (orderOk && IN.progress) IN.progress.solved("parsons", host.id || algo.name, 1, 1);
     }
     function solve() {
       state = body.map(function (o) { return { idx: o.idx, code: o.code, indent: o.indent }; });
