@@ -137,7 +137,7 @@
       var lineNo = i + 1;
       var row = el("div", { class: "pc-line", "data-line": lineNo });
       row.appendChild(el("span", { class: "ln", text: String(lineNo) }));
-      row.appendChild(el("span", { class: "code", html: indentGuides(l.indent) + tokenize(l.code) }));
+      row.appendChild(el("span", { class: "code", html: '<span class="pc-ind">' + indentGuides(l.indent) + '</span><span class="pc-txt">' + tokenize(l.code) + "</span>" }));
       if (l.grense) {
         row.classList.add("has-grense");
         row.appendChild(el("span", { class: "pc-grense-mark", title: l.grense.q, "aria-hidden": "true", text: "?" }));
@@ -316,10 +316,25 @@
       return { code: l.code, indent: l.indent || 0, idx: i };
     });
 
-    // Fasit: original rekkefølge + innrykk. Start: stokket, innrykk nullstilt til 1.
-    var order = body.slice();
-    for (var s = order.length - 1; s > 0; s--) { var j = Math.floor(Math.random() * (s + 1)); var t = order[s]; order[s] = order[j]; order[j] = t; }
-    var state = order.map(function (o) { return { idx: o.idx, code: o.code, indent: 1 }; });
+    // Fasit: original rekkefølge + innrykk. Uavhengige nabolinjer (algo.parsonsSwap: grupper av indekser)
+    // og like kodelinjer kan stå i hvilken som helst rekkefølge seg imellom – alle gyldige rekkefølger godtas.
+    var groups = algo.parsonsSwap || [];
+    function fits(idx, pos) {
+      if (idx === pos || body[idx].code === body[pos].code) return true;
+      return groups.some(function (g) { return g.indexOf(idx) >= 0 && g.indexOf(pos) >= 0; });
+    }
+    function solvedNow(st) { return st.every(function (row, pos) { return fits(row.idx, pos); }); }
+    // Start: stokket (aldri allerede løst), innrykk nullstilt til 1.
+    function shuffled() {
+      var arr, tries = 0;
+      do {
+        arr = body.slice();
+        for (var s = arr.length - 1; s > 0; s--) { var j = Math.floor(Math.random() * (s + 1)); var t = arr[s]; arr[s] = arr[j]; arr[j] = t; }
+        arr = arr.map(function (o) { return { idx: o.idx, code: o.code, indent: 1 }; });
+      } while (arr.length > 1 && solvedNow(arr) && ++tries < 50);
+      return arr;
+    }
+    var state = shuffled();
 
     var fixed = el("div", { class: "parsons-fixed muted small", html: tokenize("Procedure " + algo.name + "(" + (algo.params || "") + ")") });
     var list = el("div", { class: "parsons" });
@@ -397,11 +412,11 @@
       var orderOk = true, indentOff = false;
       IN.qsa(".parsons-line", list).forEach(function (line, pos) {
         var row = state[pos];
-        var good = row.idx === pos;            // tilgivende: kun rekkefølgen teller
+        var good = fits(row.idx, pos);         // tilgivende: kun rekkefølgen teller, likeverdige rekkefølger godtas
         line.classList.remove("ok", "bad");
         line.classList.add(good ? "ok" : "bad");
         if (!good) orderOk = false;
-        else if (row.indent !== body[pos].indent) indentOff = true;
+        else if (row.indent !== body[row.idx].indent) indentOff = true;
       });
       status.textContent = orderOk
         ? (indentOff
@@ -417,9 +432,7 @@
       status.textContent = "Fasit vist.";
     }
     function reshuffle() {
-      var arr = body.slice();
-      for (var s2 = arr.length - 1; s2 > 0; s2--) { var j2 = Math.floor(Math.random() * (s2 + 1)); var t2 = arr[s2]; arr[s2] = arr[j2]; arr[j2] = t2; }
-      state = arr.map(function (o) { return { idx: o.idx, code: o.code, indent: 1 }; });
+      state = shuffled();
       status.textContent = ""; draw();
     }
     draw();

@@ -119,7 +119,7 @@
 
       <h3>Drill: hva er kjøretiden?</h3>
       <p class="muted small">Les koden, velg svar, og les forklaringen på nivået du vil. Prikkene viser hvor du er og hva du har svart. Oppgi verste tilfelle der ikke annet står.</p>
-      <div id="drill"></div>
+      <div id="drill" class="card"></div>
 
       <h3>Øv selv</h3>
       <div id="quiz-kjoretid"></div>
@@ -706,52 +706,26 @@
     pcBlock("#pc-sumto3", "#bo-sumto3", "stSumTo3");
 
     /* ---------- Drill ---------- */
+    // Felles flervalgsmotor i bla-modus (én oppgave om gangen). Svarene lå før i in-st-drill ({id: "O(n)"}):
+    // flyttes én gang over til motorens format (in-quiz:strategi:drill, {a: {indeks: alternativ}}).
     (function drill() {
-      var host = qs("#drill"), items = ST.DRILL, idx = 0, svar = {};
-      try { svar = JSON.parse(IN.store.get("in-st-drill", "{}")) || {}; } catch (e) { svar = {}; }
-      var wrap = el("div", { class: "card st-drill" });
-      var head = el("div", { class: "st-drill-head" });
-      var dots = el("div", { class: "st-dots", role: "group", "aria-label": "Velg drilloppgave" });
-      var code = el("div", { class: "st-drill-code" });
-      var q = el("p", { class: "st-drill-q" });
-      var opts = el("div", { class: "st-opts" });
-      var fb = el("div", { class: "st-drill-fb", "aria-live": "polite" });
-      var prev = el("button", { class: "btn sm", type: "button", text: "← Forrige", onclick: function () { go(idx - 1); } });
-      var next = el("button", { class: "btn sm primary", type: "button", text: "Neste →", onclick: function () { go(idx + 1); } });
-      var reset = el("button", { class: "btn sm ghost", type: "button", text: "↺ Nullstill", onclick: function () { svar = {}; save(); go(0); } });
-      var nav = el("div", { class: "btn-row" }, [prev, next, reset]);
-      [head, dots, code, q, opts, fb, nav].forEach(function (x) { wrap.appendChild(x); });
-      host.appendChild(wrap);
-      function save() { IN.store.set("in-st-drill", JSON.stringify(svar)); }
-      function score() { var r = 0, n = 0; items.forEach(function (d) { if (svar[d.id] != null) { n++; if (svar[d.id] === d.answer) r++; } }); return { r: r, n: n }; }
-      function go(i) { idx = (i + items.length) % items.length; render(); }
-      function render() {
-        var d = items[idx], s = score();
-        head.innerHTML = '<span><b>Oppgave ' + (idx + 1) + "</b> av " + items.length + ' <span class="tag">' + d.tag + '</span></span><span class="small">' + s.r + " riktig av " + s.n + " besvart</span>";
-        IN.clear(dots);
-        items.forEach(function (x, j) {
-          var st = svar[x.id] == null ? "" : svar[x.id] === x.answer ? " ok" : " no";
-          dots.appendChild(el("button", { class: "st-dot" + st + (j === idx ? " cur" : ""), type: "button", "aria-label": "Oppgave " + (j + 1) + (st === " ok" ? ", riktig" : st === " no" ? ", feil" : ""),
-            "aria-current": j === idx ? "true" : null, onclick: function () { go(j); } }));
-        });
-        IN.pseudo.render(code, { name: d.name, params: d.params, input: d.input, lines: d.lines }, { tooltips: false });
-        q.textContent = d.q || "Hva er kjøretiden, uttrykt i n?";
-        IN.clear(opts); IN.clear(fb);
-        var chosen = svar[d.id];
-        (d.options || ST.OPTIONS).forEach(function (o) {
-          var cls = "quiz-opt";
-          if (chosen != null) { if (o === d.answer) cls += " correct"; else if (o === chosen) cls += " wrong"; }
-          opts.appendChild(el("button", { class: cls, type: "button", text: o, disabled: chosen != null,
-            onclick: function () { svar[d.id] = o; save(); render(); } }));
-        });
-        if (chosen != null) {
-          fb.appendChild(el("p", { class: "small st-verdict-line " + (chosen === d.answer ? "ok" : "no"),
-            html: chosen === d.answer ? "<b>Riktig.</b>" : "<b>Ikke helt.</b> Riktig svar er <b>" + d.answer + "</b>." }));
-          var ex = el("div"); fb.appendChild(ex);
-          IN.explain(ex, d.why, { label: "Forklaring:" });
+      var items = ST.DRILL, NY = "in-quiz:" + IN.pageId() + ":drill";
+      function optsOf(d) { return d.options || ST.OPTIONS; }
+      try {
+        var gml = JSON.parse(IN.store.get("in-st-drill", "null"));
+        if (gml && IN.store.get(NY, null) == null) {
+          var a = {};
+          items.forEach(function (d, i) { var k = gml[d.id] != null ? optsOf(d).indexOf(gml[d.id]) : -1; if (k >= 0) a[i] = k; });
+          IN.store.set(NY, JSON.stringify({ a: a, c: false }));
         }
-      }
-      render();
+        if (gml) localStorage.removeItem("in-st-drill");
+      } catch (e) {}
+      IN.quiz("#drill", items.map(function (d) {
+        return { q: (d.q || "Hva er kjøretiden, uttrykt i n?") + ' <span class="tag">' + d.tag + "</span>",
+          options: optsOf(d), answer: optsOf(d).indexOf(d.answer),
+          render: function (h) { IN.pseudo.render(h, { name: d.name, params: d.params, input: d.input, lines: d.lines }, { tooltips: false }); },
+          explain: function (h) { IN.explain(h, d.why, { label: "Nivå:" }); } };
+      }), { pager: true, inline: true, cls: "qz-mono" });
     })();
 
     IN.quiz("#quiz-kjoretid", [
@@ -870,7 +844,7 @@
     (function trapp() {
       var TASKS = [
         { label: "H2021 InRange", total: 10, link: "04-traer.html#fane=bst&oppg=exam-h2021-8", what: "(a), skrive ut verdiene i [a, b] fra et søketre",
-          steps: [["O(log n) når a = b (inorder med beskjæring)", 10], ["O(n)", 8], ["O(n log n)", 5], ["O(n²)", 2]] },
+          steps: [["O(h + k), inorder med beskjæring (O(log n) når a = b i et balansert tre)", 10], ["O(n)", 8], ["O(n log n)", 5], ["O(n²)", 2]] },
         { label: "H2022 CheckBST", total: 6, link: "04-traer.html#fane=bst&oppg=exam-h2022-10", what: "(b), sjekke om et binærtre er et søketre",
           steps: [["O(n) (grenser eller inorder)", 6], ["O(n²) (FindMin/FindMax i hver node)", 4]] },
         { label: "H2023 Diameter", total: 8, link: "04-traer.html#fane=diameter&oppg=exam-h2023-5", what: "(c), diameteren til et binærtre",
@@ -946,83 +920,46 @@
       var secs = Object.keys(GEN).filter(function (k) { return GEN[k] && GEN[k].length; });
       if (!secs.length) { host.textContent = "Fant ingen påstander å trekke fra."; return; }
       var SIZES = [{ label: "22 (som H2024)", N: 22 }, { label: "26 (som H2025)", N: 26 }, { label: "32 (som H2023)", N: 32 }];
-      var N = 22, items = [], svar = [], levert = false;
+      var N = 22;
       function poeng(n, tot) { return 2 * Math.max(n - tot / 2, 0); }
       function shuffle(a) { for (var i = a.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)), x = a[i]; a[i] = a[j]; a[j] = x; } return a; }
 
       var sizeRow = el("div", { class: "st-switch", role: "group", "aria-label": "Antall påstander" });
-      var bNy = el("button", { class: "btn sm", type: "button", text: "↺ Ny runde", onclick: function () { draw(); } });
-      var status = el("p", { class: "small muted", "aria-live": "polite" });
-      var list = el("div", { class: "tf-list" });
-      var bLever = el("button", { class: "btn sm primary", type: "button", text: "Lever og se poengene", onclick: lever });
-      var res = el("div", { "aria-live": "polite" });
-      [el("p", { class: "small", style: "margin:.1rem 0 .3rem", html: "<b>Antall påstander:</b>" }), sizeRow,
-        el("div", { class: "btn-row" }, [bNy]), status, list, el("div", { class: "btn-row" }, [bLever]), res].forEach(function (x) { host.appendChild(x); });
+      var list = el("div");
+      [el("p", { class: "small", style: "margin:.1rem 0 .3rem", html: "<b>Antall påstander:</b>" }), sizeRow, list].forEach(function (x) { host.appendChild(x); });
 
+      // Felles sant/usant-motor i eksamensmodus: Blankt-knapp, ingen straks-bryter, låst etter levering
+      function resultat(c) {
+        var half = N / 2, p = poeng(c.right, N);
+        return [el("div", { class: "callout sensor", id: "del1-resultat" }, [
+          el("span", { class: "lbl", text: "Din poengsum i del 1" }),
+          el("p", { html: "<b>n = " + c.right + "</b> riktige av N = " + N + " (" + c.wrong + " galt, " + c.blank + " blanke)." }),
+          el("p", { html: "Poeng = 2 · max(n − N/2, 0) = 2 · max(" + c.right + " − " + half + ", 0) = <b>" + p + " av " + N + "</b>." }),
+          el("p", { class: "small", text: "Bare riktige svar utover halvparten gir poeng, og hvert av dem teller dobbelt. Galt og blankt gir det samme: ingenting." })
+        ]), el("div", { class: "callout eli5" }, [
+          el("span", { class: "lbl", text: "5-åring: hvorfor gjetting ikke lønner seg" }),
+          el("p", { text: "Tenk deg at du kaster mynt på hver påstand. Da får du omtrent halvparten riktig, altså rundt " + half + " av " + N +
+            ". Men halvparten er nettopp streken der poengene begynner, så myntkast på alt gir i snitt 0 poeng. " +
+            "Du mister likevel ingenting på å gjette på de få du er usikker på, for blankt gir heller ikke noe. Det er påstandene du faktisk kan, som løfter deg over streken." })
+        ])];
+      }
       // Rundgang over blokkene (i tilfeldig rekkefølge), så blandingen dekker alle temaene
       function draw() {
         var pools = shuffle(secs.map(function (k) {
-          return shuffle(GEN[k].map(function (it) { return { s: it.s, answer: !!it.answer, explain: it.explain || "", sek: k }; }));
+          return shuffle(GEN[k].map(function (it) { return { s: it.s, answer: !!it.answer, explain: it.explain || "", tema: NAVN[k] || k, kilde: false }; }));
         }));
         var out = [], p = 0;
         while (out.length < N && pools.some(function (x) { return x.length; })) {
           var pool = pools[p++ % pools.length];
           if (pool.length) out.push(pool.pop());
         }
-        items = shuffle(out); svar = items.map(function () { return null; }); levert = false;
-        IN.clear(res); render();
-      }
-      function counts() {
-        var r = 0, g = 0, b = 0;
-        items.forEach(function (it, i) { if (svar[i] == null) b++; else if (svar[i] === it.answer) r++; else g++; });
-        return { r: r, g: g, b: b };
-      }
-      function render() {
-        IN.clear(list);
-        var c = counts();
-        status.textContent = levert ? "Levert. Trykk «Ny runde» for nye påstander." : (items.length - c.b) + " av " + items.length + " besvart. Blankt er lov, men teller som galt.";
-        bLever.disabled = levert;
-        items.forEach(function (it, i) {
-          var sel = svar[i];
-          var row = el("div", { class: "tf-item" + (sel != null ? " answered" : "") });
-          row.appendChild(el("span", { class: "tf-num", text: i + 1 }));
-          var stmt = el("div", { class: "tf-stmt", html: it.s });
-          stmt.appendChild(el("span", { class: "tag blokk", text: NAVN[it.sek] || it.sek }));
-          row.appendChild(stmt);
-          var ch = el("div", { class: "tf-choices", role: "group", "aria-label": "Svar på påstand " + (i + 1) });
-          [["Sant", true], ["Usant", false], ["Blankt", null]].forEach(function (pr) {
-            var v = pr[1], on = sel === v, cls = "tf-choice" + (on ? " sel" : "");
-            if (levert && on && v !== null) cls += v === it.answer ? " correct" : " wrong";
-            ch.appendChild(el("button", { class: cls, type: "button", text: pr[0], "aria-pressed": on ? "true" : "false", disabled: levert,
-              onclick: function () { svar[i] = v; render(); } }));
-          });
-          row.appendChild(ch);
-          if (levert) {
-            var ok = sel === it.answer;
-            row.appendChild(el("div", { class: "tf-reveal key " + (ok ? "ok" : "no"),
-              html: "Riktig svar: <b>" + (it.answer ? "Sant" : "Usant") + "</b>" + (sel == null ? " – du lot den stå blank (teller som galt)" : ok ? " – du svarte riktig ✓" : " – du svarte " + (sel ? "Sant" : "Usant") + " ✗") }));
-            if (!ok && it.explain) row.appendChild(el("div", { class: "tf-reveal exp", html: it.explain }));
-          }
-          list.appendChild(row);
+        IN.tfTest(list, shuffle(out), {
+          blank: true, instant: false, lock: true,
+          note: "Blankt er lov, men teller som galt.",
+          checkLabel: "Lever og se poengene", resetLabel: "↺ Ny runde", onReset: draw,
+          report: function (c) { if (IN.progress) IN.progress.solved("del1", "del1-ovelse", poeng(c.right, N), N); },
+          result: resultat
         });
-      }
-      function lever() {
-        levert = true; render();
-        var c = counts(), half = N / 2, p = poeng(c.r, N);
-        if (IN.progress) IN.progress.solved("del1", "del1-ovelse", p, N);
-        IN.clear(res);
-        res.appendChild(el("div", { class: "callout sensor", id: "del1-resultat" }, [
-          el("span", { class: "lbl", text: "Din poengsum i del 1" }),
-          el("p", { html: "<b>n = " + c.r + "</b> riktige av N = " + N + " (" + c.g + " galt, " + c.b + " blanke)." }),
-          el("p", { html: "Poeng = 2 · max(n − N/2, 0) = 2 · max(" + c.r + " − " + half + ", 0) = <b>" + p + " av " + N + "</b>." }),
-          el("p", { class: "small", text: "Bare riktige svar utover halvparten gir poeng, og hvert av dem teller dobbelt. Galt og blankt gir det samme: ingenting." })
-        ]));
-        res.appendChild(el("div", { class: "callout eli5" }, [
-          el("span", { class: "lbl", text: "5-åring: hvorfor gjetting ikke lønner seg" }),
-          el("p", { text: "Tenk deg at du kaster mynt på hver påstand. Da får du omtrent halvparten riktig, altså rundt " + half + " av " + N +
-            ". Men halvparten er nettopp streken der poengene begynner, så myntkast på alt gir i snitt 0 poeng. " +
-            "Du mister likevel ingenting på å gjette på de få du er usikker på, for blankt gir heller ikke noe. Det er påstandene du faktisk kan, som løfter deg over streken." })
-        ]));
       }
 
       switchRow(sizeRow, SIZES, function (it) { N = it.N; draw(); });
@@ -1087,7 +1024,7 @@
       "h2020-7a": { year: "H2020", title: "Subanagram: hva er kjøretiden?", oppgave_nr: "Oppgave 7a", points: 4,
         oppgave: IN.oppg({
           intro: "<p>W er et <b>subanagram</b> av S hvis W kan skrives med bokstaver fra S, uten å bruke noen bokstav i S mer enn én gang. «hole» er et subanagram av «ehlo», men «hello» er det ikke (S har bare én l).</p>" +
-            "<p>Prosedyren under sjekker det. Anta at Copy, Contains og Remove på en streng er lineære i lengden, og at lengden |r| er O(1). La w = |W| og s = |S|.</p>",
+            "<p>Prosedyren under sjekker det. Anta at Copy, Contains og Remove på en streng er lineære i lengden, og at det tar O(1) å finne lengden |r|. La w = |W| og s = |S|.</p>",
           figs: [pcFig(A.stSubanagram1, "IsSubanagramOf1")],
           parts: [{ t: "Hva er kjøretidskompleksiteten? Velg ett: O(w + s), O(s²), O(w log s), O(s · w), O(w²).", p: 4 }]
         }),

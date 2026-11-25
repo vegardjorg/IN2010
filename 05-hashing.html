@@ -245,7 +245,7 @@
           og blir selv en del av segmentet, så det vokser videre. Lav Load factor holder segmentene korte.</p>
       </div>
       <div class="card"><div id="fig-cluster"></div>
-        <p class="muted small">11, 12, 13, 21, 22 og 31 satt inn med N = 10. 31 hører hjemme på plass 1, men må gå forbi seks opptatte plasser før den finner plass 6.</p></div>
+        <p class="muted small">11, 12, 13, 21, 22 og 31 satt inn med N = 10. 31 hører hjemme på plass 1, men må gå forbi fem opptatte plasser (1–5) før den finner plass 6.</p></div>
 
       <div class="callout sensor"><span class="lbl">Sensortips (H2020 og H2022)</span>
         <ul>
@@ -470,8 +470,14 @@
       var handle = {
         highlight: function (n) {
           var a = multi ? Math.floor(n / 100) - 1 : 0, l = multi ? n % 100 : n;
+          // cfg.callLine: { blokk: kode } – mens blokka kjører, lyser også kall-linja i blokka som kalte den
+          var call = multi && cfg.callLine ? cfg.callLine[a + 1] : null, ca = call ? Math.floor(call / 100) - 1 : -1;
           right.classList.add("has-on");
-          hs.forEach(function (h, i) { if (i === a) { h.hd.highlight(l); h.box.classList.add("on"); } else { h.hd.clear(); h.box.classList.remove("on"); } });
+          hs.forEach(function (h, i) {
+            if (i === a) { h.hd.highlight(l); h.box.classList.add("on"); }
+            else if (i === ca) { h.hd.highlight(call % 100); h.box.classList.add("on"); }
+            else { h.hd.clear(); h.box.classList.remove("on"); }
+          });
         },
         clear: function () { right.classList.remove("has-on"); hs.forEach(function (h) { h.hd.clear(); h.box.classList.remove("on"); }); }
       };
@@ -612,6 +618,14 @@
         "Slett, søk, sett inn": [{ N: 10, mode: "mark", ops: ins([21, 54, 82, 10, 20, 44]).concat([{ op: "del", k: 10 }, { op: "get", k: 20 }, { op: "ins", k: 30 }]) }],
         "Ikke duplikat": [{ N: 10, mode: "mark", ops: ins([10, 20, 30]).concat([{ op: "del", k: 10 }, { op: "ins", k: 30 }]) }]
       },
+      legend: [
+        { cls: "compare", label: "Plassen vi ser på" },
+        { cls: "sorted", label: "Prøvd (kollisjon)" },
+        { cls: "min", label: "Satt inn" },
+        { cls: "target", label: "Funnet" },
+        { cls: "swap", label: "Nytt merke / ikke funnet" },
+        { color: "var(--hs-keep)", label: "p: husket merke (stiplet ramme)" }
+      ],
       parseInput: function (s) { var r = HS.parseOps(s, { numbers: true, del: true }); if (r.length) r[0].mode = "mark"; return r; },
       inputLabel: "f.eks. 10, 20, 30, -10, 30"
     });
@@ -632,7 +646,7 @@
       "Forventet O(1) for oppslag og sletting, forventet amortisert O(1) for innsetting (rehash), og O(n) i verste tilfelle. Iterasjon over hele tabellen er O(n + N)."
     ), { label: "Nivå:" });
     mountOps("#demo-rehash", {
-      algos: ["hsInsertRehash", "hsRehash"], gen: "hsRehashOps",
+      algos: ["hsInsertRehash", "hsRehash"], gen: "hsRehashOps", callLine: { 2: 103 },
       presets: { "Fra N = 1": [{ N: 1, keys: [5, 12, 7, 20, 3, 9] }], "Fra N = 4": [{ N: 4, keys: [4, 8, 15, 16, 23, 42, 7] }] },
       parseInput: function (s) { return HS.parseOps(s, { numbers: true, N: 1, maxN: 16 }); }, inputLabel: "f.eks. 5, 12, 7, 20, N=4"
     });

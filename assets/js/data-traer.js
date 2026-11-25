@@ -1225,53 +1225,85 @@
   /* ---------- Traverseringer ---------- */
   function travGen(kind) {
     var NAME = { pre: "Preorder", "in": "Inorder", post: "Postorder" }[kind];
-    var LV = { pre: 3, "in": 4, post: 5 }[kind];
+    // Linjenumre: 1 = prosedyrelinja, 2 = null-sjekken. Rekkefølgen på linje 3–5 avhenger av variant.
+    var ORDER = { pre: ["visit", "l", "r"], "in": ["l", "visit", "r"], post: ["l", "r", "visit"] }[kind];
+    var LINE = {}; ORDER.forEach(function (a, i) { LINE[a] = 3 + i; });
+    var LAST = 5;
     return function (input) {
-      var o = norm(input), root = treeOf(o), steps = [], visited = [], stack = [];
+      var o = norm(input), root = treeOf(o), steps = [], visited = [], frames = [];
+      // frames: bunn → topp. { v (null for null-kall), wait: tekst | null, ret: bool }
+      function call(k) { return NAME + "(" + (k == null ? "null" : k) + ")"; }
       function info() {
-        return [{ label: "Kallstakk", items: stack.map(function (v) { return NAME + "(" + v.k + ")"; }), kind: "stack" },
+        return [{ label: "Kallstakk", kind: "frames", items: frames.map(function (f, i) {
+                  var top = i === frames.length - 1, note;
+                  if (!f.v) note = "v = null → return ↩";
+                  else if (f.ret) note = "ferdig ↩";
+                  else if (!top && f.wait) note = "venter på " + f.wait;
+                  else note = f.note || "";
+                  return { name: call(f.v ? f.v.k : null), note: note, ret: !f.v || f.ret };
+                }) },
                 { label: "Besøkt", items: visited.map(function (v) { return v.k; }) }];
       }
       function snap(line, cur, text, tag) {
+        var onStack = frames.filter(function (f) { return f.v; }).map(function (f) { return f.v.id; });
         steps.push({ line: line, tree: cl(root), text: text, tag: tag, info: info(),
-          marks: { cur: cur ? cur.id : null, path: stack.map(function (v) { return v.id; }), done: visited.map(function (v) { return v.id; }) } });
+          marks: { cur: cur ? cur.id : null, path: onStack, done: visited.map(function (v) { return v.id; }) } });
       }
-      snap(null, null, t("Vi skal hilse på alle nodene i treet, i " + NAME.toLowerCase() + "-rekkefølge.",
-        "Start: " + NAME + "(roten) kalles.", "Kall " + NAME + "(rot). Følg kallstakken nederst."), "Start");
-      function leafNote(v) { return (!v.l && !v.r) ? " " + v.k + " er en løvnode, så begge barnekallene treffer null og returnerer med en gang." : ""; }
-      function rec(v) {
-        stack.push(v);
-        if (kind !== "pre") {
-          snap(2, v, t("Vi kommer til " + v.k + ". Først må vi gå til venstre.",
-            NAME + "(" + v.k + ") kalles. v er ikke null, så vi går videre." + (kind === "in" ? " Venstre subtre først." : " Begge subtrærne først."),
-            "Nytt kall " + NAME + "(" + v.k + ") på stakken. v.element venter til " + (kind === "in" ? "venstre subtre" : "begge subtrærne") + " er ferdig."), "Kall");
-        }
-        if (kind === "pre") {
-          visited.push(v);
-          snap(LV, v, t("Vi kommer til " + v.k + " og hilser med en gang, før barna." + leafNote(v),
-            NAME + "(" + v.k + "): besøk " + v.k + " først." + leafNote(v),
-            "Pre: " + v.k + " behandles før subtrærne." + leafNote(v)), "Besøk " + v.k);
-        }
-        if (v.l) rec(v.l);
-        if (kind === "in") {
-          visited.push(v);
-          snap(LV, v, t("Venstre side av " + v.k + " er ferdig. Nå hilser vi på " + v.k + "." + leafNote(v),
-            "Tilbake i " + v.k + ": venstre subtre er ferdig, så " + v.k + " besøkes." + leafNote(v),
-            "Inorder: " + v.k + " besøkes mellom subtrærne." + leafNote(v)), "Besøk " + v.k);
-        }
-        if (v.r) rec(v.r);
-        if (kind === "post") {
-          visited.push(v);
-          snap(LV, v, t("Begge sidene av " + v.k + " er ferdige. Nå hilser vi på " + v.k + "." + leafNote(v),
-            "Tilbake i " + v.k + ": begge subtrærne er ferdige, så " + v.k + " besøkes." + leafNote(v),
-            "Postorder: " + v.k + " besøkes etter begge subtrærne." + leafNote(v)), "Besøk " + v.k);
-        }
-        stack.pop();
+      function seq() { return visited.map(function (v) { return v.k; }).join(", "); }
+      var SIDE = { l: "venstre", r: "høyre" }, FIELD = { l: "v.left", r: "v.right" };
+      snap(null, null, t("Vi skal hilse på alle nodene i treet, i " + NAME.toLowerCase() + "-rekkefølge. Kallstakken under viser hvilke kall som er i gang.",
+        "Start: " + call(root ? root.k : null) + " kalles. Kallstakken under treet viser kallene som er i gang, med toppen øverst.",
+        "Vi kaller " + call(root ? root.k : null) + ". Hver ramme på kallstakken er et kall som ikke er ferdig ennå. Toppen er kallet som jobber nå."), "Start");
+      function rec(v, par) {
+        var fr = { v: v, wait: null, ret: false, note: "v ≠ null" };
+        frames.push(fr);
+        snap(2, v, t("Vi kommer til " + v.k + ". Det er en ekte node, ikke en tom plass, så vi fortsetter.",
+          call(v.k) + " kalles. Linje 2: v ≠ null, så vi går videre.",
+          "Ny ramme " + call(v.k) + " øverst på kallstakken. Basistilfellet slår ikke til, fordi v ≠ null."), "Kall " + call(v.k));
+        ORDER.forEach(function (a) {
+          if (a === "visit") {
+            visited.push(v); fr.note = "besøker " + v.k;
+            var e = { pre: "Vi hilser på " + v.k + " med en gang, før barna.",
+                      "in": "Venstre side av " + v.k + " er ferdig. Nå hilser vi på " + v.k + ".",
+                      post: "Begge sidene av " + v.k + " er ferdige. Nå hilser vi på " + v.k + "." }[kind];
+            var n = { pre: "Visit(" + v.k + "): i preorder skjer besøket før begge barnekallene.",
+                      "in": "Kallet på venstre subtre har returnert, så Visit(" + v.k + ").",
+                      post: "Begge barnekallene har returnert, så Visit(" + v.k + ")." }[kind];
+            snap(LINE.visit, v, t(e, n, "Visit(" + v.k + ") " + { pre: "før subtrærne", "in": "mellom subtrærne", post: "etter subtrærne" }[kind] + ". Rekkefølgen så langt: " + seq() + "."), "Besøk " + v.k);
+            return;
+          }
+          var c = v[a];
+          if (!c) {
+            fr.wait = call(null);
+            frames.push({ v: null });
+            snap(2, v, t(v.k + " har ikke noe barn til " + SIDE[a] + ". Der er det tomt, så vi snur med en gang.",
+              call(FIELD[a]) + " kalles med null. Linje 2: v = null, så kallet returnerer med en gang.",
+              "Null-kall: rammen " + call(null) + " treffer basistilfellet og forsvinner straks. Et tre med n noder gir n + 1 slike kall."), "null-kall (" + SIDE[a] + ")");
+            frames.pop();
+            fr.wait = null;
+            return;
+          }
+          fr.wait = call(c.k); fr.note = "kaller " + SIDE[a];
+          snap(LINE[a], v, t(v.k + " sender oss ned til " + SIDE[a] + " barn, " + c.k + ". " + v.k + " venter så lenge.",
+            call(FIELD[a]) + " = " + call(c.k) + " kalles. Rammen for " + v.k + " venter til kallet er ferdig.",
+            "Rekursivt kall på " + FIELD[a] + " = " + c.k + ". Rammen " + call(v.k) + " blir liggende under og fortsetter på neste linje når kallet returnerer."), "Kall " + SIDE[a]);
+          rec(c, v);
+          fr.wait = null;
+        });
+        fr.ret = true;
+        snap(LAST, v, t("Alt under " + v.k + " er ferdig. " + (par ? "Vi går tilbake opp til " + par.k + "." : "Det var det første kallet, så nå er vi helt ferdige."),
+          call(v.k) + " er ferdig og returnerer" + (par ? " til " + call(par.k) + "." : ". Det var det første kallet."),
+          "Rammen " + call(v.k) + " fjernes fra kallstakken." + (par ? " " + call(par.k) + " fortsetter etter kallet sitt." : " Kallstakken er tom etterpå.")), "Retur " + v.k);
+        frames.pop();
       }
-      if (root) rec(root);
-      var seq = visited.map(function (v) { return v.k; }).join(", ");
-      snap(null, null, t("Ferdig! Rekkefølgen ble: " + seq + ".", "Ferdig. " + NAME + ": " + seq + ".",
-        NAME + " = [" + seq + "]. Hver node ble besøkt nøyaktig én gang: O(n)."), "Ferdig");
+      if (root) rec(root, null);
+      else {
+        frames.push({ v: null });
+        snap(2, null, t("Treet er tomt, så vi snur med en gang.", call(null) + ": v = null, så kallet returnerer med en gang.", "Tomt tre: basistilfellet, O(1)."), "null-kall");
+        frames.pop();
+      }
+      snap(null, null, t("Ferdig! Rekkefølgen ble: " + seq() + ".", "Ferdig. " + NAME + ": " + seq() + ".",
+        NAME + " = [" + seq() + "]. Hver node ga ett kall, og i tillegg kom n + 1 null-kall: O(n)."), "Ferdig");
       return steps;
     };
   }
@@ -1349,21 +1381,17 @@
       snap(6, u, t("Vi hilser på " + u.k + " med en gang." + (leaf ? " Den har ingen barn, så ingen nye lapper." : ""),
         "Besøk " + u.k + "." + (leaf ? " Ingen barn å legge på stakken." : ""),
         "Visit(" + u.k + ") før barna: preorder." + (leaf ? " Begge null-sjekkene feiler." : "")), "Besøk " + u.k);
-      if (!leaf) {
-        var txt;
-        if (u.l && u.r) {
-          S.push(u.r); S.push(u.l);
-          txt = t("Først legger vi " + u.r.k + " (høyre), så " + u.l.k + " (venstre) oppå. Da ligger " + u.l.k + " øverst og blir neste.",
-            "Push høyre (" + u.r.k + "), så venstre (" + u.l.k + "). " + u.l.k + " ligger øverst og tas ut først.",
-            "Push(" + u.r.k + "), Push(" + u.l.k + "). LIFO gjør at hele venstre subtre er ferdig før " + u.r.k + " kommer til toppen.");
-        } else if (u.r) {
-          S.push(u.r);
-          txt = t(u.k + " har bare et høyre barn, " + u.r.k + ". Det legges i bunken.", "Bare høyre barn: Push(S, " + u.r.k + ").", "u.left = null, så bare Push(" + u.r.k + ").");
-        } else {
-          S.push(u.l);
-          txt = t(u.k + " har bare et venstre barn, " + u.l.k + ". Det legges i bunken.", "Bare venstre barn: Push(S, " + u.l.k + ").", "u.right = null, så bare Push(" + u.l.k + ").");
-        }
-        snap(u.l ? 8 : 7, u, txt, "Push barn");
+      if (u.r) {
+        S.push(u.r);
+        snap(7, u, t(u.l ? "Først legger vi det høyre barnet, " + u.r.k + ", i bunken. Det skal vente lengst." : u.k + " har bare et høyre barn, " + u.r.k + ". Det legges i bunken.",
+          "u.right = " + u.r.k + " ≠ null: Push(S, " + u.r.k + ")." + (u.l ? " Høyre først, så det havner under venstre." : " u.left er null, så linje 8 pusher ingenting."),
+          "Push(" + u.r.k + ")." + (u.l ? " Høyre barn må ligge under venstre på stakken." : " u.left = null, så bare dette barnet pushes.")), "Push " + u.r.k);
+      }
+      if (u.l) {
+        S.push(u.l);
+        snap(8, u, t(u.r ? "Så legger vi det venstre barnet, " + u.l.k + ", oppå. Da ligger " + u.l.k + " øverst og blir neste." : u.k + " har bare et venstre barn, " + u.l.k + ". Det legges i bunken.",
+          (u.r ? "" : "u.right = null, så linje 7 pusher ingenting. ") + "u.left = " + u.l.k + " ≠ null: Push(S, " + u.l.k + ")." + (u.r ? " " + u.l.k + " ligger øverst og tas ut først." : ""),
+          "Push(" + u.l.k + ")." + (u.r ? " LIFO gjør at hele venstre subtre er ferdig før " + u.r.k + " kommer til toppen." : "")), "Push " + u.l.k);
       }
     }
     var seq = seqOf(vis);
@@ -1386,10 +1414,14 @@
     while (v || S.length) {
       if (v) {
         var w = v;
-        S.push(w); v = w.l;
-        snap(6, w, t("Vi kan ikke hilse på " + w.k + " ennå, for alt til venstre skal komme først. " + w.k + " legges i bunken, og vi går til venstre" + (v ? ", til " + v.k + "." : ". Der er det tomt."),
-          "Push(S, " + w.k + "), v ← " + w.k + ".left = " + (v ? v.k : "null") + ".",
-          w.k + " venter på venstre subtre. Push, og gå ned venstrekanten: v = " + (v ? v.k : "null") + "."), "Push " + w.k);
+        S.push(w);
+        snap(5, w, t("Vi kan ikke hilse på " + w.k + " ennå, for alt til venstre skal komme først. " + w.k + " legges i bunken, så vi finner tilbake.",
+          "v = " + w.k + " ≠ null: Push(S, " + w.k + ").",
+          w.k + " venter på venstre subtre, så den pushes. Stakken: " + stackTxt(S) + "."), "Push " + w.k);
+        v = w.l;
+        snap(6, w, t("Så går vi ett steg ned til venstre" + (v ? ", til " + v.k + "." : ". Der er det tomt."),
+          "v ← " + w.k + ".left = " + (v ? v.k : "null") + ".",
+          "Ned venstrekanten: v = " + (v ? v.k : "null") + "." + (v ? "" : " Neste runde går til else-grenen.")), "Venstre");
       } else {
         var u = S.pop(); v = u;
         snap(8, u, t("Det er tomt her. Vi tar den øverste lappen: " + u.k + ". Alt til venstre for den er ferdig.",
@@ -1400,7 +1432,7 @@
         v = u.r;
         snap(10, u, t(v ? "Så går vi over til høyre side, til " + v.k + ", og gjør det samme der." : u.k + " har ingen høyre side. Neste runde tar vi en ny lapp fra bunken" + (S.length ? "." : ", hvis det er noen igjen."),
           "v ← " + u.k + ".right = " + (v ? v.k : "null") + "." + (v ? " Høyre subtre startes som et nytt tre." : ""),
-          "v ← " + (v ? v.k : "null") + ". " + u.k + " er ferdig og skal ikke tilbake på stakken." + (!v && !S.length ? " v = null og S tom: løkka stopper." : "")), "Høyre");
+          "v ← " + (v ? v.k : "null") + ". " + u.k + " er ferdig og skal ikke tilbake på stakken."), "Høyre");
       }
     }
     var seq = seqOf(vis);
@@ -1429,24 +1461,29 @@
       snap(7, u, t("Vi tar " + u.k + " fra S. Vi hilser ikke ennå, men legger den i R.",
         "Pop(S) gir " + u.k + ", og Push(R, " + u.k + ").",
         u.k + " flyttes fra S til R. R er nå " + stackTxt(R) + "."), "Til R: " + u.k, u, null);
-      if (u.l || u.r) {
-        var p = [];
-        if (u.l) { S.push(u.l); p.push(u.l.k); }
-        if (u.r) { S.push(u.r); p.push(u.r.k); }
-        snap(u.r ? 9 : 8, u, t(p.length === 2 ? "Barna legges i S: først " + p[0] + " (venstre), så " + p[1] + " (høyre) oppå." : "Barnet " + p[0] + " legges i S.",
-          "Push " + p.join(", så ") + " på S." + (p.length === 2 ? " Høyre ligger øverst." : ""),
-          "Push " + p.join(", ") + ". Høyre tas ut før venstre, så R får node – høyre – venstre."), "Push barn");
+      if (u.l) {
+        S.push(u.l);
+        snap(8, u, t(u.r ? "Det venstre barnet, " + u.l.k + ", legges i S først." : "Barnet " + u.l.k + " (venstre) legges i S.",
+          "u.left = " + u.l.k + " ≠ null: Push(S, " + u.l.k + ")." + (u.r ? "" : " u.right er null, så linje 9 pusher ingenting."),
+          "Push(" + u.l.k + ")." + (u.r ? " Venstre under høyre, så høyre tas ut først." : "")), "Push " + u.l.k);
+      }
+      if (u.r) {
+        S.push(u.r);
+        snap(9, u, t(u.l ? "Så legges det høyre barnet, " + u.r.k + ", oppå. Det tas ut først." : "Barnet " + u.r.k + " (høyre) legges i S.",
+          (u.l ? "" : "u.left = null, så linje 8 pusher ingenting. ") + "u.right = " + u.r.k + " ≠ null: Push(S, " + u.r.k + ")." + (u.l ? " Høyre ligger øverst." : ""),
+          "Push(" + u.r.k + "). Høyre tas ut før venstre, så R får node – høyre – venstre."), "Push " + u.r.k);
       }
     }
     if (root) {
-      snap(10, null, t("S er tom. Alle nodene ligger nå i R. Den øverste er den vi la sist.",
-        "S er tom. R (bunn → topp): " + seqOf(R) + ".",
+      snap(5, null, t("S er tom, så den første løkka er ferdig. Alle nodene ligger nå i R. Den øverste er den vi la sist.",
+        "S er tom, så første while-løkke stopper. R (bunn → topp): " + seqOf(R) + ".",
         "R bunn → topp = " + seqOf(R) + " (node – høyre – venstre). Tatt av fra toppen blir det postorder."), "Snu med R");
     }
     while (R.length) {
-      var x = R.pop(); vis.push(x);
-      snap(12, x, t("Vi tar " + x.k + " fra toppen av R og hilser.", "Pop(R) gir " + x.k + ". Besøk " + x.k + ".",
-        "Visit(" + x.k + ")."), "Besøk " + x.k, null, x);
+      var x = R.pop();
+      snap(11, x, t("Vi tar " + x.k + " fra toppen av R.", "Pop(R) gir u = " + x.k + ".", "u ← Pop(R) = " + x.k + ". R: " + stackTxt(R) + "."), "Pop " + x.k, null, x);
+      vis.push(x);
+      snap(12, x, t("Nå hilser vi på " + x.k + ".", "Besøk " + x.k + ".", "Visit(" + x.k + "). Postorder så langt: " + seqOf(vis) + "."), "Besøk " + x.k);
     }
     var seq = seqOf(vis);
     snap(10, null, t("Begge bunkene er tomme. Rekkefølgen ble " + seq + ": barna før forelderen.",
@@ -1486,9 +1523,13 @@
     order.forEach(function (x, i) {
       vis.push(x);
       var fr = frames(paths[i]), s = Ss[i], waits = fr.filter(function (f) { return /høyre/.test(f.note); }).length;
-      snap(t("Begge hilser på " + x.k + " nå. Kallstakken har " + fr.length + " kall oppå hverandre. Bunken S har " + s.length + " " + (s.length === 1 ? "lapp" : "lapper") + ": de høyre barna som venter.",
-        "Visit(" + x.k + "). Kallstakken: " + fr.length + " rammer, og " + waits + " av dem venter på et høyre barn. S: " + (s.length ? seqOf(s) : "tom") + ". Det er nøyaktig de samme høyre barna.",
-        "Visit(" + x.k + "): dybde " + (fr.length - 1) + ", så " + fr.length + " rammer. S = [" + seqOf(s) + "] er de ventende høyre barna, altså bare den delen av rammene som har arbeid igjen."), "Besøk " + x.k, x, fr, s);
+      var ram = fr.length + (fr.length === 1 ? " ramme" : " rammer");
+      snap(t("Begge hilser på " + x.k + " nå. Kallstakken har " + (fr.length === 1 ? "bare ett kall" : fr.length + " kall oppå hverandre") + ". " +
+          (s.length ? "Bunken S har " + s.length + " " + (s.length === 1 ? "lapp" : "lapper") + ": de høyre barna som venter." : "Bunken S er tom: ingen høyre barn venter."),
+        "Visit(" + x.k + "). Kallstakken: " + ram + (fr.length === 1 ? " (kallet som besøker " + x.k + ")" : ", og " + (waits === 0 ? "ingen" : waits) + " av dem venter på et høyre barn") + ". " +
+          (s.length ? "S: " + seqOf(s) + ". Det er nøyaktig de samme høyre barna." : "S er tom, og det stemmer: ingen ramme venter på et høyre barn."),
+        "Visit(" + x.k + "): dybde " + (fr.length - 1) + ", så " + ram + ". " +
+          (s.length ? "S = [" + seqOf(s) + "] er de ventende høyre barna, altså bare den delen av rammene som har arbeid igjen." : "S er tom: ingen ramme har et høyre barn igjen, bare retur.")), "Besøk " + x.k, x, fr, s);
     });
     snap(t("Ferdig. Begge hilste i samme rekkefølge: " + seqOf(vis) + ". Kallstakken og bunken husket det samme arbeidet, bare på hver sin måte.",
       "Samme rekkefølge: " + seqOf(vis) + ". Rekursjonen bruker kallstakken. Den iterative versjonen bruker en stakk vi har laget selv.",
@@ -1556,51 +1597,98 @@
 
   /* ---------- BST: fjerning ---------- */
   reg(IN.gen, "bstRemove", function (input) {
-    var o = norm(input), x = o.x, root = bstFrom(o.keys), steps = [], path = [];
-    function snap(line, marks, text, tag) { fixH(root); marks.path = marks.path || path.slice(); steps.push({ line: line, tree: cl(root), marks: marks, text: text, tag: tag }); }
-    function attach(par, dir, sub) { if (!par) root = sub; else par[dir] = sub; }
-    snap(null, {}, t("Vi skal fjerne " + x + ". Først må vi finne det.", "Remove(rot, " + x + "): finn noden først.", "Fjern x = " + x + ". Søkefasen er som Search."), "Start");
-    var v = root, par = null, dir = null;
-    while (v && v.k !== x) {
-      path.push(v.id);
-      if (x < v.k) { snap(4, { cur: v.id }, t(x + " er mindre enn " + v.k + ": til venstre.", x + " < " + v.k + ": fjern fra venstre subtre.", "Remove(v.left, " + x + ")."), "Venstre"); par = v; dir = "l"; v = v.l; }
-      else { snap(7, { cur: v.id }, t(x + " er større enn " + v.k + ": til høyre.", x + " > " + v.k + ": fjern fra høyre subtre.", "Remove(v.right, " + x + ")."), "Høyre"); par = v; dir = "r"; v = v.r; }
+    var o = norm(input), x0 = o.x, root = bstFrom(o.keys), steps = [], calls = [];
+    // calls = nodene som har et Remove-kall i gang (stien fra roten). del = noden som skal fjernes.
+    var del = [], keep = null;
+    function snap(line, marks, text, tag) {
+      fixH(root);
+      if (!marks.path) marks.path = calls.slice();
+      if (!marks.del) marks.del = del.slice();
+      if (keep && marks.found === undefined) marks.found = keep;
+      steps.push({ line: line, tree: cl(root), marks: marks, text: text, tag: tag });
     }
-    if (!v) {
-      snap(2, {}, t(x + " finnes ikke, så ingenting fjernes.", "Kom til null: " + x + " finnes ikke.", "Remove(null, x) = null. Treet er uendret."), "Ikke funnet");
-      return steps;
+    function nk(v) { return v ? String(v.k) : "null"; }
+    snap(null, {}, t("Vi skal fjerne " + x0 + ". Først må vi finne det.", "Remove(rot, " + x0 + "): finn noden først.", "Fjern x = " + x0 + ". Søkefasen er som Search: ett kall per nivå."), "Start");
+    // Returnerer roten i subtreet etter fjerning. inner = kallet fra linje 13 (fjerner etterfølgerens gamle plass)
+    function rem(v, x, inner) {
+      if (!v) {
+        snap(2, {}, t(x + " finnes ikke, så ingenting fjernes.", "Remove(null, " + x + "): v = null, så " + x + " finnes ikke. return null.", "Basistilfellet: Remove(null, x) = null. Treet er uendret."), "Ikke funnet");
+        return null;
+      }
+      calls.push(v.id);
+      var w;
+      if (x < v.k) {
+        snap(4, { cur: v.id }, t(x + " er mindre enn " + v.k + ", så vi leter videre til venstre.",
+          "Linje 3: " + x + " < " + v.k + ". Kall Remove(v.left, " + x + ") = Remove(" + nk(v.l) + ", " + x + ").",
+          x + " < v.element = " + v.k + ": rekursivt kall på venstre subtre. Svaret kobles på v.left når kallet returnerer."), "Venstre");
+        w = rem(v.l, x, inner);
+        var oldL = v.l; v.l = w; calls.pop();
+        snap(5, { cur: v.id }, t((oldL !== w ? v.k + " fester " + (w ? w.k : "ingenting") + " til venstre, der " + oldL.k + " satt før." : "Under " + v.k + " er alt i orden.") + " " + v.k + " selv blir stående.",
+          "v.left ← " + nk(w) + (oldL !== w ? " (var " + nk(oldL) + ")" : " (uendret)") + ". return " + v.k + ".",
+          "Kallet returnerte " + nk(w) + ", som kobles på " + v.k + ".left. Remove(" + v.k + ", " + x + ") returnerer " + v.k + ": roten i dette subtreet er den samme."), "Retur " + v.k);
+        return v;
+      }
+      if (x > v.k) {
+        snap(7, { cur: v.id }, t(x + " er større enn " + v.k + ", så vi leter videre til høyre.",
+          x + " < " + v.k + "? Nei. Linje 6: " + x + " > " + v.k + ". Kall Remove(v.right, " + x + ") = Remove(" + nk(v.r) + ", " + x + ").",
+          x + " > v.element = " + v.k + ": rekursivt kall på høyre subtre. Svaret kobles på v.right når kallet returnerer."), "Høyre");
+        w = rem(v.r, x, inner);
+        var oldR = v.r; v.r = w; calls.pop();
+        snap(8, { cur: v.id }, t((oldR !== w ? v.k + " fester " + (w ? w.k : "ingenting") + " til høyre, der " + oldR.k + " satt før." : "Under " + v.k + " er alt i orden.") + " " + v.k + " selv blir stående.",
+          "v.right ← " + nk(w) + (oldR !== w ? " (var " + nk(oldR) + ")" : " (uendret)") + ". return " + v.k + ".",
+          "Kallet returnerte " + nk(w) + ", som kobles på " + v.k + ".right. Remove(" + v.k + ", " + x + ") returnerer " + v.k + "."), "Retur " + v.k);
+        return v;
+      }
+      // x = v.element
+      del = [v.id];
+      snap(6, { cur: v.id }, t((inner ? "Der er den gamle " + x + "-en." : "Der er " + x + "!") + " Den skal bort.",
+        x + " < " + v.k + "? Nei. " + x + " > " + v.k + "? Nei. Altså x = v.element: " + (inner ? "den gamle kopien er funnet." : "noden er funnet."),
+        "Begge sammenligningene er usanne, så x = v.element. Vi er i noden som skal fjernes."), "Funnet");
+      if (!v.l) {
+        snap(9, { cur: v.id }, t(v.r ? x + " har ikke noe barn til venstre. Da kan barnet til høyre, " + v.r.k + ", ta plassen." : x + " har ingen barn. Da kan vi bare ta den bort.",
+          "v.left = null: return v.right = " + nk(v.r) + "." + (v.r ? " " + v.r.k + " rykker opp." : " Det var en løvnode."),
+          v.r ? "Tilfelle 1 barn (høyre): subtreet til " + v.r.k + " returneres og tar plassen." : "Tilfelle 0 barn: v.left = null, så linja returnerer v.right = null."), v.r ? "Ett barn" : "Løvnode");
+        calls.pop(); del = [];
+        return v.r;
+      }
+      if (!v.r) {
+        snap(10, { cur: v.id }, t(x + " har bare et barn til venstre, " + v.l.k + ". Det barnet tar plassen.",
+          "v.left ≠ null, så linje 9 slår ikke til. v.right = null: return v.left = " + v.l.k + ".",
+          "Tilfelle 1 barn (venstre): v.left ≠ null og v.right = null. Subtreet til " + v.l.k + " rykker opp."), "Ett barn");
+        calls.pop(); del = [];
+        return v.l;
+      }
+      snap(10, { cur: v.id }, t(x + " har to barn, så vi kan ikke bare ta den bort. Vi leter etter det minste tallet til høyre.",
+        "v.left ≠ null og v.right ≠ null: verken linje 9 eller 10 slår til. To barn.",
+        "Tilfelle 2 barn. Ingen av barna kan rykke opp alene, så vi bruker etterfølgeren."), "To barn");
+      var u = v.r, p2 = calls.concat([u.id]);
+      snap(11, { cur: u.id, path: p2.slice() }, t("Vi går ett steg til høyre, til " + u.k + ", og leter etter det minste der.", "FindMin(v.right) starter i " + u.k + ".", "FindMin(" + u.k + "): følg venstrekanten."), "FindMin");
+      while (u.l) {
+        u = u.l; p2.push(u.id);
+        snap(11, { cur: u.id, path: p2.slice() }, t("Det finnes et mindre tall til venstre. Vi går videre til " + u.k + ".", "FindMin: venstre barn finnes, gå til " + u.k + ".", "FindMin går langs venstre kant: " + u.k + "."), "FindMin");
+      }
+      snap(11, { found: u.id, path: p2.slice() }, t(u.k + " har ingen til venstre. Det er det minste tallet til høyre.", "Etterfølger u = " + u.k + " (har ikke venstre barn).", "u = FindMin(v.right) = " + u.k + ". u.left = null."), "Etterfølger");
+      var old = v.k; v.k = u.k; keep = v.id; del = [u.id];
+      snap(12, { cur: u.id }, t("Vi skriver " + u.k + " inn der " + old + " stod. Nå står " + u.k + " to steder en liten stund. Den nederste skal bort.",
+        "v.element ← " + u.k + ". Det står midlertidig to " + u.k + "-er.", "Verdikopi. Strukturen er uendret, og søketre-egenskapen holder rundt v."), "Kopier");
+      snap(13, { cur: v.id }, t("Nå fjerner vi den gamle " + u.k + "-en til høyre. Vi leter etter den på samme måte som før.",
+        "Kall Remove(v.right, " + u.k + ") = Remove(" + v.r.k + ", " + u.k + "). Den gamle kopien har ikke venstre barn.",
+        "Rekursivt kall på høyre subtre. Det ender i tilfellet v.left = null, så det blir aldri et nytt to-barn-tilfelle."), "Kall Remove");
+      var w2 = rem(v.r, u.k, true);
+      var oldR2 = v.r; v.r = w2;
+      snap(13, { cur: v.id }, t((oldR2 !== w2 ? v.k + " fester " + (w2 ? w2.k : "ingenting") + " til høyre." : "Kallet er ferdig, og den gamle " + u.k + "-en er borte."),
+        "Kallet returnerte " + nk(w2) + ": v.right ← " + nk(w2) + ".",
+        "v.right ← Remove(v.right, " + u.k + ") = " + nk(w2) + ". Den gamle plassen til etterfølgeren er klippet ut."), "v.right ← " + nk(w2));
+      calls.pop(); keep = null;
+      snap(14, { found: v.id }, t(old + " er borte, og " + u.k + " har tatt plassen. Noden står der fortsatt, nå med nytt tall.",
+        "return v: noden har nå verdien " + u.k + ".", "Returner v. Roten i dette subtreet er samme node, med ny verdi."), "Retur " + v.k);
+      return v;
     }
-    path.push(v.id);
-    if (!v.l || !v.r) {
-      var line = !v.l ? 9 : 10, child = !v.l ? v.r : v.l;
-      var kind = (!v.l && !v.r) ? "løvnode" : "ett barn";
-      snap(line, { rot: [v.id] }, t(kind === "løvnode" ? "Fant " + x + ". Det er en løvnode, så vi kan bare ta den bort." : "Fant " + x + ". Den har bare ett barn (" + child.k + "), som tar plassen.",
-        kind === "løvnode" ? "Funnet " + x + ", 0 barn: returner null." : "Funnet " + x + ", 1 barn: returner " + child.k + ".",
-        kind === "løvnode" ? "Tilfelle 0 barn: v.left = null, så linja returnerer v.right = null." : "Tilfelle 1 barn: subtreet til " + child.k + " rykker opp."), "Funnet");
-      attach(par, dir, child);
-      snap(line, { found: child ? child.id : null, path: [] }, t("Ferdig! " + x + " er borte" + (child ? ", og " + child.k + " står der den stod." : "."),
-        par ? par.k + (dir === "l" ? ".left" : ".right") + " ← " + (child ? child.k : "null") + ". " + x + " er fjernet." : "Roten er byttet ut. " + x + " er fjernet.",
-        "Forelderen kobler på returverdien. Inorder: " + inorder(root, []).join(", ") + "."), "Ferdig");
-      return steps;
-    }
-    snap(11, { rot: [v.id] }, t("Fant " + x + ". Den har to barn, så vi kan ikke bare ta den bort. Vi leter etter det minste tallet til høyre.",
-      "Funnet " + x + " med to barn: finn etterfølgeren, FindMin(v.right).", "Tilfelle 2 barn. Etterfølgeren er inorder-naboen til høyre."), "To barn");
-    var u = v.r, upar = v, udir = "r", p2 = [v.id];
-    while (u.l) {
-      p2.push(u.id);
-      snap(11, { rot: [v.id], cur: u.id, path: p2.slice() }, t(u.k + " har et barn til venstre. Vi går videre dit.", "FindMin: " + u.k + ".left finnes, gå til venstre.", "FindMin går langs venstre kant."), "FindMin");
-      upar = u; udir = "l"; u = u.l;
-    }
-    p2.push(u.id);
-    snap(11, { rot: [v.id], found: u.id, path: p2.slice() }, t(u.k + " har ingen til venstre. Det er det minste tallet til høyre.", "Etterfølger u = " + u.k + " (har ikke venstre barn).", "u = " + u.k + ": FindMin(v.right)."), "Etterfølger");
-    var old = v.k; v.k = u.k;
-    snap(12, { cur: v.id, found: u.id, path: [] }, t("Vi skriver " + u.k + " inn der " + old + " stod. Nå står " + u.k + " to steder en liten stund.",
-      "v.element ← " + u.k + ". Det står midlertidig to " + u.k + "-er.", "Verdikopi. Strukturen er uendret, og søketre-egenskapen holder rundt v."), "Kopier");
-    snap(13, { cur: v.id, rot: [u.id], path: [] }, t("Så fjerner vi den gamle " + u.k + " der nede. Den har ikke noe venstre barn, så det er lett.",
-      "Remove(v.right, " + u.k + "): den gamle kopien har høyst ett barn (høyre).", "Rekursjonen ender i tilfellet v.left = null."), "Fjern kopi");
-    attach(upar, udir, u.r);
-    snap(14, { found: v.id, path: [] }, t("Ferdig! " + old + " er borte, og " + u.k + " har tatt plassen. Tallene står fortsatt i riktig rekkefølge.",
-      "Ferdig. " + old + " er erstattet av etterfølgeren " + u.k + ".", "Inorder: " + inorder(root, []).join(", ") + ". Fortsatt sortert, så treet er fortsatt et søketre."), "Ferdig");
+    root = rem(root, x0, false);
+    del = []; keep = null;
+    var io = inorder(root, []).join(", ");
+    snap(null, { path: [] }, t("Ferdig! Tallene står fortsatt i riktig rekkefølge: " + (io || "treet er tomt") + ".",
+      "Ferdig. Inorder: " + (io || "tomt tre") + ".", "Inorder = [" + io + "], fortsatt sortert, så treet er fortsatt et søketre. O(h)."), "Ferdig");
     return steps;
   });
 
@@ -1612,11 +1700,14 @@
       var L = {}; Object.keys(lab).forEach(function (k) { L[k] = lab[k]; });
       marks.done = done.slice(); marks.path = stack.map(function (v) { return v.id; });
       steps.push({ line: line, tree: cl(root), marks: marks, lab: L, text: text, tag: tag, edges: edges || null,
-        info: [{ label: "Kallstakk", items: stack.map(function (v) { return "Diameter(" + v.k + ")"; }), kind: "stack" }] });
+        info: [{ label: "Kallstakk", kind: "frames", items: stack.map(function (v, i) {
+          var top = i === stack.length - 1;
+          return { name: "Diameter(" + v.k + ")", note: top ? "har regnet ut " + (lab[v.id] || "(h, d)") : "venter på Diameter(" + stack[i + 1].k + ")", ret: false };
+        }) }] });
     }
-    snap(null, {}, t("Vi spør hver node om to ting: hvor høy er du, og hvor lang er den lengste stien hos deg? Svarene står under nodene som (h, d).",
-      "Postorder: hver node får (h, d) fra barna og regner ut sin egen. Merket under noden er (h, d).",
-      "Én gjennomgang nedenfra og opp. Etiketten under hver node er paret (h, d) som returneres."), "Start");
+    snap(null, {}, t("Vi spør hver node om to ting: hvor høy er du, og hvor lang er den lengste stien hos deg? Svarene står under nodene som (h, d). Vi viser bare øyeblikket der hver node har fått svar fra barna sine.",
+      "Postorder: hver node får (h, d) fra barna og regner ut sin egen. Merket under noden er (h, d). Forløpet er forkortet: vi viser ett steg per node, når h og d er regnet ut (linje 5–6). Kallene ned og null-kallene (som gir (−1, 0)) er hoppet over.",
+      "Én gjennomgang nedenfra og opp. Etiketten under hver node er paret (h, d) som returneres. Forkortet forløp: ett steg per kall, når h og d er klare (linje 5–6), rett før return. Null-kallene returnerer (−1, 0) på linje 2 og vises ikke."), "Start");
     function rec(v) {
       if (!v) return { h: -1, d: 0, deep: [], best: [] };
       stack.push(v);
@@ -1631,9 +1722,9 @@
       var leaf = !v.l && !v.r;
       var edges = pathEdges(best);
       snap(6, { cur: v.id }, leaf
-        ? t(v.k + " har ingen barn. Høyde 0, og ingen sti å gå: (0, 0).", "Løvnode " + v.k + ": hL = hR = −1, så h = 0 og d = 0.", "Løvnode: h = 1 + Max(−1, −1) = 0, hL + hR + 2 = 0.")
+        ? t(v.k + " har ingen barn. Høyde 0, og ingen sti å gå: (0, 0).", "Løvnode " + v.k + ": begge null-kallene ga (−1, 0), så hL = hR = −1. Da blir h = 0 og d = −1 + (−1) + 2 = 0.", "Løvnode: h = 1 + Max(−1, −1) = 0, hL + hR + 2 = 0.")
         : t("Hos " + v.k + ": venstre side er " + neg(A.h) + " høy, høyre side " + neg(B.h) + ". En sti gjennom " + v.k + " blir " + through + " lang. Den lengste stien så langt er " + d + ".",
-            v.k + ": hL = " + neg(A.h) + ", hR = " + neg(B.h) + ". h = " + h + ". Gjennom " + v.k + ": " + neg(A.h) + " + " + neg(B.h) + " + 2 = " + through + ". d = Max(" + through + ", " + A.d + ", " + B.d + ") = " + d + (src === "gjennom" ? " (gjennom " + v.k + ")." : " (ligger i " + src + " subtre)."),
+            v.k + ": hL = " + neg(A.h) + ", hR = " + neg(B.h) + ". h = " + h + ". Gjennom " + v.k + ": " + par(A.h) + " + " + par(B.h) + " + 2 = " + through + ". d = Max(" + through + ", " + A.d + ", " + B.d + ") = " + d + (src === "gjennom" ? " (gjennom " + v.k + ")." : " (ligger i " + src + " subtre)."),
             "h = 1 + Max(" + neg(A.h) + ", " + neg(B.h) + ") = " + h + ", d = Max(" + through + ", " + A.d + ", " + B.d + ") = " + d + "."), "(" + h + ", " + d + ")", edges);
       stack.pop();
       return { h: h, d: d, deep: deep, best: best };
@@ -1645,6 +1736,7 @@
       "Diameter(rot) = (" + R.h + ", " + R.d + "). Lineær tid: hver node ga ett kall." + (viaRoot ? "" : " Den lengste stien ligger helt i et subtre.")), "Diameter " + R.d, pathEdges(R.best));
     return steps;
   });
+  function par(n) { return n < 0 ? "(" + neg(n) + ")" : String(n); }   // «0 + (−1) + 2»
   function pathEdges(p) { var e = []; for (var i = 0; i + 1 < p.length; i++) e.push([p[i], p[i + 1]]); return e; }
 
   /* ---------- LCA (generelt tre med parent/depth) ---------- */
@@ -1707,9 +1799,14 @@
   /* ---------- AVL-innsetting ---------- */
   reg(IN.gen, "avlInsert", function (input) {
     var o = norm(input), root = o.base ? bstFrom(o.base) : null, steps = [], rots = 0;
+    // pending: forfedre til den nye noden som ennå ikke har kjørt SetHeight. Høyden over dem er den gamle,
+    // så b vises som «b=?» og de farges ikke røde før Balance faktisk sjekker dem.
+    var pending = {};
     function snap(line, marks, text, tag) {
-      var L = avlLabels(root);
-      marks.warn = (marks.warn || []).concat(L.warn);
+      var L = avlLabels(root), warn = (marks.warn || []).slice();
+      Object.keys(pending).forEach(function (id) { if (L.lab[id] != null) L.lab[id] = "b=?"; });
+      L.warn.forEach(function (id) { if (!pending[id] && warn.indexOf(id) < 0) warn.push(id); });
+      marks.warn = warn;
       steps.push({ line: line, tree: cl(root), marks: marks, lab: L.lab, sup: L.sup, text: text, tag: tag, counter: "Rotasjoner: " + rots });
     }
     snap(null, {}, o.base
@@ -1753,7 +1850,11 @@
     function ins(v, x, attach, path) {
       if (!v) {
         var nn = mk(x); attach(nn);
-        snap(3, { fresh: nn.id, path: path.slice() }, t("Tom plass: " + x + " blir en ny node her.", "Ny løvnode " + x + " (høyde 0).", "new Node(" + x + "), h = 0."), "Ny node " + x);
+        path.forEach(function (id) { pending[id] = 1; });
+        var up = path.length > 0;
+        snap(3, { fresh: nn.id, path: path.slice() }, t("Tom plass: " + x + " blir en ny node her." + (up ? " Høydene over den er ikke oppdatert ennå (b=?). Det gjør vi på vei opp igjen." : ""),
+          "Ny løvnode " + x + " (høyde 0)." + (up ? " Nodene over har fortsatt gammel høyde, så b vises som «?» til SetHeight har kjørt for dem." : " Treet var tomt, så den blir roten."),
+          "new Node(" + x + "), h = 0." + (up ? " Forfedrene har utdatert h til SetHeight kjører på vei opp, så b er ukjent (?) for dem." : "")), "Ny node " + x);
         return nn;
       }
       path.push(v.id);
@@ -1769,7 +1870,7 @@
         return v;
       }
       path.pop();
-      var oldH = v.h; setH(v);
+      var oldH = v.h; setH(v); delete pending[v.id];
       var b = bf(v);
       if (Math.abs(b) <= 1) {
         snap(8, { cur: v.id, path: path.slice() }, t("Tilbake i " + v.k + ": høyden er " + v.h + ", og b = " + neg(b) + ". Det er innenfor, så vi lar den stå.",
@@ -1777,8 +1878,13 @@
           "h(" + v.k + ") = " + v.h + ", b = " + neg(b) + ". Invarianten holder her."), "Sjekk " + v.k);
         return v;
       }
-      snap(9, { cur: v.id, warn: [v.id], path: path.slice() }, t("Oi! " + v.k + " står for skjevt (b = " + neg(b) + "). Vi må vri.",
-        "SetHeight(" + v.k + "): h = " + v.h + ". b = " + neg(b) + ": ubalansert, Balance(" + v.k + ") roterer.",
+      var dbl = b < 0 ? bf(v.r) > 0 : bf(v.l) < 0, ch = b < 0 ? v.r : v.l;
+      snap(9, { cur: v.id, warn: [v.id], path: path.slice() }, t("Oi! " + v.k + " står for skjevt (b = " + neg(b) + "). Vi må vri. " +
+          (dbl ? "Barnet " + ch.k + " på den tunge siden bøyer seg innover, som en knekk. Da må vi vri to ganger: først rette ut knekken, så vri hele greina."
+               : "Skjevheten går rett ut i én retning, så én vridning holder."),
+        "SetHeight(" + v.k + "): h = " + v.h + ". b = " + neg(b) + ": ubalansert, Balance(" + v.k + ") roterer. " +
+          (b < 0 ? "b(v.right) = b(" + ch.k + ") = " + neg(bf(ch)) + (dbl ? " > 0: høyre barn er venstretungt (en knekk), så det blir dobbelrotasjon: først RightRotate(" + ch.k + "), så LeftRotate(" + v.k + ")." : " ≤ 0: enkel LeftRotate(" + v.k + ").")
+                 : "b(v.left) = b(" + ch.k + ") = " + neg(bf(ch)) + (dbl ? " < 0: venstre barn er høyretungt (en knekk), så det blir dobbelrotasjon: først LeftRotate(" + ch.k + "), så RightRotate(" + v.k + ")." : " ≥ 0: enkel RightRotate(" + v.k + ").")),
         "|b(" + v.k + ")| = " + Math.abs(b) + " > 1. " + (b < 0 ? "Høyretung" : "Venstretung") + (b < 0 ? (bf(v.r) > 0 ? ", knekk i høyre barn: dobbelrotasjon." : ": enkel venstrerotasjon.") : (bf(v.l) < 0 ? ", knekk i venstre barn: dobbelrotasjon." : ": enkel høyrerotasjon."))), "Ubalanse");
       return balance(v, attach);
     }
@@ -1823,6 +1929,9 @@
           "RightRotate(" + v.k + "): " + y.k + " opp, " + v.k + " blir høyre barn.", "Rotasjon nr. " + rots + ". Søketre-egenskapen er bevart."), "Høyrerotasjon");
         return nv;
       }
+      snap(10, { cur: v.id, path: path.slice() }, t(v.k + " har ikke noe barn til venstre, så her trenger vi ikke vri. " + v.k + " blir stående.",
+        v.k + ".left = null, så linje 8 slår ikke til: ingen rotasjon. return " + v.k + ".",
+        "v.left = null: betingelsen på linje 8 er usann, og subtreet er allerede en høyrekjede. return v."), "Ingen rotasjon");
       return v;
     }
     o.keys.forEach(function (x) {
@@ -1839,7 +1948,11 @@
   /* ---------- Huffman ---------- */
   reg(IN.gen, "huffman", function (input) {
     var o = norm(input), pairs = o.pairs || [], steps = [], Q = [], seq = 0, cnt = 0;
+    // Likhet i frekvens: kurset sier ikke hvem som tas ut først. Demoen (og TR.huffman) tar den som kom først inn i køen.
     function sortQ() { Q.sort(function (a, b) { return a.f - b.f || a.seq - b.seq; }); }
+    function syms(v) { return v.sym !== undefined ? [v.sym] : syms(v.l).concat(syms(v.r)); }
+    function name(v) { return v.sym !== undefined ? v.sym : "(" + syms(v).join(",") + ")"; }
+    function item(v) { return name(v) + ":" + v.f; }
     function labs(list) {
       var L = {};
       list.forEach(function (r) { (function w(v) { if (!v) return; if (v.sym !== undefined) L[v.id] = String(v.f); w(v.l); w(v.r); })(r); });
@@ -1847,29 +1960,49 @@
     }
     function snap(line, forest, marks, text, tag, info) {
       steps.push({ line: line, forest: forest.map(cl), marks: marks, lab: labs(forest), text: text, tag: tag, bits: true,
-        info: info || [{ label: "Kø (minst først)", items: Q.map(function (v) { return v.sym !== undefined ? v.sym + ":" + v.f : String(v.f); }), kind: "queue" }] });
+        info: info || [{ label: "Kø (minst først)", items: Q.map(item), kind: "queue" }] });
     }
     pairs.forEach(function (p) { Q.push({ id: "L" + p[0], k: p[0], sym: p[0], f: p[1], l: null, r: null, h: 0, seq: seq++ }); });
     sortQ();
-    snap(4, Q, {}, t("Hver bokstav blir en liten node med tallet for hvor ofte den brukes. Alle står i køen, minst først.",
-      "Én løvnode per symbol, lagt i prioritetskøen (sortert på frekvens).",
-      "n = " + pairs.length + " løvnoder i Q. Løkka vil kjøre n − 1 = " + (pairs.length - 1) + " ganger."), "Løvnoder");
+    var ties = false;
+    for (var i = 0; i + 1 < Q.length; i++) if (Q[i].f === Q[i + 1].f) ties = true;
+    snap(4, Q, {}, t("Hver bokstav blir en liten node med tallet for hvor ofte den brukes. Alle står i køen, minst først. Er to tall like, står den som kom først inn, foran.",
+      "Én løvnode per symbol, lagt i prioritetskøen (sortert på frekvens). Ved lik frekvens tar demoen ut den som kom først inn i køen. Kurset bestemmer ikke dette. Et annet valg kan gi andre koder, men like god total lengde.",
+      "n = " + pairs.length + " løvnoder i Q. Løkka vil kjøre n − 1 = " + (pairs.length - 1) + " ganger. Likhet brytes her med innsettingsrekkefølge (FIFO blant like). Kurset fastsetter ingen regel, og alle valg gir optimal total kodelengde."), "Løvnoder");
+    var round = 0;
     while (Q.length > 1) {
-      var v1 = Q.shift(), v2 = Q.shift();
-      snap(7, [v1, v2].concat(Q), { cur: v1.id, alt: v2.id }, t("Vi tar ut de to minste: " + v1.k + " (" + v1.f + ") og " + v2.k + " (" + v2.f + ").",
-        "RemoveMin to ganger: v1 = " + (v1.sym !== undefined ? v1.sym : "tre") + " (" + v1.f + "), v2 = " + (v2.sym !== undefined ? v2.sym : "tre") + " (" + v2.f + ").",
-        "De to minste frekvensene slås sammen. Det er det grådige valget."), "To minste");
+      round++;
+      var v1 = Q.shift();
+      snap(6, [v1].concat(Q), { cur: v1.id }, t("Vi tar ut den minste: " + name(v1) + " (" + v1.f + ").",
+        "v1 ← RemoveMin(Q) = " + item(v1) + ".",
+        "RemoveMin gir minste frekvens, " + v1.f + "." + (Q.length && Q[0].f === v1.f ? " " + name(Q[0]) + " har samme frekvens, men kom senere inn i køen." : "")), "v1 = " + name(v1));
+      var v2 = Q.shift();
+      snap(7, [v1, v2].concat(Q), { cur: v1.id, alt: v2.id }, t("Så tar vi ut den nest minste: " + name(v2) + " (" + v2.f + ").",
+        "v2 ← RemoveMin(Q) = " + item(v2) + ".",
+        "Ny RemoveMin: v2 har frekvens " + v2.f + ". De to minste skal slås sammen. Det er det grådige valget."), "v2 = " + name(v2));
       var nv = { id: "N" + (cnt++), k: v1.f + v2.f, f: v1.f + v2.f, l: v1, r: v2, h: 0, seq: seq++ };
+      snap(10, [nv].concat(Q), { fresh: nv.id }, t("Vi lager en ny node over dem med summen " + v1.f + " + " + v2.f + " = " + nv.f + ". " + name(v1) + " henger til venstre (0) og " + name(v2) + " til høyre (1).",
+        "Linje 8–10: ny intern node " + name(nv) + " med frekvens " + v1.f + " + " + v2.f + " = " + nv.f + ". v1 til venstre (bit 0), v2 til høyre (bit 1).",
+        "new Node(null, " + nv.f + ") med v.left = v1 og v.right = v2. Den er ikke i køen ennå."), "Ny node " + nv.f);
       Q.push(nv); sortQ();
-      snap(11, Q, { fresh: nv.id }, t("Vi lager en ny node over dem med summen " + nv.f + ", og stiller den i køen igjen.",
-        "Ny intern node med frekvens " + v1.f + " + " + v2.f + " = " + nv.f + ". v1 til venstre (0), v2 til høyre (1). Tilbake i køen.",
-        "new Node(null, " + nv.f + "), Insert(Q, v). Nå er det " + Q.length + " trær i køen."), "Slå sammen");
+      snap(11, Q, { fresh: nv.id }, t("Den nye noden stiller seg i køen igjen, på riktig plass etter tallet " + nv.f + ".",
+        "Insert(Q, v): " + item(nv) + " er tilbake i køen. Nå er det " + Q.length + " " + (Q.length === 1 ? "tre" : "trær") + " i køen.",
+        "Insert(Q, v) i O(log n). Q har nå " + Q.length + " " + (Q.length === 1 ? "tre" : "trær") + " etter runde " + round + " av " + (pairs.length - 1) + "."), "Insert " + nv.f);
     }
-    var H = TR.huffman(pairs), rows = [];
-    pairs.forEach(function (p) { rows.push(p[0] + " = " + H.codes[p[0]] + " (" + H.codes[p[0]].length + ")"); });
-    snap(12, Q, { done: Q.length ? ids(Q[0]) : [] }, t("Bare ett tre igjen: det er Huffman-treet! Følg kantene fra toppen ned til en bokstav for å få koden.",
-      "Ferdig. Kodene leses langs stien fra roten: venstre = 0, høyre = 1. Sjeldne symboler havner dypest.",
-      "Roten returneres. Kodelengde = dybden til løvnoden."), "Ferdig",
+    snap(5, Q, {}, t("Nå står det bare ett tre igjen i køen, så vi er ferdige med å slå sammen.",
+      "Size(Q) = " + Q.length + ", og " + Q.length + " > 1 er usant. Løkka stopper.",
+      "Size(Q) = 1 etter n − 1 = " + (pairs.length - 1) + " runder: løkka stopper."), "Løkka stopper");
+    var H = TR.huffman(pairs), rows = [], lens = [];
+    pairs.forEach(function (p) { rows.push(p[0] + " = " + H.codes[p[0]] + " (" + H.codes[p[0]].length + ")"); lens.push(H.codes[p[0]].length); });
+    var allSame = pairs.every(function (p) { return p[1] === pairs[0][1]; });
+    var lmin = Math.min.apply(null, lens), lmax = Math.max.apply(null, lens);
+    snap(12, Q, { done: Q.length ? ids(Q[0]) : [] }, allSame
+      ? t("Bare ett tre igjen: det er Huffman-treet! Alle bokstavene var like vanlige, så ingen fortjener en kortere kode. Kodene ble " + (lmin === lmax ? "like lange" : "nesten like lange") + ".",
+          "Ferdig. Kodene leses langs stien fra roten: venstre = 0, høyre = 1. Med like frekvenser blir treet så jevnt som mulig, og kodene " + (lmin === lmax ? "like lange (" + lmin + " bit)." : "får lengde " + lmin + " eller " + lmax + "."),
+          "Roten returneres. Like frekvenser gir et (nesten) balansert tre: kodelengdene er ⌊log₂ n⌋ eller ⌈log₂ n⌉, som en fast lengde-koding.")
+      : t("Bare ett tre igjen: det er Huffman-treet! Følg kantene fra toppen ned til en bokstav for å få koden. Bokstaver som brukes lite, havner langt nede og får lange koder.",
+          "Ferdig. Kodene leses langs stien fra roten: venstre = 0, høyre = 1. Sjeldne symboler havner dypest og får lengst kode.",
+          "Roten returneres. Kodelengde = dybden til løvnoden." + (ties ? " Med et annet valg ved lik frekvens kan enkelte koder bli annerledes, men den totale lengden blir den samme." : "")), "Ferdig",
       [{ label: "Koder (lengde)", items: rows }]);
     return steps;
   });

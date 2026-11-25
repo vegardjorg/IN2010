@@ -196,11 +196,11 @@
         states([["etter kall 1", [3, 5, 4, 9, 6, 7, 8, 12, 10], [0, 2, 5]]]),
       "<b>Kall 2.</b> Returner x = 3. Siste element 10 flyttes til roten: [10, 5, 4, 9, 6, 7, 8, 12]. Barna er 5 og 4, bytt med 4 (0 ↔ 2). Barna til indeks 2 er 7 og 8, bytt med 7 (2 ↔ 5). Ferdig." +
         states([["etter kall 2", [4, 5, 7, 9, 6, 10, 8, 12], [0, 2, 5]]]),
-      "<b>Kall 3.</b> Returner x = 4. Siste element 12 flyttes til roten: [12, 5, 7, 9, 6, 10, 8]. Barna er 5 og 7, bytt med 5 (0 ↔ 1). Barna til indeks 1 er 9 og 6, bytt med 6 (1 ↔ 4). Indeks 4 har ingen barn (2·4 + 1 = 9 ≥ 6). Ferdig." +
+      "<b>Kall 3.</b> Returner x = 4. Siste element 12 flyttes til roten: [12, 5, 7, 9, 6, 10, 8]. Barna er 5 og 7, bytt med 5 (0 ↔ 1). Barna til indeks 1 er 9 og 6, bytt med 6 (1 ↔ 4). Indeks 4 har ingen barn: 2·4 + 1 = 9 er utenfor heapen, der siste indeks nå er 6. Ferdig." +
         states([["etter kall 3", [5, 6, 7, 9, 12, 10, 8], [0, 1, 4]]]) +
         fig(heapTree([5, 6, 7, 9, 12, 10, 8], [0, 1, 4], "Heapen etter tre RemoveMin"), "Uthevet: stien 12 boblet ned langs."),
       "<b>(c)</b> Pseudokode. Vi tar ut roten, flytter siste element opp og bobler det ned mot det <i>minste</i> barnet så lenge det er større enn barnet:" +
-        pc("RemoveMin(A)", "En min-heap A med n ≥ 1 elementer", "Det minste elementet; A er en heap med n − 1 elementer", [
+        pc("RemoveMin(A)", "En min-heap A med n ≥ 1 elementer", "Det minste elementet; etterpå er A[0 … n − 2] en heap (kalleren setter n ← n − 1)", [
           "x ← A[0]",
           "A[0] ← A[n − 1]",
           "i ← 0",
@@ -214,7 +214,7 @@
           "  i ← j",
           "return x"
         ]) +
-        "<p class=\"small muted\">Grensen er n − 1 og ikke n fordi plassen A[n − 1] nettopp er tømt: heapen har nå bare indeksene 0 … n − 2.</p>",
+        "<p class=\"small muted\">Grensen er n − 1 og ikke n fordi plassen A[n − 1] nettopp er tømt: heapen har nå bare indeksene 0 … n − 2. Prosedyren endrer ikke n selv; kalleren setter n ← n − 1 etterpå.</p>",
       "<b>(d)</b> O(log n). En heap er et komplett binærtre, så høyden er ⌊log n⌋. Hver runde i løkka gjør konstant arbeid (to sammenligninger og ett bytte) og flytter i ett nivå ned, så det blir høyst ⌊log n⌋ runder."
     ],
     kjerne:
@@ -561,8 +561,10 @@
         states([["rehashet, N = 8", [_, 9, _, _, _, 13, 6, _], [1, 5, 6]]]) +
         "<p>21 mod 8 = 5: opptatt, 6 opptatt, 7 ledig. 17 mod 8 = 1: opptatt, 2 ledig. Load factor er nå 5/8, under 0,75. 30 mod 8 = 6: opptatt, 7 opptatt, 0 ledig (rundt kanten).</p>" +
         states([["N = 8", [30, 9, 17, _, _, 13, 6, 21], [0, 2, 7]]]),
-      "<b>(c)</b> Før 14: n/N = 6/8 = 0,75, så N blir 16. Gammel rekkefølge er 30, 9, 17, 13, 6, 21, som gir 30 → 14, 9 → 9, 17 → 1, 13 → 13, 6 → 6, 21 → 5. Så kommer 14 mod 16 = 14, som er opptatt, og 14 havner på 15." +
-        states([["N = 16", [_, 17, _, _, _, 21, 6, _, _, 9, _, _, _, 13, 30, 14], [15]]]) +
+      "<b>(c)</b> Før 14: n/N = 6/8 = 0,75, så N blir 16. Gammel rekkefølge er 30, 9, 17, 13, 6, 21, som gir 30 → 14, 9 → 9, 17 → 1, 13 → 13, 6 → 6, 21 → 5. Ingen av dem kolliderer." +
+        states([["rehashet, N = 16", [_, 17, _, _, _, 21, 6, _, _, 9, _, _, _, 13, 30, _], [1, 5, 6, 9, 13, 14]]]) +
+        "<p>Så kommer 14: 14 mod 16 = 14, som er opptatt, og 15 er ledig.</p>" +
+        states([["N = 16, etter 14", [_, 17, _, _, _, 21, 6, _, _, 9, _, _, _, 13, 30, 14], [15]]]) +
         "<p>Til slutt er n = 7 og N = 16.</p>",
       "<b>(d)</b> Pseudokode:" +
         pc("Insert(A, k, v)", "En tabell A med N plasser og n nøkler, og et par (k, v)", "(k, v) ligger i A", [
@@ -797,14 +799,15 @@
           ["D–F", 9, "nei", "sykel"]
         ]),
       "<b>(b)</b> Prim fra A legger alltid til den letteste kanten fra treet til en node utenfor." +
-        tab(["steg", "node lagt til", "via kant", "nye kanter i køen"], [
-          [1, "A", "start", "A–B 6, A–C 3"],
-          [2, "C", "A–C 3", "C–B 4, C–D 5, C–E 7"],
-          [3, "B", "C–B 4", "B–D 2"],
-          [4, "D", "B–D 2", "D–E 8, D–F 9"],
-          [5, "E", "C–E 7", "E–F 1 (C–D 5 og A–B 6 hoppes over)"],
-          [6, "F", "E–F 1", ""]
+        tab(["steg", "tatt ut og kastet (begge ender i treet)", "tatt ut og brukt", "node lagt til", "nye kanter i køen"], [
+          [1, "", "start", "A", "A–B 6, A–C 3"],
+          [2, "", "A–C 3", "C", "C–B 4, C–D 5, C–E 7"],
+          [3, "", "C–B 4", "B", "B–D 2"],
+          [4, "", "B–D 2", "D", "D–E 8, D–F 9"],
+          [5, "C–D 5, A–B 6", "C–E 7", "E", "E–F 1"],
+          [6, "", "E–F 1", "F", "ingen (alle naboene er i treet)"]
         ]) +
+        "<p>Til slutt tas D–E 8 og D–F 9 ut og kastes, og køen er tom.</p>" +
         "<p>Prim og Kruskal gir samme tre her, fordi alle vektene er forskjellige.</p>",
       "<b>(c)</b> Kantene er A–C, B–C, B–D, C–E og E–F, med totalvekt 3 + 4 + 2 + 7 + 1 = 17." +
         fig(graph({ w: 370, h: 190, nodes: MN, edges: ME, hl: ["A-C", "B-C", "B-D", "C-E", "E-F"], label: "Det minimale spenntreet" }), "Uthevet: det minimale spenntreet (5 = |V| − 1 kanter)."),

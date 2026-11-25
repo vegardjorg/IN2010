@@ -441,7 +441,7 @@
       <div class="callout sensor"><span class="lbl">Sensortips: rundturer og grupper</span>
         <ul>
           <li>«Grupper der alle kan nå alle», «rundturer» og «sykler i en rettet graf» peker mot sterkt sammenhengende komponenter.</li>
-          <li>En komponent med bare én node er ikke en sykel (uten løkker). Ta den ikke med når du skal finne sykler.</li>
+          <li>En komponent med bare én node er ikke en sykel (så lenge den ikke har en kant til seg selv). Ta den ikke med når du skal finne sykler.</li>
         </ul>
       </div>
     </section>
@@ -508,7 +508,7 @@
         Se demoen under <a href="#fane=dfs&amp;oppg=demo-dfs">Dybde-først (DFS)</a>, eksempelet «To komponenter».</p>
 
       <h3>Prøv selv: fjern en node</h3>
-      <p class="muted small">Klikk på en node for å fjerne den. Fargene viser hvilke deler grafen faller i.</p>
+      <p class="muted small">Trykk på en av knappene «Fjern X» for å fjerne den noden. Fargene viser hvilke deler grafen faller i.</p>
       <div class="tv-switch" role="group" aria-label="Velg node å fjerne" id="sep-btns"></div>
       <div class="grid cols-2">
         <div class="gv-mini" id="sep-fig"></div>
@@ -579,13 +579,15 @@
     var RING = "transparent;border:3px solid var(--c-target);box-sizing:border-box";
     var LEG_TRAV = [{ cls: "compare", label: "Nå / kanten vi sjekker" }, { color: DASH, label: "I køen" }, { color: RING, label: "Oppdaget" },
                     { cls: "sorted", label: "Ferdig" }, { cls: "target", label: "Kant i søketreet" }];
-    var LEG_DFS = [{ cls: "compare", label: "Nå / kanten vi sjekker" }, { color: RING, label: "Besøkt, på kallstakken" },
+    var LEG_DFS = [{ cls: "compare", label: "Nå / kanten vi sjekker / ny startnode" }, { color: RING, label: "Besøkt, på kallstakken" },
                    { cls: "sorted", label: "Ferdig" }, { cls: "target", label: "Kant i DFS-treet" }];
     var LEG_TOP = [{ cls: "compare", label: "Nå" }, { color: DASH, label: "På stakken" }, { cls: "sorted", label: "I output" }, { cls: "swap", label: "Kom aldri med (sykel)" }];
     var LEG_DIJ = [{ cls: "compare", label: "Nå / kanten vi relakserer" }, { color: DASH, label: "I køen" }, { cls: "sorted", label: "Ferdig (visited)" }, { cls: "target", label: "Beste kjente vei" }];
     var LEG_MST = [{ cls: "compare", label: "Kanten vi ser på" }, { cls: "sorted", label: "Med i treet" }, { cls: "target", label: "Kant i spenntreet" }];
-    var LEG_KRU = [{ cls: "compare", label: "Kanten vi ser på" }, { cls: "target", label: "Valgt kant" }, { label: "Samme farge = samme tre", color: "var(--c-sorted)" }];
-    var LEG_SCC = [{ cls: "compare", label: "Nå" }, { color: RING, label: "Påbegynt" }, { cls: "sorted", label: "Ferdig (fase 1)" }, { label: "Farge = komponent (fase 2)", color: "var(--c-target)" }];
+    var LEG_KRU = [{ cls: "compare", label: "Kanten vi ser på" }, { cls: "target", label: "Valgt kant" },
+                   { label: "Tre 1 (samme farge = samme tre)", color: "var(--gv-c0)" }, { label: "Tre 2", color: "var(--gv-c1)" }];
+    var LEG_SCC = [{ cls: "compare", label: "Nå" }, { color: RING, label: "På kallstakken (fase 1)" }, { cls: "sorted", label: "Ferdig, lagt på stack (fase 1)" },
+                   { label: "Komponent 1 (fase 2)", color: "var(--gv-c0)" }, { label: "Komponent 2", color: "var(--gv-c1)" }, { label: "Komponent 3", color: "var(--gv-c2)" }];
     var LEG_CYC = [{ cls: "compare", label: "Nå / kanten vi sjekker" }, { color: RING, label: "Besøkt" }, { cls: "sorted", label: "Ferdig" }, { cls: "swap", label: "Sykelen" }];
 
     function mountDemo(host, cfg) {
@@ -1122,7 +1124,22 @@
           "S (se figuren): A–B 8, C–D 8, A–C 3, B–D 3, A–D 1, B–C 1.",
           "(1) <b>Nei</b>, ikke nødvendigvis: mange kanter har samme vekt, så det kan finnes flere like billige spenntrær. (2) <b>Nei</b>: G4 er ikke sammenhengende, så den kan ikke inneholde et spenntre. (3) <b>Ja</b>: G3 er et spenntre med vekt 3 på alle kantene, og alle andre kanter er tyngre (8 eller 10). (4) <b>3</b>: G4 alene henger ikke sammen, så minst én tyngre kant trengs, og G3 gir alltid en kant med vekt 3 som kobler sammen.",
           "Type 1: alle par er naboer, så svaret er bare 10 (O(1)). Type 2: alle vektene er like, så <b>bredde-først søk</b> gir antall kanter, og lengden er 8 ganger det.",
-          "A: 0, B: 2, C: 2, D: 1, E: 4, F: 7, G: 8, H: 10. (D via A–D 1; B og C via D; E via D–E 3; F via E–F 3; G via F–G 1; H direkte med vekt 10, som er bedre enn G–H 3 til 11.) Bruk Dijkstra, eller regn for hånd."], [TYPE2VER, TWOPATHS],
+          "<p><b>1. Slå sammen kantene.</b> Behold den letteste vekten for hvert par. Alle par har minst vekt 10 (E1). Lettere enn 10 blir: " +
+            "A–D 1, B–D 1, C–D 1, F–G 1 · A–C 3, B–C 3, D–E 3, E–F 3, G–H 3 · A–B 8, A–F 8, E–H 8, F–H 8. Alle andre par har vekt 10.</p>" +
+            "<p><b>2. Kjør Dijkstra fra A.</b> Start: dist[A] = 0, alle andre ∞. Naboene relakseres i alfabetisk rekkefølge, og ved lik avstand tas den eldste oppføringen ut først. Fet = endret i runden.</p>" +
+            tab(["Runde", "Tatt ut", "A", "B", "C", "D", "E", "F", "G", "H"], [
+              ["1", "A (0)", "0", "<b>8</b>", "<b>3</b>", "<b>1</b>", "<b>10</b>", "<b>8</b>", "<b>10</b>", "<b>10</b>"],
+              ["2", "D (1)", "0", "<b>2</b>", "<b>2</b>", "1", "<b>4</b>", "8", "10", "10"],
+              ["3", "B (2)", "0", "2", "2", "1", "4", "8", "10", "10"],
+              ["4", "C (2)", "0", "2", "2", "1", "4", "8", "10", "10"],
+              ["5", "E (4)", "0", "2", "2", "1", "4", "<b>7</b>", "10", "10"],
+              ["6", "F (7)", "0", "2", "2", "1", "4", "7", "<b>8</b>", "10"],
+              ["7", "G (8)", "0", "2", "2", "1", "4", "7", "8", "10"],
+              ["8", "H (10)", "0", "2", "2", "1", "4", "7", "8", "10"]]) +
+            "<p>Mellom rundene tar køen også ut gamle oppføringer (C:3 før runde 5, B:8 og F:8 før runde 7, E:10 og G:10 før runde 8). De er alt i visited og hoppes over. " +
+            "I runde 7 gir G–H 8 + 3 = 11, som ikke er bedre enn 10, så H beholder den direkte kanten fra A.</p>" +
+            "<p><b>Svar:</b> A 0, B 2, C 2, D 1, E 4, F 7, G 8, H 10.</p>" +
+            "<p><b>Kjøretid:</b> Dijkstra er O((|V| + |E|) · log(|V|)). E1 gjør grafen komplett, så |E| = |V| · (|V| − 1) / 2 = 28 her, og i det generelle tilfellet blir det O(|V|² · log(|V|)).</p>"], [TYPE2VER, TWOPATHS],
           { figs: [gFig(S20, "S", {}, { scale: 0.8 })] }),
         kjerne: "<p>En lang oppgave som går gjennom mye av pensum: NP og verifikatorer, 2-sammenheng, Kruskal og korteste vei. Hver del er kort hvis du kjenner begrepet.</p>",
         tips: ["(a): glem ikke kanten fra den siste noden i C tilbake til den første.", "(d): bruk (i − 1 + N) mod N når du går bakover, så indeksen ikke blir negativ.", "(h): skriv opp den sammenslåtte vekten for hver kant før du starter. De fleste feil kommer av at en lettere kant ble oversett."] },
@@ -1244,7 +1261,7 @@
         explain: "En indre node har minst to naboer, og den eneste stien mellom dem går gjennom noden. Fjerner vi den, faller treet i flere deler. Løvnodene er ikke separasjonsnoder." },
       { s: "En graf som har en sykel, kan ikke ha separasjonsnoder.", answer: false, blokk: "6",
         explain: "Moteksempel: to trekanter som deler én node. Begge trekantene er sykler, men den felles noden er en separasjonsnode – uten den faller grafen i to." },
-      { s: "En rettet graf uten løkker der hver node har minst én kant ut, må ha en sykel.", answer: true, blokk: "6",
+      { s: "En rettet graf uten selvløkker (kanter fra en node til seg selv) der hver node har minst én kant ut, må ha en sykel.", answer: true, blokk: "6",
         explain: "Følg en kant ut fra node til node. Grafen har bare |V| noder, så etter høyst |V| steg må vi komme til en node vi har vært i før. Da har vi gått i ring." },
       { s: "En DAG med minst én node har alltid minst én node med inngrad 0.", answer: true, blokk: "6",
         explain: "Hadde alle nodene en kant inn, kunne vi fulgt kantene baklengs for alltid og måttet komme tilbake til en node vi har sett – en sykel. Det er derfor topologisk sortering alltid har en node å starte med." },

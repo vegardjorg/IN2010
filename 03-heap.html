@@ -507,10 +507,20 @@
       { cls: "sorted", label: "ferdig" }
     ];
     var LEG_RM = [
-      { cls: "min", label: "minste (roten)" },
+      { cls: "min", label: "minste (roten, x)" },
+      { color: "var(--vf-teal)", label: "kopieres (siste → roten)" },
       { cls: "target", label: "elementet som synker (i)" },
       { cls: "compare", label: "barna som sammenlignes" },
       { cls: "swap", label: "byttes" }
+    ];
+    // Lekeplassen kjører både Insert og RemoveMin: alle fargene fra begge
+    var LEG_PK = [
+      { cls: "min", label: "minste (roten, x)" },
+      { color: "var(--vf-teal)", label: "kopieres (siste → roten)" },
+      { cls: "target", label: "elementet vi følger (i)" },
+      { cls: "compare", label: "sammenlignes" },
+      { cls: "swap", label: "byttes" },
+      { cls: "sorted", label: "ferdig (ny heap)" }
     ];
     var LEG_BUILD = [
       { cls: "target", label: "noden vi jobber med" },
@@ -524,7 +534,8 @@
       { cls: "swap", label: "byttes" },
       { cls: "sorted", label: "sortert hale" }
     ];
-    var LEG_LO = [0, 1, 2, 3].map(function (d) { return { color: "var(--lv" + d + ")", label: "dybde " + d }; });
+    var LEG_LO = [0, 1, 2, 3].map(function (d) { return { color: "var(--lv" + d + ")", label: "dybde " + d }; })
+      .concat([{ color: "var(--color-on-surface)", label: "plassen vi leser (i), tykk ring" }]);
 
     /* Badges: gå til fanen og åpne eksamenskortet */
 
@@ -823,7 +834,7 @@
       return st;
     }
     var pg = IN.stepPlayer("#tracer-pg", {
-      generate: pgGen, initial: PG.H, render: heapRender, pseudo: IN.pseudoGroup([hPgI, hPgR]), legend: LEG_RM
+      generate: pgGen, initial: PG.H, render: heapRender, pseudo: IN.pseudoGroup([hPgI, hPgR]), legend: LEG_PK
     });
     function pgRun(op) { PG.op = op; pg.setInput(PG.H); }
     qs("#pg-ins").addEventListener("click", function () {

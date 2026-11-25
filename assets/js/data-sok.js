@@ -219,7 +219,7 @@
         low = mid + 1;
         snap(11, {}, t("Nå leter vi fra plass " + low + ".", "low ← " + low + ".", "low ← mid + 1 = " + low + "."), "Gå høyre");
       } else {
-        snap(10, { compare: [mid] }, t(A[mid] + " er for stort, så vi går til venstre.", "A[mid] &gt; x.", "A[mid] &gt; x → else."), "Sammenlign");
+        snap(12, { compare: [mid] }, t(A[mid] + " er for stort, så vi går til venstre.", "A[mid] &gt; x, så vi havner i else.", "Verken A[mid] = x eller A[mid] &lt; x: A[mid] &gt; x → else."), "Sammenlign");
         high = mid - 1;
         snap(13, {}, t("Nå leter vi til og med plass " + high + ".", "high ← " + high + ".", "high ← mid − 1 = " + high + "."), "Gå venstre");
       }
@@ -548,6 +548,9 @@
   IN.gen.findMinKSelect = IN.gen.findMinKSelect || function (input) {
     var s = split(input, 1), A = clone(s.A), n = A.length, k = Math.max(1, Math.min(n, s.p[0])), steps = [], cmp = 0;
     function snap(line, marks, p, text, tag, rnd) { steps.push({ line: line, array: clone(A), marks: marks, ptrs: p, info: [["k", k], ["runde", rnd], ["sammenligninger", cmp]], text: text, tag: tag }); }
+    snap(null, {}, {}, t("Her er tallene: " + A.join(", ") + ". Vi skal finne " + (k === 1 ? "det minste" : "de " + k + " minste") + ".",
+      "Input: A = [" + A.join(", ") + "], k = " + k + ". Vi gjør k runder med Selection-idéen.",
+      "Input A = [" + A.join(", ") + "], n = " + n + ", k = " + k + ". k runder, runde i skanner A[i..n − 1]."), "Start", 0);
     for (var i = 0; i < k; i++) {
       var m = i, done = range(0, i - 1);
       snap(3, { sorted: done, min: m }, { i: i }, t("Runde " + (i + 1) + ": vi later som " + A[i] + " er minst av dem som er igjen.", "m ← " + i + " (A[m] = " + A[m] + ").", "Runde " + (i + 1) + " av " + k + ": skann A[" + i + ".." + (n - 1) + "]."), "Runde " + (i + 1), i + 1);
@@ -557,8 +560,12 @@
         snap(5, { sorted: done, min: m, compare: [j] }, { i: i, j: j }, t("Er " + A[j] + " mindre enn " + A[m] + "?" + (less ? " Ja." : " Nei."), "A[" + j + "] &lt; A[m]? " + (less ? "Ja." : "Nei."), "Sammenligning nr. " + cmp + "."), "Sammenlign", i + 1);
         if (less) { m = j; snap(6, { sorted: done, min: m }, { i: i, j: j }, t("Nå er " + A[m] + " det minste vi har sett.", "m ← " + j + ".", "Ny kandidat m = " + j + "."), "Ny minste", i + 1); }
       }
-      snap(7, { sorted: done, swap: [i, m] }, { i: i }, t("Vi flytter " + A[m] + " fram til plass " + i + ".", "swap A[" + i + "] and A[" + m + "].", "A[" + i + "] blir det " + (i + 1) + ". minste."), "Bytte", i + 1);
-      var tmp = A[i]; A[i] = A[m]; A[m] = tmp;
+      if (m === i) {
+        snap(7, { sorted: done, target: i }, { i: i }, t(A[i] + " var minst av dem som var igjen, og står allerede på plass " + i + ". Ingen bytte trengs.", "m = i = " + i + ": swap A[" + i + "] and A[" + i + "] endrer ingenting.", "m = i, så byttet er med seg selv. A[" + i + "] = " + A[i] + " er det " + (i + 1) + ". minste."), "Allerede på plass", i + 1);
+      } else {
+        var tmp = A[i]; A[i] = A[m]; A[m] = tmp;
+        snap(7, { sorted: done, swap: [i, m] }, { i: i }, t("Vi har byttet: " + A[i] + " er flyttet fram til plass " + i + ", og " + A[m] + " tok plassen den kom fra.", "Byttet A[" + i + "] og A[" + m + "]: nå er A[" + i + "] = " + A[i] + ".", "swap A[" + i + "], A[" + m + "] utført. A[" + i + "] = " + A[i] + " er det " + (i + 1) + ". minste."), "Byttet", i + 1);
+      }
     }
     steps.push({ line: 8, array: clone(A), marks: { sorted: range(0, k - 1) }, ptrs: {}, info: [["k", k], ["sammenligninger", cmp]],
       text: t("De " + k + " minste tallene står nå først: " + A.slice(0, k).join(", ") + ".", "return A[0.." + (k - 1) + "] = " + A.slice(0, k).join(", ") + ".", "Ferdig etter " + nn(cmp, "sammenligning", "sammenligninger") + ", omtrent k·n = " + (k * n) + "."), tag: "Ferdig" });

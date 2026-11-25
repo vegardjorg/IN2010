@@ -120,7 +120,7 @@
       <div id="demo-pushback"></div>
 
       <div class="callout uni"><span class="lbl">Universitetsnivå: amortisert O(1)</span>
-        <p>Én PushBack kan koste O(n), når alt må kopieres. Men det skjer bare når D.n er 1, 2, 4, 8, … Setter vi inn n elementer, blir kopieringene til sammen 1 + 2 + 4 + …, og det er færre enn 2n,
+        <p>Én PushBack kan koste O(n), når alt må kopieres. Men det skjer bare når D.n når kapasiteten: med startkapasitet 1 er det ved D.n = 1, 2, 4, 8, …, og med startkapasitet 4 ved 4, 8, 16, … Setter vi inn n elementer, blir kopieringene til sammen 1 + 2 + 4 + …, og det er færre enn 2n,
           så alle de n innsettingene koster O(n) til sammen. Fordelt på n innsettinger er det O(1) hver. Det kalles <b>amortisert</b> kjøretid.
           (Med «9 × PushBack» i demoen: 1 + 2 + 4 + 8 = 15 kopieringer, under 2 · 9 = 18.)
           Du trenger ikke kunne utlede slike analyser selv, bare forstå begrepet. Det dukker opp igjen ved rehash i hashing

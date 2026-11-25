@@ -26,6 +26,7 @@
     .itv-note { font: 400 11px var(--font); color: var(--color-on-surface-variant); }
     .itv-empty { font-size: var(--text-xs); font-style: italic; color: var(--color-on-surface-variant); text-align: center; padding: .15rem 0; }
     .itv-cap { font-size: var(--text-xs); color: var(--color-on-surface-variant); text-align: center; }
+    .itv-end { font-size: 10px; color: var(--color-on-surface-variant); text-align: center; line-height: 1.2; }
   </style>
 </head>
 <body data-page="traer">
@@ -154,7 +155,7 @@
               <td data-tip="Én sti fra roten og ned, altså O(h). For en kjede er h = n − 1.">O(n)</td>
               <td data-tip="h = O(log n), så én sti er O(log n).">O(log n)</td></tr>
             <tr><td>Søk / innsetting / fjerning i AVL</td>
-              <td data-tip="Søk: svaret ligger i roten. Innsetting og fjerning må likevel ned til en løvnode og rebalansere: O(log n).">O(1)</td>
+              <td data-tip="Søk: svaret ligger i roten, O(1). Innsetting og fjerning må alltid ned mot en løvnode og så rebalansere på vei opp, så de er O(log n) også i beste fall.">O(1) søk, O(log n) ellers</td>
               <td data-tip="AVL-regelen holder høyden O(log n), og hver rotasjon er O(1).">O(log n)</td>
               <td data-tip="AVL-trær er alltid balanserte.">O(log n)</td></tr>
             <tr><td>Pre-/in-/post-/level-order</td>
@@ -162,7 +163,7 @@
               <td data-tip="Hver node besøkes én gang, O(1) arbeid per node.">O(n)</td>
               <td data-tip="Formen spiller ingen rolle for antall besøk.">O(n)</td></tr>
             <tr><td>Høyde, diameter, CheckBST</td>
-              <td data-tip="Høyde og diameter må se på alle noder. CheckBST er O(1) i beste fall (feil i roten), men O(n) for et gyldig søketre.">O(n)</td>
+              <td data-tip="Høyde og diameter må se på alle noder: O(n). CheckBST kan stoppe tidlig: finner den et brudd helt i starten av gjennomgangen, er den O(1). For et gyldig søketre må den se på alle nodene.">O(n), CheckBST O(1) ved tidlig brudd</td>
               <td data-tip="Én gjennomgang med O(1) arbeid per node.">O(n)</td>
               <td data-tip="Uavhengig av formen.">O(n)</td></tr>
             <tr><td>Laveste felles forfeder</td>
@@ -288,7 +289,7 @@
       </div>
 
       <h3 id="iter-demo">Steg for steg med egen stakk</h3>
-      <p class="muted small">Treet til venstre, stakken til høyre. Stiplet gul ring: noden ligger på stakken. Blå ring: markøren v (inorder) eller stakken R (postorder). Grønn: besøkt.</p>
+      <p class="muted small">Treet til venstre, stakken til høyre. Stiplet gul ring: noden ligger på stakken. Blå, tonet ring: markøren v (inorder) eller stakken R (postorder). Grønn: besøkt.</p>
       <div class="tv-switch" role="group" aria-label="Velg iterativ traversering" data-switch="iter" id="iter-switch">
         <button class="btn sm" type="button" data-sub="pre" aria-pressed="true">Preorder</button>
         <button class="btn sm" type="button" data-sub="in" aria-pressed="false">Inorder</button>
@@ -400,7 +401,7 @@
       <div class="grid cols-2">
         <div><h4 style="margin:.2rem 0 .4rem">Pseudokode</h4><div id="pc-check"></div></div>
         <div><h4 style="margin:.2rem 0 .4rem">Moteksempelet</h4><div class="tv-mini" id="mini-check"></div>
-          <p class="muted small">Hver forelder–barn-sjekk er grei (2 &lt; 5 og 7 &gt; 2), men 7 ligger i venstre subtre til 5. Grensene (−∞, 5) for venstre subtre fanger det.</p></div>
+          <p class="muted small">Hver forelder–barn-sjekk er grei (2 &lt; 5 og 9 &gt; 2), men 9 ligger i venstre subtre til 5. Grensene (−∞, 5) for venstre subtre fanger det. Det er samme feil som i moteksempelet til H2022-oppgaven.</p></div>
       </div>
       <details class="card"><summary><b>Koden, linje for linje</b> (CheckBST)</summary><div id="exp-check"></div></details>
 
@@ -700,8 +701,9 @@
        vizTree – MIDLERTIDIG sidelokal trevisualisering (SVG).
        Foreslått slått sammen med heap-modulens vizHeap til felles
        assets/js/viz-tree.js (se plan/foresporsler-traer.md).
-       step: { tree | forest, marks:{cur,alt,found,fresh,rot[],warn[],done[],path[],queued[],sub[]},
+       step: { tree | forest, marks:{cur,alt,found,fresh,rot[],warn[],del[],done[],path[],queued[],sub[]},
                lab:{id:tekst}, sup:{id:tekst}, edges:[[a,b]], bits, info:[{label,items,kind}], counter }
+       info.kind: "queue" | "stack" (brikker) | "frames" (kallstakk med rammer {name, note, ret}, bunn → topp)
        opts: { onNode(id), ariaLabel }
        ===================================================================== */
     var R = 16, DX = 44, PADX = 24;
@@ -759,6 +761,7 @@
         if (inA(m.sub, v.id)) c += " is-sub";
         if (inA(m.path, v.id)) c += " is-path";
         if (inA(m.alt, v.id)) c += " is-alt";
+        if (inA(m.del, v.id)) c += " is-del";
         if (m.cur === v.id) c += " is-cur";
         if (m.fresh === v.id) c += " is-fresh";
         if (m.found === v.id) c += " is-found";
@@ -775,7 +778,23 @@
       return out + "</svg>";
     }
     function ariaOf(L) { return L.nodes.length ? "Tre med " + L.nodes.length + " noder" : "Tomt tre"; }
+    // Kallstakk som rammer (som n!-demoen i 00-begreper): items er bunn → topp, toppen tegnes øverst.
+    function framesRow(row) {
+      var items = row.items || [], stack = el("div", { class: "callstack tv-frames" });
+      items.forEach(function (f, i) {
+        var top = i === items.length - 1;
+        stack.appendChild(el("div", { class: "frame" + (f.ret ? " ret" : "") + (top ? " top" : ""),
+          html: '<span class="mono cs-name">' + esc(f.name) + '</span><span class="cs-body small">' + esc(f.note || "") + "</span>" }));
+      });
+      if (!items.length) stack.appendChild(el("div", { class: "tv-none small", text: "(tom – ingen kall er i gang)" }));
+      return el("div", { class: "cs-wrap tv-cs", role: "group", "aria-label": row.label + ", " + items.length + " rammer" }, [
+        el("div", { class: "tv-cs-head small" }, [el("b", { text: row.label }), el("span", { class: "muted", text: " · ↑ toppen: kallet som jobber nå" })]),
+        stack,
+        el("div", { class: "cs-end muted small", text: "bunnen: første kall" })
+      ]);
+    }
     function infoRow(row) {
+      if (row.kind === "frames") return framesRow(row);
       var d = el("div", { class: "tv-info" });
       d.appendChild(el("span", { class: "lbl", text: row.label + ":" }));
       if (!row.items || !row.items.length) d.appendChild(el("span", { class: "tv-none", text: row.kind === "queue" ? "tom kø" : row.kind === "stack" ? "tom" : "ingen ennå" }));
@@ -831,6 +850,16 @@
     IN.vizTree = IN.vizTree || vizTree;   // midlertidig; overskriver ikke en felles komponent
 
     /* ---------- Fellesoppsett for demoer ---------- */
+    var PATHC = "color-mix(in srgb, var(--c-target) 22%, transparent);border:3px solid var(--c-target)";
+    var ALTC = "transparent;border:3px dashed var(--color-on-surface)";
+    var DELC = "color-mix(in srgb, var(--c-swap) 25%, transparent);border:3px dashed var(--c-swap)";
+    var LEG_TRAV = [{ cls: "compare", label: "Kallet som jobber nå (v)" }, { color: PATHC, label: "Har en ramme på kallstakken" }, { cls: "sorted", label: "Besøkt" }];
+    var LEG_SOK = [{ cls: "compare", label: "Gjeldende node" }, { color: PATHC, label: "Sti fra roten" }, { cls: "target", label: "Funnet" }, { cls: "min", label: "Ny node" }];
+    var LEG_REM = [{ cls: "compare", label: "Gjeldende node" }, { color: PATHC, label: "Sti / kall i gang" }, { color: DELC, label: "Fjernes" }, { cls: "target", label: "Etterfølger / erstatter" }];
+    var LEG_LCA = [{ cls: "compare", label: "u (klatrer)" }, { color: ALTC, label: "v (den andre noden)" }, { color: PATHC, label: "Sti de har klatret" }, { cls: "target", label: "LCA (svaret)" }];
+    var LEG_LCABST = [{ cls: "compare", label: "Gjeldende node" }, { color: ALTC, label: "Søker etter (x, y)" }, { color: PATHC, label: "Sti" }, { cls: "target", label: "LCA (svaret)" }];
+    var LEG_AVL = [{ cls: "compare", label: "Gjeldende node" }, { color: PATHC, label: "Sti / kall i gang" }, { cls: "min", label: "Ny node" }, { cls: "swap", label: "Roteres / ubalansert" }, { cls: "sorted", label: "Ferdig" }];
+    var LEG_DIAM = [{ cls: "compare", label: "Kallet som regner nå" }, { color: PATHC, label: "Har en ramme på kallstakken" }, { color: "var(--c-swap)", label: "Lengste sti så langt (kanter)" }, { cls: "sorted", label: "Ferdig (h, d)" }, { cls: "target", label: "Roten (svaret)" }];
     var LEGEND = [
       { cls: "compare", label: "Gjeldende node" },
       { cls: "target", label: "Funnet / mål" },
@@ -973,9 +1002,9 @@
     ), { label: "Nivå:" });
     // Et array av tall bygges som et BST (norm() i data-traer.js); {tree} gir et fast tre.
     var TRAV_P = { "Kurstreet": KURS, "BST 50…80": BST7.slice(), "Ujevnt BST": [4, 2, 6, 1, 3, 5] };
-    mountDemo("#demo-pre", { algo: "preorder", presets: TRAV_P, inputLabel: "tall → BST, f.eks. 5,3,8,1" });
-    mountDemo("#demo-in", { algo: "inorder", presets: TRAV_P, inputLabel: "tall → BST, f.eks. 5,3,8,1" });
-    mountDemo("#demo-post", { algo: "postorder", presets: TRAV_P, inputLabel: "tall → BST, f.eks. 5,3,8,1" });
+    mountDemo("#demo-pre", { algo: "preorder", presets: TRAV_P, legend: LEG_TRAV, inputLabel: "tall → BST, f.eks. 5,3,8,1" });
+    mountDemo("#demo-in", { algo: "inorder", presets: TRAV_P, legend: LEG_TRAV, inputLabel: "tall → BST, f.eks. 5,3,8,1" });
+    mountDemo("#demo-post", { algo: "postorder", presets: TRAV_P, legend: LEG_TRAV, inputLabel: "tall → BST, f.eks. 5,3,8,1" });
     mountDemo("#demo-level", { algo: "levelOrder", presets: TRAV_P, inputLabel: "tall → BST, f.eks. 5,3,8,1" });
     IN.pseudo.parsons("#parsons-level", A.levelOrder);
 
@@ -988,6 +1017,7 @@
       if (col.out != null) box.appendChild(el("div", { class: "itv-out", text: "↑ " + col.out, title: "Nettopp tatt av", "aria-label": "Nettopp tatt av: " + col.out }));
       var cells = el("div", { class: "itv-cells", role: "list",
         "aria-label": col.label + (items.length ? ", " + items.length + " elementer, øverst først" : ", tom") });
+      if (items.length) box.appendChild(el("div", { class: "itv-end", text: "↑ topp", "aria-hidden": "true" }));
       if (!items.length) cells.appendChild(el("div", { class: "itv-empty", text: "(tom)" }));
       for (var i = items.length - 1; i >= 0; i--) {
         var it = items[i], c = el("div", { class: "itv-cell" + (i === items.length - 1 ? " top" : ""), role: "listitem" });
@@ -996,6 +1026,7 @@
         cells.appendChild(c);
       }
       box.appendChild(cells);
+      if (items.length) box.appendChild(el("div", { class: "itv-end", text: "bunn", "aria-hidden": "true" }));
       return box;
     }
     function renderIter(stage, s) {
@@ -1013,7 +1044,7 @@
       IN.clear(stage); stage.appendChild(wrap);
       vizTree(treeHost, { tree: s.tree, marks: s.marks }, { ariaLabel: "Treet som traverseres" });
     }
-    var RING = "transparent;border:2px dashed var(--c-compare)", BLUERING = "transparent;border:2px solid var(--c-target)";
+    var RING = "transparent;border:2px dashed var(--c-compare)", BLUERING = PATHC;
     function mountIter(host, cfg) {
       if (typeof host === "string") host = qs(host);
       var algo = A[cfg.algo];
@@ -1089,12 +1120,12 @@
       "Søk, innsetting og fjerning følger én sti fra roten, så de koster O(h). Hvor god h er, avhenger av rekkefølgen tallene ble satt inn i.",
       "Søketre-egenskapen er en invariant: inorder gir sortert rekkefølge. Alle tre operasjonene er O(h), med h mellom ⌊log n⌋ og n − 1. Vanlige BST-er gir ingen garanti for h. Det er AVL-treets jobb."
     ), { label: "Nivå:" });
-    mountDemo("#demo-bstins", { algo: "bstInsert", inputLabel: "f.eks. 50,30,70,20",
+    mountDemo("#demo-bstins", { algo: "bstInsert", legend: LEG_SOK, inputLabel: "f.eks. 50,30,70,20",
       presets: { "Balansert": BST7.slice(), "Sortert (kjede)": [10, 20, 30, 40, 50], "Med duplikat": [8, 3, 10, 3, 6] } });
-    mountDemo("#demo-bstsearch", { algo: "bstSearch", parseInput: parseKeysX, inputLabel: "nøkler / x, f.eks. 50,30,70 / 30",
+    mountDemo("#demo-bstsearch", { algo: "bstSearch", legend: LEG_SOK, parseInput: parseKeysX, inputLabel: "nøkler / x, f.eks. 50,30,70 / 30",
       presets: { "Finn 60": [{ keys: BST7.slice(), x: 60 }], "Finn 40": [{ keys: BST7.slice(), x: 40 }], "Finnes ikke (65)": [{ keys: BST7.slice(), x: 65 }] } });
     var REM = [50, 30, 70, 20, 40, 60, 80, 35];
-    mountDemo("#demo-bstrem", { algo: "bstRemove", parseInput: parseKeysX, inputLabel: "nøkler / x, f.eks. 50,30,70 / 30",
+    mountDemo("#demo-bstrem", { algo: "bstRemove", legend: LEG_REM, parseInput: parseKeysX, inputLabel: "nøkler / x, f.eks. 50,30,70 / 30",
       presets: { "Løvnode (20)": [{ keys: REM.slice(), x: 20 }], "Ett barn (40)": [{ keys: REM.slice(), x: 40 }],
                  "To barn (30)": [{ keys: REM.slice(), x: 30 }], "Roten (50)": [{ keys: REM.slice(), x: 50 }] } });
     pcBlock("#pc-findmin", "#exp-findmin", "findMin");
@@ -1129,7 +1160,7 @@
       "Begge løsningene er O(n). Grensemetoden bruker O(h) stakk. Inorder-metoden kan også gjøres med O(h) minne ved å bare huske forrige verdi, i stedet for å lagre hele lista."
     ), { label: "Nivå:" });
     pcBlock("#pc-check", "#exp-check", "checkBST");
-    staticTree("#mini-check", { tree: TR.fromNested([5, [2, null, [7]], [8]]), marks: { warn: ["7"], cur: "5" } }, { ariaLabel: "Binærtre som ikke er et søketre" });
+    staticTree("#mini-check", { tree: TR.fromNested([5, [2, null, [9]], [8]]), marks: { warn: ["9"], cur: "5" } }, { ariaLabel: "Binærtre som ikke er et søketre" });
     pcBlock("#pc-range", "#exp-range", "inRange");
 
     /* ===================== DIAMETER ===================== */
@@ -1138,7 +1169,7 @@
       "For hver node v er den lengste stien som går gjennom v lik hL + hR + 2. Diameteren er den største av disse over alle noder. Regn ut høyde og diameter i samme rekursjon, så blir det O(n).",
       "Returner paret (h, d) nedenfra og opp. Med høyde(null) = −1 stemmer formlene for alle antall barn. Kjøretiden er O(n) og stakken O(h)."
     ), { label: "Nivå:" });
-    mountDemo("#demo-diameter", { algo: "treDiameter", inputLabel: "tall → BST, f.eks. 5,3,8,1",
+    mountDemo("#demo-diameter", { algo: "treDiameter", legend: LEG_DIAM, inputLabel: "tall → BST, f.eks. 5,3,8,1",
       presets: {
         "Gjennom roten": [{ tree: ["r", ["a", ["c"], ["d"]], ["b", null, ["e"]]] }],
         "Ikke gjennom roten": [{ tree: ["r", ["a", ["b", ["d"]], ["c", null, ["e"]]]] }],
@@ -1158,10 +1189,10 @@
       "Generelt tre: løft den dypeste noden ett nivå om gangen til de to møtes. Søketre: start i roten og gå mot x og y så lenge begge ligger på samme side.",
       "Begge løsningene er O(h). Den generelle bruker parent- og depth-pekere. Søketre-versjonen bruker ordningen og stopper i splittpunktet x ≤ v.element ≤ y."
     ), { label: "Nivå:" });
-    mountDemo("#demo-lca", { algo: "lca", inputLabel: "to noder, f.eks. g, j",
+    mountDemo("#demo-lca", { algo: "lca", legend: LEG_LCA, inputLabel: "to noder, f.eks. g, j",
       parseInput: function (s) { var p = s.split(/[\s,;]+/).filter(Boolean); return p.length >= 2 ? [{ u: p[0], v: p[1] }] : []; },
       presets: { "g og j": [{ u: "g", v: "j" }], "f og j": [{ u: "f", v: "j" }], "h og j (forfeder)": [{ u: "h", v: "j" }], "c og d": [{ u: "c", v: "d" }] } });
-    mountDemo("#demo-lcabst", { algo: "lcaBST", parseInput: parseKeysX, inputLabel: "nøkler / x, y, f.eks. 50,30,70 / 30, 70",
+    mountDemo("#demo-lcabst", { algo: "lcaBST", legend: LEG_LCABST, parseInput: parseKeysX, inputLabel: "nøkler / x, y, f.eks. 50,30,70 / 30, 70",
       presets: { "20 og 40": [{ keys: BST7.slice(), x: 20, y: 40 }], "60 og 80": [{ keys: BST7.slice(), x: 60, y: 80 }],
                  "30 og 40 (forfeder)": [{ keys: BST7.slice(), x: 30, y: 40 }], "20 og 80": [{ keys: BST7.slice(), x: 20, y: 80 }] } });
     IN.quiz("#quiz-lca", [
@@ -1200,7 +1231,7 @@
       bar.appendChild(bL); bar.appendChild(bR);
       paint("Start: z har høyre barn y. A, B og C er hele subtrær (blå). Trykk for å rotere.");
     })();
-    mountDemo("#demo-avl", { algo: "avlInsert", gen: "avlInsert", inputLabel: "f.eks. 10,20,30",
+    mountDemo("#demo-avl", { algo: "avlInsert", gen: "avlInsert", legend: LEG_AVL, inputLabel: "f.eks. 10,20,30",
       presets: {
         "H2020: kjede + 5": [{ base: [1, 2, 3, 4], keys: [5] }],
         "H2022: 2,4,3,1,5": [2, 4, 3, 1, 5],
@@ -1227,7 +1258,7 @@
       "InsertAntiAVL er vanlig BST-innsetting, men på veien tilbake opp sjekker vi om noden har fått et venstre barn. Har den det, gjør vi en høyrerotasjon. Resultatet er alltid en sortert høyrekjede.",
       "Rotasjonen bevarer søketre-egenskapen, og invarianten «ingen venstre barn» gir høyst én rotasjon per innsetting. Høyden er n − 1, så innsetting er O(n) i verste fall."
     ), { label: "Nivå:" });
-    mountDemo("#demo-antiavl", { algo: "insertAntiAVL", inputLabel: "f.eks. 3,1,4,2,5",
+    mountDemo("#demo-antiavl", { algo: "insertAntiAVL", legend: LEG_AVL, inputLabel: "f.eks. 3,1,4,2,5",
       presets: { "H2025: 3,1,4,2,5": [3, 1, 4, 2, 5], "Stigende 1–5": [1, 2, 3, 4, 5], "Synkende 5–1": [5, 4, 3, 2, 1] } });
 
     /* ===================== HUFFMAN ===================== */
@@ -1242,7 +1273,7 @@
       return out.length >= 2 ? [{ pairs: out.slice(0, 10) }] : [];
     }
     mountDemo("#demo-huffman", { algo: "huffman", parseInput: parsePairs, inputLabel: "f.eks. A1 B3 C7 D2",
-      legend: [{ cls: "compare", label: "v1 (minst)" }, { cls: "target", label: "v2 (nest minst)" }, { cls: "min", label: "Ny intern node" }, { cls: "sorted", label: "Ferdig tre" }],
+      legend: [{ cls: "compare", label: "v1 (minst)" }, { color: ALTC, label: "v2 (nest minst)" }, { cls: "min", label: "Ny intern node" }, { cls: "sorted", label: "Ferdig tre" }],
       presets: { "H2024: A1 B3 C7 D2": [{ pairs: [["A", 1], ["B", 3], ["C", 7], ["D", 2]] }],
                  "H2021: a2 b1 c12 d1 e4": [{ pairs: [["a", 2], ["b", 1], ["c", 12], ["d", 1], ["e", 4]] }],
                  "Like frekvenser": [{ pairs: [["w", 1], ["x", 1], ["y", 1], ["z", 1]] }] } });

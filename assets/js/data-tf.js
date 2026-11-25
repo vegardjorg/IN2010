@@ -241,7 +241,7 @@
     {
       "s": "Insertion sort er O(n²) i verste tilfelle, for eksempel når arrayet er sortert baklengs.",
       "answer": true,
-      "explain": "Da må hvert nytt element flyttes helt fremst, så antall bytter blir 1 + 2 + … + (n − 1).",
+      "explain": "Da må hvert nytt element flyttes helt fremst, så antall forskyvninger blir 1 + 2 + … + (n − 1).",
       "tema": "Insertion sort",
       "kilde": false
     },

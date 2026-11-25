@@ -277,7 +277,10 @@
         bunker sammen: se på de to øverste prøvene, ta den med lavest poengsum, og gjør det igjen og igjen.</div>
       <div class="grid cols-2">
         <div><div id="tracer-merge"></div></div>
-        <div><h4 style="margin:.2rem 0 .4rem">Hovedprosedyre</h4><div id="pc-merge"></div></div>
+        <div class="pc-stack">
+          <h4 style="margin:.2rem 0 .4rem">MergeSort (følger demoen)</h4><div id="pc-merge"></div>
+          <h4>Merge (flettingen)</h4><div id="pc-merge2"></div>
+        </div>
       </div>
       <div class="callout eksempel"><span class="lbl">Flettingen (Merge) er nøkkelen</span>
         Demoen viser hvordan de to sorterte halvdelene flettes tilbake i arrayet. Tar vi fra venstre ved
@@ -305,7 +308,10 @@
         hver gruppe, helt til hver gruppe har høyst én elev.</div>
       <div class="grid cols-2">
         <div><div id="tracer-quick"></div></div>
-        <div><h4 style="margin:.2rem 0 .4rem">Partition (følger demoen)</h4><div id="pc-quick"></div></div>
+        <div class="pc-stack">
+          <h4 style="margin:.2rem 0 .4rem">Quicksort (følger demoen)</h4><div id="pc-quick"></div>
+          <h4>Partition</h4><div id="pc-quick2"></div>
+        </div>
       </div>
       <div class="callout eksempel"><span class="lbl">Partisjonering (lilla = pivot)</span>
         Pivoten (lilla) parkeres bakerst. <b>left</b> leter fra venstre etter et tall som er større enn
@@ -433,8 +439,9 @@
       </div>
 
       <div class="callout eksempel"><span class="lbl">Selection sorts smartere tvilling</span>
-        Begge gjør det samme: finn det største elementet i den usorterte delen og flytt det på plass.
-        Forskjellen er <b>datastrukturen</b>:
+        Begge plukker ut ett ekstremt element fra den usorterte delen per runde og setter det på plass for godt.
+        Selection sort (slik demoen over viser den) henter det <b>minste</b> og bygger sortert del forfra; heapsort
+        henter det <b>største</b> og bygger sortert hale bakfra. Den virkelige forskjellen er <b>datastrukturen</b>:
         <ul>
           <li><b>Selection sort</b> leter gjennom hele resten hver gang: O(n) per runde, O(n²) totalt.</li>
           <li><b>Heapsort</b> holder resten som en max-heap, så det største ligger klart i roten, og
@@ -467,7 +474,7 @@
     <section data-panel="test">
       <h3>Sant eller usant – sortering</h3>
       <p class="muted small">Prøv deg selv på påstander i eksamensstil. Svar Sant/Usant, trykk
-        <b>Sjekk svar</b> for antall riktige, og bruk <b>Fasit</b>/<b>Forklar</b> på hver påstand når du
+        <b>Sjekk svar</b> for antall riktige, og åpne <b>Forklaring</b> under en påstand når du
         vil se mer. Svarene huskes i nettleseren din.</p>
       <h3 id="eksamen-test" class="exam-anchor" style="margin-top:1rem">Eksamen H2021 · Oppgave 3 <span class="tag">10p</span></h3>
       <p class="muted small">A er et array med n elementer, og 0 ≤ i &lt; n. «Runde» betyr én iterasjon av den
@@ -511,12 +518,49 @@
     // Forklaringer i sammenligningstabellen (hover på desktop, trykk på mobil)
     IN.tips(IN.qs(".cmp-table"));
 
-    var LEGEND = [
-      { cls: "compare", label: "sammenlignes / aktivt område" },
-      { cls: "swap", label: "bytte / skrives" },
-      { cls: "min", label: "minste / pivot" },
-      { cls: "sorted", label: "ferdig på plass" }
-    ];
+    // Fargeforklaring per algoritme: bare fargene demoen faktisk bruker
+    var SW_PART = "repeating-linear-gradient(135deg, var(--c-sorted) 0 4px, color-mix(in srgb, var(--c-sorted) 35%, var(--color-surface)) 4px 8px)";
+    var SW_STALE = "repeating-linear-gradient(90deg, var(--c-default) 0 3px, transparent 3px 6px)";
+    var LEGENDS = {
+      selection: [
+        { cls: "target", label: "plass i som fylles" },
+        { cls: "min", label: "k: minste så langt" },
+        { cls: "compare", label: "j: sammenlignes" },
+        { cls: "swap", label: "byttet" },
+        { cls: "sorted", label: "ferdig på plass" }
+      ],
+      bubble: [
+        { cls: "compare", label: "naboparet som sammenlignes" },
+        { cls: "swap", label: "byttet" },
+        { cls: "sorted", label: "ferdig på plass" }
+      ],
+      insertion: [
+        { cls: "compare", label: "sammenlignes med key" },
+        { cls: "target", label: "skrives hit" },
+        { cls: "stale", label: "ledig plass", color: SW_STALE },
+        { cls: "part", label: "sortert seg imellom", color: SW_PART },
+        { cls: "sorted", label: "ferdig (til slutt)" }
+      ],
+      gnome: [
+        { cls: "compare", label: "naboparet som sammenlignes" },
+        { cls: "swap", label: "byttet" },
+        { cls: "part", label: "sortert seg imellom", color: SW_PART },
+        { cls: "sorted", label: "ferdig (til slutt)" }
+      ],
+      merge: [
+        { cls: "compare", label: "L[i] og R[j] sammenlignes" },
+        { cls: "target", label: "skrives nå (A[k])" },
+        { cls: "stale", label: "ledig: kopiert til L og R", color: SW_STALE },
+        { cls: "part", label: "delsortert", color: SW_PART },
+        { cls: "sorted", label: "ferdig sortert" }
+      ],
+      quick: [
+        { cls: "min", label: "pivot" },
+        { cls: "compare", label: "left / right ser på" },
+        { cls: "swap", label: "byttes" },
+        { cls: "sorted", label: "pivot på endelig plass" }
+      ]
+    };
 
     var INTRO = {
       selection: {
@@ -581,24 +625,25 @@
       { id: "bubble",    key: "bubbleSort",    sync: true },
       { id: "insertion", key: "insertionSort", sync: true },
       { id: "gnome",     key: "gnomeSort",     sync: true },
-      { id: "merge",     key: "mergeSort",     sync: false },
-      { id: "quick",     key: "quickSort",     sync: true, pcKey: "partition" }
+      { id: "merge",     key: "mergeSort",     sync: true, subKey: "merge" },
+      { id: "quick",     key: "quickSort",     sync: true, subKey: "partition" }
     ];
 
     ALGOS.forEach(function (cfg) {
       var algo = IN.algos[cfg.key];
       if (INTRO[cfg.id]) IN.explain("#intro-" + cfg.id, INTRO[cfg.id], { label: "Nivå:" });
 
-      // Pseudokode ved siden av demoen (synk for alle unntatt merge)
-      // (quick viser Partition, som er der demoen bruker mest tid; kjøretidskortet er fortsatt Quicksort sitt)
-      var pcHandle = IN.pseudo.render("#pc-" + cfg.id, cfg.pcKey ? IN.algos[cfg.pcKey] : algo, {});
+      // Pseudokode ved siden av demoen, synket med stegene. Merge og quick viser hovedprosedyren og
+      // delprosedyren (Merge / Partition) som én gruppe: linjekode 100·blokk + linje (se IN.pseudoGroup).
+      var pcHandle = IN.pseudo.render("#pc-" + cfg.id, algo, {});
+      if (cfg.subKey) pcHandle = IN.pseudoGroup([pcHandle, IN.pseudo.render("#pc-" + cfg.id + "2", IN.algos[cfg.subKey], {})]);
 
       IN.stepPlayer("#tracer-" + cfg.id, {
         generate: IN.gen[cfg.key],
         presets: P[cfg.id],
         render: function (s, ctx) { IN.vizBars(ctx.stage, s); },
         pseudo: cfg.sync ? pcHandle : null,
-        legend: LEGEND,
+        legend: LEGENDS[cfg.id],
         countControl: { min: 3, max: 9 }
       });
 
@@ -754,8 +799,8 @@
         explain: "Ja – ved å ta fra venstre halvdel når elementene er like (≤), bevares opprinnelig rekkefølge.", blokk: "1" },
       { s: "Tidlig stopp med et «swapped»-flagg gir bubble sort O(n) i beste tilfelle.", answer: true,
         explain: "Er arrayet alt sortert, går bubble én runde uten bytte og stopper → O(n). Trikset virker ikke for selection/insertion.", blokk: "1" },
-      { s: "Et sortert array er alltid en gyldig min-heap.", answer: true,
-        explain: "I et sortert array er A[i] ≤ begge barna (indeks 2i+1, 2i+2), så min-heap-egenskapen holder. (Det motsatte gjelder ikke.)", blokk: "1" },
+      { s: "Et stigende sortert array er alltid en gyldig min-heap.", answer: true,
+        explain: "I et stigende sortert array er A[i] ≤ begge barna (indeks 2i+1, 2i+2), så min-heap-egenskapen holder. (Det motsatte gjelder ikke.)", blokk: "1" },
       { s: "Heapsort er stabil.", answer: false,
         explain: "Heapsort er ustabil: bytter over lang avstand (rot ↔ siste) kan endre rekkefølgen mellom like elementer.", blokk: "1" },
       { s: "Merge sort har kjøretid O(n log n).", answer: true,
@@ -899,8 +944,8 @@
         explain: "Den bytter A[i] med det minste elementet, som kan ligge hvor som helst lenger bak – et langt hopp." },
       { s: "Selection sort gjør så få bytter som mulig.", answer: true,
         explain: "Høyst ett bytte per runde, altså høyst n − 1 bytter. Det er fasiten på denne eksamenen." },
-      { s: "Insertion sort: etter i runder står de i første elementene ferdig sortert.", answer: true,
-        explain: "Insertion holder starten av arrayet sortert og utvider den med ett element per runde. (De er sortert seg imellom, men et senere, mindre element kan fortsatt skyves inn foran dem.)" },
+      { s: "Insertion sort: etter i runder av den ytre løkka er de i første elementene sortert.", answer: true,
+        explain: "Sant (fasiten på H2021). Den ytre løkka starter på i = 1, så etter i runder er faktisk de i + 1 første sortert – og da er de i første det også. Men de er bare sortert <i>seg imellom</i>, ikke på endelig plass: et senere, mindre element kan fortsatt skyves inn foran dem." },
       { s: "Insertion sort: etter i runder står de i siste elementene ferdig sortert.", answer: false,
         explain: "Bakerst har insertion ikke rørt noe ennå." },
       { s: "Insertion sort bytter bare naboelementer.", answer: true,

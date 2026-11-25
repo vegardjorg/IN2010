@@ -120,7 +120,7 @@
 
       <h3>Stabil vs. ustabil – samme nøkkel, ulik farge</h3>
       <p class="muted small">Vi sorterer på <b>tallet</b>. Bokstaven viser opprinnelig rekkefølge blant like tall.
-        En stabil sortering holder A før B når begge er «2».</p>
+        En stabil sortering holder C før D når begge er «2».</p>
       <div class="grid cols-2">
         <div class="card"><h4 style="margin-top:.2rem">Før</h4><div id="st-before" class="chips"></div></div>
         <div class="card">
@@ -215,7 +215,7 @@
       <p class="muted small">Disse påstandene har aldri stått på eksamen. De er laget ut fra hva eksamenene og
         sensorveiledningene H2020–H2025 tester igjen og igjen, så du kan sjekke at du kan det sensor ser etter.
         De oftest testede står først.</p>
-      <p class="muted small">Svar Sant/Usant, trykk <b>Sjekk svar</b>, og bruk <b>Fasit</b>/<b>Forklar</b> på hver påstand. Svarene huskes i nettleseren din.</p>
+      <p class="muted small">Svar Sant/Usant, trykk <b>Sjekk svar</b>, og åpne <b>Forklaring</b> under hver påstand. Svarene huskes i nettleseren din.</p>
       <div data-tf-gen="begreper"></div>
     </section>
   </main>
@@ -242,7 +242,7 @@
     IN.explain("#ex-bigo", {
       eli5: "<p>Big-O svarer på: «Når det blir dobbelt så mange ting, hvor mye mer jobb blir det?» O(n) betyr dobbelt så mye jobb. O(n²) betyr fire ganger så mye. 2ⁿ betyr … mye verre!</p>",
       normal: "<p>Big-O beskriver veksttakten til kjøretiden når n vokser, uten konstanter og lavordensledd – vi skriver f.eks. O(n) eller O(n²) etter hvor raskt arbeidet vokser. Legg merke til at dette er noe annet enn beste/verste/snitt-tilfelle: tilfellet velger <i>hvilken</i> situasjon vi analyserer, mens Big-O sier hvor fort kjøretiden vokser der. Derfor kan vi gi én kjøretid for beste tilfelle (ofte O(n)) og en annen for verste (ofte O(n²)).</p>",
-      teknisk: "<p>Formelt: f(n) = O(g(n)) betyr at f til slutt holder seg under g bortsett fra en konstant faktor – det finnes konstanter c &gt; 0 og n₀ slik at f(n) ≤ c·g(n) for alle n ≥ n₀. Grunnen til at vi dropper konstanter og lavordensledd er at for store n er det det dominerende leddet som avgjør: en O(n²)-algoritme taper for en O(n log n)-algoritme uansett hvor god konstanten er. Og husk at veksttakt (Big-O) og tilfelle (beste/verste/snitt) er to uavhengige valg – vi kan gi en Big-O for hvilket som helst tilfelle.</p>"
+      teknisk: "<p>Formelt: f(n) = O(g(n)) betyr at f til slutt holder seg under g bortsett fra en konstant faktor – det finnes konstanter c &gt; 0 og n₀ slik at f(n) ≤ c·g(n) for alle n ≥ n₀. I praksis: fra en viss størrelse n₀ og oppover er f aldri mer enn et fast antall ganger (c) g – hva som skjer for små input, og hvor stor den faste faktoren er, teller ikke. Grunnen til at vi dropper konstanter og lavordensledd er at for store n er det det dominerende leddet som avgjør: en O(n²)-algoritme taper for en O(n log n)-algoritme uansett hvor god konstanten er. Og husk at veksttakt (Big-O) og tilfelle (beste/verste/snitt) er to uavhengige valg – vi kan gi en Big-O for hvilket som helst tilfelle.</p>"
     }, { label: "Nivå:" });
 
     IN.explain("#ex-stabil", {
@@ -259,7 +259,7 @@
 
     IN.explain("#ex-rekursjon", {
       eli5: "<p>Når du har kommet inn til den minste dukken, er du ikke ferdig: nå setter du dukkene sammen igjen. Den siste du åpnet, lukker du først. Datamaskinen gjør det samme med kallene. Hvert kall venter på at kallet inni blir ferdig, og så blir det selv ferdig. Det er det du ser i demoen under: kallene stables opp, og så «foldes» de tilbake ett og ett.</p>",
-      normal: "<p>En rekursiv funksjon løser et problem ved å kalle seg selv på en mindre del, og kombinere svarene. Den må ha et basistilfelle for å stoppe.</p>",
+      normal: "<p>En rekursiv funksjon løser et problem ved å kalle seg selv på en mindre del, og kombinere svarene. Den må ha et basistilfelle for å stoppe. Hvert kall legges på <b>kallstakken</b> og venter der til kallet over det har svart; da regner det seg ferdig og fjernes fra toppen.</p>",
       teknisk: "<p>Hvert kall løser en mindre utgave av samme problem og har sine egne lokale variabler. For å finne kjøretiden teller vi kall og arbeid per kall: fakultet gjør n kall med O(1) arbeid hver, altså O(n).</p>"
     }, { label: "Nivå:" });
 
@@ -278,9 +278,9 @@
     var slider = qs("#bo-n"), nval = qs("#bo-nval"), logc = qs("#bo-log"), host = qs("#bo-bars");
     var CLASSES = [
       { name: "1", f: function () { return 1; }, color: "var(--c-sorted)" },
-      { name: "log n", f: function (n) { return Math.max(1, Math.log2(n)); }, color: "var(--c-target)" },
+      { name: "log n", f: function (n) { return Math.log2(n); }, color: "var(--c-target)" },
       { name: "n", f: function (n) { return n; }, color: "var(--c-default)" },
-      { name: "n log n", f: function (n) { return n * Math.max(1, Math.log2(n)); }, color: "var(--c-compare)" },
+      { name: "n log n", f: function (n) { return n * Math.log2(n); }, color: "var(--c-compare)" },
       { name: "n²", f: function (n) { return n * n; }, color: "var(--c-min)" },
       { name: "2ⁿ", f: function (n) { return Math.pow(2, n); }, color: "var(--c-swap)" }
     ];
@@ -382,9 +382,10 @@
     /* Hver ramme husker sin egen n og hva den venter på. Uttrykket under stakken viser hele
        regnestykket: det vokser innover på vei ned (4 · (3 · (2 · 1))) og krymper på vei opp (4 · 6 → 24). */
     function genFact(input) {
-      var n = Array.isArray(input) ? (input[0] || 4) : input;
-      n = Math.max(1, Math.min(7, n));
-      var steps = [], stack = [];
+      var n = Array.isArray(input) ? (input.length ? input[0] : 4) : input;
+      n = +n; if (!isFinite(n)) n = 4;
+      n = Math.max(0, Math.min(7, Math.floor(n)));
+      var steps = [], stack = [], calls = Math.max(1, n);
       function t(a, b, c) { return { eli5: a, normal: b, teknisk: c }; }
       function copy() { return stack.map(function (f) { var o = {}; for (var k in f) o[k] = f[k]; return o; }); }
       // Uttrykket: rammene under toppen venter på «k · (…)», toppen bidrar med inner
@@ -396,14 +397,29 @@
       function snap(line, text, tag, inner, mark) {
         steps.push({ line: line, stack: copy(), text: text, tag: tag, expr: expr(mark ? "<mark>" + inner + "</mark>" : inner) });
       }
+      steps.push({ line: null, stack: [], start: true, n: n, tag: "Start", expr: "Fakultet(" + n + ")",
+        text: t("Vi skal regne ut " + n + "! («" + n + " fakultet»). Stakken med lapper er tom – ingen har begynt ennå.",
+          "Input: n = " + n + ". Vi kaller Fakultet(" + n + "); kallstakken er tom før første kall.",
+          "Kall Fakultet(" + n + ") med tom kallstakk. Hvert kall får sin egen ramme med sin egen n.") });
       (function down(k) {
-        stack.push({ n: k, phase: "ny" });
-        var top = stack[stack.length - 1], res;
+        stack.push({ n: k, phase: "test" });
+        var top = stack[stack.length - 1], res, alone = stack.length === 1;
+        snap(2, k <= 1
+          ? t("Fakultet(" + k + ") får en ny lapp øverst på stakken og sjekker: er " + k + " liten nok (1 eller mindre)? Ja!",
+              "Ny ramme for Fakultet(" + k + "). Linje 2: n = " + k + " ≤ 1 er sann, så vi går til linje 3.",
+              "Ramme n = " + k + " pushes. Testen n ≤ 1 er sann: basistilfellet.")
+          : t("Fakultet(" + k + ") får en ny lapp øverst på stakken og sjekker: er " + k + " liten nok (1 eller mindre)? Nei, så den må spørre et mindre kall.",
+              "Ny ramme for Fakultet(" + k + "). Linje 2: n = " + k + " ≤ 1 er usann, så vi hopper til linje 4.",
+              "Ramme n = " + k + " pushes. Testen n ≤ 1 er usann: rekursivt tilfelle."),
+          k <= 1 ? "Test: ja" : "Test: nei", "Fakultet(" + k + ")", false);
         if (k <= 1) {
           top.phase = "basis"; top.ret = 1;
-          snap(3, t("Fakultet(" + k + ") er den minste dukken: svaret er bare 1. Ingen nye kall. Nå kan alle som venter, regne seg ferdig – fra toppen og ned.",
-            "Basistilfellet: n = " + k + " ≤ 1, så kallet returnerer 1 uten å kalle videre. Nå snur vi.",
-            "Basis: n ≤ 1 ⇒ return 1. Ingen nye rammer; nå starter returfasen."), "Basis", "1", true);
+          snap(3, t(alone
+              ? (k === 0 ? "0! er 1 – slik er det bestemt. Fakultet(0) svarer 1 med en gang. Ingen andre kall venter, så vi er ferdige."
+                         : "Fakultet(1) er den minste dukken: svaret er bare 1. Ingen andre kall venter, så vi er ferdige.")
+              : "Fakultet(" + k + ") er den minste dukken: svaret er bare 1. Ingen nye kall. Nå kan alle som venter under, regne seg ferdig – fra toppen og ned.",
+            "Basistilfellet: n = " + k + " ≤ 1, så kallet returnerer 1 uten å kalle videre." + (alone ? (k === 0 ? " (0! = 1.)" : "") + " Ingen andre kall venter." : " Nå snur vi."),
+            "Basis: n ≤ 1 ⇒ return 1." + (alone ? " Det var eneste ramme, så stakken blir tom." : " Ingen nye rammer; nå starter returfasen.")), "Basis", "1", true);
           res = 1;
         } else {
           top.phase = "venter";
@@ -422,7 +438,8 @@
         return res;
       })(n);
       steps.push({ line: null, stack: [], text: t("Ferdig! " + n + "! = " + res0(n) + ". Alle lappene er brukt opp.",
-        "Ferdig: " + n + "! = " + res0(n) + ", og stakken er tom.", "Alle rammer er poppet; resultat " + res0(n) + ". " + n + " kall, O(1) arbeid hver: O(n)."),
+        "Ferdig: " + n + "! = " + res0(n) + ", og stakken er tom.",
+        "Alle rammer er poppet; resultat " + res0(n) + ". " + (calls === 1 ? "Ett kall med O(1) arbeid." : calls + " kall, O(1) arbeid hver: O(n).")),
         tag: "Ferdig", expr: "<mark>" + res0(n) + "</mark>", done: n, val: res0(n) });
       return steps;
     }
@@ -436,13 +453,15 @@
         // .callstack er column-reverse: første ramme (eldste) havner nederst, nyeste øverst
         step.stack.forEach(function (fr, i) {
           var isTop = i === step.stack.length - 1, right;
-          if (fr.phase === "basis") right = "n ≤ 1 → <b>1</b> <span class=\"cs-ret\">↩ 1</span>";
+          if (fr.phase === "test") right = "n = " + fr.n + ": er n ≤ 1?";
+          else if (fr.phase === "basis") right = "n ≤ 1 → <b>1</b> <span class=\"cs-ret\">↩ 1</span>";
           else if (fr.phase === "retur") right = fr.n + " · <b>" + fr.got + "</b> = <b>" + fr.ret + "</b> <span class=\"cs-ret\">↩ " + fr.ret + "</span>";
           else right = fr.n + " · <span class=\"cs-q\">?</span> <span class=\"muted small\">venter på Fakultet(" + (fr.n - 1) + ")</span>";
           wrap.appendChild(el("div", { class: "frame" + (fr.phase === "basis" || fr.phase === "retur" ? " ret" : "") + (isTop ? " top" : ""),
             html: '<span class="mono cs-name">Fakultet(' + fr.n + ')</span><span class="cs-body">' + right + "</span>" }));
         });
-        if (!step.stack.length) wrap.appendChild(el("div", { class: "frame ret top", html: '<span class="mono cs-name">' + step.done + "!</span><span class=\"cs-body\">= <b>" + step.val + "</b></span>" }));
+        if (!step.stack.length && step.start) wrap.appendChild(el("div", { class: "frame top", html: '<span class="cs-body muted">Tom stakk – Fakultet(' + step.n + ') kalles nå</span>' }));
+        else if (!step.stack.length) wrap.appendChild(el("div", { class: "frame ret top", html: '<span class="mono cs-name">' + step.done + "!</span><span class=\"cs-body\">= <b>" + step.val + "</b></span>" }));
         var col = el("div", { class: "cs-wrap" }, [
           el("div", { class: "cs-end muted small", text: "↑ toppen: kallet som jobber nå" }),
           wrap,
@@ -455,6 +474,7 @@
         ]));
       },
       pseudo: rkHandle,
+      inputLabel: "n fra 0 til 7, f.eks. 5",
       initial: [4]
     });
   })();

@@ -35,9 +35,16 @@
     if (text != null) e.textContent = text;
     return e;
   }
+  // Urettet graf: nøkkelen kan stå begge veier. Har begge retninger en tilstand, vinner den
+  // sterkeste, så kanten vi sjekker nå (hot) eller sykelkanten (back) aldri skjules av en trekant.
+  var RANK = { hot: 6, back: 5, cand: 4, tree: 3, done: 3, dim: 1 };
   function edgeState(map, u, v, directed) {
     if (!map) return null;
-    return map[u + ">" + v] || (!directed ? map[v + ">" + u] : null) || null;
+    var a = map[u + ">" + v] || null;
+    if (directed) return a;
+    var b = map[v + ">" + u] || null;
+    if (!a || !b) return a || b;
+    return (RANK[b] || 0) > (RANK[a] || 0) ? b : a;
   }
   function unit(dx, dy) { var l = Math.sqrt(dx * dx + dy * dy) || 1; return [dx / l, dy / l]; }
 

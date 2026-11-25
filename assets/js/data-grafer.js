@@ -167,7 +167,9 @@
         panel: [{ label: "Kø (front → bak):", items: Q.slice(), kind: "queue" }, { label: "visited:", items: vis.slice() }],
         note: "Tallet over en node er antall kanter fra " + s + ". BFS finner dem lag for lag." });
     }
-    snap(1, t("Vi starter i " + s + ".", "BFSVisit kalles med s = " + s + ".", "Kall BFSVisit(G, " + s + ", visited) med tom visited."), "Start");
+    snap(1, t("Vi starter i " + s + ". Naboene til en node ser vi alltid på i alfabetisk rekkefølge.",
+      "BFSVisit kalles med s = " + s + ". Naboene gås gjennom i alfabetisk rekkefølge.",
+      "Kall BFSVisit(G, " + s + ", visited) med tom visited. Naboene gås gjennom i alfabetisk rekkefølge; rekkefølgen avgjør hvilket BFS-tre vi får."), "Start");
     vis.push(s); inV[s] = 1; dist[s] = 0;
     snap(2, t(s + " får et kryss.", s + " merkes som besøkt.", "visited = {" + s + "}."), "Merk " + s);
     Q.push(s);
@@ -187,8 +189,12 @@
         }
       });
       done[u] = 1; hot = null; cur = null;
-      snap(4, t("Ferdig med naboene til " + u + ". Er det flere i køen?", "Alle naboene til " + u + " er sett på. Sjekk om køen er tom.",
-        u + " er ferdig behandlet. Løkkevilkåret sjekkes på nytt."), Q.length ? "Neste" : "Køen er tom");
+      if (Q.length) snap(4, t("Ferdig med naboene til " + u + ". Det står fortsatt noen i køen, så vi fortsetter.",
+          "Alle naboene til " + u + " er sett på. Køen er ikke tom, så løkka fortsetter.",
+          u + " er ferdig behandlet. Løkkevilkåret sjekkes på nytt: køen har " + Q.length + " node" + (Q.length > 1 ? "r" : "") + ", så vi går en runde til."), "Neste");
+      else snap(4, t("Ferdig med naboene til " + u + ". Nå står det ingen i køen.",
+          "Alle naboene til " + u + " er sett på. Køen er tom, så løkka stopper.",
+          u + " er ferdig behandlet. Løkkevilkåret sjekkes på nytt: køen er tom, så while-løkka avslutter."), "Køen er tom");
     }
     snap(null, t("Køen er tom. Alle som kan nås fra " + s + ", er besøkt.", "Ferdig. Blå kanter er BFS-treet: korteste stier (i antall kanter) fra " + s + ".",
       "Ferdig: visited = {" + vis.join(", ") + "}. BFS-treet gir korteste stier i en uvektet graf."), "Ferdig");
@@ -242,21 +248,24 @@
 
   reg(IN.gen, "grDFS", function (inp) {
     var g = inp[0], s = inp[1], A = adj(g), steps = [];
-    var vis = [], inV = {}, stack = [], done = {}, tree = {}, cur = null, hot = null, order = [];
+    var vis = [], inV = {}, stack = [], done = {}, tree = {}, cur = null, hot = null, order = [], popped = null;
     function snap(line, text, tag) {
       var nodes = {}, edges = {};
       vis.forEach(function (v) { nodes[v] = done[v] ? "done" : "seen"; });
       if (cur) nodes[cur] = "cur";
       keys(tree).forEach(function (k) { edges[k] = "tree"; });
       if (hot) edges[hot] = "hot";
-      steps.push({ line: line, g: g, nodes: nodes, edges: edges, text: text, tag: tag,
-        panel: [{ label: "Kallstakk (bunn → topp):", items: stack.slice(), kind: "stack" }, { label: "Besøksrekkefølge:", items: order.slice() }] });
+      var panel = [{ label: "Kallstakk (bunn → topp):", items: stack.slice(), kind: "stack" }];
+      if (popped) panel.push({ label: "Tatt av stakken:", items: [popped] });
+      panel.push({ label: "Besøksrekkefølge:", items: order.slice() });
+      steps.push({ line: line, g: g, nodes: nodes, edges: edges, text: text, tag: tag, panel: panel });
     }
     function visit(u, parent) {
       stack.push(u); cur = u; hot = null;
-      snap(1, t(parent ? "Vi går inn til " + u + "." : "Vi begynner i " + u + ".",
-                "DFSVisit(" + u + ") starter." + (parent ? " Kalt fra " + parent + "." : ""),
-                "Nytt kall: DFSVisit(G, " + u + ", visited). Kallstakken er nå " + stack.join(" → ") + "."), "Kall " + u);
+      var first = !steps.length;
+      snap(1, t((parent ? "Vi går inn til " + u + "." : "Vi begynner i " + u + ".") + (first ? " Naboene til en node ser vi alltid på i alfabetisk rekkefølge." : ""),
+                "DFSVisit(" + u + ") starter." + (parent ? " Kalt fra " + parent + "." : "") + (first ? " Naboene gås gjennom i alfabetisk rekkefølge." : ""),
+                "Nytt kall: DFSVisit(G, " + u + ", visited). Kallstakken er nå " + stack.join(" → ") + "." + (first ? " Naboene gås gjennom i alfabetisk rekkefølge; rekkefølgen avgjør hvilket DFS-tre vi får." : "")), "Kall " + u);
       vis.push(u); inV[u] = 1; order.push(u);
       snap(2, t(u + " får et kryss.", "Merk " + u + " som besøkt.", "visited ∪= {" + u + "}."), "Merk " + u);
       A[u].forEach(function (nb) {
@@ -269,17 +278,18 @@
           visit(v, u);
         }
       });
-      done[u] = 1; stack.pop(); cur = stack.length ? stack[stack.length - 1] : null; hot = null;
-      snap(3, t("Ingen nye naboer hos " + u + ". Vi går tilbake" + (cur ? " til " + cur + "." : "."),
-                u + " er ferdig. Kallet returnerer" + (cur ? " til " + cur + "." : "."),
-                "Løkka over naboene til " + u + " er ferdig, så kallet returnerer. " + u + " er ferdig (grønn)."), "Ferdig " + u);
+      done[u] = 1; stack.pop(); popped = u; cur = stack.length ? stack[stack.length - 1] : null; hot = null;
+      snap(3, t("Ingen nye naboer hos " + u + ". " + u + " tas av stakken, og vi går tilbake" + (cur ? " til " + cur + "." : "."),
+                u + " er ferdig og tas av kallstakken. Kallet returnerer" + (cur ? " til " + cur + "." : "."),
+                "Løkka over naboene til " + u + " er ferdig, så kallet returnerer: rammen for " + u + " poppes. " + u + " er ferdig (grønn)."), "Ferdig " + u);
+      popped = null;
     }
     var Vs = [s].concat(ids(g).filter(function (x) { return x !== s; }));
     Vs.forEach(function (v, i) {
       if (inV[v]) return;
       if (i > 0) {
         cur = null; hot = null;
-        steps.push({ line: null, g: g, nodes: (function () { var o = {}; vis.forEach(function (x) { o[x] = "done"; }); o[v] = "src"; return o; })(),
+        steps.push({ line: null, g: g, nodes: (function () { var o = {}; vis.forEach(function (x) { o[x] = "done"; }); o[v] = "cur"; return o; })(),
           edges: (function () { var o = {}; keys(tree).forEach(function (k) { o[k] = "tree"; }); return o; })(),
           panel: [{ label: "Kallstakk (bunn → topp):", items: [], kind: "stack" }, { label: "Besøksrekkefølge:", items: order.slice() }],
           text: t(v + " ble aldri nådd. Vi starter på nytt der.", "DFSFull går videre i V og finner " + v + ", som ikke er besøkt. Ny komponent!",
@@ -362,6 +372,8 @@
              "Inngradene telles én gang, hver node pushes og popes én gang, og hver kant telles ned én gang.",
              "O(|V| + |E|) for inngradene, O(|V|) for stakkoperasjonene og O(|E|) for nedtellingene.") }
   });
+  // Parsons: «stack ← empty stack» og «output ← empty list» er uavhengige og kan stå i begge rekkefølger.
+  if (IN.algos.topSort) IN.algos.topSort.parsonsSwap = [[0, 1]];
 
   reg(IN.algos, "hasCycleDirected", {
     title: "Har en rettet graf en sykel? (via topologisk sortering)",
@@ -417,8 +429,9 @@
       steps.push({ line: line, g: g, nodes: nodes, edges: edges, lab: lab, text: text, tag: tag, panel: panel,
         note: "Tallet over en node er inngraden som gjenstår." });
     }
-    snap(LN.init, t("Vi teller hvor mange piler som går inn til hver node.", "Inngradene er telt opp (tallet over hver node).",
-      "inDeg: " + V.map(function (v) { return v + " = " + deg[v]; }).join(", ") + "."), "Tell inngrader");
+    snap(LN.init, t("Vi teller hvor mange piler som går inn til hver node. Nodene og pilene ut fra en node ser vi alltid på i alfabetisk rekkefølge.",
+      "Inngradene er telt opp (tallet over hver node). Nodene og kantene ut fra en node gås gjennom i alfabetisk rekkefølge.",
+      "inDeg: " + V.map(function (v) { return v + " = " + deg[v]; }).join(", ") + ". Nodene og kantene ut fra u gås gjennom i alfabetisk rekkefølge; rekkefølgen avgjør hvilken av de gyldige ordningene vi får."), "Tell inngrader");
     V.forEach(function (v) { if (deg[v] === 0) stack.push(v); });
     snap(LN.push0, t(stack.length ? stack.join(" og ") + " venter ikke på noen. De er klare." : "Alle venter på noen! Ingen kan starte.",
       stack.length ? "Noder med inngrad 0 legges på stakken: " + stack.join(", ") + "." : "Ingen node har inngrad 0.",
@@ -427,7 +440,7 @@
       var u = stack.pop(); cur = u; hot = null;
       snap(LN.pop, t(u + " er klar og får tur.", "Pop " + u + " (sist lagt på stakken).", "u ← " + u + "."), "Pop " + u);
       out.push(u); inOut[u] = 1;
-      snap(LN.out, t(u + " får plass nummer " + out.length + ".", mode === "count" ? "processed = " + out.length + "." : u + " legges bakerst i output.",
+      snap(LN.out, t(mode === "count" ? u + " er nummer " + out.length + " vi har telt." : u + " får plass nummer " + out.length + " i rekkefølgen.", mode === "count" ? "processed = " + out.length + "." : u + " legges bakerst i output.",
         mode === "count" ? "processed ← " + out.length + "." : "output = [" + out.join(", ") + "]."), mode === "count" ? "Tell " + u : "Output " + u);
       A[u].forEach(function (nb) {
         var v = nb.v; hot = ek(u, v); deg[v]--;
@@ -446,7 +459,7 @@
     if (left.length) {
       snap(LN.check, t("Stakken er tom, men " + left.join(", ") + " ble aldri klare. De venter på hverandre i ring!",
         "Bare " + out.length + " av " + V.length + " noder kom med. Resten ligger på eller etter en sykel" + (mode === "count" ? ": svaret er true." : ": feil."),
-        "|output| = " + out.length + " < |V| = " + V.length + ". Nodene " + left.join(", ") + " fikk aldri inngrad 0" + (mode === "count" ? " ⇒ return true." : " ⇒ error."), { warn: left }), "Sykel!");
+        "|output| = " + out.length + " < |V| = " + V.length + ". Nodene " + left.join(", ") + " fikk aldri inngrad 0" + (mode === "count" ? " ⇒ return true." : " ⇒ error.")), "Sykel!", { warn: left });
     } else {
       snap(LN.check, t("Alle kom med. Det finnes ingen ring.", "Alle " + V.length + " nodene kom med, så grafen er en DAG" + (mode === "count" ? ": svaret er false." : "."),
         "|output| = |V| = " + V.length + (mode === "count" ? " ⇒ return false." : ", ingen feil.")), "Ingen sykel");
@@ -551,9 +564,10 @@
 
   reg(IN.gen, "grDijkstra", function (inp) {
     var g = inp[0], s = inp[1], A = adj(g), V = ids(g), steps = [];
-    var dist = {}, prev = {}, vis = {}, pq = [], seq = 0, cur = null, hot = null;
+    var dist = {}, prev = {}, vis = {}, pq = [], seq = 0, cur = null, hot = null, hiV = null;
     V.forEach(function (v) { dist[v] = Infinity; });
     function snap(line, text, tag) {
+      var hiN = hiV || cur;
       var nodes = {}, edges = {}, lab = {};
       V.forEach(function (v) { lab[v] = fmtD(dist[v]); });
       pq.forEach(function (x) { if (!vis[x.v]) nodes[x.v] = "queued"; });
@@ -564,12 +578,13 @@
       steps.push({ line: line, g: g, nodes: nodes, edges: edges, lab: lab, text: text, tag: tag,
         panel: [{ label: "Prioritetskø (minst først):", items: pqItems(pq, function (x) { return x.v + ":" + x.p; }, function (x) { return vis[x.v] || x.p > dist[x.v]; }), kind: "queue" },
                 { label: "visited:", items: V.filter(function (v) { return vis[v]; }) }],
-        table: { head: [""].concat(V), rows: [["dist"].concat(V.map(function (v) { return fmtD(dist[v]); }))], hi: cur ? V.indexOf(cur) + 1 : null },
-        note: "Tallet over en node er dist. Blå kanter: beste kjente vei. Overstreket i køen = gammel oppføring." });
+        table: { head: [""].concat(V), rows: [["dist"].concat(V.map(function (v) { return fmtD(dist[v]); }))], hi: hiN ? V.indexOf(hiN) + 1 : null },
+        note: "Tallet over en node er dist. Blå kanter: beste kjente vei. Overstreket i køen = gammel oppføring. Uthevet i tabellen: avstanden vi oppdaterer eller sammenligner med (ellers noden vi står i)." });
     }
     pq.push({ v: s, p: 0, seq: seq++ }); dist[s] = 0;
-    snap(5, t("Alle avstander er ukjente (∞), unntatt " + s + ", som er 0.", "dist[" + s + "] = 0, alle andre ∞. Køen inneholder " + s + ":0.",
-      "Initialisering: dist[" + s + "] ← 0, queue = {(" + s + ", 0)}."), "Start");
+    snap(5, t("Alle avstander er ukjente (∞), unntatt " + s + ", som er 0. Naboene til en node ser vi alltid på i alfabetisk rekkefølge.",
+      "dist[" + s + "] = 0, alle andre ∞. Køen inneholder " + s + ":0. Naboene gås gjennom i alfabetisk rekkefølge, og like prioriteter tas ut i den rekkefølgen de ble lagt inn.",
+      "Initialisering: dist[" + s + "] ← 0, queue = {(" + s + ", 0)}. Naboene gås gjennom i alfabetisk rekkefølge; ved lik prioritet tas den eldste oppføringen ut først."), "Start");
     while (pq.length) {
       var x = pqPop(pq), u = x.v; cur = u; hot = null;
       if (vis[u]) {
@@ -580,8 +595,11 @@
       }
       snap(7, t(u + " er nærmest av de i køen (" + x.p + ").", "RemoveMin gir " + u + " med prioritet " + x.p + ".", "u ← " + u + ". dist[" + u + "] = " + dist[u] + " er nå endelig."), "Ta ut " + u);
       vis[u] = 1;
+      snap(9, t("Nå vet vi sikkert at det er " + dist[u] + " til " + u + ". " + u + " skrives opp som ferdig.",
+        u + " er ikke i visited fra før, så den legges i visited. dist[" + u + "] = " + dist[u] + " endrer seg ikke mer.",
+        "u ∉ visited, så testen på linje 8 slipper oss videre: visited ∪= {" + u + "}. dist[" + u + "] = " + dist[u] + " er endelig."), u + " i visited");
       A[u].forEach(function (nb) {
-        var v = nb.v, c = dist[u] + nb.w; hot = ek(u, v);
+        var v = nb.v, c = dist[u] + nb.w; hot = ek(u, v); hiV = v;
         if (c < dist[v]) {
           var old = dist[v]; dist[v] = c; prev[v] = u; pq.push({ v: v, p: c, seq: seq++ });
           snap(14, t("Via " + u + " blir det " + dist[u] + " + " + nb.w + " = " + c + " til " + v + ". Det er kortere enn " + fmtD(old) + "!",
@@ -593,7 +611,7 @@
             "c = " + c + " ≥ " + fmtD(dist[v]) + ": testen på linje 12 feiler."), "Ikke bedre");
         }
       });
-      hot = null;
+      hot = null; hiV = null;
     }
     cur = null;
     snap(null, t("Køen er tom. Nå vet vi korteste avstand til alle.", "Ferdig. Blå kanter danner treet av korteste stier fra " + s + ".",
@@ -681,7 +699,9 @@
         note: "Overstreket = kanten går til en node som alt er i treet, og blir kastet når den tas ut." });
     }
     pq.push({ a: null, v: s, p: 0, seq: seq++ });
-    snap(4, t("Vi starter i " + s + ".", "Køen inneholder (null, " + s + ") med prioritet 0.", "Start i s = " + s + "."), "Start");
+    snap(4, t("Vi starter i " + s + ". Kablene ut fra en node ser vi alltid på i alfabetisk rekkefølge.",
+      "Køen inneholder (null, " + s + ") med prioritet 0. Kantene ut fra en node legges inn i alfabetisk rekkefølge, og ved lik vekt tas den eldste ut først.",
+      "Start i s = " + s + ". Naboene gås gjennom i alfabetisk rekkefølge; ved lik prioritet tas den eldste oppføringen ut først."), "Start");
     while (pq.length) {
       var x = pqPop(pq), u = x.v; cur = u; hot = x.a ? ek(x.a, u) : null;
       if (parents.hasOwnProperty(u)) {
@@ -699,7 +719,7 @@
       snap(10, t("Alle kantene ut fra " + u + " legges i køen.", "Legg kantene fra " + u + " i køen: " + A[u].map(function (nb) { return u + "–" + nb.v + " (" + nb.w + ")"; }).join(", ") + ".",
         "Insert for alle (" + u + ", v) ∈ E, også de som går tilbake inn i treet."), "Nye kanter");
     }
-    cur = null;
+    cur = null; hot = null;
     snap(null, t("Køen er tom. Alle er hektet på med billigst mulig kabler: " + total + ".", "Ferdig. Spenntreet har totalvekt " + total + ".",
       "Minimalt spenntre med " + (order.length - 1) + " kanter og totalvekt " + total + "."), "Ferdig");
     return steps;
@@ -750,7 +770,9 @@
         }) }, { label: "Totalvekt:", items: [String(total)] }],
         note: "Nodene i samme tre har samme farge." });
     }
-    snap(3, t("Alle kablene er sortert fra billigst til dyrest.", "Kantene er sortert på vekt. Hver node er sitt eget tre.", "Sortert: " + E.map(function (e) { return e.u + e.v + ":" + e.w; }).join(", ") + "."), "Sortert");
+    snap(3, t("Alle kablene er sortert fra billigst til dyrest. Koster to kabler det samme, tar vi dem i alfabetisk rekkefølge.",
+      "Kantene er sortert på vekt, og kanter med lik vekt står i alfabetisk rekkefølge. Hver node er sitt eget tre.",
+      "Kanter med lik vekt sorteres alfabetisk. Sortert: " + E.map(function (e) { return e.u + e.v + ":" + e.w; }).join(", ") + "."), "Sortert");
     E.forEach(function (e) {
       cur = e;
       if (comp[e.u] !== comp[e.v]) {
@@ -762,9 +784,10 @@
           "{" + e.u + ", " + e.v + "} krysser mellom to trær og er den letteste slike kanten ⇒ trygg."), "Ta med");
       } else {
         e.st = "nei";
-        snap(5, t(e.u + " og " + e.v + " henger alt sammen. Kabelen ville laget en ring, så vi dropper den.",
-          e.u + " og " + e.v + " er i samme tre: " + e.u + "–" + e.v + " ville laget en sykel. Hopp over.",
-          "Samme tre ⇒ sykel. Kanten forkastes."), "Forkast");
+        var full = E.filter(function (f) { return f.st === "ok"; }).length === V.length - 1;
+        snap(5, t(e.u + " og " + e.v + " henger alt sammen. Kabelen ville laget en ring, så vi dropper den." + (full ? " (Alle husene henger alt sammen, men vi prøver kablene som er igjen.)" : ""),
+          e.u + " og " + e.v + " er i samme tre: " + e.u + "–" + e.v + " ville laget en sykel. Hopp over." + (full ? " Treet er ferdig, men løkka går til kantene er brukt opp." : ""),
+          "Samme tre ⇒ sykel. Kanten forkastes." + (full ? " T har alt |V| − 1 = " + (V.length - 1) + " kanter, men for-løkka går gjennom resten av E." : "")), "Forkast");
       }
     });
     cur = null;
@@ -810,23 +833,33 @@
 
   reg(IN.gen, "grSCC", function (inp) {
     var g = inp[0], V = ids(g), A = adj(g), steps = [], gr = reverse(g), Ar = adj(gr);
-    var vis = {}, stack = [], done = {}, cur = null, comps = [], cmap = {};
+    var vis = {}, stack = [], done = {}, cur = null, comps = [], cmap = {}, call = [], tour = [];
     function snapA(text, tag) {
       var nodes = {};
       keys(vis).forEach(function (v) { nodes[v] = done[v] ? "done" : "seen"; });
       if (cur) nodes[cur] = "cur";
       steps.push({ line: 2, g: g, nodes: nodes, text: text, tag: tag,
-        panel: [{ label: "stack (bunn → topp):", items: stack.slice(), kind: "stack" }] });
+        panel: [{ label: "Kallstakk (bunn → topp):", items: call.slice(), kind: "stack" },
+                { label: "stack, ferdige noder (bunn → topp):", items: stack.slice(), kind: "stack" },
+                { label: "Besøksrekkefølge:", items: tour.slice() }],
+        note: "Fase 1 (DFSTopSort i G). Ring = besøkt og ligger på kallstakken. Grønn = ferdig og lagt på stack." });
     }
-    // Fase 1: DFSTopSort – vis hver gang en node blir ferdig og pushes
-    function dfs(u) {
-      vis[u] = 1; cur = u;
-      A[u].forEach(function (nb) { if (!vis[nb.v]) dfs(nb.v); });
-      done[u] = 1; stack.push(u); cur = u;
-      snapA(t(u + " er ferdig: alle den kan gå videre til, er besøkt. " + u + " legges på bunken.",
-        "DFS: " + u + " er ferdig og pushes.", "Postorder-push av " + u + "."), "Push " + u);
+    snapA(t("Først går vi dypt gjennom grafen og legger hver node i en bunke når vi er ferdige med den. Naboene til en node ser vi alltid på i alfabetisk rekkefølge.",
+      "Fase 1: DFSTopSort(G). Vi holder styr på to stakker: kallstakken (nodene vi er midt i) og stack (nodene som er ferdige). Naboene gås gjennom i alfabetisk rekkefølge.",
+      "Fase 1: stack ← DFSTopSort(G). Kallstakken er rekursjonen i DFSVisit; stack får nodene i postorder (når kallet returnerer). Nodene og naboene gås gjennom i alfabetisk rekkefølge."), "Start");
+    // Fase 1: DFSTopSort – ett steg når en node besøkes, og ett når den blir ferdig og pushes
+    function dfs(u, from) {
+      vis[u] = 1; cur = u; call.push(u); tour.push(u);
+      snapA(t(from ? "Fra " + from + " går vi videre til " + u + "." : "Vi starter i " + u + ".",
+        (from ? "DFS går fra " + from + " til " + u : "DFSTopSort starter et søk i " + u) + ". " + u + " er besøkt og ligger på kallstakken.",
+        "DFSVisit(G, " + u + ") kalles" + (from ? " fra " + from : " fra den ytre løkka") + ". Kallstakken: " + call.join(" → ") + "."), "Besøk " + u);
+      A[u].forEach(function (nb) { if (!vis[nb.v]) dfs(nb.v, u); });
+      done[u] = 1; call.pop(); stack.push(u); cur = u;
+      snapA(t(u + " er ferdig: alle den kan gå videre til, er besøkt. " + u + " legges på bunken med ferdige noder.",
+        u + " er ferdig. Den tas av kallstakken og pushes på stack.",
+        "Kallet DFSVisit(G, " + u + ") returnerer, og " + u + " pushes i postorder. stack = " + stack.join(", ") + "."), "Push " + u);
     }
-    V.forEach(function (v) { if (!vis[v]) dfs(v); });
+    V.forEach(function (v) { if (!vis[v]) dfs(v, null); });
     cur = null;
     var order = stack.slice();
     function snapB(line, text, tag, hiComp) {
@@ -906,7 +939,8 @@
 
   reg(IN.gen, "grCycleUndir", function (inp) {
     var g = inp[0], V = ids(g), A = adj(g), steps = [];
-    var vis = {}, par = {}, tree = {}, done = {}, stack = [], cur = null, hot = null, found = null;
+    var vis = {}, par = {}, tree = {}, done = {}, stack = [], cur = null, hot = null, found = null, popped = null, answer = null;
+    function frame(x) { return x[0] + "," + (x[1] || "null"); }
     function snap(line, text, tag) {
       var nodes = {}, edges = {};
       keys(vis).forEach(function (v) { nodes[v] = done[v] ? "done" : "seen"; });
@@ -914,12 +948,17 @@
       keys(tree).forEach(function (k) { edges[k] = "tree"; });
       if (hot) edges[hot] = "hot";
       if (found) { found.cyc.forEach(function (v) { nodes[v] = "warn"; }); edges[found.back] = "back"; found.cycE.forEach(function (k) { edges[k] = "back"; }); }
-      steps.push({ line: line, g: g, nodes: nodes, edges: edges, text: text, tag: tag,
-        panel: [{ label: "Kallstakk (u, p):", items: stack.map(function (x) { return x[0] + "," + (x[1] || "null"); }), kind: "stack" }] });
+      var panel = [{ label: "Kallstakk (u, p), bunn → topp:", items: stack.map(frame), kind: "stack" }];
+      if (popped) panel.push({ label: "Tatt av stakken:", items: [popped] });
+      if (answer) panel.push({ label: "Svar:", items: [answer] });
+      steps.push({ line: line, g: g, nodes: nodes, edges: edges, text: text, tag: tag, panel: panel });
     }
     function visit(u, p) {
       stack.push([u, p]); vis[u] = 1; par[u] = p; cur = u; hot = null;
-      snap(2, t("Vi går til " + u + (p ? " fra " + p : "") + " og setter kryss.", "HasCycleFrom(p = " + (p || "null") + ", u = " + u + "): merk " + u + ".", "visited ∪= {" + u + "}."), "Besøk " + u);
+      var first = !steps.length;
+      snap(2, t("Vi går til " + u + (p ? " fra " + p : "") + " og setter kryss." + (first ? " Naboene til en node ser vi alltid på i alfabetisk rekkefølge." : ""),
+        "HasCycleFrom(p = " + (p || "null") + ", u = " + u + "): merk " + u + "." + (first ? " Naboene gås gjennom i alfabetisk rekkefølge." : ""),
+        "visited ∪= {" + u + "}." + (first ? " Naboene gås gjennom i alfabetisk rekkefølge; rekkefølgen avgjør hvilken bakoverkant vi finner først." : "")), "Besøk " + u);
       for (var i = 0; i < A[u].length; i++) {
         var v = A[u][i].v; cur = u; hot = ek(u, v);
         if (v === p) { snap(4, t(v + " er den vi kom fra. Den teller ikke.", v + " er forelderen. Hopp over.", "v = p = " + v + " ⇒ continue."), "Forelder"); continue; }
@@ -937,8 +976,10 @@
         snap(6, t(v + " er ny. Vi går dit, og husker at vi kom fra " + u + ".", "Rekursivt kall: HasCycleFrom(p = " + u + ", u = " + v + ").", "{" + u + ", " + v + "} blir en kant i DFS-treet."), "Gå til " + v);
         if (visit(v, u)) return true;
       }
-      done[u] = 1; stack.pop(); cur = stack.length ? stack[stack.length - 1][0] : null; hot = null;
-      snap(7, t("Ingen ring under " + u + ". Vi går tilbake.", u + " gir false.", "Ingen bakoverkant fra subtreet under " + u + "."), "false fra " + u);
+      done[u] = 1; popped = frame(stack.pop()); cur = stack.length ? stack[stack.length - 1][0] : null; hot = null;
+      snap(7, t("Ingen ring under " + u + ". " + u + " tas av stakken, og vi går tilbake.", u + " gir false, og rammen (" + popped + ") tas av kallstakken.",
+        "Ingen bakoverkant fra subtreet under " + u + ": return false, og rammen (" + popped + ") poppes."), "false fra " + u);
+      popped = null;
       return false;
     }
     var hit = false;
@@ -947,7 +988,15 @@
       if (i > 0) { cur = null; hot = null; snap(null, t("Vi har ikke vært i " + V[i] + " ennå. Vi starter et nytt søk der.", "Ny komponent: HasCycle kaller HasCycleFrom(null, " + V[i] + ").", "Ytre løkke i HasCycle: ny komponent fra " + V[i] + "."), "Ny komponent"); }
       hit = visit(V[i], null);
     }
-    if (!hit) { cur = null; snap(null, t("Vi fant ingen ring. Grafen er et tre (eller flere trær).", "Ingen sykel: HasCycle returnerer false. Grafen er et tre eller en skog.", "|E| = " + g.edges.length + ", |V| = " + V.length + ": en skog har |E| = |V| − (antall komponenter)."), "Ingen sykel"); }
+    if (hit) {
+      var depth = stack.length; stack = []; cur = null; hot = null; answer = "true";
+      snap(6, t("Vi har funnet en ring, så vi er ferdige. Svaret «ja, det finnes en ring» sendes tilbake helt til start.",
+        "true sendes tilbake gjennom hele kallstakken: kallene under det innerste returnerer true på linje 6, ett etter ett, og til slutt returnerer HasCycle true.",
+        "Det innerste kallet returnerte true på linje 5. De " + (depth - 1) + " rammene under det returnerer true på linje 6, én etter én, og HasCycle returnerer true uten å se på resten av grafen."), "true helt opp");
+    } else {
+      cur = null; answer = "false";
+      snap(null, t("Vi fant ingen ring. Grafen er et tre (eller flere trær).", "Ingen sykel: HasCycle returnerer false. Grafen er et tre eller en skog.", "|E| = " + g.edges.length + ", |V| = " + V.length + ": en skog har |E| = |V| − (antall komponenter)."), "Ingen sykel");
+    }
     return steps;
   });
 

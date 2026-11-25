@@ -199,7 +199,7 @@
       legend: [
         { cls: "default", label: "Usortert" }, { cls: "target", label: "Målplass i" },
         { cls: "min", label: "Minste k" }, { cls: "compare", label: "Skanner j" },
-        { cls: "swap", label: "Bytter" }, { cls: "sorted", label: "Sortert" }
+        { cls: "swap", label: "Byttet" }, { cls: "sorted", label: "Sortert" }
       ],
       initial: [5, 1, 4, 2, 8]
     });
@@ -241,7 +241,7 @@
         if (n === badLine) {
           h.select(n); solved = true;
           status.innerHTML = "✓ Riktig! Den skal være <span class='mono'>for j ← i + 1 to n − 1 do</span>. " +
-            "Med <span class='mono'>n − 2</span> ser den indre løkka aldri på det siste elementet, så ligger det minste gjenværende tallet helt bakerst, blir det aldri valgt – og arrayet ender usortert.";
+            "Med <span class='mono'>n − 2</span> ser den indre løkka aldri på det siste elementet. Hvis det minste gjenværende tallet ligger bakerst, blir det aldri sammenlignet og aldri valgt – og arrayet kan ende usortert.";
         } else {
           status.textContent = "Ikke den linja – prøv igjen.";
         }

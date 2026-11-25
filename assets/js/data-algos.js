@@ -62,57 +62,61 @@
     }
   };
   IN.gen.selectionSort = function (arr) {
-    var A = clone(arr), n = A.length, steps = [], i, j, k;
+    var A = clone(arr), n = A.length, steps = [], i, j, k, cmp = 0;
     function snap(line, marks, ptrs, text, tag) {
       steps.push({ line: line, array: clone(A), marks: marks, ptrs: ptrs, text: text, tag: tag });
     }
+    snap(null, {}, {},
+      t("Her er tallene vi skal sortere: " + A.join(", ") + ". Vi fyller plassene fra venstre, én om gangen, med det minste tallet som er igjen.",
+        "Input: [" + A.join(", ") + "], n = " + n + ". Selection sort fyller plass 0, 1, … med det minste av dem som er igjen.",
+        "Input A = [" + A.join(", ") + "], n = " + n + ". Invariant: før runde i er A[0..i − 1] de i minste, på endelig plass."), "Start");
     for (i = 0; i < n; i++) {
-      var sorted = []; for (var s = 0; s < i; s++) sorted.push(s);
+      var sorted = range(0, i - 1);
       snap(2, { sorted: sorted, target: i }, { i: i },
         t("Nå skal vi fylle plass " + i + ". Vi leter etter det minste tallet blant dem som er igjen.",
-          "i = " + i + ": finn minste i A[" + i + "..].",
-          "Ytre iterasjon i = " + i + ". " + (i === 0 ? "Sortert prefiks: tomt (ingen elementer er plassert ennå)." : "Sortert prefiks [0.." + (i - 1) + "].")), "Ny plass");
+          "i = " + i + ": finn minste i A[" + i + ".." + (n - 1) + "].",
+          "Ytre iterasjon i = " + i + ". " + (i === 0 ? "Sortert prefiks: tomt (ingen elementer er plassert ennå)." : "A[0.." + (i - 1) + "] er ferdig (grønt).")), "Ny plass");
       k = i;
       snap(3, { sorted: sorted, target: i, min: k }, { i: i, k: k },
         t("Vi antar at det minste er her på plass " + i + " (verdi " + A[i] + ") inntil vi finner noe mindre.",
-          "k = " + k + " (antatt minimum = " + A[k] + ").",
+          "k ← " + k + " (antatt minste = " + A[k] + ").",
           "k ← " + k + ", kandidatminimum = " + A[k] + "."), "Antatt minste");
       for (j = i + 1; j < n; j++) {
-        var less = A[j] < A[k];
+        var less = A[j] < A[k]; cmp++;
         snap(5, { sorted: sorted, target: i, min: k, compare: [j] }, { i: i, k: k, j: j },
           t("Vi ser på tallet " + A[j] + " (det står på plass " + j + "). Det minste vi har sett så langt er " + A[k] + " (det står på plass " + k + "). " +
               (less ? "Oi – " + A[j] + " er mindre!" : A[j] + " er ikke mindre, så vi beholder " + A[k] + "."),
-            "Sammenlign A[" + j + "]=" + A[j] + " med minste A[" + k + "]=" + A[k] + (less ? " → nytt minimum." : " → ingen endring."),
-            "j = " + j + ": A[j] &lt; A[k]? " + (less ? "ja" : "nei") + "."), less ? "Mindre funnet" : null);
+            "Sammenlign A[" + j + "] = " + A[j] + " med minste A[" + k + "] = " + A[k] + (less ? ": mindre, nytt minste." : ": ikke mindre, ingen endring."),
+            "j = " + j + ": A[j] &lt; A[k]? " + A[j] + " &lt; " + A[k] + " er " + (less ? "sant." : "usant.")), less ? "Mindre funnet" : "Ingen ny minste");
         if (less) {
           k = j;
-          snap(6, { sorted: sorted, target: i, min: k, compare: [j] }, { i: i, k: k, j: j },
-            t("Nå husker vi plass " + j + " som det minste.",
-              "k ← " + j + ".",
+          snap(6, { sorted: sorted, target: i, min: k }, { i: i, k: k, j: j },
+            t("Nå husker vi plass " + j + " (tallet " + A[j] + ") som det minste.",
+              "k ← " + j + " (nytt minste = " + A[k] + ").",
               "k ← " + j + " (ny minimumsindeks)."), "Nytt minste");
         }
       }
+      var scanned = i + 1 < n ? "j har gått gjennom hele resten" : "Det er ingen tall etter plass " + i + ", så den indre løkka kjørte ikke";
+      snap(7, { sorted: sorted, target: i, min: k }, { i: i, k: k },
+        t((i + 1 < n ? "Vi har sett på alle tallene som er igjen. Det minste er " + A[k] + " på plass " + k + ". "
+              : "Det er bare ett tall igjen, " + A[i] + ". ") +
+            (i !== k ? "Det står ikke på plass " + i + ", så vi må bytte." : "Det står allerede på plass " + i + ", så vi trenger ikke bytte."),
+          scanned + ". Minste er A[" + k + "] = " + A[k] + ". i ≠ k? " + (i !== k ? "Ja (" + i + " ≠ " + k + "), så vi bytter." : "Nei, i = k = " + i + ": ingen bytte."),
+          scanned + "; k = " + k + ". Testen i ≠ k er " + (i !== k ? "sann → swap." : "usann → byttet hoppes over.") + (i !== k ? "" : " A[" + i + "] er på endelig plass.")),
+        i !== k ? "Bytte trengs" : "Ingen bytte");
       if (i !== k) {
+        var a = A[i], b = A[k];
+        A[i] = b; A[k] = a;
         snap(8, { sorted: sorted, swap: [i, k] }, { i: i, k: k },
-          t("Vi bytter " + A[i] + " og " + A[k] + " slik at det minste havner på plass " + i + ".",
-            "Bytt A[" + i + "] og A[" + k + "].",
-            "swap A[" + i + "],A[" + k + "]."), "Bytte");
-        var tmp = A[i]; A[i] = A[k]; A[k] = tmp;
-      } else {
-        snap(7, { sorted: sorted, target: i, min: k }, { i: i, k: k },
-          t("Det minste lå allerede på plass " + i + ". Ingen bytte trengs.",
-            "i = k: ingen bytte.",
-            "i = k: hopp over byttet."), "Ingen bytte");
+          t("Byttet! " + b + " står nå på plass " + i + ", og " + a + " flyttet bakover til plass " + k + ". Plass " + i + " er ferdig.",
+            "Byttet A[" + i + "] og A[" + k + "]: nå er A[" + i + "] = " + b + " og A[" + k + "] = " + a + ". Plass " + i + " er på endelig plass.",
+            "Etter swap A[" + i + "], A[" + k + "]: A[0.." + i + "] er de " + (i + 1) + " minste, i sortert rekkefølge."), "Byttet");
       }
-      var done = []; for (var d = 0; d <= i; d++) done.push(d);
-      snap(2, { sorted: done }, { },
-        t("Plass " + i + " er nå ferdig og grønn.",
-          "A[0.." + i + "] er sortert.",
-          "Prefiks [0.." + i + "] ferdig."), "Plass ferdig");
     }
-    var all = []; for (var z = 0; z < n; z++) all.push(z);
-    steps.push({ line: null, array: clone(A), marks: { sorted: all }, ptrs: {},
-      text: t("Ferdig! Alle tallene står i rekkefølge.", "Sortert.", "Terminert. O(n²) sammenligninger brukt."), tag: "Ferdig" });
+    steps.push({ line: null, array: clone(A), marks: { sorted: range(0, n - 1) }, ptrs: {},
+      text: t("Ferdig! Alle tallene står i rekkefølge: " + A.join(", ") + ".",
+        "Sortert: [" + A.join(", ") + "]. Selection gjorde " + cmp + " sammenligninger.",
+        "Terminert: [" + A.join(", ") + "]. " + cmp + " sammenligninger = n(n − 1)/2 for n = " + n + ", uansett input: O(n²)."), tag: "Ferdig" });
     return steps;
   };
 
@@ -166,33 +170,59 @@
     }
   };
   IN.gen.bubbleSort = function (arr) {
-    var A = clone(arr), n = A.length, steps = [];
-    function snap(line, marks, ptrs, text, tag) { steps.push({ line: line, array: clone(A), marks: marks, ptrs: ptrs, text: text, tag: tag }); }
+    var A = clone(arr), n = A.length, steps = [], swaps = 0;
+    // i er en rundeteller, ikke en plass i arrayet: den vises som en pille over søylene (vars), ikke som peker.
+    function snap(line, marks, ptrs, text, tag, vars) { steps.push({ line: line, array: clone(A), marks: marks, ptrs: ptrs, text: text, tag: tag, vars: vars }); }
+    snap(null, {}, {},
+      t("Her er tallene vi skal sortere: " + A.join(", ") + ". Vi tar runde etter runde og bytter naboer som står feil vei.",
+        "Input: [" + A.join(", ") + "], n = " + n + ". Hver runde bobler det største gjenværende tallet bakerst.",
+        "Input A = [" + A.join(", ") + "], n = " + n + ". Etter runde i står de i + 1 største bakerst på endelig plass."), "Start");
     for (var i = 0; i < n; i++) {
-      var tail = []; for (var s = n - i; s < n; s++) tail.push(s);
+      var tail = range(n - i, n - 1);
       var swapped = false;
-      snap(3, { sorted: tail }, { i: i },
-        t("Runde " + (i + 1) + ". Vi bobler gjennom, par for par.", "Runde i=" + i + ".", "Runde i = " + i + "; halen er sortert."), "Ny runde");
+      snap(3, { sorted: tail }, {},
+        t("Runde " + (i + 1) + " (i = " + i + "). Vi har ikke byttet noe i denne runden ennå.",
+          "Runde i = " + i + ": swapped ← false." + (i ? " De " + i + " bakerste står ferdig." : ""),
+          "Ytre iterasjon i = " + i + "; swapped ← false. " + (i ? "Halen A[" + (n - i) + ".." + (n - 1) + "] er ferdig sortert." : "Ingen hale ennå.")), "Ny runde",
+        [["i", i], ["swapped", "false"]]);
       for (var j = 0; j < n - 1 - i; j++) {
         var gt = A[j] > A[j + 1];
         snap(5, { sorted: tail, compare: [j, j + 1] }, { j: j },
           t("Er " + A[j] + " større enn naboen sin til høyre, " + A[j + 1] + "? " + (gt ? "Ja, da står de feil vei." : "Nei, da får de stå."),
-            "Sammenlign naboene " + A[j] + " og " + A[j + 1] + (gt ? " → bytt." : " → ok."),
-            "A[j] &gt; A[j + 1]? " + (gt ? "ja" : "nei")), gt ? "Bytter" : null);
+            "Sammenlign naboene A[" + j + "] = " + A[j] + " og A[" + (j + 1) + "] = " + A[j + 1] + (gt ? ": feil rekkefølge, bytt." : ": i orden."),
+            "j = " + j + ": A[j] &gt; A[j + 1]? " + A[j] + " &gt; " + A[j + 1] + " er " + (gt ? "sant." : "usant.")), gt ? "Feil vei" : "I orden",
+          [["i", i], ["swapped", String(swapped)]]);
         if (gt) {
-          var tmp = A[j]; A[j] = A[j + 1]; A[j + 1] = tmp; swapped = true;
+          var a = A[j], b = A[j + 1];
+          A[j] = b; A[j + 1] = a; swapped = true; swaps++;
           snap(6, { sorted: tail, swap: [j, j + 1] }, { j: j },
-            t("Bytt! Det store sklir til høyre.", "Bytt A[" + j + "] og A[" + (j + 1) + "].", "swap."), "Bytte");
+            t("Byttet! " + a + " sklir ett hakk til høyre, og " + b + " flytter til venstre. Vi husker at vi har byttet noe i denne runden.",
+              "Byttet A[" + j + "] og A[" + (j + 1) + "]: nå " + b + ", " + a + ". swapped ← true (linje 7).",
+              "swap A[" + j + "], A[" + (j + 1) + "]; swapped ← true (linje 7). Ett nabobytte fjerner nøyaktig én inversjon."), "Byttet",
+            [["i", i], ["swapped", "true"]]);
         }
       }
+      var newTail = range(n - 1 - i, n - 1);
       if (!swapped) {
-        snap(8, { sorted: (function () { var a = []; for (var z = 0; z < n; z++) a.push(z); return a; })() }, {},
-          t("Ingen bytter – alt er sortert. Vi stopper.", "Ingen bytte → ferdig.", "swapped=false → break."), "Tidlig stopp");
+        var none = n - 1 - i <= 0;
+        snap(9, { sorted: range(0, n - 1) }, {},
+          t(none ? "Det er ingen nabopar igjen å sjekke, så runden byttet ingenting. Vi stopper."
+                 : "Hele runden gikk uten et eneste bytte. Da står alt riktig, og vi kan stoppe tidlig!",
+            (none ? "Runden hadde ingen par igjen å sjekke, så" : "Ingen bytter i runde i = " + i + ", så") + " swapped = false: break.",
+            "if not swapped er sann: break. " + (none ? "(Siste runde har tom indre løkke.)" : "Tidlig stopp etter " + (i + 1) + " runde" + (i ? "r" : "") + " – dette gir O(n) på sortert input.")),
+          none ? "Ingen par igjen" : "Tidlig stopp", [["i", i], ["swapped", "false"]]);
         break;
       }
+      snap(8, { sorted: newTail }, {},
+        t("Runden er ferdig. Vi byttet noe, så vi tar en runde til. " + A[n - 1 - i] + " har boblet helt fram til plass " + (n - 1 - i) + " og står ferdig.",
+          "Slutt på runde i = " + i + ": swapped = true, så vi fortsetter. A[" + (n - 1 - i) + "] = " + A[n - 1 - i] + " er på endelig plass.",
+          "if not swapped er usann. A[" + (n - 1 - i) + ".." + (n - 1) + "] er de " + (i + 1) + " største, på endelig plass."), "Runde ferdig",
+        [["i", i], ["swapped", "true"]]);
     }
-    var all = []; for (var z = 0; z < n; z++) all.push(z);
-    steps.push({ line: null, array: clone(A), marks: { sorted: all }, ptrs: {}, text: t("Ferdig!", "Sortert.", "Terminert."), tag: "Ferdig" });
+    steps.push({ line: null, array: clone(A), marks: { sorted: range(0, n - 1) }, ptrs: {},
+      text: t("Ferdig! Tallene står i rekkefølge: " + A.join(", ") + ".",
+        "Sortert: [" + A.join(", ") + "] etter " + swaps + " bytte" + (swaps === 1 ? "" : "r") + ".",
+        "Terminert: [" + A.join(", ") + "]. " + swaps + " nabobytter = antall inversjoner i input."), tag: "Ferdig" });
     return steps;
   };
 
@@ -242,31 +272,71 @@
     }
   };
   IN.gen.insertionSort = function (arr) {
-    var A = clone(arr), n = A.length, steps = [];
-    function sortedPrefix(upto) { var a = []; for (var z = 0; z < upto; z++) a.push(z); return a; }
-    function snap(line, marks, ptrs, text, tag) { steps.push({ line: line, array: clone(A), marks: marks, ptrs: ptrs, text: text, tag: tag }); }
+    /* Kursversjonen forskyver (ingen bytter): key holdes til side, større tall kopieres ett hakk
+       til høyre, og key skrives inn i hullet til slutt. Hullet (plassen key skal inn på hvis løkka
+       stopper nå) vises som en tom, stiplet søyle – den gamle verdien står igjen der til den overskrives. */
+    var A = clone(arr), n = A.length, steps = [], shifts = 0;
+    function prefixBut(upto, hole) { return range(0, upto).filter(function (z) { return z !== hole; }); }
+    function snap(line, marks, ptrs, text, tag, hold, vars) {
+      steps.push({ line: line, array: clone(A), marks: marks, ptrs: ptrs, text: text, tag: tag, hold: hold || null, vars: vars || [] });
+    }
+    snap(null, {}, {},
+      t("Her er tallene vi skal sortere: " + A.join(", ") + ". Det første tallet alene regnes som sortert. Så setter vi inn ett tall om gangen på rett plass blant dem til venstre.",
+        "Input: [" + A.join(", ") + "], n = " + n + ". A[0..0] er sortert seg imellom fra start.",
+        "Input A = [" + A.join(", ") + "], n = " + n + ". Invariant: før runde i er A[0..i − 1] sortert seg imellom (men ikke nødvendigvis på endelig plass)."), "Start");
     for (var i = 1; i < n; i++) {
+      snap(2, { part: range(0, i - 1), target: i }, { i: i },
+        t("Tallene på plass 0 til " + (i - 1) + " er sortert seg imellom (skravert). Nå skal tallet på plass " + i + ", " + A[i] + ", settes inn blant dem.",
+          "i = " + i + ": A[0.." + (i - 1) + "] er sortert seg imellom. Neste tall: A[" + i + "] = " + A[i] + ".",
+          "Ytre iterasjon i = " + i + ". Invariant: A[0.." + (i - 1) + "] sortert seg imellom."), "Ny runde", null, [["i", i]]);
       var key = A[i];
-      snap(3, { sorted: sortedPrefix(i), target: i }, { i: i },
-        t("Vi plukker opp tallet " + key + " (på plass " + i + ") for å sette det inn blant de sorterte til venstre.",
-          "key = " + key + " skal settes inn i A[0.." + (i - 1) + "].",
-          "i=" + i + ", key=" + key + "."), "Plukk opp");
+      snap(3, { part: range(0, i - 1), stale: [i] }, { i: i },
+        t("Vi plukker opp " + key + " og holder det i hånda (key). Plass " + i + " er nå ledig – vi trenger ikke tallet som står igjen der.",
+          "key ← A[" + i + "] = " + key + ". Plass " + i + " regnes som ledig (et «hull»).",
+          "key ← " + key + ". A[" + i + "] kan nå overskrives; hullet er på j + 1 = " + i + "."), "Ta ut key", { label: "key", v: key }, [["i", i]]);
       var j = i - 1;
-      while (j >= 0 && A[j] > key) {
-        snap(5, { sorted: sortedPrefix(i), compare: [j], target: j + 1 }, { j: j },
-          t("Tallet " + A[j] + " er større enn " + key + ", så vi skyver det ett hakk til høyre.",
-            "A[" + j + "]=" + A[j] + " > " + key + " → skyv til høyre.",
-            "A[j] &gt; key → A[j + 1] ← A[j]."), "Skyv");
-        A[j + 1] = A[j]; j--;
+      snap(4, { part: range(0, i - 1), stale: [i] }, { i: i, j: j },
+        t("Vi begynner å sammenligne med naboen til venstre, på plass " + j + ".",
+          "j ← i − 1 = " + j + ".",
+          "j ← " + j + ". Hullet ligger alltid på j + 1."), "Start j", { label: "key", v: key }, [["i", i], ["j", j]]);
+      while (true) {
+        var go = j >= 0 && A[j] > key;
+        var jp = {}; if (j >= 0) jp.j = j; jp.i = i;
+        snap(5, { part: prefixBut(i, j + 1), compare: j >= 0 ? [j] : [], stale: [j + 1] }, jp,
+          t(j < 0 ? "Det er ingen flere tall til venstre. Da skal " + key + " helt først, og vi slutter å lete."
+                  : go ? A[j] + " er større enn " + key + ", så " + A[j] + " må flytte seg ett hakk til høyre."
+                       : A[j] + " er ikke større enn " + key + ". Da skal " + key + " stå rett etter " + A[j] + ", og vi slutter å lete.",
+            j < 0 ? "j = −1: j ≥ 0 er usann, så løkka stopper. key skal inn på plass 0."
+                  : "A[" + j + "] = " + A[j] + " &gt; key = " + key + "? " + (go ? "Ja: skyv." : "Nei: løkka stopper, key skal inn på plass " + (j + 1) + "."),
+            j < 0 ? "j ≥ 0 er usann (j = −1): løkka terminerer; hullet er på 0."
+                  : "Testen A[j] &gt; key er " + (go ? "sann." : "usann (" + A[j] + " ≤ " + key + "): løkka terminerer. Streng &gt; gjør at et likt tall ikke passeres – derfor stabil.")),
+          go ? "Større: skyv" : "Løkka stopper", { label: "key", v: key, cls: j >= 0 ? "compare" : null }, [["i", i], ["j", j]]);
+        if (!go) break;
+        var mv = A[j];
+        A[j + 1] = mv; shifts++;
+        snap(6, { part: prefixBut(i, j), target: j + 1, stale: [j] }, { i: i, j: j },
+          t(mv + " kopieres ett hakk til høyre, til plass " + (j + 1) + ". Den gamle " + mv + " på plass " + j + " står igjen til den blir overskrevet – nå er det den plassen som er ledig.",
+            "A[" + (j + 1) + "] ← A[" + j + "] = " + mv + ". Hullet flytter seg til plass " + j + ".",
+            "Forskyvning nr. " + shifts + ": A[" + (j + 1) + "] ← A[" + j + "]. Én forskyvning per inversjon key danner med prefikset."), "Forskyv",
+          { label: "key", v: key }, [["i", i], ["j", j]]);
+        j--;
+        var jp2 = {}; if (j >= 0) jp2.j = j; jp2.i = i;
+        snap(7, { part: prefixBut(i, j + 1), stale: [j + 1] }, jp2,
+          t(j >= 0 ? "Vi går ett hakk til venstre og ser på plass " + j + "." : "Vi går ett hakk til venstre – men nå er vi forbi starten av arrayet.",
+            "j ← j − 1 = " + j + ".",
+            "j ← " + j + "."), "Ett steg ned", { label: "key", v: key }, [["i", i], ["j", j]]);
       }
       A[j + 1] = key;
-      snap(8, { sorted: sortedPrefix(i + 1), swap: [j + 1] }, { j: j },
-        t("Vi legger " + key + " ned på plass " + (j + 1) + ". Venstre del er sortert igjen.",
-          "Sett key inn på plass " + (j + 1) + ".",
-          "A[" + (j + 1) + "] ← key."), "Satt inn");
+      var jp3 = { i: i }; if (j >= 0) jp3.j = j;
+      snap(8, { part: range(0, i), target: j + 1 }, jp3,
+        t("Vi legger " + key + " ned i det ledige hullet på plass " + (j + 1) + ". Nå er tallene på plass 0 til " + i + " sortert seg imellom.",
+          "A[j + 1] = A[" + (j + 1) + "] ← key = " + key + ". A[0.." + i + "] er sortert seg imellom.",
+          "A[" + (j + 1) + "] ← key. Invarianten gjelder nå for A[0.." + i + "]."), "Satt inn", null, [["i", i], ["j", j]]);
     }
-    var all = []; for (var z = 0; z < n; z++) all.push(z);
-    steps.push({ line: null, array: clone(A), marks: { sorted: all }, ptrs: {}, text: t("Ferdig!", "Sortert.", "Terminert."), tag: "Ferdig" });
+    steps.push({ line: null, array: clone(A), marks: { sorted: range(0, n - 1) }, ptrs: {}, vars: [],
+      text: t("Ferdig! Alle tallene står i rekkefølge: " + A.join(", ") + ". Først nå vet vi at hvert tall står på sin endelige plass.",
+        "Sortert: [" + A.join(", ") + "] med " + shifts + " forskyvning" + (shifts === 1 ? "" : "er") + ".",
+        "Terminert: [" + A.join(", ") + "]. " + shifts + " forskyvninger = antall inversjoner i input."), tag: "Ferdig" });
     return steps;
   };
 
@@ -316,28 +386,58 @@
     }
   };
   IN.gen.gnomeSort = function (arr) {
-    var A = clone(arr), n = A.length, steps = [], guard = 0;
-    function snap(line, marks, ptrs, text, tag) { steps.push({ line: line, array: clone(A), marks: marks, ptrs: ptrs, text: text, tag: tag }); }
+    /* Invariant (vises skravert): A[0..i − 1] er alltid sortert seg imellom. i vises både som peker
+       og som pille, så i = n (forbi siste plass) også synes. Pekeren flyttes i samme steg som i ← i ± 1. */
+    var A = clone(arr), n = A.length, steps = [], guard = 0, swaps = 0;
+    function snap(line, marks, i, text, tag) {
+      var p = {}; if (i < n) p.i = i;
+      steps.push({ line: line, array: clone(A), marks: marks, ptrs: p, text: text, tag: tag, vars: [["i", i], ["n", n]] });
+    }
     var i = 0;
+    snap(2, {}, i,
+      t("Her er tallene: " + A.join(", ") + ". Nissen starter helt til venstre, på plass 0.",
+        "Input: [" + A.join(", ") + "], n = " + n + ". i ← 0.",
+        "Input A = [" + A.join(", ") + "]. i ← 0; invariant: A[0..i − 1] er sortert seg imellom."), "Start");
     while (i < n && guard++ < 400) {
-      if (i > 0 && A[i - 1] > A[i]) {
-        snap(4, { compare: [i - 1, i] }, { i: i },
-          t("Tallet bak nissen (" + A[i - 1] + ") er større enn tallet han står på (" + A[i] + "). Bytt!",
-            "A[" + (i - 1) + "]>" + "A[" + i + "] → bytt.",
-            "i=" + i + ": A[i−1]>A[i] → swap."), "Bytter");
-        var tmp = A[i - 1]; A[i - 1] = A[i]; A[i] = tmp;
-        snap(6, { swap: [i - 1, i] }, { i: i },
-          t("Nissen går ett skritt tilbake for å dobbeltsjekke.", "Bytt gjort; i ← i−1.", "swap; i←i−1."), "Ett tilbake");
-        i--;
-      } else {
-        snap(8, { sorted: [] }, { i: i },
-          t("Paret er i orden (eller vi er helt i starten). Nissen går framover.",
-            "Ordnet → i ← i+1.", "i←i+1."), "Framover");
+      var part = range(0, i - 1);
+      if (i === 0) {
+        snap(4, { part: part }, i,
+          t("Nissen står helt først. Det er ingen potte bak ham å sammenligne med.",
+            "i = 0: i &gt; 0 er usann, så testen er usann og vi går til else.",
+            "i &gt; 0 er usann; «and» kortslutter, så A[−1] leses aldri. Gå til else."), "Ingen nabo bak");
         i++;
+        snap(8, { part: range(0, i - 1) }, i,
+          t("Han går ett skritt fram, til plass " + i + ".", "i ← i + 1 = " + i + ".", "i ← " + i + "."), "Framover");
+        continue;
+      }
+      var a = A[i - 1], b = A[i], wrong = a > b;
+      snap(4, { part: part, compare: [i - 1, i] }, i,
+        t("Nissen ser på potten bak seg (" + a + ") og potten han står ved (" + b + "). " + (wrong ? a + " er større enn " + b + ", så de står feil." : a + " er ikke større enn " + b + ", så de står riktig."),
+          "A[" + (i - 1) + "] = " + a + " &gt; A[" + i + "] = " + b + "? " + (wrong ? "Ja: bytt og gå tilbake." : "Nei: paret er i orden, gå fram."),
+          "i = " + i + ": A[i − 1] &gt; A[i] er " + (wrong ? "sann." : "usann (" + a + " ≤ " + b + "), så A[0.." + i + "] er sortert seg imellom.")), wrong ? "Feil vei" : "I orden");
+      if (wrong) {
+        A[i - 1] = b; A[i] = a; swaps++;
+        snap(5, { part: range(0, i - 2), swap: [i - 1, i] }, i,
+          t("Byttet! Nå står " + b + " foran " + a + ".",
+            "Byttet A[" + (i - 1) + "] og A[" + i + "]: nå " + b + ", " + a + ".",
+            "swap A[" + (i - 1) + "], A[" + i + "] (bytte nr. " + swaps + ")."), "Byttet");
+        i--;
+        snap(6, { part: range(0, i - 1) }, i,
+          t("Nissen går ett skritt tilbake, til plass " + i + ", for å sjekke om " + b + " også står feil i forhold til potten bak.",
+            "i ← i − 1 = " + i + ".",
+            "i ← " + i + ". Det nye paret (i − 1, i) kan nå stå feil, så det må sjekkes."), "Ett tilbake");
+      } else {
+        i++;
+        snap(8, { part: range(0, i - 1) }, i,
+          t("Han går ett skritt fram" + (i < n ? ", til plass " + i + "." : " – forbi den siste potten."),
+            "else: i ← i + 1 = " + i + ".",
+            "i ← " + i + "."), "Framover");
       }
     }
-    var all = []; for (var z = 0; z < n; z++) all.push(z);
-    steps.push({ line: null, array: clone(A), marks: { sorted: all }, ptrs: {}, text: t("Ferdig – nissen er i mål!", "Sortert.", "Terminert."), tag: "Ferdig" });
+    snap(3, { sorted: range(0, n - 1) }, i,
+      t("Nissen har gått forbi den siste potten. Alt står i rekkefølge: " + A.join(", ") + ".",
+        "i = n = " + n + ": while i &lt; n er usann, og løkka stopper. Sortert: [" + A.join(", ") + "].",
+        "i = n: løkka terminerer. A[0..n − 1] er sortert (invarianten med i = n). " + swaps + " bytter = antall inversjoner."), "Ferdig");
     return steps;
   };
 
@@ -536,40 +636,130 @@
       )
     }
   };
-  // Tracer: fletting skriver tilbake i A; vi markerer skrivecellen og rammer inn [lo,hi] med pekere.
+  /* Tracer for MergeSort + Merge. Linjekoder for IN.pseudoGroup([MergeSort, Merge]):
+     MergeSort-linje n → n; Merge-linje n → 6000 + 100 + n (Merge kalt fra linje 6 i MergeSort).
+     L og R vises som egne rader under arrayet, så hver verdi alltid synes et sted:
+     plassene i A[lo..hi] som ennå ikke er skrevet, er stiplet («ledig, kopiert til L/R»).
+     Ferdig flettede delstykker er skravert (delsortert), ikke grønne – grønt kommer først til slutt. */
   IN.gen.mergeSort = function (arr) {
-    var A = clone(arr), n = A.length, steps = [];
-    function snap(marks, ptrs, text, tag) { steps.push({ line: null, array: clone(A), marks: marks, ptrs: ptrs, text: text, tag: tag }); }
+    var A = clone(arr), n = A.length, steps = [], runs = [];
+    function M(line) { return 6100 + line; }
+    function runIdx(skipLo, skipHi) {
+      var out = [];
+      runs.forEach(function (r) { for (var z = r[0]; z <= r[1]; z++) if (z < skipLo || z > skipHi) out.push(z); });
+      return out;
+    }
+    function snap(line, marks, ptrs, text, tag, extra) {
+      var s = { line: line, array: clone(A), marks: marks, ptrs: ptrs, ptrCls: { k: "target" }, text: text, tag: tag, vars: [] };
+      for (var key in extra) s[key] = extra[key];
+      steps.push(s);
+    }
+    function cells(X, used, cur, curCls, ptrName) {
+      return X.map(function (v, z) {
+        return { v: v, cls: z === cur ? curCls : (z < used ? "used" : null), ptr: z === used ? ptrName : "" };
+      });
+    }
+    function rows(L, R, i, j, cmpOn, took) {
+      // took: { side: "L"|"R", idx } – elementet som nettopp ble skrevet til A[k]
+      var lc = cells(L, i, cmpOn ? i : (took && took.side === "L" ? took.idx : -1), cmpOn ? "compare" : "target", "i");
+      var rc = cells(R, j, cmpOn ? j : (took && took.side === "R" ? took.idx : -1), cmpOn ? "compare" : "target", "j");
+      return [
+        { label: "L", cells: lc, note: i >= L.length ? "i = |L| = " + L.length + ": tom" : "" },
+        { label: "R", cells: rc, note: j >= R.length ? "j = |R| = " + R.length + ": tom" : "" }
+      ];
+    }
+    function callName(lo, hi) { return "MergeSort(A, " + lo + ", " + hi + ")"; }
+
+    snap(null, {}, {},
+      t("Her er tallene vi skal sortere: " + A.join(", ") + ". Vi deler i to igjen og igjen, og fletter så bitene sammen.",
+        "Input: [" + A.join(", ") + "], n = " + n + ". Vi kaller MergeSort(A, 0, " + (n - 1) + ").",
+        "Input A = [" + A.join(", ") + "]. Kall MergeSort(A, 0, n − 1) = MergeSort(A, 0, " + (n - 1) + ")."), "Start");
+
     function merge(lo, mid, hi) {
       var L = A.slice(lo, mid + 1), R = A.slice(mid + 1, hi + 1), i = 0, j = 0, k = lo;
-      snap({}, { low: lo, mid: mid, high: hi },
-        t("Nå fletter vi venstre (" + L.join(",") + ") og høyre (" + R.join(",") + ") sammen.",
-          "Flett A[" + lo + ".." + mid + "] og A[" + (mid + 1) + ".." + hi + "].",
-          "Flett: L = " + JSON.stringify(L) + ", R = " + JSON.stringify(R) + "."), "Flett");
+      var vars = [["kall", "Merge(A, " + lo + ", " + mid + ", " + hi + ")"]];
+      var outside = function () { return runIdx(lo, hi); };
+      function aMarks(extra) {
+        var m = { part: outside().concat(range(lo, k - 1)), stale: range(k, hi) };
+        for (var key in extra) m[key] = extra[key];
+        return m;
+      }
+      snap(M(2), aMarks({}), { lo: lo, hi: hi, k: k },
+        t("Vi kopierer de to sorterte halvdelene over i to små bunker: L = " + L.join(", ") + " og R = " + R.join(", ") + ". Plassene " + lo + " til " + hi + " i arrayet er nå ledige (stiplet), og vi fyller dem på nytt fra venstre.",
+          "L ← A[" + lo + ".." + mid + "] = [" + L.join(", ") + "], R ← A[" + (mid + 1) + ".." + hi + "] = [" + R.join(", ") + "]. Så i ← 0, j ← 0, k ← " + lo + " (linje 3).",
+          "Kopier til hjelpearrayene L og R (det er derfor merge ikke er in-place). i = j = 0, k = lo = " + lo + " (linje 3)."), "Kopier til L og R",
+        { vars: vars, rows: rows(L, R, i, j, false, null) });
       while (i < L.length && j < R.length) {
-        var fromL = L[i] <= R[j], v = fromL ? L[i] : R[j];
-        A[k] = v; if (fromL) i++; else j++;
-        snap({ target: k }, { low: lo, high: hi, k: k },
-          t("Minste øverste kort er " + v + " – det legges på plass " + k + ".",
-            v + " (fra " + (fromL ? "venstre" : "høyre") + ") → A[" + k + "].",
-            "A[" + k + "]←" + v + " (" + (fromL ? "L[i++]" : "R[j++]") + ")."), null);
+        var fromL = L[i] <= R[j];
+        snap(M(5), aMarks({}), { lo: lo, hi: hi, k: k },
+          t("Begge bunkene har kort igjen. Vi ser på de to øverste: " + L[i] + " fra L og " + R[j] + " fra R. " +
+              (fromL ? L[i] + " er minst" + (L[i] === R[j] ? " (like store – da tar vi fra venstre)" : "") + ", så det tas fra L." : R[j] + " er minst, så det tas fra R."),
+            "i &lt; |L| og j &lt; |R| (linje 4). L[" + i + "] = " + L[i] + " ≤ R[" + j + "] = " + R[j] + "? " + (fromL ? "Ja: ta fra L." : "Nei: ta fra R (else)."),
+            "Testen L[i] ≤ R[j] er " + (fromL ? "sann" : "usann") + " (" + L[i] + (fromL ? " ≤ " : " &gt; ") + R[j] + ")." + (L[i] === R[j] ? " Ved likhet tar ≤ fra L – det bevarer stabiliteten." : "")),
+          "Sammenlign", { vars: vars, rows: rows(L, R, i, j, true, null) });
+        var v = fromL ? L[i] : R[j], took = fromL ? { side: "L", idx: i } : { side: "R", idx: j };
+        A[k] = v;
+        if (fromL) i++; else j++;
+        snap(M(fromL ? 6 : 8), aMarks({ target: k, stale: range(k + 1, hi) }), { lo: lo, hi: hi, k: k },
+          t(v + " legges på plass " + k + " i arrayet. Så går vi videre til neste plass.",
+            "A[" + k + "] ← " + (fromL ? "L[" + (i - 1) + "]" : "R[" + (j - 1) + "]") + " = " + v + "; " + (fromL ? "i ← " + i : "j ← " + j) + ". Deretter k ← " + (k + 1) + " (linje 9).",
+            "A[" + k + "] ← " + v + "; " + (fromL ? "i" : "j") + " og k øker med 1 (linje 9). A[" + lo + ".." + k + "] er nå de " + (k - lo + 1) + " minste av L og R, i sortert rekkefølge."),
+          "Skriv minste", { vars: vars, rows: rows(L, R, i, j, false, took) });
         k++;
       }
-      while (i < L.length) { A[k] = L[i++]; snap({ target: k }, { low: lo, high: hi, k: k }, t("Resten av venstre: " + A[k] + ".", "Tøm venstre.", "A[" + k + "]←L."), null); k++; }
-      while (j < R.length) { A[k] = R[j++]; snap({ target: k }, { low: lo, high: hi, k: k }, t("Resten av høyre: " + A[k] + ".", "Tøm høyre.", "A[" + k + "]←R."), null); k++; }
-      snap({ sorted: range(lo, hi) }, {}, t("Dette stykket er nå sortert.", "A[" + lo + ".." + hi + "] sortert.", "Delresultat ferdig."), "Delferdig");
+      var lEmpty = i >= L.length;
+      snap(M(4), aMarks({}), { lo: lo, hi: hi, k: k },
+        t((lEmpty ? "L" : "R") + " er tom. Da kan vi ikke sammenligne mer, så resten av " + (lEmpty ? "R" : "L") + " legges rett inn – de er alt sortert og større enn alt vi har skrevet.",
+          "while-testen er usann: " + (lEmpty ? "i = |L| = " + L.length : "j = |R| = " + R.length) + ". Resten av " + (lEmpty ? "R" : "L") + " kopieres inn (linje 10).",
+          "Løkka terminerer fordi " + (lEmpty ? "i = |L|" : "j = |R|") + ". Elementene igjen i " + (lEmpty ? "R" : "L") + " er ≥ alt som er skrevet."), "Én bunke tom",
+        { vars: vars, rows: rows(L, R, i, j, false, null) });
+      while (i < L.length || j < R.length) {
+        var restL = i < L.length, val = restL ? L[i] : R[j], tk = restL ? { side: "L", idx: i } : { side: "R", idx: j };
+        A[k] = val; if (restL) i++; else j++;
+        snap(M(10), aMarks({ target: k, stale: range(k + 1, hi) }), { lo: lo, hi: hi, k: k },
+          t("Resten av " + (restL ? "L" : "R") + ": " + val + " legges på plass " + k + ".",
+            "A[" + k + "] ← " + (restL ? "L" : "R") + "[" + (restL ? i - 1 : j - 1) + "] = " + val + " (rest).",
+            "Rest-kopiering: A[" + k + "] ← " + val + "."), "Kopier rest", { vars: vars, rows: rows(L, R, i, j, false, tk) });
+        k++;
+      }
+      runs = runs.filter(function (r) { return r[1] < lo || r[0] > hi; });
+      runs.push([lo, hi]);
+      var last = lo === 0 && hi === n - 1;
+      snap(6, last ? { sorted: range(0, n - 1) } : { part: runIdx(-1, -1) }, { lo: lo, hi: hi },
+        t(last ? "Den siste flettingen er ferdig. Nå er hele arrayet sortert: " + A.join(", ") + "."
+               : "Stykket fra plass " + lo + " til " + hi + " er nå sortert seg imellom (skravert): " + A.slice(lo, hi + 1).join(", ") + ". Det er ikke ferdig ennå – det skal flettes med naboen sin senere.",
+          last ? "Merge(A, 0, " + mid + ", " + (n - 1) + ") er ferdig: A er sortert."
+               : "Merge ferdig: A[" + lo + ".." + hi + "] = [" + A.slice(lo, hi + 1).join(", ") + "] er sortert seg imellom. " + callName(lo, hi) + " returnerer.",
+          last ? "Øverste Merge returnerer; A[0..n − 1] er sortert."
+               : callName(lo, hi) + " returnerer med A[" + lo + ".." + hi + "] sortert (delsortert – ikke nødvendigvis endelig plass)."),
+        last ? "Ferdig" : "Delsortert", { vars: [["kall", callName(lo, hi)]] });
     }
-    function sort(lo, hi) {
-      if (lo >= hi) return;
+    function sort(lo, hi, from) {
+      var vars = [["kall", callName(lo, hi)]];
+      var fromTxt = from === 4 ? " (kalt fra linje 4: venstre halvdel)" : from === 5 ? " (kalt fra linje 5: høyre halvdel)" : "";
+      if (lo >= hi) {
+        runs.push([lo, lo]);
+        snap(2, { part: runIdx(-1, -1) }, { lo: lo, hi: hi },
+          t("Bunken på plass " + lo + " har bare ett kort (" + A[lo] + "). Ett kort er alltid sortert, så her er det ingenting å gjøre.",
+            callName(lo, hi) + fromTxt + ": lo &lt; hi er usann (lo = hi = " + lo + "). Basistilfellet: ett element er sortert.",
+            "Basis: lo = hi = " + lo + ", intervallet har ett element. Kallet returnerer uten arbeid."), "Basis", { vars: vars });
+        return;
+      }
+      snap(2, { part: runIdx(-1, -1) }, { lo: lo, hi: hi },
+        t("Nå skal vi sortere plass " + lo + " til " + hi + " (" + (hi - lo + 1) + " tall). Det er mer enn ett, så vi må dele.",
+          callName(lo, hi) + fromTxt + ": lo &lt; hi (" + lo + " &lt; " + hi + "), så vi deler.",
+          callName(lo, hi) + fromTxt + ": " + (hi - lo + 1) + " elementer, lo &lt; hi er sann."), "Kall", { vars: vars });
       var mid = Math.floor((lo + hi) / 2);
-      snap({}, { low: lo, mid: mid, high: hi },
-        t("Vi deler stykket [" + lo + ".." + hi + "] i to ved " + mid + ".",
-          "Del [" + lo + ".." + hi + "] ved mid=" + mid + ".",
-          "Del: lo = " + lo + ", mid = " + mid + ", hi = " + hi + "."), "Del");
-      sort(lo, mid); sort(mid + 1, hi); merge(lo, mid, hi);
+      snap(3, { part: runIdx(-1, -1) }, { lo: lo, mid: mid, hi: hi },
+        t("Vi deler på midten: venstre del er plass " + lo + " til " + mid + ", høyre del er plass " + (mid + 1) + " til " + hi + ".",
+          "mid ← ⌊(" + lo + " + " + hi + ") / 2⌋ = " + mid + ". Venstre A[" + lo + ".." + mid + "], høyre A[" + (mid + 1) + ".." + hi + "].",
+          "mid = " + mid + "; halvdelene har " + (mid - lo + 1) + " og " + (hi - mid) + " elementer."), "Del", { vars: vars });
+      sort(lo, mid, 4); sort(mid + 1, hi, 5); merge(lo, mid, hi);
     }
-    sort(0, n - 1);
-    steps.push({ line: null, array: clone(A), marks: { sorted: range(0, n - 1) }, ptrs: {}, text: t("Ferdig – alt flettet sammen!", "Sortert.", "Terminert. O(n log n)."), tag: "Ferdig" });
+    sort(0, n - 1, 0);
+    // Med n ≥ 2 er siste fletting selve sluttsteget (grønt, med svaret). Med ett element trengs et eget.
+    if (n < 2) steps.push({ line: null, array: clone(A), marks: { sorted: range(0, n - 1) }, ptrs: {}, vars: [],
+      text: t("Ferdig! Ett tall er allerede sortert: " + A.join(", ") + ".", "Sortert: [" + A.join(", ") + "].", "Terminert uten fletting: basistilfellet."), tag: "Ferdig" });
     return steps;
   };
 
@@ -689,29 +879,40 @@
     }
   };
   IN.gen.quickSort = function (arr) {
+    /* Linjekoder for IN.pseudoGroup([Quicksort, Partition]): Quicksort-linje n → n;
+       Partition-linje n → 4000 + 100 + n (Partition kalt fra linje 4 i Quicksort). */
     var A = clone(arr), n = A.length, steps = [], done = [];
-    function snap(line, marks, ptrs, text, tag) {
+    function push(code, marks, ptrs, text, tag) {
       marks = marks || {};
       marks.sorted = (marks.sorted || []).concat(done);
-      steps.push({ line: line, array: clone(A), marks: marks, ptrs: ptrs || {}, text: text, tag: tag });
+      steps.push({ line: code, array: clone(A), marks: marks, ptrs: ptrs || {}, text: text, tag: tag });
     }
+    function snap(line, marks, ptrs, text, tag) { push(line == null ? null : 4100 + line, marks, ptrs, text, tag); }
     function swap(a, b) { var tmp = A[a]; A[a] = A[b]; A[b] = tmp; }
     function lr(l, r) { var p = {}; if (l >= 0 && l < n) p.left = l; if (r >= 0 && r < n) p.right = r; return p; }
+    push(null, {}, {},
+      t("Her er tallene vi skal sortere: " + A.join(", ") + ". Vi kaller Quicksort på hele arrayet.",
+        "Input: [" + A.join(", ") + "]. Kall Quicksort(A, 0, " + (n - 1) + ").",
+        "Input A = [" + A.join(", ") + "], low = 0, high = n − 1 = " + (n - 1) + "."), "Start");
     function qs(low, high) {
       if (low >= high) {
-        if (low === high) {
-          done.push(low);
-          snap(null, {}, { low: low, high: high },
-            t("Stykket har bare ett tall (" + A[low] + ") – det er allerede sortert.",
-              "Quicksort(A, " + low + ", " + high + "): ett element – basistilfelle.",
-              "low = high = " + low + " → return."), "Basistilfelle");
-        }
+        var bp = {}; if (low < n) bp.low = low; if (high >= 0) bp.high = high;
+        if (low === high) done.push(low);
+        push(3, {}, bp,
+          low === high
+            ? t("Stykket har bare ett tall (" + A[low] + ") – det er allerede sortert, og det står på endelig plass.",
+                "Quicksort(A, " + low + ", " + high + "): low ≥ high (ett element) – basistilfelle, return.",
+                "low = high = " + low + ": basistilfellet. Elementet står på endelig plass.")
+            : t("Stykket fra plass " + low + " til " + high + " er tomt. Her er det ingenting å gjøre.",
+                "Quicksort(A, " + low + ", " + high + "): low &gt; high, tomt område – basistilfelle, return.",
+                "low = " + low + " &gt; high = " + high + ": tomt intervall (pivoten havnet i kanten). Basistilfellet fanger det med ≥."),
+          low === high ? "Basistilfelle" : "Tomt stykke");
         return;
       }
-      snap(null, {}, { low: low, high: high },
-        t("Nå sorterer vi stykket fra plass " + low + " til " + high + ".",
-          "Quicksort(A, " + low + ", " + high + ").",
-          "Kall på A[" + low + ".." + high + "]."), "Kall");
+      push(2, {}, { low: low, high: high },
+        t("Nå sorterer vi stykket fra plass " + low + " til " + high + ". Det har mer enn ett tall, så vi må partisjonere.",
+          "Quicksort(A, " + low + ", " + high + "): low ≥ high er usann, så vi kaller Partition.",
+          "Kall på A[" + low + ".." + high + "] (" + (high - low + 1) + " elementer)."), "Kall");
       snap(2, { min: high }, { low: low, high: high },
         t("Vi velger pivot. Her tar vi bare det siste tallet (" + A[high] + "), så du kan se hva som skjer i verste fall. Kurset anbefaler å velge tilfeldig eller median-av-tre.",
           "ChoosePivot: demoen bruker siste element, A[" + high + "] = " + A[high] + ". (Kurset: tilfeldig eller median-av-tre.)",
@@ -761,16 +962,21 @@
               "left=" + left + " > right=" + right + "; løkka avsluttes."), "Krysset");
         }
       }
+      snap(7, { min: high }, lr(left, right),
+        t("Letingen er over. Nå skal pivoten inn på plass " + left + ", der left står.",
+          "while left ≤ right: " + left + " ≤ " + right + " er usann, så den ytre løkka er ferdig.",
+          "Løkkevilkåret left ≤ right er usant (left = " + left + ", right = " + right + "). Invariant: A[low..left−1] ≤ pivot og A[right+1..high−1] ≥ pivot."), "Løkka ferdig");
       swap(left, high);
       done.push(left);
       snap(14, { swap: [left, high] }, { left: left },
-        t("Pivoten " + pivot + " flyttes inn på plass " + left + " – nå står den helt riktig (grønn).",
-          "Pivot til plass " + left + "; den er ferdig. return " + left + ".",
-          "swap A[" + left + "], A[" + high + "]; p = " + left + "."), "Pivot plassert");
+        t("Pivoten " + pivot + " flyttes inn på plass " + left + " – nå står den helt riktig (grønn). Partition forteller at pivoten havnet på plass " + left + ".",
+          "Pivot til plass " + left + "; den er ferdig. Partition returnerer " + left + " (linje 15), så p = " + left + ".",
+          "swap A[" + left + "], A[" + high + "]; return left gir p = " + left + ". Så Quicksort(A, " + low + ", " + (left - 1) + ") og Quicksort(A, " + (left + 1) + ", " + high + ")."), "Pivot plassert");
       qs(low, left - 1); qs(left + 1, high);
     }
     qs(0, n - 1);
-    steps.push({ line: null, array: clone(A), marks: { sorted: range(0, n - 1) }, ptrs: {}, text: t("Ferdig!", "Sortert.", "Terminert."), tag: "Ferdig" });
+    steps.push({ line: null, array: clone(A), marks: { sorted: range(0, n - 1) }, ptrs: {},
+      text: t("Ferdig! Tallene står i rekkefølge: " + A.join(", ") + ".", "Sortert: [" + A.join(", ") + "].", "Terminert: [" + A.join(", ") + "]."), tag: "Ferdig" });
     return steps;
   };
 
@@ -944,7 +1150,7 @@
       steps.push({ line: 2, A: A.slice(), B: copyB(B), labels: labels, digit: p, text:
         t("Nå ser vi bare på " + pname + " (det understrekte sifferet).",
           "i = " + i + ": sorter på " + pname + " (siffer " + i + " fra venstre).",
-          "i = " + i + " → siffer " + i + " (" + pname + ")."), tag: "Siffer " + i });
+          "i = " + i + " → siffer " + i + " (" + pname + ")."), tag: "Siffer " + i + " · " + pname });
       for (var a = 0; a < n; a++) {
         var it = A[a], dg = digitOf(it.v, p);
         B[dg].push(it); done.push(a);
@@ -962,7 +1168,7 @@
           "Etter runden: sortert på sifrene " + i + " … " + (d - 1) + "."), tag: "Samle" });
     }
     steps.push({ line: 4, A: A.slice(), B: empty(), labels: labels, written: range(0, n - 1), text:
-      t("Ferdig! Etter det første sifferet er alle tallene sortert.",
+      t("Ferdig! Etter siste runde, med det første (mest betydningsfulle) sifferet, er alle tallene sortert.",
         "Sortert etter alle " + d + " siffer.",
         "Terminert etter d = " + d + " runder: O(d·(N + n))."), tag: "Ferdig" });
     return steps;
@@ -1150,4 +1356,15 @@
       if (!hit[c] && window.console) console.warn("Grenseforklaring uten treff i " + key + ": " + c);
     });
   });
+
+  /* ===================== PARSONS: BYTTBARE LINJER =====================
+     Linjer (indekser i lines[]) som står rett etter hverandre og er uavhengige av hverandre,
+     så begge rekkefølgene er riktige. Parsons-sjekken (pseudocode.js) godtar alle rekkefølger
+     innen en gruppe. Like kodelinjer godtas uansett. */
+  var BYTTBARE = {
+    insertionSort: [[1, 2]],   // key ← A[i]  /  j ← i − 1
+    binarySearch: [[0, 1]],    // low ← 0  /  high ← n − 1
+    heapInsert: [[0, 1]]       // A[n] ← x  /  i ← n
+  };
+  Object.keys(BYTTBARE).forEach(function (key) { if (IN.algos[key]) IN.algos[key].parsonsSwap = BYTTBARE[key]; });
 })();

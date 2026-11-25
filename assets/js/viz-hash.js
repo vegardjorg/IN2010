@@ -5,7 +5,8 @@
    IN.vizHash(stage, step, opts) tegner et steg. step = {
      parts: [
        { type: "probe", label, N, cells: [ {k, v?} | {tomb:true} | {ref:n} | null ],
-         marks: { cur, found, fresh, hole, miss, home, occ:[], moved:[] }, clusters: bool },
+         marks: { cur, found, fresh, hole, miss, home, keep, occ:[], moved:[] }, clusters: bool },
+         (keep = husket slettet-merke p ved innsetting med merker: stiplet ramme + «p»-merke)
        { type: "chain", label, N, rows: [ [ {k, v} … ] | null ],
          marks: { row, miss, cur:[r, j], found:[r, j], fresh:[r, j], repl:[r, j], seen:[[r, j]…] } },
        { type: "entries", label, items: [ {k, v} ], marks: { cur, fresh, repl, found } },
@@ -60,9 +61,11 @@
       if (m.found === i) cls += " is-found";
       if (m.hole === i) cls += " is-hole";
       if (m.miss === i) cls += " is-miss";
+      if (m.keep === i) { cls += " is-keep"; aria += " (husket merke p)"; }
       if (rr[i]) cls += " run-" + rr[i];
       var cell = el("div", { class: cls, role: "listitem", "aria-label": aria });
       if (m.home === i) cell.appendChild(el("span", { class: "hs-homemark", "aria-hidden": "true", text: "h" }));
+      if (m.keep === i) cell.appendChild(el("span", { class: "hs-keepmark", "aria-hidden": "true", text: "p" }));
       cell.appendChild(el("span", { class: "hs-k" + (main.length > 3 ? " sm" : ""), text: main }));
       if (sub) cell.appendChild(el("span", { class: "hs-v", text: sub }));
       cell.appendChild(el("span", { class: "hs-i", text: String(i) }));

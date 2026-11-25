@@ -297,7 +297,7 @@
         if (s.mangler) body.appendChild(el("p", { class: "cr-mangler small", text: (s.mangler === true ? "Et eget øvingskort for dette mangler ennå." : s.mangler) }));
       }
       // 6 Sjekk
-      body.appendChild(h3("Sjekk"));
+      body.appendChild(h3(s.sjekk && s.sjekk.length ? "Sjekk" : "Egenvurdering"));
       (s.sjekk || []).forEach(function (c, i) { buildCheck(s, c, i, body); });
       body.appendChild(selfMark(s));
       // 7 Feller
@@ -346,9 +346,7 @@
       if (c.type === "quiz") {
         var host = el("div", { id: hid, class: "cr-quiz" });
         wrap.appendChild(host);
-        var again = el("button", { class: "btn sm ghost", type: "button", text: "↺ Prøv igjen" });
-        again.addEventListener("click", function () { IN.quiz(host, c.items); });
-        wrap.appendChild(el("div", { class: "cr-ckbar" }, [res, again]));
+        wrap.appendChild(el("div", { class: "cr-ckbar" }, res));   // «↺ Nullstill» ligger i quizen selv
         body.appendChild(wrap);
         IN.quiz(host, c.items);
       } else if (c.type === "tf") {
@@ -441,7 +439,7 @@
         ]);
         into.appendChild(meta);
         if (m.begrunnelse) into.appendChild(el("p", { class: "small muted cr-mock-why", html: m.begrunnelse }));
-        if (m.eli5) into.appendChild(el("div", { class: "callout eli5 small", html: m.eli5 }));
+        if (m.eli5) into.appendChild(el("div", { class: "callout eli5 small lvl", "data-eli5": true, html: m.eli5 }));
         var d = {}; for (var k in m) if (Object.prototype.hasOwnProperty.call(m, k)) d[k] = m[k];
         IN.examTask(into, d);
       }

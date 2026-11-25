@@ -346,14 +346,235 @@
     return { activate: activate };
   };
 
-  /* ---------- Quiz ---------- */
-  // questions: [{ q, options:[...], answer: idx, explain }]
-  IN.quiz = function (host, questions) {
-    if (typeof host === "string") host = qs(host);
-    if (!host) return;
+  /* ---------- Felles motor for sant/usant og flervalg ----------
+     Én motor og ett design for IN.tfTest og IN.quiz:
+       topp:  bryter «Vis svar med en gang» + poeng
+       liste: nummererte punkter, svarknapper og nedtrekket «Forklaring» under hvert punkt
+       bunn:  «Sjekk svar» + «↺ Nullstill»
+     Bryteren er én global innstilling for alle sett og sider (localStorage in2010:svar-straks,
+     standard av). Regel for begge: du kan alltid endre svaret (unntak: lock etter sjekk).
+     Når tilbakemelding vises (bryteren på, eller etter «Sjekk svar»), blir valget grønt/rødt
+     med ✓/✗, riktig svar markeres, og et galt valg åpner forklaringen sin.
+     «Sjekk svar» åpner forklaringen under alle gale punkter og lukker de andre. */
+  var STRAKS_KEY = "in2010:svar-straks", qzN = 0;
+  function straksEvent(on) { try { document.dispatchEvent(new CustomEvent("in:svar-straks", { detail: !!on })); } catch (e) {} }
+  IN.svarStraks = {
+    KEY: STRAKS_KEY,
+    get: function () { return IN.store.get(STRAKS_KEY, "0") === "1"; },
+    set: function (on) { IN.store.set(STRAKS_KEY, on ? "1" : "0"); straksEvent(on); }
+  };
+  window.addEventListener("storage", function (e) { if (e.key === STRAKS_KEY) straksEvent(e.newValue === "1"); });
+  function plain(html) { var d = document.createElement("div"); d.innerHTML = html; return (d.textContent || "").trim(); }
+
+  /* spec: { kind: "tf"|"mc", storeKey, progressId,
+             items: [{ id, prompt (html), tag?: {text, cls, title}, render?: fn(node),
+                       choices: [{ label (html), value }], key, keyLabel (html), explain: html | fn(node) }] }
+     opts: se IN.tfTest / IN.quiz */
+  function answerSet(host, spec, o) {
+    if (host._qzOff) host._qzOff();
     clear(host);
-    // Fremdrift: når alle spørsmålene er besvart → quiz:<side>:<id>
-    var qid = host.id;
+    o = o || {};
+    var items = spec.items, mc = spec.kind === "mc", uid = "qz" + (++qzN);
+    var follow = o.instant == null;                 // følger den globale bryteren
+    var answers = {}, checked = false, open = {}, reported = false, cur = 0;
+    function has(id) { return answers[id] != null; }
+    if (spec.storeKey) {
+      try {
+        var saved = JSON.parse(IN.store.get(spec.storeKey, "null"));
+        if (saved && saved.a && typeof saved.a === "object") {
+          items.forEach(function (it) {
+            var v = saved.a[it.id];
+            if (v != null && it.choices.some(function (c) { return c.value === v; })) answers[it.id] = v;
+          });
+          checked = !!saved.c;
+        }
+      } catch (e) {}
+    }
+    function persist() { if (spec.storeKey) IN.store.set(spec.storeKey, JSON.stringify({ a: answers, c: checked })); }
+    function instant() { return follow ? IN.svarStraks.get() : !!o.instant; }
+    // "" (ingen tilbakemelding) | "right" | "wrong" | "blank" (ubesvart etter sjekk)
+    function state(it) {
+      if (!(instant() || checked)) return "";
+      if (!has(it.id)) return checked ? (o.blank ? "wrong" : "blank") : "";
+      return answers[it.id] === it.key ? "right" : "wrong";
+    }
+    function counts() {
+      var c = { right: 0, wrong: 0, blank: 0, answered: 0, total: items.length };
+      items.forEach(function (it) {
+        if (!has(it.id)) c.blank++;
+        else { c.answered++; if (answers[it.id] === it.key) c.right++; else c.wrong++; }
+      });
+      return c;
+    }
+
+    var wrap = el("div", { class: "qz " + (mc ? "qz-mc" : "qz-tf") + (o.cls ? " " + o.cls : "") });
+    var live = el("span", { class: "qz-live", "aria-live": "polite" });
+    function say(t) { live.textContent = ""; setTimeout(function () { live.textContent = t; }, 30); }
+    var head = el("div", { class: "qz-head" }), sw = null;
+    if (follow) {
+      sw = el("button", { class: "qz-switch", type: "button", role: "switch", "aria-checked": "false",
+        onclick: function () { IN.svarStraks.set(!instant()); } }, [
+        el("span", { class: "qz-track", "aria-hidden": "true" }, el("span", { class: "qz-thumb" })),
+        el("span", { text: "Vis svar med en gang" })]);
+      head.appendChild(sw);
+    } else if (o.note) head.appendChild(el("span", { class: "qz-note", html: o.note }));
+    var score = el("span", { class: "qz-score" });
+    head.appendChild(score);
+    var list = el("ol", { class: "qz-list" + (o.pager ? " qz-paged" : "") });
+
+    var rows = items.map(function (it, pos) {
+      var li = el("li", { class: "qz-item" });
+      var num = el("span", { class: "qz-num", "aria-hidden": "true", text: pos + 1 });
+      var body = el("div", { class: "qz-body" });
+      var prompt = el("div", { class: "qz-prompt", html: it.prompt });
+      if (it.tag) prompt.appendChild(el("span", { class: "tag blokk" + (it.tag.cls ? " " + it.tag.cls : ""), text: it.tag.text, title: it.tag.title || null }));
+      body.appendChild(prompt);
+      if (it.render) { var extra = el("div", { class: "qz-extra" }); body.appendChild(extra); it.render(extra); }
+      var group = el("div", { class: "qz-choices", role: "group",
+        "aria-label": (mc ? "Svaralternativer, spørsmål " : "Svar på påstand ") + (pos + 1) });
+      var btns = it.choices.map(function (c) {
+        var mark = el("span", { class: "qz-mark", "aria-hidden": "true" });
+        var b = el("button", { class: "qz-choice", type: "button", "aria-pressed": "false",
+          onclick: function () { choose(it, c.value); } }, [mark, el("span", { class: "qz-lbl", html: c.label })]);
+        b._v = c.value; b._mark = mark;
+        group.appendChild(b);
+        return b;
+      });
+      var expId = uid + "-x" + pos;
+      var tog = el("button", { class: "qz-exp-btn", type: "button", "aria-expanded": "false", "aria-controls": expId,
+        onclick: function () { open[it.id] = !open[it.id]; paint(); } },
+        [el("span", { text: it.explain ? "Forklaring" : "Fasit" }), el("span", { class: "qz-caret", "aria-hidden": "true", text: "▾" })]);
+      var exp = el("div", { class: "qz-exp", id: expId, hidden: true });
+      var sr = el("span", { class: "qz-sr" });
+      body.appendChild(el("div", { class: "qz-ctl" }, [group, tog]));
+      body.appendChild(exp);
+      body.appendChild(sr);
+      li.appendChild(num); li.appendChild(body);
+      list.appendChild(li);
+      return { it: it, li: li, num: num, btns: btns, tog: tog, exp: exp, sr: sr, pos: pos, filled: false };
+    });
+
+    function fill(r) {
+      r.filled = true;
+      r.exp.appendChild(el("p", { class: "qz-key", html: "Riktig svar: <b>" + r.it.keyLabel + "</b>" }));
+      if (typeof r.it.explain === "function") { var h = el("div"); r.exp.appendChild(h); r.it.explain(h); }
+      else if (r.it.explain) r.exp.appendChild(el("div", { class: "qz-exp-txt", html: r.it.explain }));
+    }
+    function paintItem(r) {
+      var it = r.it, st = state(it), sel = has(it.id) ? answers[it.id] : null, locked = !!(o.lock && checked);
+      r.li.className = "qz-item" + (st ? " is-" + st : "") + (has(it.id) ? " answered" : "");
+      r.num.textContent = st === "right" ? "✓" : st === "wrong" ? "✗" : st === "blank" ? "–" : String(r.pos + 1);
+      r.btns.forEach(function (b) {
+        var isSel = b._v === sel, cls = "qz-choice" + (isSel ? " sel" : ""), mk = "";
+        if (st && isSel) { if (st === "right") { cls += " correct"; mk = "✓"; } else if (st === "wrong") { cls += " wrong"; mk = "✗"; } }
+        if (st === "wrong" && !isSel && b._v === it.key) { cls += " iskey"; mk = "✓"; }
+        b.className = cls; b._mark.textContent = mk;
+        b.setAttribute("aria-pressed", isSel ? "true" : "false");
+        b.disabled = locked;
+      });
+      var key = plain(it.keyLabel);
+      r.sr.textContent = st === "right" ? "Riktig." : st === "blank" ? "Ikke besvart." :
+        st === "wrong" ? (has(it.id) ? "Feil. " : "Blankt, teller som galt. ") + "Riktig svar: " + key + "." : "";
+      var canExp = !(o.lock && !checked);
+      var isOpen = canExp && !!open[it.id];
+      r.tog.hidden = !canExp;
+      r.tog.setAttribute("aria-expanded", isOpen ? "true" : "false");
+      if (isOpen && !r.filled) fill(r);
+      r.exp.hidden = !isOpen;
+    }
+    function scoreHtml(c) {
+      if (checked) return '<b class="ok">✓ ' + c.right + ' riktig</b> · <b class="no">✗ ' + c.wrong + " galt</b>" +
+        (c.blank ? ' · <span class="' + (o.blank ? "no" : "muted") + '">' + c.blank + (o.blank ? (c.blank === 1 ? " blank" : " blanke") : " ubesvart") + "</span>" : "") +
+        " · " + c.right + "/" + c.total;
+      return c.answered + " av " + c.total + " besvart" + (instant() && c.answered ? ' · <b class="ok">' + c.right + " riktig</b>" : "");
+    }
+    function paint() {
+      if (sw) sw.setAttribute("aria-checked", instant() ? "true" : "false");
+      rows.forEach(paintItem);
+      score.innerHTML = scoreHtml(counts());
+      bCheck.disabled = !!(o.lock && checked);
+      if (o.pager) paintPager();
+    }
+    function report() {
+      var c = counts();
+      if (o.report) { o.report(c); return; }
+      if (IN.progress && spec.progressId) IN.progress.solved(mc ? "quiz" : "tf", spec.progressId, c.right, c.total);
+    }
+    function choose(it, v) {
+      if (o.lock && checked) return;
+      if (v == null) delete answers[it.id]; else answers[it.id] = v;
+      persist();
+      var st = state(it);
+      if (st === "wrong") open[it.id] = true;
+      paint();
+      if (st === "right") say("Riktig.");
+      else if (st === "wrong") say("Feil. Riktig svar: " + plain(it.keyLabel) + ".");
+      // Fremdrift i straks-modus: første gang alle er besvart (deretter ved «Sjekk svar»)
+      if (instant() && !checked && !reported && counts().answered === items.length) { reported = true; report(); }
+    }
+    function doCheck() {
+      checked = true;
+      rows.forEach(function (r) { open[r.it.id] = state(r.it) === "wrong"; });
+      persist(); paint(); report();
+      var c = counts();
+      clear(res);
+      if (o.result) { var x = o.result(c); if (typeof x === "string") res.innerHTML = x; else append(res, x); }
+      else say(c.right + " av " + c.total + " riktig. " + c.wrong + " galt" + (c.blank ? ", " + c.blank + " ubesvart" : "") + ".");
+    }
+    function doReset() {
+      if (o.onReset) { o.onReset(); return; }
+      answers = {}; checked = false; open = {}; reported = false; cur = 0;
+      persist(); clear(res); paint(); say("Nullstilt.");
+    }
+
+    var bCheck = el("button", { class: "btn primary", type: "button", text: o.checkLabel || "Sjekk svar", onclick: doCheck });
+    var bReset = el("button", { class: "btn", type: "button", text: o.resetLabel || "↺ Nullstill", onclick: doReset });
+    var foot = el("div", { class: "qz-foot" }, [bCheck, bReset]);
+    var res = el("div", { class: "qz-result", "aria-live": o.result ? "polite" : null });
+
+    // Bla-modus (én oppgave om gangen, med prikker for oversikt)
+    var dots = [], pgLbl = null, dotRow = null, pnav = null;
+    function go(j) { cur = (j + rows.length) % rows.length; paint(); }
+    function paintPager() {
+      rows.forEach(function (r, j) { r.li.hidden = j !== cur; });
+      pgLbl.textContent = "Oppgave " + (cur + 1) + " av " + rows.length;
+      dots.forEach(function (d, j) {
+        var it = rows[j].it, st = state(it);
+        d.className = "qz-dot" + (st ? " is-" + st : "") + (has(it.id) ? " answered" : "") + (j === cur ? " cur" : "");
+        d.textContent = st === "right" ? "✓" : st === "wrong" ? "✗" : String(j + 1);
+        d.setAttribute("aria-label", "Oppgave " + (j + 1) + (st === "right" ? ", riktig" : st === "wrong" ? ", feil" : has(it.id) ? ", besvart" : ""));
+        d.setAttribute("aria-current", j === cur ? "true" : "false");
+      });
+    }
+    if (o.pager) {
+      dotRow = el("div", { class: "qz-dots", role: "group", "aria-label": "Velg oppgave" });
+      dots = rows.map(function (r, j) { var d = el("button", { class: "qz-dot", type: "button", onclick: function () { go(j); } }); dotRow.appendChild(d); return d; });
+      pgLbl = el("span", { class: "qz-pg" });
+      pnav = el("div", { class: "qz-pnav" }, [
+        el("button", { class: "btn", type: "button", text: "← Forrige", onclick: function () { go(cur - 1); } }), pgLbl,
+        el("button", { class: "btn", type: "button", text: "Neste →", onclick: function () { go(cur + 1); } })]);
+    }
+
+    [head, dotRow, list, pnav, foot, res, live].forEach(function (x) { if (x) wrap.appendChild(x); });
+    host.appendChild(wrap);
+    if (checked) rows.forEach(function (r) { open[r.it.id] = state(r.it) === "wrong"; });
+    function onPref() { if (!wrap.isConnected) { host._qzOff && host._qzOff(); return; } paint(); }
+    document.addEventListener("in:svar-straks", onPref);
+    host._qzOff = function () { document.removeEventListener("in:svar-straks", onPref); host._qzOff = null; };
+    paint();
+    return { check: doCheck, reset: doReset, counts: counts, el: wrap };
+  }
+
+  /* ---------- Flervalg ----------
+     IN.quiz(host, questions, opts?)
+     questions: [{ q (html), options: [html…], answer: idx, explain: html | fn(node), render?: fn(node) }]
+     opts: { id?, pager?: én om gangen med prikker, inline?: alternativene på rad, cls? }
+     Fremdrift: quiz:<side>:<id>. Svar lagres i in-quiz:<side>:<id> når quizen har id. */
+  IN.quiz = function (host, questions, opts) {
+    if (typeof host === "string") host = qs(host);
+    if (!host || !questions || !questions.length) return;
+    opts = opts || {};
+    var qid = opts.id || host.id;
     if (!qid) {
       var pan = host.closest && host.closest("[data-panel]");
       var pre = pan ? pan.getAttribute("data-panel") + "-" : "";
@@ -361,171 +582,49 @@
       IN.quiz._n[pre] = (IN.quiz._n[pre] || 0) + 1;
       qid = pre + "quiz" + IN.quiz._n[pre];
     }
-    var answered = 0, right = 0;
-    questions.forEach(function (item, qi) {
-      var card = el("div", { class: "quiz-q" });
-      card.appendChild(el("div", { class: "qtext", html: item.q }));
-      var exp = el("div", { class: "quiz-exp", html: item.explain || "" });
-      var opts = item.options.map(function (opt, oi) {
-        return el("button", {
-          class: "quiz-opt", type: "button", html: opt,
-          onclick: function () {
-            qsa(".quiz-opt", card).forEach(function (b) { b.disabled = true; });
-            if (oi === item.answer) this.classList.add("correct");
-            else {
-              this.classList.add("wrong");
-              qsa(".quiz-opt", card)[item.answer].classList.add("correct");
-            }
-            exp.classList.add("show");
-            answered++; if (oi === item.answer) right++;
-            if (answered === questions.length && IN.progress) IN.progress.solved("quiz", qid, right, questions.length);
-          }
-        });
-      });
-      card.appendChild(el("div", {}, opts));
-      if (item.explain) card.appendChild(exp);
-      host.appendChild(card);
+    var items = questions.map(function (item, i) {
+      return { id: i, prompt: item.q, render: item.render || null, explain: item.explain || "",
+        choices: item.options.map(function (opt, oi) { return { label: opt, value: oi }; }),
+        key: item.answer, keyLabel: item.options[item.answer] };
     });
+    return answerSet(host, { kind: "mc", items: items, progressId: qid,
+      storeKey: (opts.id || host.id) ? "in-quiz:" + IN.pageId() + ":" + qid : null },
+      { pager: opts.pager, cls: (opts.inline ? "qz-inline" : "") + (opts.cls ? " " + opts.cls : "") });
   };
 
-  /* ---------- Sant/usant-test ----------
-     items: [{ s: "påstand (html)", answer: true|false, explain: "html", blokk: "1" }]
-     opts:  { id?: lagringsnøkkel, shuffle?: false }
-     Prøv deg selv, få antall riktig/galt, og vis fasit/forklaring per påstand
-     eller for alle samtidig. Lett grensesnitt – ingen avhengigheter. */
+  /* ---------- Sant/usant ----------
+     IN.tfTest(host, items, opts?)
+     items: [{ s: "påstand (html)", answer: true|false, explain: "html", blokk?, tema?, kilde? }]
+       kilde: eksamen påstanden er fra (ellers årstallet i teksten, f.eks. «(H2022)»; false = aldri merke).
+       Påstander fra eksamen sorteres først.
+     opts: { id?: lagringsnøkkel in-tf:<id> og fremdrift tf:<side>:<id>, shuffle?,
+             blank?: egen «Blankt»-knapp, og blankt teller som galt ved sjekk,
+             instant?: true/false låser modus og skjuler bryteren (udefinert = global bryter),
+             lock?: svarene låses etter sjekk, og forklaringene vises først etter sjekk,
+             note?: html i topplinja når bryteren er skjult,
+             checkLabel?, resetLabel?, onReset?: fn (erstatter vanlig nullstilling),
+             report?: fn(counts) (erstatter vanlig fremdrift), result?: fn(counts) → html | node under knappene } */
   IN.tfTest = function (host, items, opts) {
     if (typeof host === "string") host = qs(host);
     if (!host || !items || !items.length) return;
     opts = opts || {};
-    var storeKey = opts.id ? "in-tf:" + opts.id : null;
-
-    // Stabil identitet + gjenoppretting av svar
-    // kilde: eksamen påstanden kommer fra (eget felt, ellers årstallet i teksten, f.eks. «(H2022)»)
     function kildeOf(it) {
       if (it.kilde !== undefined) return it.kilde || null;   // kilde: false = aldri eksamensmerke
       var m = /\b([HV]20\d\d)\b/.exec((it.s || "") + " " + (it.explain || ""));
       return m ? m[1] : null;
     }
-    items = items.map(function (it, i) { return { s: it.s, answer: !!it.answer, explain: it.explain || "", blokk: it.blokk || null, tema: it.tema || null, kilde: kildeOf(it), _id: i }; });
-    var answers = {}; // _id -> true/false
-    var checked = false;
-    if (storeKey) {
-      try {
-        var saved = JSON.parse(IN.store.get(storeKey, "null"));
-        if (saved && saved.a) { answers = saved.a; checked = !!saved.c; }
-      } catch (e) {}
-    }
-    function persist() {
-      if (!storeKey) return;
-      IN.store.set(storeKey, JSON.stringify({ a: answers, c: checked }));
-    }
-
-    // Påstander fra eksamen først, deretter resten (ellers uendret rekkefølge)
-    var order = items.filter(function (it) { return it.kilde; }).concat(items.filter(function (it) { return !it.kilde; }))
-      .map(function (it) { return it._id; });
-    function shuffle() { for (var i = order.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)); var t = order[i]; order[i] = order[j]; order[j] = t; } }
-    if (opts.shuffle) shuffle();
-
-    var wrap = el("div", { class: "tftest" });
-    var score = el("span", { class: "tf-score", "aria-live": "polite" });
-    var bCheck = el("button", { class: "btn sm primary", type: "button", text: "Sjekk svar", onclick: doCheck });
-    var bReset = el("button", { class: "btn sm", type: "button", text: "↺ Nullstill", onclick: doReset });
-    var keyShown = false, expShown = false;
-    var bKey = el("button", { class: "btn sm ghost", type: "button", text: "Vis alle fasit",
-      onclick: function () { keyShown = !keyShown; bKey.textContent = keyShown ? "Skjul fasit" : "Vis alle fasit"; render(); } });
-    var bExp = el("button", { class: "btn sm ghost", type: "button", text: "Vis alle forklaringer",
-      onclick: function () { expShown = !expShown; bExp.textContent = expShown ? "Skjul forklaringer" : "Vis alle forklaringer"; render(); } });
-    var bar = el("div", { class: "tf-bar" }, [bCheck, bReset, el("span", { class: "tf-sep" }), bKey, bExp, score]);
-    var list = el("div", { class: "tf-list" });
-    wrap.appendChild(bar); wrap.appendChild(list);
-    clear(host); host.appendChild(wrap);
-
-    function counts() {
-      var right = 0, wrong = 0, blank = 0;
-      items.forEach(function (it) {
-        if (answers[it._id] == null) blank++;
-        else if (answers[it._id] === it.answer) right++;
-        else wrong++;
-      });
-      return { right: right, wrong: wrong, blank: blank, total: items.length };
-    }
-    function updateScore() {
-      if (!checked) { score.textContent = ""; score.className = "tf-score"; return; }
-      var c = counts();
-      score.className = "tf-score show";
-      score.innerHTML = '<b class="ok">' + c.right + " riktig</b> · <b class=\"no\">" + c.wrong + " galt</b>" +
-        (c.blank ? ' · <span class="muted">' + c.blank + " ubesvart</span>" : "") +
-        ' · ' + c.right + "/" + c.total;
-    }
-    function choose(id, val) {
-      answers[id] = val; persist();
-      if (checked) updateScore();
-      render();
-    }
-    function doCheck() {
-      checked = true; persist(); render(); updateScore();
-      var c = counts(), tid = opts.id || host.id;
-      if (IN.progress && tid) IN.progress.solved("tf", tid, c.right, c.total);
-    }
-    function doReset() { answers = {}; checked = false; keyShown = false; expShown = false; bKey.textContent = "Vis alle fasit"; bExp.textContent = "Vis alle forklaringer"; persist(); render(); updateScore(); }
-
-    function render() {
-      clear(list);
-      order.forEach(function (id, pos) {
-        var it = items[id];
-        var sel = answers[id];
-        // Én rad per påstand: nr · påstand · Sant/Usant · Fasit/Forklar (fasit/forklaring folder ut under raden)
-        var item = el("div", { class: "tf-item" + (sel != null ? " answered" : "") });
-        item.appendChild(el("span", { class: "tf-num", text: (pos + 1) }));
-        var stmt = el("div", { class: "tf-stmt", html: it.s });
-        if (it.kilde) stmt.appendChild(el("span", { class: "tag blokk tf-eks", text: it.kilde, title: "Fra eksamen " + it.kilde }));
-        else if (it.tema) stmt.appendChild(el("span", { class: "tag blokk", text: it.tema }));
-        else if (it.blokk) stmt.appendChild(el("span", { class: "tag blokk", text: "Blokk " + it.blokk }));
-        item.appendChild(stmt);
-
-        var choices = el("div", { class: "tf-choices", role: "group", "aria-label": "Sant eller usant" });
-        [["Sant", true], ["Usant", false]].forEach(function (pair) {
-          var val = pair[1];
-          var cls = "tf-choice" + (sel === val ? " sel" : "");
-          if (checked && sel === val) cls += (val === it.answer ? " correct" : " wrong");
-          if (checked && keyShownMaybe(it) && val === it.answer) cls += " iskey";
-          var b = el("button", { class: cls, type: "button", text: pair[0],
-            "aria-pressed": sel === val ? "true" : "false",
-            onclick: function () { choose(id, val); } });
-          choices.appendChild(b);
-        });
-        item.appendChild(choices);
-
-        // Per-påstand verktøy
-        var tools = el("div", { class: "tf-tools" });
-        var itemKey = !!it._showKey || keyShown;
-        var itemExp = !!it._showExp || expShown;
-        var tKey = el("button", { class: "linklike" + (itemKey ? " on" : ""), type: "button", text: "Fasit",
-          "aria-expanded": itemKey ? "true" : "false", title: itemKey ? "Skjul fasit" : "Vis fasit",
-          onclick: function () { it._showKey = !itemKey; render(); } });
-        var tExp = el("button", { class: "linklike" + (itemExp ? " on" : ""), type: "button", text: "Forklar",
-          "aria-expanded": itemExp ? "true" : "false", title: itemExp ? "Skjul forklaring" : "Vis forklaring",
-          onclick: function () { it._showExp = !itemExp; render(); } });
-        tools.appendChild(tKey);
-        if (it.explain) tools.appendChild(tExp);
-        item.appendChild(tools);
-
-        if (itemKey) {
-          var ok = checked && sel != null && sel === it.answer;
-          var bad = checked && sel != null && sel !== it.answer;
-          item.appendChild(el("div", { class: "tf-reveal key" + (ok ? " ok" : bad ? " no" : ""),
-            html: "Riktig svar: <b>" + (it.answer ? "Sant" : "Usant") + "</b>" +
-              (checked && sel != null ? (ok ? " – du svarte riktig ✓" : " – du svarte " + (sel ? "Sant" : "Usant") + " ✗") : "") }));
-        }
-        if (itemExp && it.explain) item.appendChild(el("div", { class: "tf-reveal exp", html: it.explain }));
-
-        list.appendChild(item);
-      });
-    }
-    function keyShownMaybe(it) { return keyShown || it._showKey; }
-
-    render(); updateScore();
-    return { check: doCheck, reset: doReset, counts: counts };
+    var norm = items.map(function (it, i) { return { s: it.s, answer: !!it.answer, explain: it.explain || "", blokk: it.blokk || null, tema: it.tema || null, kilde: kildeOf(it), _id: i }; });
+    var order = norm.filter(function (it) { return it.kilde; }).concat(norm.filter(function (it) { return !it.kilde; }));
+    if (opts.shuffle) for (var i = order.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)), t = order[i]; order[i] = order[j]; order[j] = t; }
+    var choices = [{ label: "Sant", value: true }, { label: "Usant", value: false }];
+    if (opts.blank) choices.push({ label: "Blankt", value: null });
+    var list = order.map(function (it) {
+      return { id: it._id, prompt: it.s, explain: it.explain, choices: choices, key: it.answer, keyLabel: it.answer ? "Sant" : "Usant",
+        tag: it.kilde ? { text: it.kilde, cls: "tf-eks", title: "Fra eksamen " + it.kilde } :
+          it.tema ? { text: it.tema } : it.blokk ? { text: "Blokk " + it.blokk } : null };
+    });
+    return answerSet(host, { kind: "tf", items: list, progressId: opts.id || host.id,
+      storeKey: opts.id ? "in-tf:" + opts.id : null }, opts);
   };
 
   /* ---------- Eksamensoppgave (utvidbart kort) ----------

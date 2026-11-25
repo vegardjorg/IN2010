@@ -24,7 +24,8 @@
      step: {
        array: [...],            // hele arrayet
        size:  n,                // hvor mange av cellene som er heap (resten = sortert hale)
-       marks: { compare:[], swap:[], active: i, sorted:[], target: i, ghost: true },
+       marks: { compare:[], swap:[], moved:[], active: i, sorted:[], target: i, ghost: true,
+                vars: [[navn, verdi]] },   // moved = kopieres/flyttes (ikke bytte); vars = piller (i, j, x …)
        edge:  [a, b],           // kant som utheves (forelder–barn som sammenlignes)
        out:   [...],            // verdier som er tatt ut (prioritetskø-rekkefølge)
        outLabel: "Tatt ut"
@@ -40,6 +41,7 @@
     if (inArr(marks.compare, i)) c += " is-compare";
     if (marks.min === i) c += " is-min";
     if (inArr(marks.swap, i)) c += " is-swap";
+    if (inArr(marks.moved, i)) c += " is-moved";
     if (marks.active === i || marks.target === i) c += " is-target";
     if (marks.sel === i) c += " is-sel";
     if (inArr(marks.rel, i)) c += " is-rel";
@@ -97,7 +99,10 @@
     if (marks.ghost) cells += '<div class="hv-cell hv-ghostcell"><span class="v">&nbsp;</span><span class="ix">' + A.length + "</span></div>";
     if (!A.length && !marks.ghost) cells = '<span class="muted small">(tomt array)</span>';
 
-    var html = '<div class="hv">' + (opts.label ? '<div class="hv-lbl small">' + opts.label + "</div>" : "") + svg +
+    var vars = step.vars || marks.vars, varsHtml = "";
+    if (vars && vars.length) varsHtml = '<div class="hv-vars" aria-label="Variabler">' + vars.map(function (p) {
+      return '<span class="hv-var"><span class="lbl">' + esc(p[0]) + '</span><span class="val">' + esc(p[1]) + "</span></span>"; }).join("") + "</div>";
+    var html = '<div class="hv">' + (opts.label ? '<div class="hv-lbl small">' + opts.label + "</div>" : "") + svg + varsHtml +
       (opts.hideArray ? "" : '<div class="hv-arr-wrap"><div class="hv-arr-lbl muted small">' + esc(opts.arrName || "Array A") +
       (size < A.length ? ' · heap = A[0..' + (size - 1) + '], sortert hale = A[' + size + '..' + (A.length - 1) + ']' : "") +
       '</div><div class="hv-arr">' + cells + "</div></div>");
@@ -597,8 +602,10 @@
   function genInsert(vals, start, opts) {
     opts = opts || {};
     var A = start ? clone(start) : [], steps = [];
-    function snap(line, marks, text, tag, edge) {
-      steps.push({ line: line, array: clone(A), size: A.length, marks: marks || {}, edge: edge || null, text: text, tag: tag });
+    function snap(line, marks, text, tag, edge, vars) {
+      marks = marks || {};
+      if (vars) marks.vars = vars;
+      steps.push({ line: line, array: clone(A), size: A.length, marks: marks, edge: edge || null, text: text, tag: tag });
     }
     if (!opts.quiet) {
       snap(null, { ghost: true },
@@ -611,17 +618,17 @@
               "Utgangspunkt: tom heap (n = 0). Vi kaller HeapInsert(A, x) for hvert tall i rekkefølge: " + vals.join(", ") + "."),
         "Start");
     }
-    vals.forEach(function (x) {
+    vals.forEach(function (x, vi) {
       var n = A.length;
       A.push(x);
       snap(2, { target: n },
         t(x + " legges på første ledige plass nederst i treet (plass " + n + "). Da er treet fortsatt fylt opp fra venstre.",
           "A[" + n + "] ← " + x + ": legg " + x + " bakerst.",
           "Vi plasserer " + x + " på indeks n = " + n + ". Treet er fortsatt komplett, men heap-egenskapen kan være brutt mellom " + x + " og forelderen."),
-        "Sett inn " + x);
+        "Sett inn " + x, null, [["x", x], ["n", n]]);
       var i = n;
       snap(3, { target: i },
-        t("Vi følger " + x + " med «i» = " + i + ".", "i ← " + i + ".", "i ← " + i + ": boble opp starter i den nye løvnoden."), null);
+        t("Vi følger " + x + " med «i» = " + i + ".", "i ← " + i + ".", "i ← " + i + ": boble opp starter i den nye løvnoden."), null, null, [["x", x], ["i", i]]);
       while (true) {
         if (i === 0) {
           snap(4, { target: 0 },
@@ -631,7 +638,8 @@
                   "i = 0, så løkkevilkåret er usant. Heapen hadde bare dette ene elementet.")
               : t(x + " har klatret helt til toppen. Nå er det det minste tallet i hele heapen.",
               "i = 0: roten er nådd, løkka stopper.",
-              "i = 0, så løkkevilkåret er usant. " + x + " er nytt minimum i roten."), n === 0 ? "Første element" : "Roten nådd");
+              "i = 0, så løkkevilkåret er usant. " + x + " er nytt minimum i roten."), n === 0 ? "Første element" : "Roten nådd", null,
+            [["x", x], ["i", 0], ["i > 0?", "nei"]]);
           break;
         }
         var p = parent(i);
@@ -640,33 +648,35 @@
             t("Forelderen " + A[p] + " er større enn " + A[i] + ". Det minste skal stå øverst, så de må bytte.",
               "Forelder A[" + p + "] = " + A[p] + " > A[" + i + "] = " + A[i] + ": heap-egenskapen er brutt.",
               "Forelderen til " + i + " er ⌊(" + i + " − 1)/2⌋ = " + p + ". Siden " + A[p] + " > " + A[i] + " holder løkkevilkåret, og vi må boble opp."),
-            "Sammenlign", [p, i]);
+            "Sammenlign", [p, i], [["x", x], ["i", i], ["forelder", p], ["A[" + p + "] > A[" + i + "]?", A[p] + " > " + A[i] + ": ja"]]);
           var tmp = A[p]; A[p] = A[i]; A[i] = tmp;
           snap(5, { swap: [p, i] },
             t(A[p] + " og " + A[i] + " bytter plass. Det lille tallet flytter én etasje opp.",
               "Bytt A[" + i + "] og A[" + p + "].",
               "Etter byttet holder heap-egenskapen mellom " + p + " og barna. En eventuell feil finnes nå bare mellom " + p + " og forelderen dens."),
-            "Bytt", [p, i]);
+            "Bytt", [p, i], [["x", x], ["i", i], ["forelder", p]]);
           i = p;
           snap(6, { target: i },
-            t("Vi følger " + A[i] + " opp til plass " + i + " og sjekker igjen.", "i ← " + i + ".", "i ← ⌊(i − 1)/2⌋ = " + i + "."), null);
+            t("Vi følger " + A[i] + " opp til plass " + i + " og sjekker igjen.", "i ← " + i + ".", "i ← ⌊(i − 1)/2⌋ = " + i + "."), null, null, [["x", x], ["i", i]]);
         } else {
           snap(4, { compare: [p, i] },
             t("Forelderen " + A[p] + " er ikke større enn " + A[i] + ". Da står " + A[i] + " riktig, og vi er ferdige med dette tallet.",
               "A[" + p + "] = " + A[p] + " ≤ " + A[i] + ": heap-egenskapen holder, stopp.",
               "Vilkåret A[" + p + "] > A[" + i + "] er usant, så " + A[i] + " står riktig og løkka avslutter."),
-            "Stopp", [p, i]);
+            "Stopp", [p, i], [["x", x], ["i", i], ["forelder", p], ["A[" + p + "] > A[" + i + "]?", A[p] + " > " + A[i] + ": nei"]]);
           break;
         }
       }
-      if (!opts.quiet) snap(null, { ghost: true },
+      // «Heap nå» etter siste tall ville vært nesten likt «Ferdig»-steget under, så det hoppes over
+      if (!opts.quiet && vi < vals.length - 1) snap(null, { ghost: true },
         t("Heapen nå: " + list(A) + ".", "A = " + list(A) + ".", "Etter HeapInsert(A, " + x + "): A = " + list(A) + ", n = " + A.length + "."), "Heap nå");
     });
     if (!opts.quiet) {
+      var last = vals[vals.length - 1];
       steps.push({ line: null, array: clone(A), size: A.length, marks: { sorted: A.map(function (_, k) { return k; }) },
         text: t("Ferdig! Heapen er " + list(A) + ". Det minste tallet ligger på toppen.",
-                "Ferdig. Sluttilstand: " + A.join(", ") + ".",
-                "Ferdig. Sluttilstand: " + A.join(", ") + ". Hver innsetting kostet O(log n), så n innsettinger koster O(n log n) til sammen."),
+                "Ferdig etter HeapInsert(A, " + last + "). Sluttilstand: " + A.join(", ") + ".",
+                "Ferdig. Sluttilstand: " + A.join(", ") + " (n = " + A.length + "). Hver innsetting kostet O(log n), så " + vals.length + " innsettinger koster O(n log n) til sammen."),
         tag: "Ferdig" });
     }
     return steps;
@@ -683,8 +693,10 @@
     var wasHeap = isMinHeap(A);
     if (!wasHeap) buildMin(A);
     var reps = Math.min(count == null ? 3 : count, A.length);
-    function snap(line, marks, size, text, tag, edge) {
-      steps.push({ line: line, array: clone(A), size: size, marks: marks || {}, edge: edge || null, out: clone(out), outLabel: "Tatt ut (i rekkefølge)", text: text, tag: tag });
+    function snap(line, marks, size, text, tag, edge, vars) {
+      marks = marks || {};
+      if (vars) marks.vars = vars;
+      steps.push({ line: line, array: clone(A), size: size, marks: marks, edge: edge || null, out: clone(out), outLabel: "Tatt ut (i rekkefølge)", text: text, tag: tag });
     }
     function ganger(k) { return k + (k === 1 ? " gang" : " ganger"); }
     if (!opts.quiet) {
@@ -699,41 +711,44 @@
         "Start");
     }
     for (var r = 0; r < reps; r++) {
-      var n = A.length, x = A[0], m = n - 1;
+      var n = A.length, x = A[0], m = n - 1, X = ["x (tas ut)", x];
       snap(2, { min: 0 }, n,
-        t("Det minste tallet, " + x + ", ligger alltid på toppen. Vi tar vare på det.", "x ← A[0] = " + x + ".", "Minimum ligger i roten: x ← A[0] = " + x + ". Her er n = " + n + "."), "Minste = " + x);
+        t("Det minste tallet, " + x + ", ligger alltid på toppen. Vi tar vare på det.", "x ← A[0] = " + x + ".", "Minimum ligger i roten: x ← A[0] = " + x + ". Her er n = " + n + "."), "Minste = " + x, null, [X]);
       A[0] = A[n - 1];
-      snap(3, { swap: n > 1 ? [0, n - 1] : [0] }, n,
+      snap(3, n > 1 ? { moved: [0, n - 1] } : { min: 0 }, n,
         n > 1
-          ? t("Det siste tallet, " + A[0] + ", kopieres opp på toppen for å fylle hullet. Den bakerste plassen hører ikke med lenger.",
-              "A[0] ← A[" + (n - 1) + "] = " + A[0] + ". Heapen har nå n − 1 = " + m + " elementer.",
-              "Hullet i roten fylles med siste element, A[" + (n - 1) + "] = " + A[0] + ". Heapen er nå A[0.." + (m - 1) + "], altså n − 1 = " + m + " elementer.")
+          ? t("Det siste tallet, " + A[0] + ", kopieres opp på toppen for å fylle hullet. Det er en flytting, ikke et bytte: " + x + " ligger trygt i x. Den bakerste plassen hører ikke med lenger.",
+              "A[0] ← A[" + (n - 1) + "] = " + A[0] + " (en kopi, ikke et bytte). Heapen har nå n − 1 = " + m + " elementer.",
+              "Hullet i roten fylles med en kopi av siste element, A[" + (n - 1) + "] = " + A[0] + ". Heapen er nå A[0.." + (m - 1) + "], altså n − 1 = " + m + " elementer.")
           : t("Det var bare ett tall, så toppen er også det siste. Nå er heapen tom.", "n = 1: heapen blir tom.", "n = 1: n − 1 = 0, heapen er tom etterpå."),
-        "Siste til roten");
+        n > 1 ? "Siste kopieres til roten" : "Siste til roten", null, [X]);
       A.pop();
       var i = 0, stopped = false;
       if (m > 0) snap(4, { target: 0 }, m,
-        t("Nå følger vi " + A[0] + " fra toppen. (Den gamle bakerste plassen er fjernet fra tegningen.)", "i ← 0. Grensen i løkka er n − 1 = " + m + ".", "Boble ned starter i roten. Heapen har n − 1 = " + m + " elementer, og det er grensen løkka bruker."), null);
+        t("Nå følger vi " + A[0] + " fra toppen. (Den gamle bakerste plassen er fjernet fra tegningen.)", "i ← 0. Grensen i løkka er n − 1 = " + m + ".", "Boble ned starter i roten. Heapen har n − 1 = " + m + " elementer, og det er grensen løkka bruker."), null, null, [X, ["i", 0]]);
       while (2 * i + 1 < m) {
         var j = 2 * i + 1;
         snap(5, { target: i }, m,
-          t(A[i] + " har barn under seg, så vi må sjekke om det står riktig.", "2i + 1 = " + j + " < n − 1 = " + m + ": i har minst ett barn.", "Venstre barn 2·" + i + " + 1 = " + j + " ligger innenfor heapen (< n − 1 = " + m + "), så " + i + " er ikke en løvnode."), null);
-        snap(6, { target: i, compare: [j] }, m, t("Vi ser først på barnet til venstre: " + A[j] + ".", "j ← " + j + " (venstre barn).", "j ← 2i + 1 = " + j + "."), null);
+          t(A[i] + " har barn under seg, så vi må sjekke om det står riktig.", "2i + 1 = " + j + " < n − 1 = " + m + ": i har minst ett barn.", "Venstre barn 2·" + i + " + 1 = " + j + " ligger innenfor heapen (< n − 1 = " + m + "), så " + i + " er ikke en løvnode."), null, null,
+          [X, ["i", i], ["2i + 1 < n − 1?", j + " < " + m + ": ja"]]);
+        snap(6, { target: i, compare: [j] }, m, t("Vi ser først på barnet til venstre: " + A[j] + ".", "j ← " + j + " (venstre barn).", "j ← 2i + 1 = " + j + "."), null, null, [X, ["i", i], ["j", j]]);
         if (j + 1 < m) {
           var right = A[j + 1] < A[j];
           snap(7, { target: i, compare: [j, j + 1] }, m,
             t("Hvilket barn er minst: " + A[j] + " eller " + A[j + 1] + "? " + (right ? "Høyre (" + A[j + 1] + ")." : "Venstre (" + A[j] + ")."),
               "Barn: A[" + j + "] = " + A[j] + ", A[" + (j + 1) + "] = " + A[j + 1] + " → minste er " + (right ? "høyre" : "venstre") + ".",
               "Vi må velge det minste barnet: min(" + A[j] + ", " + A[j + 1] + ") = " + Math.min(A[j], A[j + 1]) + (right ? "" : ". Ved likhet beholder vi venstre") + "."),
-            "Minste barn");
-          if (right) { j = j + 1; snap(8, { target: i, compare: [j] }, m, t("Vi går videre med høyre barn.", "j ← " + j + ".", "j ← j + 1 = " + j + " (høyre barn)."), null); }
+            "Minste barn", null, [X, ["i", i], ["j", j], ["A[j + 1] < A[j]?", A[j + 1] + " < " + A[j] + ": " + (right ? "ja" : "nei")]]);
+          if (right) { j = j + 1; snap(8, { target: i, compare: [j] }, m, t("Vi går videre med høyre barn.", "j ← " + j + ".", "j ← j + 1 = " + j + " (høyre barn)."), null, null, [X, ["i", i], ["j", j]]); }
         } else {
           snap(7, { target: i, compare: [j] }, m,
-            t(A[i] + " har bare ett barn: " + A[j] + ".", "Ingen høyre barn (j + 1 = " + (j + 1) + " er ikke < " + m + ").", "j + 1 = " + (j + 1) + " er ikke < n − 1 = " + m + ", så bare venstre barn finnes."), null);
+            t(A[i] + " har bare ett barn: " + A[j] + ".", "Ingen høyre barn (j + 1 = " + (j + 1) + " er ikke < " + m + ").", "j + 1 = " + (j + 1) + " er ikke < n − 1 = " + m + ", så bare venstre barn finnes."), null, null,
+            [X, ["i", i], ["j", j], ["j + 1 < n − 1?", (j + 1) + " < " + m + ": nei"]]);
         }
         if (A[i] <= A[j]) {
           snap(9, { target: i, compare: [j] }, m,
-            t(A[i] + " er ikke større enn " + A[j] + ", så det står riktig. Vi stopper.", "A[i] = " + A[i] + " ≤ A[j] = " + A[j] + ": heap-egenskapen holder.", A[i] + " ≤ " + A[j] + ", så heap-egenskapen holder, og vi er ferdige."), "Står riktig", [i, j]);
+            t(A[i] + " er ikke større enn " + A[j] + ", så det står riktig. Vi stopper.", "A[i] = " + A[i] + " ≤ A[j] = " + A[j] + ": heap-egenskapen holder.", A[i] + " ≤ " + A[j] + ", så heap-egenskapen holder, og vi er ferdige."), "Står riktig", [i, j],
+            [X, ["i", i], ["j", j], ["A[i] ≤ A[j]?", A[i] + " ≤ " + A[j] + ": ja"]]);
           out.push(x);
           snap(10, {}, m,
             t("Vi gir fra oss " + x + ". Heapen er i orden igjen: " + list(A) + ".", "return " + x + ". Heap nå: " + list(A) + ".", "return " + x + " (tidlig stopp). Heapen er gyldig igjen: " + list(A) + "."), "Returner " + x);
@@ -741,16 +756,18 @@
           break;
         }
         snap(9, { target: i, compare: [j] }, m,
-          t(A[i] + " er større enn barnet " + A[j] + ". Det er feil, så de må bytte.", "A[i] = " + A[i] + " > A[j] = " + A[j] + ": må bytte.", A[i] + " > " + A[j] + ", så heap-egenskapen er brutt mellom " + i + " og " + j + "."), "Sammenlign", [i, j]);
+          t(A[i] + " er større enn barnet " + A[j] + ". Det er feil, så de må bytte.", "A[i] = " + A[i] + " > A[j] = " + A[j] + ": må bytte.", A[i] + " > " + A[j] + ", så heap-egenskapen er brutt mellom " + i + " og " + j + "."), "Sammenlign", [i, j],
+          [X, ["i", i], ["j", j], ["A[i] ≤ A[j]?", A[i] + " ≤ " + A[j] + ": nei"]]);
         var tmp = A[i]; A[i] = A[j]; A[j] = tmp;
         snap(11, { swap: [i, j] }, m,
-          t(A[i] + " og " + A[j] + " bytter plass. Det store tallet synker én etasje.", "Bytt A[" + i + "] og A[" + j + "].", "Etter byttet er det minste av de tre øverst. Feilen kan bare ha flyttet seg ned til " + j + "."), "Bytt", [i, j]);
+          t(A[i] + " og " + A[j] + " bytter plass. Det store tallet synker én etasje.", "Bytt A[" + i + "] og A[" + j + "].", "Etter byttet er det minste av de tre øverst. Feilen kan bare ha flyttet seg ned til " + j + "."), "Bytt", [i, j], [X, ["i", i], ["j", j]]);
         i = j;
-        snap(12, { target: i }, m, t("Vi følger " + A[i] + " videre ned.", "i ← " + i + ".", "i ← j = " + i + "."), null);
+        snap(12, { target: i }, m, t("Vi følger " + A[i] + " videre ned.", "i ← " + i + ".", "i ← j = " + i + "."), null, null, [X, ["i", i]]);
       }
       if (!stopped) {
         if (m > 0) snap(5, { target: i }, m,
-          t(A[i] + " har ingen barn under seg, så det kan ikke synke mer.", "2i + 1 = " + (2 * i + 1) + " er ikke < n − 1 = " + m + ": i er en løvnode.", "2·" + i + " + 1 = " + (2 * i + 1) + " ≥ n − 1 = " + m + ", så " + i + " er en løvnode og løkka stopper."), null);
+          t(A[i] + " har ingen barn under seg, så det kan ikke synke mer.", "2i + 1 = " + (2 * i + 1) + " er ikke < n − 1 = " + m + ": i er en løvnode.", "2·" + i + " + 1 = " + (2 * i + 1) + " ≥ n − 1 = " + m + ", så " + i + " er en løvnode og løkka stopper."), null, null,
+          [X, ["i", i], ["2i + 1 < n − 1?", (2 * i + 1) + " < " + m + ": nei"]]);
         out.push(x);
         snap(13, {}, m,
           t("Vi gir fra oss " + x + ". Heapen er i orden igjen: " + list(A) + ".",
@@ -759,13 +776,19 @@
       }
     }
     if (!opts.quiet) steps.push({ line: null, array: clone(A), size: A.length, marks: {}, out: clone(out), outLabel: "Tatt ut (i rekkefølge)",
-      text: t("Ferdig! Legg merke til at tallene kom ut i stigende rekkefølge: " + out.join(", ") + ". Det er dette som gjør heapen til en prioritetskø.",
-              "Tatt ut: " + out.join(", ") + " – alltid minste først. Heap igjen: " + list(A) + ".",
-              "Tatt ut i stigende rekkefølge: " + out.join(", ") + ". Gjentatte RemoveMin gir sortert rekkefølge. Det er ideen bak Heapsort."),
+      text: out.length > 1
+        ? t("Ferdig! Legg merke til at tallene kom ut i stigende rekkefølge: " + out.join(", ") + ". Det er dette som gjør heapen til en prioritetskø.",
+            "Tatt ut: " + out.join(", ") + " – alltid minste først. Heap igjen: " + list(A) + ".",
+            "Tatt ut i stigende rekkefølge: " + out.join(", ") + ". Gjentatte RemoveMin gir sortert rekkefølge. Det er ideen bak Heapsort.")
+        : t("Ferdig! Vi tok ut det minste tallet, " + out[0] + ". Neste gang ligger det nye minste tallet klart på toppen.",
+            "Tatt ut: " + out[0] + ". Heap igjen: " + list(A) + ".",
+            "RemoveMin ga " + out[0] + ", og heapen " + list(A) + " er gyldig igjen. O(log n)."),
       tag: "Ferdig" });
     return steps;
   }
   def(IN.gen, "removeMin", function (arr) { return genRemoveMin(arr, 3); });
+  // Parsons: «x ← A[0]» må stå først (før roten overskrives). «A[0] ← A[n − 1]» og «i ← 0» er uavhengige og kan byttes.
+  if (IN.algos.removeMin) IN.algos.removeMin.parsonsSwap = [[1, 2]];
 
   /* --- Felles: rekursiv BubbleDown som steg (min eller max) ---
      base = linjekode for linje 0 i BubbleDown-blokka (100 eller 200), så +2 … +11.
@@ -775,37 +798,39 @@
     var word = isMax ? "største" : "minste", bigW = isMax ? "størst" : "minst", key = isMax ? "largest" : "smallest";
     var code = function (l) { return (caller ? caller * 1000 : 0) + base + l; };
     var i = i0;
+    function V(s, l, r, extra) { var v = [["i", i], [key, s], ["left", l], ["right", r]]; if (extra) v.push(extra); return v; }
+    function M(m, vars) { m.vars = vars; return m; }
     while (true) {
       var s = i, l = 2 * i + 1, r = 2 * i + 2;
-      snap(code(2), { target: i },
+      snap(code(2), M({ target: i }, V(s, l, r)),
         t("Vi ser på " + A[i] + " (plass " + i + ") og barna under.", key + " ← " + i + ", left = " + l + ", right = " + r + ".", key + " ← " + i + "; barna har indeks 2i + 1 = " + l + " og 2i + 2 = " + r + "."), null);
       if (l < n) {
         var bl = better(A[l], A[s]);
-        snap(code(5), { target: i, compare: [l] },
+        snap(code(5), M({ target: i, compare: [l] }, V(s, l, r, ["left < n og A[left] " + (isMax ? ">" : "<") + " A[" + key + "]?", A[l] + (isMax ? " > " : " < ") + A[s] + ": " + (bl ? "ja" : "nei")])),
           t("Venstre barn er " + A[l] + ". Er det " + bigW + " så langt? " + (bl ? "Ja." : "Nei."), "A[left] = " + A[l] + " mot A[" + key + "] = " + A[s] + ": " + (bl ? "ja" : "nei") + ".", "left = " + l + " < n = " + n + ". " + A[l] + (bl ? (isMax ? " > " : " < ") : (isMax ? " ≤ " : " ≥ ")) + A[s] + "."), null, [i, l]);
-        if (bl) { s = l; snap(code(6), { target: i, compare: [l] }, t("Venstre barn er " + bigW + " hittil.", key + " ← " + l + ".", key + " ← left = " + l + "."), null); }
+        if (bl) { s = l; snap(code(6), M({ target: i, compare: [l] }, V(s, l, r)), t("Venstre barn er " + bigW + " hittil.", key + " ← " + l + ".", key + " ← left = " + l + "."), null); }
       } else {
-        snap(code(5), { target: i }, t(A[i] + " har ingen barn.", "left = " + l + " er ikke < n = " + n + ".", "left = " + l + " ≥ n = " + n + ": løvnode."), null);
+        snap(code(5), M({ target: i }, V(s, l, r, ["left < n?", l + " < " + n + ": nei"])), t(A[i] + " har ingen barn.", "left = " + l + " er ikke < n = " + n + ".", "left = " + l + " ≥ n = " + n + ": løvnode."), null);
       }
       if (r < n) {
         var br = better(A[r], A[s]);
-        snap(code(7), { target: i, compare: [s === i ? r : s, r] },
+        snap(code(7), M({ target: i, compare: s === i ? [r] : [s, r] }, V(s, l, r, ["right < n og A[right] " + (isMax ? ">" : "<") + " A[" + key + "]?", A[r] + (isMax ? " > " : " < ") + A[s] + ": " + (br ? "ja" : "nei")])),
           t("Høyre barn er " + A[r] + ". Er det enda " + (isMax ? "større" : "mindre") + "? " + (br ? "Ja." : "Nei."), "A[right] = " + A[r] + " mot A[" + key + "] = " + A[s] + ": " + (br ? "ja" : "nei") + ".", "right = " + r + " < n. Sammenlign med beste hittil, A[" + s + "] = " + A[s] + "."), null, [i, r]);
-        if (br) { s = r; snap(code(8), { target: i, compare: [r] }, t("Høyre barn er " + bigW + ".", key + " ← " + r + ".", key + " ← right = " + r + "."), null); }
+        if (br) { s = r; snap(code(8), M({ target: i, compare: [r] }, V(s, l, r)), t("Høyre barn er " + bigW + ".", key + " ← " + r + ".", key + " ← right = " + r + "."), null); }
       } else if (l < n) {
-        snap(code(7), { target: i }, t("Det finnes ikke noe høyre barn.", "right = " + r + " er ikke < n.", "right = " + r + " ≥ n = " + n + ": bare venstre barn."), null);
+        snap(code(7), M({ target: i }, V(s, l, r, ["right < n?", r + " < " + n + ": nei"])), t("Det finnes ikke noe høyre barn.", "right = " + r + " er ikke < n.", "right = " + r + " ≥ n = " + n + ": bare venstre barn."), null);
       }
       if (s === i) {
-        snap(code(9), { target: i },
+        snap(code(9), M({ target: i }, V(s, l, r, ["i ≠ " + key + "?", i + " ≠ " + s + ": nei"])),
           t(A[i] + " står riktig. Ferdig med dette tallet.", "i = " + key + ": ferdig.", "i = " + key + ", så subtreet med rot " + i + " er en " + (isMax ? "max-heap" : "heap") + "."), "Står riktig");
         return;
       }
-      snap(code(9), { target: i, compare: [s] }, t("Barnet " + A[s] + " er " + word + ", så tallet står feil.", "i ≠ " + key + " (" + s + ").", "i ≠ " + key + " = " + s + ": må bytte."), null, [i, s]);
+      snap(code(9), M({ target: i, compare: [s] }, V(s, l, r, ["i ≠ " + key + "?", i + " ≠ " + s + ": ja"])), t("Barnet " + A[s] + " er " + word + ", så tallet står feil.", "i ≠ " + key + " (" + s + ").", "i ≠ " + key + " = " + s + ": må bytte."), null, [i, s]);
       var tmp = A[i]; A[i] = A[s]; A[s] = tmp;
       if (counter) counter.swaps++;
-      snap(code(10), { swap: [i, s] },
+      snap(code(10), M({ swap: [i, s] }, V(s, l, r)),
         t(A[s] + " og " + A[i] + " bytter plass." + (counter ? " (Bytter så langt: " + counter.swaps + ".)" : ""), "Bytt A[" + i + "] og A[" + s + "].", "Bytt: " + A[i] + " opp, " + A[s] + " ned ett nivå." + (counter ? " Bytter totalt: " + counter.swaps + "." : "")), "Bytt", [i, s]);
-      snap(code(11), { target: s }, t("Vi fortsetter der " + A[s] + " havnet.", "Rekursivt kall fra " + s + ".", "Rekursjon: BubbleDown(A, " + s + ", " + n + ")."), null);
+      snap(code(11), M({ target: s }, [["kall", (isMax ? "BubbleDown" : "BubbleDownMin") + "(A, " + s + ", " + n + ")"]]), t("Vi fortsetter der " + A[s] + " havnet.", "Rekursivt kall fra " + s + ".", "Rekursjon: " + (isMax ? "BubbleDown" : "BubbleDownMin") + "(A, " + s + ", " + n + ")."), null);
       i = s;
     }
   }
@@ -843,6 +868,10 @@
       snap(3, {},
         t("Nå er hele grenen under plass " + i0 + " i orden (grønn).", "Subtreet med rot " + i0 + " er en heap.", "Invariant: alle subtrær med rot ≥ " + i0 + " er heaper."), null);
     }
+    snap(2, { vars: [["i", -1], ["i ≥ 0?", "nei"]] },
+      t("Vi har vært innom alle plassene fra " + Math.floor(n / 2) + " og ned til 0. Da er løkka ferdig.",
+        "i = −1: for-løkka (ned til 0) er ferdig.",
+        "Etter i = 0 blir i = −1, og løkka stopper. Invarianten gjelder nå for roten, så hele arrayet er en heap."), "Løkka stopper");
     steps.push({ line: null, array: clone(A), size: n, marks: { sorted: A.map(function (_, k) { return k; }) },
       text: t("Ferdig! Hele treet er en heap: " + list(A) + ". Vi trengte bare " + counter.swaps + " bytter.",
               "Heap: " + list(A) + ". Totalt " + counter.swaps + " bytter (n = " + n + ").",
@@ -930,16 +959,23 @@
       "Q.small (max-heap, nedre halvdel) og Q.large (heap, øvre halvdel) er tomme. Insert " + vals.join(", ") + ", så removeMedian ×" + removes + ".",
       "Invariant: alt i Q.small ≤ alt i Q.large, og |Q.small| − |Q.large| er 0 eller 1. Da ligger medianen alltid i roten av Q.small."), "Start");
     function balance(callLine) {
-      if (S.length > L.length + 1) {
-        snap(callLine * 1000 + 102, { s: [0] }, t("Den nedre bunken har blitt for stor (" + S.length + " mot " + L.length + ").", "|Q.small| = " + S.length + " > |Q.large| + 1 = " + (L.length + 1) + ".", "Skjevhet: flytt største fra Q.small."), "For skjev");
+      var c1 = S.length > L.length + 1;
+      snap(callLine * 1000 + 102, c1 ? { s: [0], check: "|Q.small| > |Q.large| + 1? " + S.length + " > " + (L.length + 1) + ": ja" } : { check: "|Q.small| > |Q.large| + 1? " + S.length + " > " + (L.length + 1) + ": nei" },
+        c1 ? t("Den nedre bunken har blitt for stor (" + S.length + " mot " + L.length + ").", "|Q.small| = " + S.length + " > |Q.large| + 1 = " + (L.length + 1) + ".", "Skjevhet: flytt største fra Q.small.")
+           : t("Er den nedre bunken mer enn én større enn den øvre? Nei (" + S.length + " mot " + L.length + ").", "|Q.small| = " + S.length + " > |Q.large| + 1 = " + (L.length + 1) + "? Nei.", "Første sjekk er usann: Q.small har ikke for mange."),
+        c1 ? "For skjev" : "Sjekk 1");
+      if (c1) {
         var v = maxPop(S); minPush(L, v);
         snap(callLine * 1000 + 103, { l: [L.indexOf(v)] }, t(v + " flytter fra den nedre til den øvre bunken.", "Flytt " + v + " til Q.large.", "Insert(Q.large, RemoveMax(Q.small)) = " + v + ", O(log n)."), "Flytt " + v + " opp");
-      } else if (S.length < L.length) {
-        snap(callLine * 1000 + 104, { l: [0] }, t("Den øvre bunken har flere enn den nedre (" + L.length + " mot " + S.length + ").", "|Q.small| = " + S.length + " < |Q.large| = " + L.length + ".", "Skjevhet: flytt minste fra Q.large."), "For skjev");
+      }
+      var c2 = S.length < L.length;
+      snap(callLine * 1000 + 104, c2 ? { l: [0], check: "|Q.small| < |Q.large|? " + S.length + " < " + L.length + ": ja" } : { check: "|Q.small| < |Q.large|? " + S.length + " < " + L.length + ": nei" },
+        c2 ? t("Den øvre bunken har flere enn den nedre (" + L.length + " mot " + S.length + ").", "|Q.small| = " + S.length + " < |Q.large| = " + L.length + ".", "Skjevhet: flytt minste fra Q.large.")
+           : t("Har den øvre bunken flere enn den nedre? Nei (" + L.length + " mot " + S.length + "). Da er bunkene i balanse, og ingenting mer skal flyttes.", "|Q.small| = " + S.length + " < |Q.large| = " + L.length + "? Nei. Størrelsene er i orden.", "Andre sjekk er usann: |Q.small| − |Q.large| = " + (S.length - L.length) + " ∈ {0, 1}, så invarianten holder."),
+        c2 ? "For skjev" : "Balansert");
+      if (c2) {
         var w = minPop(L); maxPush(S, w);
         snap(callLine * 1000 + 105, { s: [S.indexOf(w)] }, t(w + " flytter fra den øvre ned til den nedre bunken.", "Flytt " + w + " til Q.small.", "Insert(Q.small, RemoveMin(Q.large)) = " + w + ", O(log n)."), "Flytt " + w + " ned");
-      } else {
-        snap(callLine * 1000 + 104, {}, t("Bunkene er like store, eller den nedre har ett ekstra. Ingenting å flytte.", "Størrelsene er i orden (" + S.length + " og " + L.length + ").", "|Q.small| = " + S.length + ", |Q.large| = " + L.length + ": invarianten holder."), "Balansert");
       }
     }
     vals.forEach(function (x) {
@@ -977,12 +1013,14 @@
     var all = step.small.concat(step.large).sort(function (x, y) { return x - y; });
     var med = step.small.length ? step.small[0] : null, medShown = false;
     var info = IN.el("div", { class: "hv-out small" });
+    var chk = null;
+    if (mk.check) chk = IN.el("div", { class: "hv-vars" }, [IN.el("span", { class: "hv-var" }, [IN.el("span", { class: "lbl", text: "Sjekk" }), IN.el("span", { class: "val", text: mk.check })])]);
     info.innerHTML = '<span class="muted">Alle, sortert:</span> ' +
       (all.length ? all.map(function (v) { if (v === med && !medShown) { medShown = true; return '<b class="hv-outv hv-med" title="median">' + esc(v) + "</b>"; } return '<span class="hv-plain">' + esc(v) + "</span>"; }).join(" ") : '<span class="muted">tom</span>') +
       ' <span class="hv-sep">·</span> <span class="muted">removeMedian ga:</span> ' +
       (step.out.length ? step.out.map(function (v) { return '<b class="hv-outv">' + esc(v) + "</b>"; }).join(" ") : '<span class="muted">ingen ennå</span>');
     var wrap = IN.el("div", { class: "hv" });
-    wrap.appendChild(row); wrap.appendChild(info);
+    wrap.appendChild(row); if (chk) wrap.appendChild(chk); wrap.appendChild(info);
     stage.appendChild(wrap);
   };
 

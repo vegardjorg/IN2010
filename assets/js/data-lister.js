@@ -394,7 +394,8 @@
           snap(202, main(), t("Det er " + (A.length - n) + " ledig" + (A.length - n === 1 ? "" : "e") + " plass" + (A.length - n === 1 ? "" : "er") + ". Fint!",
             "D.n = " + n + " < |D.A| = " + A.length + ": det er plass.", n + " < " + A.length + ": return, O(1)."), "Plass");
         } else {
-          snap(202, main({ cur: [] }), t("Hylla er full! Alle " + n + " plassene er i bruk.", "D.n = " + n + " = |D.A|: arrayet er fullt.", "D.n = |D.A| = " + n + ": må utvide."), "Fullt");
+          var full = []; for (var f = 0; f < n; f++) full.push(f);
+          snap(202, main({ cur: full }), t("Hylla er full! " + (n === 1 ? "Den ene plassen er i bruk." : "Alle " + n + " plassene er i bruk."), "D.n = " + n + " = |D.A|: arrayet er fullt.", "D.n = |D.A| = " + n + ": må utvide."), "Fullt");
           var B = []; for (var q = 0; q < 2 * A.length; q++) B.push(null);
           snap(204, [arrPart("D.A (gammelt)", A, n, {}, {}, true), arrPart("A (nytt, |A| = " + B.length + ")", B, 0)],
             t("Vi lager en ny hylle med " + B.length + " plasser, dobbelt så lang.", "Nytt array med |D.A| · 2 = " + B.length + " plasser.", "Nytt array, kapasitet " + B.length + "."), "Doble");
@@ -403,7 +404,7 @@
               B[i] = A[i]; copies++;
               var pi = {}; pi[i] = "i";
               snap(206, [arrPart("D.A (gammelt)", A, n, { cur: i }, pi, true), arrPart("A (nytt)", B, i + 1, { fresh: i }, pi)],
-                t("Flytt " + A[i] + " over til plass " + i + " på den nye hylla.", "i = " + i + ": A[" + i + "] ← D.A[" + i + "] = " + A[i] + ".", "Kopi " + (i + 1) + " av " + n + "."), "Kopier");
+                t("Kopier " + A[i] + " over til plass " + i + " på den nye hylla.", "i = " + i + ": A[" + i + "] ← D.A[" + i + "] = " + A[i] + ".", "Kopi " + (i + 1) + " av " + n + "."), "Kopier");
             }
           } else {
             for (var k = 0; k < n; k++) B[k] = A[k];
@@ -413,7 +414,7 @@
               t("Alle " + n + " tingene flyttes over, én etter én.", "Løkka går for i = 0 til D.n − 1 = " + (n - 1) + ": " + n + " kopieringer.", n + " kopieringer, O(D.n)."), "Kopier alle " + n);
           }
           A = B;
-          snap(207, main(), t("Nå bruker vi den nye hylla. Det er god plass igjen.", "D.A er nå det nye arrayet med " + A.length + " plasser.", "|D.A| = " + A.length + ". De neste " + (A.length - n) + " PushBack-ene er O(1)."), "Byttet array");
+          snap(207, main(), t("Nå bruker vi den nye hylla. Det er god plass igjen.", "D.A er nå det nye arrayet med " + A.length + " plasser.", "|D.A| = " + A.length + ". " + (A.length - n === 1 ? "Den neste PushBack-en er O(1)." : "De neste " + (A.length - n) + " PushBack-ene er O(1).")), "Byttet array");
         }
         A[n] = e;
         snap(103, main({ fresh: n }), t("Legg " + e + " på plass " + n + ", den første ledige.", "D.A[D.n] = D.A[" + n + "] ← " + e + ".", "Skriv på indeks D.n = " + n + "."), "Skriv");
@@ -462,12 +463,12 @@
         for (var j = n - 1; j >= i; j--) {
           A[j + 1] = A[j]; moves++; moved.push(j + 1);
           var pp = one(j, "j"); if (j !== i) pp[i] = "i"; else pp[j] = "j = i";
-          snap(104, { moved: [j + 1], cur: j }, pp, t("Flytt " + A[j] + " ett hakk til høyre, til plass " + (j + 1) + ".", "j = " + j + ": D.A[" + (j + 1) + "] ← D.A[" + j + "] = " + A[j] + ".", "Flytting " + (n - j) + " av " + (n - i) + "."), "Flytt høyre");
+          snap(104, { moved: [j + 1], cur: j }, pp, t("Kopier " + A[j] + " ett hakk til høyre, til plass " + (j + 1) + ".", "j = " + j + ": D.A[" + (j + 1) + "] ← D.A[" + j + "] = " + A[j] + ".", "Flytting " + (n - j) + " av " + (n - i) + "."), "Flytt høyre");
         }
         A[i] = e;
-        snap(105, { fresh: i }, one(i, "i"), t("Nå er plass " + i + " ledig. Legg " + e + " der.", "D.A[" + i + "] ← " + e + ".", "Skriv e."), "Sett inn");
+        snap(105, { fresh: i }, one(i, "i"), t((i < n ? "Det som stod på plass " + i + ", er allerede kopiert ett hakk til høyre, så vi kan skrive over det." : "Plass " + i + " er ledig.") + " Legg " + e + " der.", "D.A[" + i + "] ← " + e + ".", "Skriv e."), "Sett inn");
         n++;
-        snap(106, {}, null, t("Ferdig. Vi måtte flytte " + (n - 1 - i) + (n - 1 - i === 1 ? " ting" : " ting") + ".", "D.n ← " + n + ". " + (n - 1 - i) + " elementer ble flyttet.", "O(D.n − i) = " + (n - 1 - i) + " flyttinger."), "D.n + 1");
+        snap(106, {}, null, t("Innsatt. Vi måtte flytte " + (n - 1 - i) + " ting.", "D.n ← " + n + ". " + (n - 1 - i) + (n - 1 - i === 1 ? " element ble flyttet." : " elementer ble flyttet."), "O(D.n − i) = " + (n - 1 - i) + " flyttinger."), "D.n + 1");
       } else if (o.op === "rem") {
         if (!n) return;
         var r = Math.max(0, Math.min(n - 1, o.i)), old = A[r];
@@ -475,12 +476,12 @@
         if (r > n - 2) snap(202, { hole: r }, one(r, "i"), t("Det er ingen ting bak, så ingenting må flyttes.", "i = D.n − 1, så løkka kjører null ganger.", "Null runder."), "Ingen flytting");
         for (var jj = r; jj <= n - 2; jj++) {
           A[jj] = A[jj + 1]; moves++;
-          snap(203, { moved: [jj], cur: jj + 1 }, one(jj, "j"), t("Flytt " + A[jj] + " ett hakk til venstre, til plass " + jj + ".", "j = " + jj + ": D.A[" + jj + "] ← D.A[" + (jj + 1) + "] = " + A[jj] + ".", "Flytting " + (jj - r + 1) + " av " + (n - 1 - r) + "."), "Flytt venstre");
+          snap(203, { moved: [jj], cur: jj + 1 }, one(jj, "j"), t("Kopier " + A[jj] + " ett hakk til venstre, til plass " + jj + ".", "j = " + jj + ": D.A[" + jj + "] ← D.A[" + (jj + 1) + "] = " + A[jj] + ".", "Flytting " + (jj - r + 1) + " av " + (n - 1 - r) + "."), "Flytt venstre");
         }
         A[n - 1] = null;
         snap(204, { hole: n - 1 }, null, t("Den siste plassen tømmes.", "D.A[" + (n - 1) + "] ← null.", "Rydd bakerste plass."), "Tøm siste");
         n--;
-        snap(205, {}, null, t("Ferdig. " + old + " er borte.", "D.n ← " + n + ". " + (n - r) + " elementer ble flyttet.", "O(D.n − i)."), "D.n − 1");
+        snap(205, {}, null, t("Fjernet. " + old + " er borte.", "D.n ← " + n + ". " + (n - r) + (n - r === 1 ? " element ble flyttet." : " elementer ble flyttet."), "O(D.n − i)."), "D.n − 1");
       }
     });
     snap(null, {}, null, t("Ferdig!", "Ferdig. Jo nærmere starten vi setter inn eller fjerner, jo flere elementer må flyttes.", "Totalt " + moves + " flyttinger. Add og Remove er O(n) i verste tilfelle."), "Ferdig");
@@ -540,7 +541,8 @@
         snap(202, { ptrs: pu }, t("Lag en ny vogn med " + o.v + " i. Den er ikke koblet på ennå.", "u ← new Node(" + o.v + "). u.next er null.", "Ny node, ikke i lista ennå."), "Ny node");
         nodes[u].next = nodes[vv].next;
         var hl = {}; hl[u] = "next";
-        snap(203, { ptrs: pu, hl: hl }, t("Fest den nye vogna til " + (nodes[u].next ? nodes[nodes[u].next].v : "ingenting (v var sist)") + ".", "u.next ← v.next (" + (nodes[u].next ? nodes[nodes[u].next].v : "null") + ").", "Nå peker både v og u på samme node."), "u.next");
+        snap(203, { ptrs: pu, hl: hl }, t("Fest den nye vogna til " + (nodes[u].next ? nodes[nodes[u].next].v : "ingenting (v var sist)") + ".", "u.next ← v.next (" + (nodes[u].next ? nodes[nodes[u].next].v : "null") + ").",
+          nodes[u].next ? "Nå peker både v.next og u.next på samme node (" + nodes[nodes[u].next].v + ")." : "v var siste node, så v.next er null, og u.next blir også null. Ingen node å dele ennå."), "u.next");
         nodes[vv].next = u; extra = null;
         var hl2 = {}; hl2[vv] = "next";
         snap(204, { ptrs: pu, hl: hl2, fresh: u }, t("Fest " + nodes[vv].v + " til den nye vogna. Ferdig!", "v.next ← u. " + o.v + " står nå rett etter " + nodes[vv].v + ".", "To pekerendringer, O(1). Selve innsettingen kostet ingenting ekstra etter NodeAt."), "v.next");
@@ -656,12 +658,17 @@
     for (var k = 0; k < A.length; k++) {
       var tg = A[k];
       snap(3, k, t("Neste tagg: " + esc(tg) + ".", "tag = " + tagStr(tg) + ".", "Tagg " + k + "."), "Tagg " + k);
-      if (tg === "<div>") {
+      var opens = tg === "<div>";
+      snap(4, k, t(opens ? "Er det en åpnetagg? Ja." : "Er det en åpnetagg? Nei, det er en lukketagg.",
+        "tag = \"&lt;div&gt;\"? " + (opens ? "Ja." : "Nei, så vi går til else."), opens ? "Åpnetagg." : "Lukketagg: else-grenen."), opens ? "Åpner" : "Lukker");
+      if (opens) {
         i++;
-        snap(5, k, t("Den åpner en boks. Nå står " + i + " åpne.", "Åpnetagg: i ← " + i + ".", "i = " + i + "."), "i + 1");
+        snap(5, k, t("Den åpner en boks. " + (i === 1 ? "Nå er 1 boks åpen." : "Nå er " + i + " bokser åpne."), "Åpnetagg: i ← " + i + ".", "i = " + i + "."), "i + 1");
       } else {
         i--;
-        snap(7, k, t("Den lukker en boks. Nå står " + Math.max(0, i) + " åpne" + (i < 0 ? ", men vi lukket én for mye!" : "."), "Lukketagg: i ← " + i + ".", "i = " + i + "."), "i − 1", i < 0);
+        snap(7, k, t(i < 0 ? "Den lukker en boks, men ingen var åpne! Telleren går ned til −1: vi har lukket én for mye."
+            : "Den lukker en boks. " + (i === 1 ? "Nå er 1 boks åpen." : "Nå er " + i + " bokser åpne."),
+          "Lukketagg: i ← " + i + ".", "i = " + i + "."), "i − 1", i < 0);
         snap(8, k, t(i < 0 ? "Vi har lukket flere enn vi åpnet." : "Ikke lukket for mange så langt.", "i < 0? " + (i < 0 ? "Ja." : "Nei."), i < 0 ? "i = " + i + " < 0." : "i ≥ 0."), "Sjekk i < 0", i < 0);
         if (i < 0) {
           snap(9, k, t("Feil! En boks ble lukket uten å være åpnet.", "return false: " + tagStr(tg) + " på plass " + k + " lukker noe som ikke er åpent.", "Tidlig retur på plass " + k + "."), "false", true, false);
@@ -670,8 +677,8 @@
       }
     }
     var ok = i === 0;
-    snap(10, null, t(ok ? "Alle boksene er lukket. Riktig!" : i + " boks" + (i === 1 ? "" : "er") + " står fortsatt åpne. Feil!",
-      "return i = 0: i = " + i + ", så svaret er " + ok + ".", ok ? "Velformatert." : i + " åpne tagger er aldri lukket."), String(ok), !ok, ok);
+    snap(10, null, t(ok ? "Alle boksene er lukket. Riktig!" : (i === 1 ? "1 boks står fortsatt åpen. Feil!" : i + " bokser står fortsatt åpne. Feil!"),
+      "return i = 0: i = " + i + ", så svaret er " + ok + ".", ok ? "Velformatert." : (i === 1 ? "1 åpen tagg er aldri lukket." : i + " åpne tagger er aldri lukket.")), String(ok), !ok, ok);
     return steps;
   });
 
@@ -708,7 +715,7 @@
     }
     var ok = !s.length;
     snap(8, null, t(ok ? "Stabelen er tom: alt som ble åpnet, ble lukket. Riktig!" : "Det ligger " + s.length + " igjen på stabelen. De ble aldri lukket. Feil!",
-      "return s is empty: " + ok + ".", ok ? "Velformatert." : s.length + " åpne tagger igjen."), String(ok), { ret: ok, bad: !ok });
+      "return s is empty: " + ok + ".", ok ? "Velformatert." : (s.length === 1 ? "1 åpen tagg igjen." : s.length + " åpne tagger igjen.")), String(ok), { ret: ok, bad: !ok });
     return steps;
   });
 
