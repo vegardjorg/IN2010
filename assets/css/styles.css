@@ -30,7 +30,7 @@
   --color-surface-container-high: #e9ebef;
   --color-outline: #808792;
   --color-outline-variant: #e1e4e8;
-  --color-placeholder: #6e7580;
+  --color-placeholder: #646b76;
   --color-tone-info: #e3edf7;        --color-on-tone-info: #1f4a73;
   --color-tone-ok: #e2f1e4;          --color-on-tone-ok: #1e5a2b;
   --color-tone-warn: #fbefd2;        --color-on-tone-warn: #6b4a00;
@@ -316,9 +316,9 @@ th.has-tip { text-decoration: underline dotted; text-underline-offset: 3px;
 .et-sec { margin-top: var(--d-sm); padding-left: .8rem; border-left: 3px solid var(--color-outline-variant); }
 .et-sec:first-child { margin-top: .4rem; }
 .et-sec.oppgave { border-left-color: var(--color-primary); }
-.et-sec.losning { border-left-color: var(--tone-ok, var(--color-primary)); }
-.et-sec.kjerne  { border-left-color: var(--tone-info, var(--color-primary)); }
-.et-sec.tips    { border-left-color: var(--tone-danger, var(--color-primary)); }
+.et-sec.losning { border-left-color: var(--color-on-tone-ok); }
+.et-sec.kjerne  { border-left-color: var(--color-on-tone-info); }
+.et-sec.tips    { border-left-color: var(--color-on-tone-danger); }
 .et-lbl {
   font-size: var(--text-xs); font-weight: 700; letter-spacing: .4px; text-transform: uppercase;
   color: var(--color-on-surface-variant); margin-bottom: .25rem;
@@ -1500,3 +1500,21 @@ body[data-page="strategi"] .bigo-compact .bigo-val { white-space: normal; overfl
   .st-rules, .st-strats, .st-probs, .st-types { grid-template-columns: minmax(0, 1fr); }
   .st-reduce { flex-direction: column; align-items: flex-start; }
 }
+
+/* === Gjennomgang 2026-11: felles UI-rettinger === */
+.grid > .callout { margin: 0; }
+@media (max-width: 640px) {
+  /* Én vannrett rullbar fanelinje i stedet for 3–4 rader */
+  .tabs { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
+  .tabs::-webkit-scrollbar { display: none; }
+  .tabs button[role="tab"] { flex: none; white-space: nowrap; }
+  /* Bare toppmenyen står fast på mobil – nivålinja ruller med */
+  #levelbar { position: static; }
+}
+@media (pointer: coarse) {
+  .btn.sm, .level-mini .seg-btn { min-height: 32px; }
+  .linklike { min-height: 28px; padding: 4px 2px; font-size: var(--text-sm); }
+}
+/* Fargebrikkene er lyse i mørkt tema: mørk tekst gir lesbar kontrast */
+:root[data-theme="dark"] .chip { color: #111; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .chip { color: #111; } }

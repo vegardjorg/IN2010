@@ -81,6 +81,12 @@
       inner.classList.toggle("scroll-x", inner.scrollWidth > inner.clientWidth + 2);
     }
     syncNavScroll();
+    // Mobil: rull aktiv side inn i menyen, så man ser hvor man er
+    var act = qs(".navlink.active", inner);
+    if (act && inner.scrollWidth > inner.clientWidth) {
+      var ar = act.getBoundingClientRect(), ir = inner.getBoundingClientRect();
+      inner.scrollLeft += (ar.left - ir.left) - (inner.clientWidth - ar.width) / 2;
+    }
     window.addEventListener("resize", syncNavScroll);
     inner.addEventListener("scroll", syncNavScroll);
   }
@@ -93,15 +99,19 @@
     IN.store.set("in-theme", mode);
   }
   function themeIcon(mode) { return mode === "dark" ? "🌙" : mode === "light" ? "☀️" : "🖥️"; }
+  function themeLabel(mode) {
+    return "Tema: " + (mode === "dark" ? "mørkt" : mode === "light" ? "lyst" : "som systemet") + ". Trykk for å bytte.";
+  }
   function buildThemeToggle() {
     var modes = ["system", "light", "dark"];
     var btn = el("button", {
       class: "theme-toggle", type: "button", title: "Bytt tema (system → lys → mørk)",
-      "aria-label": "Bytt tema", text: themeIcon(currentTheme())
+      "aria-label": themeLabel(currentTheme()), text: themeIcon(currentTheme())
     });
     btn.addEventListener("click", function () {
       var next = modes[(modes.indexOf(currentTheme()) + 1) % modes.length];
       applyTheme(next); btn.textContent = themeIcon(next);
+      btn.setAttribute("aria-label", themeLabel(next));
     });
     return btn;
   }
@@ -275,6 +285,14 @@
       // la demoer o.l. reagere på at de blir synlige
       var panel = panels.filter(function (p) { return p.getAttribute("data-panel") === id; })[0];
       if (panel) panel.dispatchEvent(new CustomEvent("in:shown", { bubbles: true }));
+      // Fanelinja scroller vannrett på mobil: hold aktiv fane synlig
+      if (bar.scrollWidth > bar.clientWidth) {
+        var ab = btns.filter(function (b) { return b.getAttribute("data-tab") === id; })[0];
+        if (ab) {
+          var br = ab.getBoundingClientRect(), rr = bar.getBoundingClientRect();
+          if (br.left < rr.left || br.right > rr.right) bar.scrollLeft += br.left - rr.left - 16;
+        }
+      }
     }
 
     btns.forEach(function (b, i) {
@@ -307,7 +325,7 @@
         if (!t) return;
         var card = t.matches && t.matches("details") ? t : t.querySelector("details.examtask");
         if (card) card.open = true;
-        var top = t.getBoundingClientRect().top + window.pageYOffset - 90; // under den faste toppmenyen
+        var top = t.getBoundingClientRect().top + window.pageYOffset - IN.stickyH(); // under de faste linjene
         window.scrollTo({ top: Math.max(0, top), behavior: "instant" });
       };
       // To ganger: demoene over kan endre høyde rett etter lasting
@@ -316,6 +334,7 @@
       else window.addEventListener("load", run);
     }
     reveal();
+    IN.revealOppg = reveal;
 
     window.addEventListener("hashchange", function () {
       var h = (location.hash.match(/fane=([\w-]+)/) || [])[1];
@@ -645,11 +664,41 @@
     set: function (k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
   };
 
+  /* Høyden på de faste linjene øverst (meny + ev. nivålinje) når de står fast, + litt luft */
+  IN.stickyH = function () {
+    var h = 0;
+    [qs("#topnav"), qs("#levelbar")].forEach(function (n) {
+      if (!n) return;
+      var cs = getComputedStyle(n);
+      if (cs.position === "sticky" || cs.position === "fixed") h = Math.max(h, (parseFloat(cs.top) || 0) + n.offsetHeight);
+    });
+    return h + 8;
+  };
+
+  /* Eksamensmerker i sidehodet: <span class="badge" data-go="fane" data-card="h2021-9">.
+     Ett felles oppsett for alle sider: lenke-rolle, tastatur, og hopp via #fane=…&oppg=…
+     (data-card kan utelates; da brukes #exam-<fane> hvis den finnes, ellers bare fanen). */
+  function initBadges() {
+    qsa(".badge[data-go]").forEach(function (b) {
+      b.setAttribute("role", "link"); b.setAttribute("tabindex", "0");
+      function go() {
+        var fane = b.getAttribute("data-go"), c = b.getAttribute("data-card");
+        var id = c ? "exam-" + c : (document.getElementById("exam-" + fane) ? "exam-" + fane : "");
+        var h = "#fane=" + fane + (id ? "&oppg=" + id : "");
+        if (location.hash !== h) location.hash = h;      // hashchange → fane + reveal
+        else if (IN.revealOppg) IN.revealOppg();
+      }
+      b.addEventListener("click", go);
+      b.addEventListener("keydown", function (e) { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); go(); } });
+    });
+  }
+
   /* ---------- Oppstart ---------- */
   function boot() {
     buildNav();
     buildLevelBar();
     IN.tabs(document);
+    initBadges();
     // Genererte sant/usant-påstander (data-tf.js): <div data-tf-gen="sortering"></div>
     qsa("[data-tf-gen]").forEach(function (host) {
       var sek = host.getAttribute("data-tf-gen");

@@ -1062,18 +1062,7 @@
       { s: "O(log(|E|)) er det samme som O(log(|V|)).", answer: true, blokk: "6",
         explain: "|E| ≤ |V|², så log(|E|) ≤ 2 · log(|V|)." }
     ], { id: "grafer-tf" });
-
-    // Badge-klikk: gå til fanen og åpne eksamenskortet
-    qsa(".badge[data-go]").forEach(function (b) {
-      b.setAttribute("role", "button"); b.setAttribute("tabindex", "0");
-      function go() {
-        location.hash = "fane=" + b.getAttribute("data-go");
-        var card = qs("#exam-" + b.getAttribute("data-card") + " .examtask");
-        if (card) { card.setAttribute("open", ""); setTimeout(function () { card.scrollIntoView({ behavior: "smooth", block: "center" }); }, 60); }
-      }
-      b.addEventListener("click", go);
-      b.addEventListener("keydown", function (e) { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); go(); } });
-    });
+
   })();
   </script>
 </body>

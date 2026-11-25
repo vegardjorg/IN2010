@@ -432,10 +432,6 @@
   (function () {
     var IN = window.IN, qs = IN.qs;
 
-    IN.qsa(".badge[data-go]").forEach(function (b) {
-      b.style.cursor = "pointer";
-      b.addEventListener("click", function () { location.hash = "fane=" + b.getAttribute("data-go"); });
-    });
 
     IN.explain("#ex-hvorfor", {
       eli5: "<p>Å sortere er å legge ting i rekkefølge, som å stille opp etter høyde. Da blir det superlett å finne ting, telle like, og sammenligne to rekker.</p>",
@@ -675,7 +671,7 @@
         ]
       },
       bucket: {
-        year: "H2024", oppgave_nr: "Oppgave 3", title: "Etymologisk ordliste", points: 10,
+        id: "exam-h2024-3", year: "H2024", oppgave_nr: "Oppgave 3", title: "Etymologisk ordliste", points: 10,
         oppgave: "<p>En etymologisk ordliste slår opp opphavet til et ord. Hvert ordobjekt <code>v</code> har feltene <code>v.string</code> (selve ordet) og <code>v.category</code> (kategorien). Anta at det finnes <code>N</code> kategorier med <code>N &lt; 100</code>.</p><ul><li><b>(a)</b> Arrayet <code>A</code> inneholder hele ordlisten sortert alfabetisk (etter <code>string</code>). Skriv <code>EtymologySort(A)</code> som <b>stabilt</b> sorterer <code>A</code> tematisk (etter <code>category</code>). Prosedyren skal <b>ikke</b> kalle en sorteringsalgoritme.</li><li><b>(b)</b> Du har nå en ordbok <code>K</code> som for hver kategori gir et intervall <code>K[v.category] = [low, high]</code> (indeks til første og siste ordobjekt i kategorien). Beskriv hvordan du kan bruke en pensumalgoritme til å sjekke om et gitt ordobjekt <code>v</code> finnes i <code>A</code>, og oppgi kjøretiden.</li></ul>",
         losning: [
           "<b>(a)</b> Tilpasset bøttesortering: lag en ordnet ordbok <code>B</code> med tom liste som standardverdi; løp gjennom <code>A</code> og legg hvert element bakerst i bøtta <code>B[A[i].category]</code>; løp så gjennom kategorinøklene i sortert rekkefølge og skriv elementene tilbake i <code>A</code> i samme rekkefølge de lå. Dette er O(n) fordi antall kategorier er begrenset av konstanten <code>N &lt; 100</code>, og stabilt fordi hver bøtte beholder den opprinnelige alfabetiske rekkefølgen.",
@@ -707,7 +703,7 @@
 
     var EXAM_EXTRA = {
       stabilitet: {
-        year: "H2021", oppgave_nr: "Oppgave 2", title: "Stabilitet", points: 3,
+        id: "exam-h2021-2", year: "H2021", oppgave_nr: "Oppgave 2", title: "Stabilitet", points: 3,
         oppgave: "<p>Et usortert array <code>A</code> inneholder personobjekter med et alder-felt. Personene på <code>A[3]</code> og <code>A[42]</code> er begge 22 år. <code>A</code> sorteres på alder, og etterpå ligger personen fra <code>A[3]</code> på <code>A[9]</code>, og personen fra <code>A[42]</code> på <code>A[7]</code>.</p><ul><li><b>(a)</b> Var sorteringen stabil?</li><li><b>(b)</b> Hvilken alder har personen som nå ligger på <code>A[8]</code>?</li><li><b>(c)</b> Ingen er eldre enn 100 år. Hvilken sorteringsalgoritme bør du velge for best kjøretid?</li></ul>",
         losning: [
           "<b>(a) Nei.</b> De to 22-åringene har byttet rekkefølge: den som lå først (indeks 3), ligger nå sist (indeks 9). En stabil sortering ville holdt dem i samme innbyrdes rekkefølge.",
@@ -722,7 +718,7 @@
         ]
       },
       subanagrams: {
-        year: "H2020", oppgave_nr: "Oppgave 7d", title: "SortSubanagrams", points: 6,
+        id: "exam-h2020-7d", year: "H2020", oppgave_nr: "Oppgave 7d", title: "SortSubanagrams", points: 6,
         oppgave: "<p>Et array <code>A</code> med ord er allerede sortert alfabetisk. Ordene skal i stedet sorteres etter lengde, <b>lengst først</b>, og ord med samme lengde skal fortsatt stå alfabetisk. Eksempel: [«algorithm», «alright», «git», «logarithm», «math», «right»] skal bli [«algorithm», «logarithm», «alright», «right», «math», «git»]. Skriv <code>SortSubanagrams(A)</code> med så lav kjøretid som mulig.</p>",
         losning: [
           "Kjenn igjen mønsteret: data som alt er sortert på det sekundære kriteriet (alfabetisk), skal sorteres på et primært kriterium (lengde). Da trenger vi en <b>stabil</b> sortering på lengde – og lengden er et lite heltall, så bøttesortering passer.",
@@ -782,14 +778,6 @@
       });
     });
 
-    // Badge-klikk: gå til fanen og åpne eksamenskortet
-    IN.qsa(".badge[data-go]").forEach(function (b) {
-      b.addEventListener("click", function () {
-        var id = b.getAttribute("data-go");
-        var card = qs("#exam-" + id + " .examtask");
-        if (card) { card.setAttribute("open", ""); setTimeout(function () { card.scrollIntoView({ behavior: "smooth", block: "center" }); }, 60); }
-      });
-    });
 
   })();
   </script>

@@ -520,18 +520,6 @@
     var LEG_LO = [0, 1, 2, 3].map(function (d) { return { color: "var(--lv" + d + ")", label: "dybde " + d }; });
 
     /* Badges: gå til fanen og åpne eksamenskortet */
-    IN.qsa(".badge[data-go]").forEach(function (b) {
-      b.style.cursor = "pointer";
-      b.setAttribute("role", "link"); b.setAttribute("tabindex", "0");
-      function go() {
-        var id = b.getAttribute("data-go");
-        location.hash = "fane=" + id;
-        var card = qs("#exam-" + id + " .examtask");
-        if (card) { card.setAttribute("open", ""); setTimeout(function () { card.scrollIntoView({ behavior: "smooth", block: "center" }); }, 60); }
-      }
-      b.addEventListener("click", go);
-      b.addEventListener("keydown", function (e) { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); go(); } });
-    });
 
     /* Hjelper: løsning med pseudokode (BYGGEGUIDE 5.4) */
     function solution(items, keys) {

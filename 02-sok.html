@@ -373,19 +373,6 @@
     "use strict";
     var IN = window.IN, qs = IN.qs, el = IN.el;
 
-    // Merkelapper → riktig fane
-    IN.qsa(".badge[data-go]").forEach(function (b) {
-      b.style.cursor = "pointer";
-      b.setAttribute("role", "link"); b.setAttribute("tabindex", "0");
-      function go() {
-        var id = b.getAttribute("data-go");
-        location.hash = "fane=" + id;
-        var card = qs("#exam-" + id + " .examtask");
-        if (card) { card.setAttribute("open", ""); setTimeout(function () { card.scrollIntoView({ behavior: "smooth", block: "center" }); }, 60); }
-      }
-      b.addEventListener("click", go);
-      b.addEventListener("keydown", function (e) { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); go(); } });
-    });
 
     function fmt(v) { return Math.round(v).toLocaleString("nb-NO"); }
     function log2(v) { return Math.log(v) / Math.LN2; }

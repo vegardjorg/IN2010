@@ -201,10 +201,6 @@
   (function () {
     var IN = window.IN, el = IN.el, qs = IN.qs;
 
-    // badge -> fane
-    IN.qsa(".badge[data-go]").forEach(function (b) {
-      b.addEventListener("click", function () { location.hash = "fane=" + b.getAttribute("data-go"); });
-    });
 
     /* ---- Nivådelte forklaringer ---- */
     IN.explain("#ex-algoritme", {

@@ -1020,20 +1020,7 @@
       { s: "Polynomiell tid betyr O(nᵏ) for en konstant k.", answer: true, blokk: "7",
         explain: "Ja. O(2ⁿ) er ikke polynomiell, fordi n står i eksponenten." }
     ], { id: "strategi-tf" });
-
-    // Badge-klikk: gå til fanen og åpne eksamenskortet
-    qsa(".badge[data-go]").forEach(function (b) {
-      b.setAttribute("role", "button"); b.setAttribute("tabindex", "0");
-      function go() {
-        // core.js åpner kortet og ruller dit når hashen endres (#fane=…&oppg=…)
-        var h = "#fane=" + b.getAttribute("data-go") + "&oppg=exam-" + b.getAttribute("data-card");
-        if (location.hash !== h) { location.hash = h; return; }
-        var card = qs("#exam-" + b.getAttribute("data-card") + " .examtask");
-        if (card) { card.open = true; window.scrollTo({ top: Math.max(0, card.getBoundingClientRect().top + window.pageYOffset - 90), behavior: "smooth" }); }
-      }
-      b.addEventListener("click", go);
-      b.addEventListener("keydown", function (e) { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); go(); } });
-    });
+
   })();
   </script>
 </body>
