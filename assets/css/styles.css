@@ -1518,3 +1518,19 @@ body[data-page="strategi"] .bigo-compact .bigo-val { white-space: normal; overfl
 /* Fargebrikkene er lyse i mørkt tema: mørk tekst gir lesbar kontrast */
 :root[data-theme="dark"] .chip { color: #111; }
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .chip { color: #111; } }
+/* «Universitetsnivå»-boksene er overbygg – skjul dem på 5-åring-nivå */
+:root[data-level="eli5"] .callout.uni { display: none; }
+/* Parsons på smal skjerm: koden får hele bredden og brytes, knappene legges under */
+@media (max-width: 520px) {
+  .parsons-line { flex-wrap: wrap; }
+  .parsons-line .pcode { flex: 1 1 calc(100% - 1.5rem); white-space: pre-wrap; overflow: visible; }
+  .parsons-line .mv { margin-left: auto; }
+}
+/* Pekerne i søkedemoene: større og mørkere i lyst tema (kontrast ≥ 4.5:1) */
+.ptr { font-size: 12px; font-weight: 700; }
+:root:not([data-theme="dark"]) .ptr.i, :root:not([data-theme="dark"]) .ptr.target, :root:not([data-theme="dark"]) .ptr.left { color: #2a6bb3; }
+:root:not([data-theme="dark"]) .ptr.j, :root:not([data-theme="dark"]) .ptr.mid, :root:not([data-theme="dark"]) .ptr.right { color: #8f5a00; }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .ptr.i, :root:not([data-theme="light"]) .ptr.target, :root:not([data-theme="light"]) .ptr.left { color: var(--c-target); }
+  :root:not([data-theme="light"]) .ptr.j, :root:not([data-theme="light"]) .ptr.mid, :root:not([data-theme="light"]) .ptr.right { color: var(--c-compare); }
+}

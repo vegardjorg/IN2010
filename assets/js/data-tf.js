@@ -700,6 +700,13 @@
       "kilde": false
     },
     {
+      "s": "Et AVL-tre med n noder har høyde O(log n).",
+      "answer": true,
+      "explain": "Det minste AVL-treet med høyde h har ett subtre med høyde h − 1 og ett med h − 2. Antall noder vokser da som Fibonacci-tallene, altså eksponentielt i h, så h = O(log n).",
+      "tema": "AVL",
+      "kilde": false
+    },
+    {
       "s": "Den største verdien i et binært søketre ligger alltid i en løvnode.",
       "answer": false,
       "explain": "Den største noden har ikke høyre barn, men den kan ha et venstre barn. Vi finner den ved å gå til høyre så lenge det går.",
@@ -761,6 +768,34 @@
       "explain": "Det er omvendt: sjeldne symboler slås sammen først og havner dypest. Derfor sparer Huffman bit.",
       "tema": "Huffman",
       "kilde": false
+    },
+    {
+      "s": "Et AVL-tre er alltid et komplett binærtre.",
+      "answer": false,
+      "explain": "En rot med bare et høyre barn har balansefaktor −1 og er et gyldig AVL-tre, men den er ikke komplett, for det nederste nivået er ikke fylt fra venstre.",
+      "tema": "AVL",
+      "kilde": false
+    },
+    {
+      "s": "Etter en innsetting i et AVL-tre holder det å sjekke balansefaktoren i nodene på stien fra den nye noden opp til roten.",
+      "answer": true,
+      "explain": "Bare subtrærne som inneholder den nye noden, kan ha fått ny høyde, og det er nettopp nodene på denne stien. Stien har lengde O(log n).",
+      "tema": "AVL",
+      "kilde": false
+    },
+    {
+      "s": "Setter vi inn 1, 2 og 3 i denne rekkefølgen i et tomt AVL-tre, blir 2 roten.",
+      "answer": true,
+      "explain": "Etter 3 har 1 balansefaktor −2, og treet er en rett kjede mot høyre. Én venstrerotasjon på 1 gjør 2 til rot med barna 1 og 3.",
+      "tema": "rotasjon",
+      "kilde": false
+    },
+    {
+      "s": "Setter vi inn 30, 10 og 20 i denne rekkefølgen i et tomt AVL-tre, holder én enkel rotasjon.",
+      "answer": false,
+      "explain": "20 havner som høyre barn av 10, som er venstre barn av 30. Det er en knekk, så vi trenger en dobbel rotasjon: venstre på 10, så høyre på 30. Resultatet er 20 med barna 10 og 30.",
+      "tema": "rotasjon",
+      "kilde": false
     }
   ],
   "hashing": [
@@ -779,7 +814,7 @@
       "kilde": false
     },
     {
-      "s": "Med god hashfunksjon og lav lastfaktor er oppslag med Separate chaining forventet O(1), men O(n) i verste tilfelle.",
+      "s": "Med god hashfunksjon og lav Load factor er oppslag med Separate chaining forventet O(1), men O(n) i verste tilfelle.",
       "answer": true,
       "explain": "I verste tilfelle havner alt i samme bøtte. H2025 ga eget poeng for hvert av de to svarene.",
       "tema": "kjøretid",
@@ -807,23 +842,23 @@
       "kilde": false
     },
     {
-      "s": "Med Linear probing kan lastfaktoren bli større enn 1.",
+      "s": "Med Linear probing kan Load factor bli større enn 1.",
       "answer": false,
-      "explain": "Hver plass har høyst ett element, så n kan ikke bli større enn N. Med Separate chaining går det derimot an.",
-      "tema": "lastfaktor",
+      "explain": "Hver plass har høyst ett element, så n ≤ N og Load factor er høyst 1. I praksis rehasher vi lenge før tabellen er full. Med Separate chaining går det derimot an.",
+      "tema": "Load factor",
       "kilde": false
     },
     {
-      "s": "Lastfaktoren til en hashtabell er antall elementer delt på arraystørrelsen.",
+      "s": "Load factor til en hashtabell er antall elementer delt på arraystørrelsen.",
       "answer": true,
-      "explain": "Lastfaktoren er n/N. Blir den for høy, rehasher vi til et større array, slik H2024 beskrev for Python-ordbøker.",
-      "tema": "lastfaktor",
+      "explain": "Load factor er n/N. Blir den for høy, rehasher vi til et større array, slik H2024 beskrev for Python-ordbøker.",
+      "tema": "Load factor",
       "kilde": false
     },
     {
       "s": "Forventet O(1) for oppslag gjelder uansett hvor full tabellen er.",
       "answer": false,
-      "explain": "Forventet O(1) krever en god hashfunksjon og lav lastfaktor. Med full tabell blir letesekvensene lange.",
+      "explain": "Forventet O(1) krever en god hashfunksjon og lav Load factor. Med full tabell blir letesekvensene lange.",
       "tema": "kjøretid",
       "kilde": false
     },
@@ -863,10 +898,10 @@
       "kilde": false
     },
     {
-      "s": "Med Separate chaining kan lastfaktoren bli større enn 1.",
+      "s": "Med Separate chaining kan Load factor bli større enn 1.",
       "answer": true,
       "explain": "Hver bøtte er en liste som kan holde mange elementer, så n kan bli større enn N. Det gjør likevel bøttene lange og oppslagene trege.",
-      "tema": "lastfaktor",
+      "tema": "Load factor",
       "kilde": false
     },
     {
@@ -1047,6 +1082,48 @@
       "kilde": false
     },
     {
+      "s": "I et tre med minst tre noder er hver node som har minst to naboer, en separasjonsnode.",
+      "answer": true,
+      "explain": "Et tre har bare én sti mellom hvert par av noder. Fjerner vi en node med to eller flere naboer, mister naboene den eneste forbindelsen seg imellom. Noder med bare én nabo kan fjernes uten at treet deles.",
+      "tema": "separasjonsnoder",
+      "kilde": false
+    },
+    {
+      "s": "En graf som består av to trekanter som deler nøyaktig én node, er 2-sammenhengende.",
+      "answer": false,
+      "explain": "Den felles noden er en separasjonsnode: fjerner vi den, faller grafen i to deler. Én liten moteksempel-graf som denne er nok til å avgjøre slike påstander.",
+      "tema": "separasjonsnoder",
+      "kilde": false
+    },
+    {
+      "s": "En urettet komplett graf med |V| noder har |V| · (|V| − 1) / 2 kanter.",
+      "answer": true,
+      "explain": "Hver av de |V| nodene har en kant til de |V| − 1 andre. Da teller vi hver kant to ganger, én gang fra hver ende, så vi deler på 2.",
+      "tema": "komplett graf",
+      "kilde": false
+    },
+    {
+      "s": "Finnes det en sti fra u til v i en rettet graf, er u og v i samme sterkt sammenhengende komponent.",
+      "answer": false,
+      "explain": "Det må finnes en sti begge veier, fra u til v og fra v til u. I en graf med bare kanten u → v er u og v hver sin komponent.",
+      "tema": "SCC",
+      "kilde": false
+    },
+    {
+      "s": "Bredde-først søk bruker en kø, mens dybde-først søk bruker en stakk eller rekursjon.",
+      "answer": true,
+      "explain": "Køen gjør at BFS går lag for lag, nærmeste noder først. Stakken (eller kallstakken) gjør at DFS går så langt som mulig før den snur.",
+      "tema": "traversering",
+      "kilde": false
+    },
+    {
+      "s": "Dybde-først søk finner alltid stier med færrest mulig kanter i en uvektet graf.",
+      "answer": false,
+      "explain": "DFS kan gå en lang omvei før den finner en node som ligger like ved. Det er BFS, som går lag for lag, som gir færrest kanter.",
+      "tema": "traversering",
+      "kilde": false
+    },
+    {
       "s": "En urettet graf med |V| noder og |V| − 1 kanter er alltid et tre.",
       "answer": false,
       "explain": "Den må også være sammenhengende. En trekant pluss en løs node har fire noder og tre kanter, men er ikke et tre.",
@@ -1079,6 +1156,83 @@
       "answer": true,
       "explain": "Kursets algoritme gjør dette i ett dybde-først-søk. H2025 knyttet 2-sammenheng til at grafen ikke har separasjonsnoder; per-node-søk blir tregere.",
       "tema": "separasjonsnoder",
+      "kilde": false
+    },
+    {
+      "s": "En graf som har en separasjonsnode, kan ikke inneholde sykler.",
+      "answer": false,
+      "explain": "To trekanter som deler én node, har to sykler, og den felles noden er likevel en separasjonsnode. Hver sykel gir alternative ruter innenfor sin egen trekant, men ikke fra den ene trekanten til den andre.",
+      "tema": "separasjonsnoder",
+      "kilde": false
+    },
+    {
+      "s": "En urettet graf som bare er én sykel med minst tre noder, har ingen separasjonsnoder.",
+      "answer": true,
+      "explain": "Fjerner vi én node, blir sykelen til en sti som fortsatt går innom alle de andre nodene. Resten henger altså sammen.",
+      "tema": "separasjonsnoder",
+      "kilde": false
+    },
+    {
+      "s": "I en sammenhengende graf er roten i DFS-treet en separasjonsnode nøyaktig når den har minst to barn i DFS-treet.",
+      "answer": true,
+      "explain": "Har roten to barn, finnes det ingen kant mellom subtrærne deres, ellers ville DFS ha funnet den og gjort dem til ett subtre. Uten roten blir de da adskilt. Derfor behandler kursets algoritme roten for seg.",
+      "tema": "separasjonsnoder",
+      "kilde": false
+    },
+    {
+      "s": "I en komplett graf er |E| = O(|V|²), så O(|V| + |E|) kan skrives O(|V|²).",
+      "answer": true,
+      "explain": "|V| · (|V| − 1) / 2 vokser som |V|². Når grafen er komplett, er det vanlig å oppgi kjøretiden bare med |V|.",
+      "tema": "komplett graf",
+      "kilde": false
+    },
+    {
+      "s": "En komplett graf med minst tre noder har ingen separasjonsnoder.",
+      "answer": true,
+      "explain": "Fjerner vi én node, er resten fortsatt en komplett graf med minst to noder, og den henger sammen.",
+      "tema": "komplett graf",
+      "kilde": false
+    },
+    {
+      "s": "En urettet komplett graf med minst tre noder er et tre.",
+      "answer": false,
+      "explain": "Tre vilkårlige noder danner en trekant, altså en sykel. Et tre har ingen sykler og bare |V| − 1 kanter.",
+      "tema": "komplett graf",
+      "kilde": false
+    },
+    {
+      "s": "I en rettet graf uten sykler (DAG) består hver sterkt sammenhengende komponent av én node.",
+      "answer": true,
+      "explain": "To ulike noder i samme komponent kan nå hverandre begge veier, og de to stiene gir til sammen en sykel. Uten sykler kan det ikke skje.",
+      "tema": "SCC",
+      "kilde": false
+    },
+    {
+      "s": "Hver node i en rettet graf ligger i nøyaktig én sterkt sammenhengende komponent.",
+      "answer": true,
+      "explain": "Komponentene deler nodene opp uten overlapp. En node som ingen andre når begge veier, er en komponent alene.",
+      "tema": "SCC",
+      "kilde": false
+    },
+    {
+      "s": "Kursets algoritme for sterkt sammenhengende komponenter kjører dybde-først søk både på grafen og på den omvendte grafen.",
+      "answer": true,
+      "explain": "Først gir et DFS en rekkefølge (stakken fra DFSTopSort). Så snur vi alle kantene og kjører DFS i den rekkefølgen. Hvert nytt søk i andre fase finner én komponent. Alt er O(|V| + |E|).",
+      "tema": "SCC",
+      "kilde": false
+    },
+    {
+      "s": "BFS fra en startnode besøker bare nodene som kan nås fra startnoden.",
+      "answer": true,
+      "explain": "Søket følger bare kanter, så noder i andre komponenter blir aldri med. Vil vi ha med alle nodene, må vi starte nye søk fra ubesøkte noder.",
+      "tema": "traversering",
+      "kilde": false
+    },
+    {
+      "s": "Rekkefølgen BFS besøker nodene i, er entydig bestemt av grafen og startnoden.",
+      "answer": false,
+      "explain": "Rekkefølgen avhenger også av rekkefølgen naboene står i nabolistene. Det er bare avstanden (hvilket lag en node ligger i) som er entydig.",
+      "tema": "traversering",
       "kilde": false
     }
   ],
@@ -1191,7 +1345,7 @@
     {
       "s": "Svar som bruker hashing, bør oppgi både forventet og verste kjøretid.",
       "answer": true,
-      "explain": "H2025 ga eget poeng for hvert. Forventet O(1) forutsetter god hashfunksjon og lav lastfaktor; verste tilfelle er O(n).",
+      "explain": "H2025 ga eget poeng for hvert. Forventet O(1) forutsetter god hashfunksjon og lav Load factor; verste tilfelle er O(n).",
       "tema": "hashing",
       "kilde": false
     },

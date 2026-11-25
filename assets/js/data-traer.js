@@ -311,7 +311,7 @@
         teknisk: "Høyre barn kommer etter venstre barn i køen og blir derfor besøkt etter det." }
     ],
     bigO: { best: "O(n)", avg: "O(n)", worst: "O(n)", space: "O(n)",
-      why: t("Alle nodene står i køen én gang og blir hilst på én gang.",
+      why: t("Hver node går inn i køen én gang og ut én gang, og vi hilser på den akkurat da. Det tar omtrent like lang tid som å telle nodene.",
              "Hver node legges i køen og tas ut nøyaktig én gang. Køen kan inneholde et helt nivå, og det nederste nivået kan ha rundt halvparten av nodene.",
              "n Enqueue og n Dequeue à O(1) gir O(n). Køen holder høyst bredden av treet. I et komplett binærtre er det nederste nivået omtrent n/2 noder, så minnet er O(n).") }
   });
@@ -523,7 +523,7 @@
     bigO: { best: "O(1)", worst: "O(n)", space: "O(h)",
       why: t("Vi ser på hver node én gang, så tiden vokser i takt med antall noder.",
              "Hver node sjekkes én gang mot to grenser. Det er O(n). Å kalle FindMin og FindMax for hver node ville gitt O(n²).",
-             "T(n) = O(n): én konstant sjekk per node. Kallstakken er O(h). Alternativet med inorder til en liste og sjekk av at lista er sortert er også O(n), men bruker O(n) ekstra minne.") }
+             "Kjøretiden er O(n): én konstant sjekk per node. Kallstakken er O(h). Alternativet med inorder til en liste og sjekk av at lista er sortert er også O(n), men bruker O(n) ekstra minne.") }
   });
 
   reg(IN.algos, "inRange", {
@@ -554,7 +554,7 @@
         teknisk: "Speilbildet av beskjæringen til venstre." }
     ],
     bigO: { best: "O(1)", worst: "O(n)", space: "O(h)",
-      why: t("Vi går bare inn i grener der det kan finnes treff.",
+      why: t("Vi går bare ned der det kan ligge tall i intervallet, og hopper over hele grener som er for små eller for store. Tiden avhenger av hvor høyt treet er, og av hvor mange tall vi finner.",
              "Vi følger to stier nedover, én mot hvert endepunkt av intervallet (O(h)) og besøker i tillegg treffene. Er hele treet i intervallet, blir det O(n). Er a = b i et balansert tre, blir det O(log n).",
              "Kjøretiden er O(h + k), der k er antall utskrevne verdier. Uten beskjæring er det en vanlig inorder på O(n), som H2021 ga mindre uttelling for.") }
   });
@@ -604,7 +604,7 @@
     bigO: { best: "O(n)", avg: "O(n)", worst: "O(n)", space: "O(h)",
       why: t("Vi spør hver node bare én gang, og får både høyde og sti tilbake samtidig.",
              "Hver node besøkes én gang, og høyden regnes ut i samme gjennomgang. Det naive alternativet kaller Height på nytt for hver node og blir O(n²) for en skjev kjede.",
-             "T(n) = O(n) fordi hvert kall gjør O(1) arbeid utover de to rekursive kallene. Kallstakken er O(h). Den naive versjonen bruker O(n) for hver av n noder i verste fall, altså O(n²).") }
+             "Kjøretiden er O(n): hvert kall gjør O(1) arbeid utover de to rekursive kallene, og det er O(n) kall (ett per node og ett per tomt barn). Kallstakken er O(h). Den naive versjonen bruker O(n) for hver av n noder i verste fall, altså O(n²).") }
   });
 
   /* ============================================================
@@ -981,7 +981,7 @@
         eli5: "Ellers blir alt stående.", normal: "Ingen rotasjon nødvendig.", teknisk: "Vanlig tilfelle når x gikk til høyre." }
     ],
     bigO: { best: "O(1)", worst: "O(n)", space: "O(n)",
-      why: t("Treet blir en lang stige. Skal vi helt ned, må vi gå forbi alle.",
+      why: t("Vi går ned til riktig plass som i et vanlig søketre, og vrir høyst én gang på veien opp. Men treet er en lang stige, så skal vi helt ned, må vi forbi alle nodene.",
              "Anti-AVL-treet er alltid en høyrekjede, så høyden er n − 1. Innsetting av et stort tall går gjennom hele kjeden: O(n). Et tall mindre enn roten settes inn på ett skritt: O(1).",
              "h = n − 1 gir O(n) for innsetting og oppslag i verste fall. Rekursjonsstakken blir like dyp.") }
   });

@@ -693,6 +693,17 @@
     });
   }
 
+  /* Lenke til samme #fane=…&oppg=… som allerede står i adressen gir ingen hashchange:
+     kjør hoppet likevel, så lenken alltid gjør noe. */
+  document.addEventListener("click", function (e) {
+    var a = e.target.closest && e.target.closest('a[href*="#fane="]');
+    if (!a || e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey) return;
+    var href = a.getAttribute("href"), i = href.indexOf("#");
+    var page = href.slice(0, i), here = location.pathname.split("/").pop() || "index.html";
+    if (page && page !== here) return;
+    if (href.slice(i) === location.hash && IN.revealOppg) { e.preventDefault(); IN.revealOppg(); }
+  });
+
   /* ---------- Oppstart ---------- */
   function boot() {
     buildNav();

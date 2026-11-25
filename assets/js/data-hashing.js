@@ -48,6 +48,7 @@
   // Ligger h i det sirkulære intervallet (i, j] (mod N)?
   function inCyc(h, i, j, N) { var a = mod(h - i, N), b = mod(j - i, N); return a > 0 && a <= b; }
   function cycList(i, j, N) { var out = [], x = mod(i + 1, N), g = 0; while (g++ <= N) { out.push(x); if (x === j) break; x = mod(x + 1, N); } return out; }
+  function tries(n) { return n + (n === 1 ? " prøvd plass" : " prøvde plasser"); }
   function fmt(x) { return String(Math.round(x * 100) / 100).replace(".", ","); }
   HS.mod = mod; HS.h31 = h31; HS.h31Full = h31Full; HS.hSum = hSum; HS.hash = hash; HS.hText = hText;
   HS.inCyc = inCyc; HS.cycList = cycList; HS.fmt = fmt; HS.show = show;
@@ -97,16 +98,16 @@
         normal: "Hashfunksjonen gir et tall mellom 0 og N − 1: indeksen til bøtta.",
         teknisk: "Én hashberegning, O(1). Samme nøkkel gir alltid samme bøtte, ellers ville vi aldri funnet den igjen." },
       { code: "B ← A[i]", indent: 1,
-        eli5: "Se i den bøtta.", normal: "B er lista på plass i (eller null hvis ingen har brukt plassen ennå).",
+        eli5: "Gå til den bøtta og se hva som ligger der. Kanskje finnes den ikke ennå.", normal: "B er lista på plass i (eller null hvis ingen har brukt plassen ennå).",
         teknisk: "Bøttene lages først når de trengs, så A[i] kan være null." },
       { code: "if B = null then", indent: 1,
-        eli5: "Finnes det ingen bøtte her ennå?", normal: "Første gang noe hasher til plass i, finnes det ingen liste.",
+        eli5: "Har ingen nøkkel havnet på denne plassen før? Da finnes det ingen bøtte her ennå.", normal: "Første gang noe hasher til plass i, finnes det ingen liste.",
         teknisk: "Lat initialisering av bøtta. Sensor trakk poeng når det var uklart hvordan bøtta ble laget." },
       { code: "A[i] ← new list with (k, v)", indent: 2,
         eli5: "Lag en ny bøtte med bare dette paret i.", normal: "Lag en liste som inneholder (k, v), og legg den på plass i.",
         teknisk: "Ny liste med ett element, O(1)." },
       { code: "return A", indent: 2,
-        eli5: "Ferdig!", normal: "Ferdig: nøkkelen kan ikke finnes fra før, for bøtta var tom.", teknisk: "Ferdig." },
+        eli5: "Ferdig! Bøtta var tom, så nøkkelen kunne ikke finnes fra før.", normal: "Ferdig: nøkkelen kan ikke finnes fra før, for bøtta var tom.", teknisk: "Ferdig." },
       { code: "for j ← 0 to |B| − 1 do", indent: 1,
         eli5: "Se på hvert par i bøtta, ett om gangen.", normal: "Gå gjennom alle parene i bøtta.",
         teknisk: "Lineært søk i bøtta: O(|B|). Med god hashfunksjon og lav Load factor er |B| forventet O(1).",
@@ -115,16 +116,16 @@
           "Listene er 0-indeksert: en bøtte med |B| par har indeksene 0 til |B| − 1. Går vi til |B|, leser vi utenfor lista.",
           "0-indeksert: gyldige indekser er 0, …, |B| − 1. Er bøtta tom (|B| = 0), kjører løkka null ganger, og vi går rett til append.") } },
       { code: "if B[j].key = k then", indent: 2,
-        eli5: "Er dette den samme nøkkelen?", normal: "Ligger nøkkelen k allerede i bøtta?",
+        eli5: "Er dette den samme nøkkelen som vi skal sette inn? Da skal vi ikke lage en til.", normal: "Ligger nøkkelen k allerede i bøtta?",
         teknisk: "Nøkler sammenlignes med likhet. Det er grunnen til at samme nøkkel aldri skal ligge to ganger." },
       { code: "B[j] ← (k, v)", indent: 3,
         eli5: "Bytt ut den gamle verdien med den nye.", normal: "Overskriv det gamle paret. Et hashmap har hver nøkkel bare én gang.",
         teknisk: "Overskriving i stedet for duplikat. H2025 trakk poeng for løsninger som glemte dette." },
-      { code: "return A", indent: 3, eli5: "Ferdig!", normal: "Ferdig etter overskrivingen.", teknisk: "Antall par n endres ikke." },
+      { code: "return A", indent: 3, eli5: "Ferdig! Vi byttet ut den gamle verdien.", normal: "Ferdig etter overskrivingen.", teknisk: "Antall par n endres ikke." },
       { code: "append (k, v) to B", indent: 1,
         eli5: "Nøkkelen fantes ikke, så vi legger paret bakerst i bøtta.", normal: "Nøkkelen fantes ikke i bøtta: legg paret til på slutten.",
         teknisk: "Append er O(1). Totalt: O(1 + |B|)." },
-      { code: "return A", indent: 1, eli5: "Ferdig!", normal: "Ferdig.", teknisk: "n øker med 1." }
+      { code: "return A", indent: 1, eli5: "Ferdig! Paret ligger nå bakerst i bøtta.", normal: "Ferdig.", teknisk: "n øker med 1." }
     ],
     bigO: { best: "O(1)", avg: "O(1) forventet", worst: "O(n)", space: "O(n + N)",
       why: t("Vanligvis er bøtta nesten tom, så det går fort. Men havner alt i samme bøtte, må vi lete gjennom alt.",
@@ -136,17 +137,17 @@
     title: "Separate chaining: oppslag", name: "SeparateChainingGet", params: "A, k",
     input: "Et array A av størrelse N med bøtter, og en nøkkel k", output: "Verdien til k, eller null hvis k ikke finnes",
     lines: [
-      { code: "i ← h(k, N)", indent: 1, eli5: "Finn riktig bøtte.", normal: "Samme hashfunksjon som ved innsetting, så vi havner i samme bøtte.", teknisk: "O(1)." },
-      { code: "B ← A[i]", indent: 1, eli5: "Se i bøtta.", normal: "Hent bøtta på plass i.", teknisk: "Kan være null." },
-      { code: "if B = null then", indent: 1, eli5: "Ingen bøtte?", normal: "Ingen bøtte betyr at ingen nøkkel har hashet hit.", teknisk: "Da kan k umulig finnes." },
+      { code: "i ← h(k, N)", indent: 1, eli5: "Regn ut bøttenummeret på samme måte som da nøkkelen ble lagt inn. Da havner vi i riktig bøtte.", normal: "Samme hashfunksjon som ved innsetting, så vi havner i samme bøtte.", teknisk: "O(1)." },
+      { code: "B ← A[i]", indent: 1, eli5: "Hent bøtta på den plassen. Kanskje finnes den ikke.", normal: "Hent bøtta på plass i.", teknisk: "Kan være null." },
+      { code: "if B = null then", indent: 1, eli5: "Er det ingen bøtte her? Da har ingen nøkkel noen gang havnet på denne plassen.", normal: "Ingen bøtte betyr at ingen nøkkel har hashet hit.", teknisk: "Da kan k umulig finnes." },
       { code: "return null", indent: 2, eli5: "Da finnes ikke nøkkelen.", normal: "k finnes ikke.", teknisk: "Mislykket oppslag i O(1)." },
-      { code: "for j ← 0 to |B| − 1 do", indent: 1, eli5: "Se på hvert par i bøtta.", normal: "Let gjennom bøtta.", teknisk: "O(|B|)." },
-      { code: "if B[j].key = k then", indent: 2, eli5: "Er det denne?", normal: "Sammenlign nøkkelen.", teknisk: "Likhetssjekk." },
+      { code: "for j ← 0 to |B| − 1 do", indent: 1, eli5: "Se på parene i bøtta, ett om gangen.", normal: "Let gjennom bøtta.", teknisk: "O(|B|)." },
+      { code: "if B[j].key = k then", indent: 2, eli5: "Er dette nøkkelen vi leter etter, og ikke bare en annen som havnet i samme bøtte?", normal: "Sammenlign nøkkelen.", teknisk: "Likhetssjekk." },
       { code: "return B[j].value", indent: 3, eli5: "Funnet! Gi tilbake verdien.", normal: "Funnet: returner verdien.", teknisk: "Vellykket oppslag." },
       { code: "return null", indent: 1, eli5: "Vi lette i hele bøtta uten å finne den.", normal: "Hele bøtta er sjekket: k finnes ikke.", teknisk: "Mislykket oppslag i O(1 + |B|)." }
     ],
     bigO: { best: "O(1)", avg: "O(1) forventet", worst: "O(n)", space: "O(1) ekstra",
-      why: t("Som oftest er det bare et par ting i bøtta.", "Vi leter bare i én bøtte. Den er forventet kort, men kan i verste fall inneholde alle n nøklene.",
+      why: t("Som oftest er det bare et par ting i bøtta. Men havner alt i samme bøtte, må vi lete gjennom alt.", "Vi leter bare i én bøtte. Den er forventet kort, men kan i verste fall inneholde alle n nøklene.",
         "O(1 + |B|). Forventet |B| = n/N, altså O(1) når Load factor holdes konstant. Verste tilfelle O(n).") }
   });
 
@@ -163,16 +164,16 @@
     lines: [
       { code: "i ← h(k, N)", indent: 1, eli5: "Finn plassen nøkkelen helst vil ha.", normal: "Start på hjemmeplassen h(k, N).", teknisk: "0 ≤ i ≤ N − 1." },
       { code: "while A[i] ≠ null do", indent: 1,
-        eli5: "Så lenge plassen er opptatt …", normal: "Fortsett så lenge plassen er opptatt.",
+        eli5: "Så lenge noen allerede bruker plassen, må vi lete videre …", normal: "Fortsett så lenge plassen er opptatt.",
         teknisk: "Løkka stopper fordi arrayet ikke er fullt. Rehash ved høy Load factor sørger for det." },
       { code: "if A[i].key = k then", indent: 2,
-        eli5: "… sjekk om det er samme nøkkel.", normal: "Ligger nøkkelen her fra før?", teknisk: "Samme nøkkel skal overskrives, ikke legges inn to ganger." },
-      { code: "break", indent: 3, eli5: "Ja! Da stopper vi her.", normal: "Stopp: vi skal overskrive på denne plassen.", teknisk: "Hopp ut av løkka med i på nøkkelens plass." },
-      { code: "i ← (i + 1) mod N", indent: 2, eli5: "Prøv neste plass.", normal: "Kollisjon: gå til neste plass, rundt til 0 etter siste plass.",
+        eli5: "… men først: er det kanskje vår egen nøkkel som ligger der?", normal: "Ligger nøkkelen her fra før?", teknisk: "Samme nøkkel skal overskrives, ikke legges inn to ganger." },
+      { code: "break", indent: 3, eli5: "Ja! Da stopper vi her og bytter bare verdien.", normal: "Stopp: vi skal overskrive på denne plassen.", teknisk: "Hopp ut av løkka med i på nøkkelens plass." },
+      { code: "i ← (i + 1) mod N", indent: 2, eli5: "Plassen var opptatt av en annen. Vi går ett skritt til høyre. Fra den siste plassen går vi tilbake til den første.", normal: "Kollisjon: gå til neste plass, rundt til 0 etter siste plass.",
         teknisk: "Lineær probing: hjemmeplass, så +1, +2, … (mod N).", grense: MODN },
       { code: "A[i] ← (k, v)", indent: 1, eli5: "Legg paret på plassen vi stoppet på.", normal: "Enten en ledig plass, eller plassen der k lå fra før.",
         teknisk: "Én skriving. Kostnaden er antall prøvde plasser." },
-      { code: "return A", indent: 1, eli5: "Ferdig!", normal: "Ferdig.", teknisk: "" }
+      { code: "return A", indent: 1, eli5: "Ferdig! Paret ligger nå i tabellen.", normal: "Ferdig.", teknisk: "" }
     ],
     bigO: { best: "O(1)", avg: "O(1) forventet", worst: "O(n)", space: "O(N)",
       why: t("Som regel er hjemmeplassen ledig eller nesten ledig. Men står mange i kø på rad, må vi gå forbi alle.",
@@ -185,16 +186,16 @@
     input: "Et array A av størrelse N og en nøkkel k", output: "Verdien til k, eller null",
     lines: [
       { code: "i ← h(k, N)", indent: 1, eli5: "Start der nøkkelen hører hjemme.", normal: "Start på hjemmeplassen.", teknisk: "Samme startpunkt som innsettingen brukte." },
-      { code: "while A[i] ≠ null do", indent: 1, eli5: "Så lenge plassen ikke er tom …", normal: "Let til vi treffer en ledig plass.",
+      { code: "while A[i] ≠ null do", indent: 1, eli5: "Så lenge det ligger noe på plassen, leter vi videre …", normal: "Let til vi treffer en ledig plass.",
         teknisk: "En ledig plass betyr at k aldri ble skjøvet forbi hit. Derfor kan vi stoppe der." },
-      { code: "if A[i].key = k then", indent: 2, eli5: "Er det denne?", normal: "Sammenlign nøkkelen.", teknisk: "" },
-      { code: "return A[i].value", indent: 3, eli5: "Funnet!", normal: "Funnet: returner verdien.", teknisk: "" },
-      { code: "i ← (i + 1) mod N", indent: 2, eli5: "Prøv neste plass.", normal: "Neste plass, rundt til 0 etter siste.", teknisk: "", grense: MODN },
+      { code: "if A[i].key = k then", indent: 2, eli5: "Er dette nøkkelen vi leter etter, og ikke bare en annen som havnet på samme sted?", normal: "Sammenlign nøkkelen.", teknisk: "" },
+      { code: "return A[i].value", indent: 3, eli5: "Funnet! Vi gir tilbake verdien som hører til nøkkelen.", normal: "Funnet: returner verdien.", teknisk: "" },
+      { code: "i ← (i + 1) mod N", indent: 2, eli5: "Ikke den rette. Vi går ett skritt til høyre, og fra den siste plassen tilbake til den første.", normal: "Neste plass, rundt til 0 etter siste.", teknisk: "", grense: MODN },
       { code: "return null", indent: 1, eli5: "Vi traff en tom plass, så nøkkelen finnes ikke.", normal: "En ledig plass: k finnes ikke.",
         teknisk: "Dette er grunnen til at sletting ikke bare kan sette en plass til null. Da kan senere oppslag stoppe for tidlig." }
     ],
     bigO: { best: "O(1)", avg: "O(1) forventet", worst: "O(n)", space: "O(1) ekstra",
-      why: t("Vanligvis bare noen få steg.", "Som innsetting: vi går gjennom segmentet av opptatte plasser fra hjemmeplassen.",
+      why: t("Vanligvis er det bare noen få plasser å sjekke. Står mange på rad, må vi gå forbi alle.", "Som innsetting: vi går gjennom segmentet av opptatte plasser fra hjemmeplassen.",
         "Antall prøvde plasser er forventet O(1) ved begrenset Load factor. Verste tilfelle O(n).") }
   });
 
@@ -204,13 +205,13 @@
     lines: [
       { code: "i ← h(k, N)", indent: 1, eli5: "Finn nøkkelen først, akkurat som ved oppslag.", normal: "Start på hjemmeplassen til k.", teknisk: "" },
       { code: "while A[i] ≠ null and A[i].key ≠ k do", indent: 1, eli5: "Gå videre til vi finner den eller en tom plass.", normal: "Let som ved oppslag.", teknisk: "" },
-      { code: "i ← (i + 1) mod N", indent: 2, eli5: "Neste plass.", normal: "Neste plass.", teknisk: "", grense: MODN },
-      { code: "if A[i] = null then", indent: 1, eli5: "Fant vi en tom plass?", normal: "Traff vi en ledig plass, finnes ikke k.", teknisk: "" },
+      { code: "i ← (i + 1) mod N", indent: 2, eli5: "Plassen var opptatt av en annen. Vi går ett skritt til høyre. Fra den siste plassen går vi tilbake til den første.", normal: "Neste plass.", teknisk: "", grense: MODN },
+      { code: "if A[i] = null then", indent: 1, eli5: "Kom vi til en tom plass? Da var nøkkelen aldri her.", normal: "Traff vi en ledig plass, finnes ikke k.", teknisk: "" },
       { code: "return A", indent: 2, eli5: "Da er det ingenting å slette.", normal: "Ingenting å slette.", teknisk: "" },
       { code: "A[i] ← null", indent: 1, eli5: "Ta den bort. Nå er det et hull her.", normal: "Fjern paret. Plass i er nå et hull.",
         teknisk: "Et hull midt i et segment kan få oppslag til å stoppe for tidlig. Resten av prosedyren tetter hullet." },
       { code: "j ← (i + 1) mod N", indent: 1, eli5: "Se på dem som står etter hullet.", normal: "j går gjennom resten av segmentet etter hullet.", teknisk: "" },
-      { code: "while A[j] ≠ null do", indent: 1, eli5: "Fortsett til neste tomme plass.", normal: "Bare nøklene fram til neste ledige plass kan være berørt.",
+      { code: "while A[j] ≠ null do", indent: 1, eli5: "Vi sjekker alle som står på rad etter hullet, helt til vi kommer til en tom plass.", normal: "Bare nøklene fram til neste ledige plass kan være berørt.",
         teknisk: "Ingen nøkkel lenger ut kan ha probet forbi hullet, fordi probingen stopper ved første null." },
       { code: "if h(A[j].key, N) ∉ (i, j] then", indent: 2, eli5: "Ville denne nøkkelen ha gått forbi hullet for å komme dit den står?",
         normal: "Hjemmeplassen til nøkkelen på plass j ligger ikke mellom hullet og j. Da passerte den hullet på veien, og må flyttes inn i det.",
@@ -219,13 +220,13 @@
           "Hører nøkkelen hjemme akkurat i hullet, skal den også flyttes. Da må hullet være utenfor «bli»-området.",
           "Er hjemmeplassen lik i, går probingen innom hullet først, så nøkkelen må flyttes. Derfor er i ikke med, mens j er med (en nøkkel som hører hjemme på j, står riktig).",
           "Intervallet er åpent i i og lukket i j: h = i betyr at proben starter i hullet, og h = j betyr at nøkkelen står på hjemmeplassen sin.") } },
-      { code: "A[i] ← A[j]", indent: 3, eli5: "Flytt den inn i hullet.", normal: "Flytt paret inn i hullet.", teknisk: "Nå kan den nås igjen fra hjemmeplassen sin." },
+      { code: "A[i] ← A[j]", indent: 3, eli5: "Flytt den inn i hullet, så den kan finnes igjen.", normal: "Flytt paret inn i hullet.", teknisk: "Nå kan den nås igjen fra hjemmeplassen sin." },
       { code: "A[j] ← null", indent: 3, eli5: "Nå er hullet der den sto.", normal: "Det nye hullet er på plass j.", teknisk: "" },
       { code: "i ← j", indent: 3, eli5: "Vi fortsetter å tette det nye hullet.", normal: "Fortsett med å tette det nye hullet.", teknisk: "Samme som det rekursive kallet i kursets versjon." },
-      { code: "j ← (j + 1) mod N", indent: 2, eli5: "Neste.", normal: "Se på neste plass.", teknisk: "", grense: MODN }
+      { code: "j ← (j + 1) mod N", indent: 2, eli5: "Vi går videre til neste i rekka.", normal: "Se på neste plass.", teknisk: "", grense: MODN }
     ],
     bigO: { best: "O(1)", avg: "O(1) forventet", worst: "O(n)", space: "O(1) ekstra",
-      why: t("Vi ser bare på dem som står på rad etter hullet.",
+      why: t("Først leter vi fram nøkkelen, og så ser vi bare på dem som står på rad etter hullet. Som regel er det få.",
         "Først et oppslag, så én gjennomgang av resten av segmentet. Begge er forventet korte.",
         "Lengden på segmentet er forventet O(1) ved begrenset Load factor, men O(n) i verste fall.") }
   });
@@ -235,21 +236,21 @@
     title: "Linear probing med slettet-merker: innsetting", name: "InsertWithMarks", params: "A, k, v",
     input: "Array A (ledig = null, slettet = DELETED), nøkkel k, verdi v", output: "A med (k, v)",
     lines: [
-      { code: "i ← h(k, N)", indent: 1, eli5: "Start på hjemmeplassen.", normal: "Start på hjemmeplassen.", teknisk: "" },
+      { code: "i ← h(k, N)", indent: 1, eli5: "Vi regner ut hvor nøkkelen helst vil bo, og begynner der.", normal: "Start på hjemmeplassen.", teknisk: "" },
       { code: "p ← null", indent: 1, eli5: "Vi har ikke sett noe merke ennå.", normal: "p husker det første slettet-merket vi går forbi.", teknisk: "" },
-      { code: "while A[i] ≠ null do", indent: 1, eli5: "Gå til første helt tomme plass.", normal: "Vi må helt til en ledig plass for å vite at k ikke finnes lenger ut.",
+      { code: "while A[i] ≠ null do", indent: 1, eli5: "Vi må gå helt til en tom plass, for nøkkelen kan ligge lenger ut.", normal: "Vi må helt til en ledig plass for å vite at k ikke finnes lenger ut.",
         teknisk: "Stopper vi ved første merke, kan k ligge lenger ut, og da får vi duplikat." },
-      { code: "if A[i] = DELETED then", indent: 2, eli5: "Er plassen merket som slettet?", normal: "Et merke kan gjenbrukes.", teknisk: "" },
-      { code: "if p = null then p ← i", indent: 3, eli5: "Husk den første slike plassen.", normal: "Husk det første merket.", teknisk: "" },
-      { code: "else if A[i].key = k then", indent: 2, eli5: "Samme nøkkel?", normal: "Ligger k her fra før?", teknisk: "" },
-      { code: "A[i] ← (k, v)", indent: 3, eli5: "Bytt ut verdien.", normal: "Overskriv.", teknisk: "" },
-      { code: "return A", indent: 3, eli5: "Ferdig!", normal: "Ferdig.", teknisk: "" },
-      { code: "i ← (i + 1) mod N", indent: 2, eli5: "Neste plass.", normal: "Neste plass.", teknisk: "", grense: MODN },
+      { code: "if A[i] = DELETED then", indent: 2, eli5: "Står det en «slettet»-lapp på plassen?", normal: "Et merke kan gjenbrukes.", teknisk: "" },
+      { code: "if p = null then p ← i", indent: 3, eli5: "Husk den første plassen med slettemerke. Der kan vi sette nøkkelen hvis den ikke finnes fra før.", normal: "Husk det første merket.", teknisk: "" },
+      { code: "else if A[i].key = k then", indent: 2, eli5: "Bor nøkkelen allerede her? Da skal vi bare bytte verdien.", normal: "Ligger k her fra før?", teknisk: "" },
+      { code: "A[i] ← (k, v)", indent: 3, eli5: "Bytt ut den gamle verdien med den nye.", normal: "Overskriv.", teknisk: "" },
+      { code: "return A", indent: 3, eli5: "Ferdig! Vi byttet ut den gamle verdien.", normal: "Ferdig.", teknisk: "" },
+      { code: "i ← (i + 1) mod N", indent: 2, eli5: "Plassen var opptatt av en annen. Vi går ett skritt til høyre. Fra den siste plassen går vi tilbake til den første.", normal: "Neste plass.", teknisk: "", grense: MODN },
       { code: "if p ≠ null then i ← p", indent: 1, eli5: "Fant vi et merke, bruker vi den plassen.", normal: "Gjenbruk det første merket hvis vi fant et.", teknisk: "Kortere probing neste gang." },
-      { code: "A[i] ← (k, v)", indent: 1, eli5: "Legg paret her.", normal: "Sett inn.", teknisk: "" }
+      { code: "A[i] ← (k, v)", indent: 1, eli5: "Legg paret her. Nøkkelen fantes ikke fra før.", normal: "Sett inn.", teknisk: "" }
     ],
     bigO: { best: "O(1)", avg: "O(1) forventet", worst: "O(n)", space: "O(N)",
-      why: t("Som vanlig innsetting.", "Merker teller som opptatte når vi leter, så mange merker gjør letingen lengre.",
+      why: t("Vi går forbi opptatte plasser og plasser med slettemerke til vi finner en tom. Merkene gjør køene lengre, men vanligvis er det bare noen få steg.", "Merker teller som opptatte når vi leter, så mange merker gjør letingen lengre.",
         "Probelengden avhenger av både ekte elementer og merker. Merkene forsvinner ved neste rehash.") }
   });
 
@@ -257,31 +258,31 @@
     title: "Linear probing med slettet-merker: oppslag", name: "GetWithMarks", params: "A, k",
     input: "Array A (ledig = null, slettet = DELETED), nøkkel k", output: "Verdien til k, eller null",
     lines: [
-      { code: "i ← h(k, N)", indent: 1, eli5: "Start på hjemmeplassen.", normal: "Start på hjemmeplassen.", teknisk: "" },
-      { code: "while A[i] ≠ null do", indent: 1, eli5: "Stopp bare ved helt tomme plasser.", normal: "Et merke er ikke null, så vi går forbi det.", teknisk: "Det er hele poenget med merket." },
-      { code: "if A[i] ≠ DELETED and A[i].key = k then", indent: 2, eli5: "Er det denne?", normal: "Sjekk nøkkelen hvis plassen ikke er et merke.", teknisk: "" },
-      { code: "return A[i].value", indent: 3, eli5: "Funnet!", normal: "Funnet.", teknisk: "" },
-      { code: "i ← (i + 1) mod N", indent: 2, eli5: "Neste plass.", normal: "Neste plass.", teknisk: "", grense: MODN },
-      { code: "return null", indent: 1, eli5: "Ikke her.", normal: "k finnes ikke.", teknisk: "" }
+      { code: "i ← h(k, N)", indent: 1, eli5: "Vi regner ut hvor nøkkelen helst vil bo, og begynner der.", normal: "Start på hjemmeplassen.", teknisk: "" },
+      { code: "while A[i] ≠ null do", indent: 1, eli5: "Vi stopper bare ved helt tomme plasser. En «slettet»-lapp betyr at vi må lete videre.", normal: "Et merke er ikke null, så vi går forbi det.", teknisk: "Det er hele poenget med merket." },
+      { code: "if A[i] ≠ DELETED and A[i].key = k then", indent: 2, eli5: "Er dette nøkkelen vi leter etter? Plasser med slettemerke hopper vi over.", normal: "Sjekk nøkkelen hvis plassen ikke er et merke.", teknisk: "" },
+      { code: "return A[i].value", indent: 3, eli5: "Funnet! Vi gir tilbake verdien som hører til nøkkelen.", normal: "Funnet.", teknisk: "" },
+      { code: "i ← (i + 1) mod N", indent: 2, eli5: "Ikke denne. Vi går ett skritt videre, også forbi plasser med slettemerke.", normal: "Neste plass.", teknisk: "", grense: MODN },
+      { code: "return null", indent: 1, eli5: "Vi kom til en helt tom plass. Hadde nøkkelen vært i tabellen, ville vi ha møtt den før dette. Den finnes ikke.", normal: "k finnes ikke.", teknisk: "" }
     ],
     bigO: { best: "O(1)", avg: "O(1) forventet", worst: "O(n)", space: "O(1) ekstra",
-      why: t("Som vanlig oppslag.", "Merker gjør segmentene lengre, ikke kortere.", "Forventet O(1) så lenge plasser med enten element eller merke holdes under en fast andel av N.") }
+      why: t("Vi må gå forbi slettemerkene også, for de teller som opptatt. Har vi slettet mye, blir køene lange og oppslaget tregere. Derfor bygger man tabellen på nytt av og til.", "Merker gjør segmentene lengre, ikke kortere.", "Forventet O(1) så lenge plasser med enten element eller merke holdes under en fast andel av N.") }
   });
 
   reg(IN.algos, "hsMarkRemove", {
     title: "Linear probing med slettet-merker: sletting", name: "RemoveWithMark", params: "A, k",
     input: "Array A (ledig = null, slettet = DELETED), nøkkel k", output: "A der k er erstattet med et merke",
     lines: [
-      { code: "i ← h(k, N)", indent: 1, eli5: "Finn nøkkelen.", normal: "Let som ved oppslag.", teknisk: "" },
+      { code: "i ← h(k, N)", indent: 1, eli5: "Først må vi finne nøkkelen. Vi starter der den hører hjemme.", normal: "Let som ved oppslag.", teknisk: "" },
       { code: "while A[i] ≠ null do", indent: 1, eli5: "Gå til vi finner den, eller en tom plass.", normal: "Let til en ledig plass.", teknisk: "" },
-      { code: "if A[i] ≠ DELETED and A[i].key = k then", indent: 2, eli5: "Er det denne?", normal: "Fant vi k?", teknisk: "" },
+      { code: "if A[i] ≠ DELETED and A[i].key = k then", indent: 2, eli5: "Er dette nøkkelen vi skal slette? Plasser med slettemerke hopper vi over.", normal: "Fant vi k?", teknisk: "" },
       { code: "A[i] ← DELETED", indent: 3, eli5: "Sett en lapp «slettet» på plassen i stedet for å tømme den.", normal: "Marker plassen som slettet. Den er ikke null, så oppslag går videre forbi den.",
         teknisk: "Ingen elementer flyttes. Til gjengjeld blir merkene liggende til neste rehash." },
-      { code: "return A", indent: 3, eli5: "Ferdig!", normal: "Ferdig.", teknisk: "" },
-      { code: "i ← (i + 1) mod N", indent: 2, eli5: "Neste plass.", normal: "Neste plass.", teknisk: "", grense: MODN }
+      { code: "return A", indent: 3, eli5: "Ferdig! Nøkkelen er borte, og lappen sørger for at de andre fortsatt kan finnes.", normal: "Ferdig.", teknisk: "" },
+      { code: "i ← (i + 1) mod N", indent: 2, eli5: "Plassen var opptatt av en annen. Vi går ett skritt til høyre. Fra den siste plassen går vi tilbake til den første.", normal: "Neste plass.", teknisk: "", grense: MODN }
     ],
     bigO: { best: "O(1)", avg: "O(1) forventet", worst: "O(n)", space: "O(1) ekstra",
-      why: t("Bare et oppslag og en lapp.", "Kostnaden er oppslaget. Selve merkingen er O(1).", "Forventet O(1), verste tilfelle O(n).") }
+      why: t("Vi leter fram nøkkelen og legger en lapp med «slettet» der den lå. Å lete tar det meste av tiden.", "Kostnaden er oppslaget. Selve merkingen er O(1).", "Forventet O(1), verste tilfelle O(n).") }
   });
 
   /* ---------- Rehash ---------- */
@@ -289,21 +290,21 @@
     title: "Innsetting med rehash (Linear probing)", name: "Insert", params: "k, v",
     input: "Nøkkel k og verdi v. Hashmapet har arrayet A, størrelsen N og antall par n", output: "(k, v) er satt inn",
     lines: [
-      { code: "if n / N ≥ 0.75 then", indent: 1, eli5: "Er tabellen for full?", normal: "Sjekk Load factor før innsettingen.",
+      { code: "if n / N ≥ 0.75 then", indent: 1, eli5: "Er tabellen minst tre fjerdedeler full? Da blir køene lange, og vi må lage mer plass.", normal: "Sjekk Load factor før innsettingen.",
         teknisk: "Kurset bruker grensen 0,75. Ideelt ligger Load factor omtrent mellom 1/2 og 3/4.",
         grense: { q: "Hvorfor sjekke før innsettingen?", a: t(
           "Da er det alltid minst én tom plass når vi skal legge inn noe.",
           "Etter sjekken er n/N < 0,75, altså n < N. Da finnes det en ledig plass, og probe-løkka stopper.",
           "Invarianten n < N gjør at while-løkka terminerer. Med grense 0,75 holdes dessuten forventet probelengde konstant.") } },
       { code: "Rehash()", indent: 2, eli5: "Lag en større tabell og flytt alt over.", normal: "Doble arrayet og sett inn alt på nytt.", teknisk: "O(n), men sjelden." },
-      { code: "i ← h(k, N)", indent: 1, eli5: "Finn hjemmeplassen.", normal: "Hjemmeplassen med den (kanskje nye) N-en.", teknisk: "" },
+      { code: "i ← h(k, N)", indent: 1, eli5: "Finn hjemmeplassen. Har tabellen nettopp blitt større, kan den være en annen enn før.", normal: "Hjemmeplassen med den (kanskje nye) N-en.", teknisk: "" },
       { code: "while A[i] ≠ null do", indent: 1, eli5: "Så lenge plassen er opptatt …", normal: "Linear probing som før.", teknisk: "" },
-      { code: "if A[i].key = k then", indent: 2, eli5: "Samme nøkkel?", normal: "Ligger k her fra før?", teknisk: "" },
-      { code: "A[i] ← (k, v)", indent: 3, eli5: "Bytt verdi.", normal: "Overskriv.", teknisk: "" },
-      { code: "return", indent: 3, eli5: "Ferdig!", normal: "Ferdig (n uendret).", teknisk: "" },
-      { code: "i ← (i + 1) mod N", indent: 2, eli5: "Neste plass.", normal: "Neste plass.", teknisk: "", grense: MODN },
-      { code: "A[i] ← (k, v)", indent: 1, eli5: "Legg paret her.", normal: "Sett inn på den ledige plassen.", teknisk: "" },
-      { code: "n ← n + 1", indent: 1, eli5: "Én til i tabellen.", normal: "Tell opp antall par.", teknisk: "" }
+      { code: "if A[i].key = k then", indent: 2, eli5: "Bor nøkkelen allerede her? Da skal vi bare bytte verdien.", normal: "Ligger k her fra før?", teknisk: "" },
+      { code: "A[i] ← (k, v)", indent: 3, eli5: "Bytt ut den gamle verdien med den nye.", normal: "Overskriv.", teknisk: "" },
+      { code: "return", indent: 3, eli5: "Ferdig! Vi byttet ut verdien, så antallet i tabellen er det samme.", normal: "Ferdig (n uendret).", teknisk: "" },
+      { code: "i ← (i + 1) mod N", indent: 2, eli5: "Plassen var opptatt av en annen. Vi går ett skritt til høyre. Fra den siste plassen går vi tilbake til den første.", normal: "Neste plass.", teknisk: "", grense: MODN },
+      { code: "A[i] ← (k, v)", indent: 1, eli5: "Legg paret på den ledige plassen.", normal: "Sett inn på den ledige plassen.", teknisk: "" },
+      { code: "n ← n + 1", indent: 1, eli5: "Nå er det én til i tabellen. Vi teller, så vi vet når den blir for full.", normal: "Tell opp antall par.", teknisk: "" }
     ],
     bigO: { best: "O(1)", avg: "O(1) forventet amortisert", worst: "O(n)", space: "O(N)",
       why: t("Nesten alltid raskt. Av og til må alt flyttes, men det skjer så sjelden at det jevner seg ut.",
@@ -316,20 +317,21 @@
     input: "Hashmapet (A, N, n)", output: "A er dobbelt så stort, og alle par er satt inn på nytt",
     lines: [
       { code: "B ← A", indent: 1, eli5: "Ta vare på den gamle tabellen.", normal: "Det gamle arrayet.", teknisk: "" },
-      { code: "N ← 2 · N", indent: 1, eli5: "Den nye tabellen blir dobbelt så stor.", normal: "Doble størrelsen.", teknisk: "",
+      { code: "N ← 2 · N", indent: 1, eli5: "Den nye tabellen blir dobbelt så stor, så det blir lenge til neste gang den blir full.", normal: "Doble størrelsen.", teknisk: "",
         grense: { q: "Hvorfor doble, og ikke bare legge til litt?", a: t(
           "Gjør vi tabellen bare litt større, blir den full igjen med en gang, og vi må flytte alt hele tiden.",
           "Med N ← N + 1 måtte vi rehashet nesten ved hver innsetting, og alt ville blitt O(n). Dobling gjør rehash sjelden.",
           "Dobling gir en geometrisk rekke 1 + 2 + 4 + … < 2n flytt totalt, altså amortisert O(1). Å legge til en konstant gir O(n) amortisert.") } },
       { code: "A ← new array of size N", indent: 1, eli5: "Lag en ny, tom tabell.", normal: "Nytt array der alle plasser er null.", teknisk: "" },
-      { code: "n ← 0", indent: 1, eli5: "Den nye er tom.", normal: "Insert teller opp igjen.", teknisk: "" },
+      { code: "n ← 0", indent: 1, eli5: "Den nye tabellen er tom, så vi begynner å telle på null.", normal: "Insert teller opp igjen.", teknisk: "" },
       { code: "for j ← 0 to |B| − 1 do", indent: 1, eli5: "Gå gjennom hele den gamle tabellen.", normal: "Alle plassene i det gamle arrayet.", teknisk: "O(N) plasser, og O(n) innsettinger." },
-      { code: "if B[j] ≠ null then", indent: 2, eli5: "Ligger det noe her?", normal: "Hopp over ledige plasser.", teknisk: "" },
+      { code: "if B[j] ≠ null then", indent: 2, eli5: "Ligger det noe på denne plassen i den gamle tabellen? Tomme plasser hopper vi over.", normal: "Hopp over ledige plasser.", teknisk: "" },
       { code: "Insert(B[j].key, B[j].value)", indent: 3, eli5: "Flytt det over. Det kan havne et nytt sted!", normal: "Sett inn på nytt med h(k, N) for den nye N-en.",
         teknisk: "Nøklene må hashes på nytt, fordi hjemmeplassen avhenger av N. Insert utløser ikke ny rehash: n/N ≤ 1/2 etter doblingen." }
     ],
     bigO: { best: "O(n + N)", avg: "O(n + N)", worst: "O(n + N)", space: "O(N)",
-      why: t("Alt må flyttes én gang.", "Hvert par settes inn på nytt. Siden N ≤ 2n rett etter (bortsett fra helt små tabeller), er det O(n).",
+      why: t("Når garderoben blir for full, bygger vi en dobbelt så stor og henger hver jakke opp på nytt. Det tar tid akkurat da, men det skjer sjelden.",
+        "Hvert par settes inn på nytt. Rehash skjer først når n/N ≥ 0,75, så rett etter doblingen er N høyst en konstant ganger n (omtrent 8/3 · n). Altså er N = O(n), og hele rehashen er O(n).",
         "O(N) for å gå gjennom B, pluss n forventet O(1)-innsettinger. Med Load factor over en fast nedre grense er det O(n).") }
   });
 
@@ -339,13 +341,13 @@
     input: "Nøkkel k. indices har N plasser (null eller en indeks i entries), entries er tettpakket", output: "Verdien til k, eller null",
     lines: [
       { code: "N ← |indices|", indent: 1, eli5: "Det er den store tabellen med hull vi hasher inn i.", normal: "Det er indices som har N plasser og hull.", teknisk: "entries har bare n plasser." },
-      { code: "i ← h(k, N)", indent: 1, eli5: "Finn hjemmeplassen.", normal: "Hjemmeplass i indices.", teknisk: "" },
+      { code: "i ← h(k, N)", indent: 1, eli5: "Finn hjemmeplassen i den store tabellen med hull.", normal: "Hjemmeplass i indices.", teknisk: "" },
       { code: "while indices[i] ≠ null do", indent: 1, eli5: "Så lenge det står et tall her …", normal: "Linear probing i indices.", teknisk: "" },
       { code: "e ← entries[indices[i]]", indent: 2, eli5: "Tallet sier hvor i lista paret ligger.", normal: "Følg indeksen til paret i entries.", teknisk: "Ett ekstra oppslag, O(1)." },
-      { code: "if e.key = k then", indent: 2, eli5: "Er det denne?", normal: "Sammenlign nøkkelen i entries.", teknisk: "" },
-      { code: "return e.value", indent: 3, eli5: "Funnet!", normal: "Funnet.", teknisk: "" },
-      { code: "i ← (i + 1) mod N", indent: 2, eli5: "Neste plass i indices.", normal: "Neste plass i indices.", teknisk: "", grense: MODN },
-      { code: "return null", indent: 1, eli5: "Ikke her.", normal: "Ledig plass i indices: k finnes ikke.", teknisk: "" }
+      { code: "if e.key = k then", indent: 2, eli5: "Er dette nøkkelen vi leter etter, og ikke bare en annen som havnet på samme sted?", normal: "Sammenlign nøkkelen i entries.", teknisk: "" },
+      { code: "return e.value", indent: 3, eli5: "Funnet! Vi gir tilbake verdien som hører til nøkkelen.", normal: "Funnet.", teknisk: "" },
+      { code: "i ← (i + 1) mod N", indent: 2, eli5: "Ikke den rette. Vi går videre til neste plass i den store tabellen med hull.", normal: "Neste plass i indices.", teknisk: "", grense: MODN },
+      { code: "return null", indent: 1, eli5: "Vi kom til en tom plass i den store tabellen. Hadde nøkkelen vært her, ville vi ha møtt den før dette. Den finnes ikke.", normal: "Ledig plass i indices: k finnes ikke.", teknisk: "" }
     ],
     bigO: { best: "O(1)", avg: "O(1) forventet", worst: "O(n)", space: "O(1) ekstra",
       why: t("Som vanlig Linear probing, med en ekstra titt i lista.", "Samme probing som før. Hvert steg koster ett ekstra arrayoppslag.", "Forventet O(1), verste tilfelle O(n).") }
@@ -356,13 +358,13 @@
     input: "Nøkkel k og verdi v", output: "(k, v) ligger i entries, og indices peker på det",
     lines: [
       { code: "N ← |indices|", indent: 1, eli5: "Vi hasher inn i den store tabellen.", normal: "Probing skjer i indices.", teknisk: "" },
-      { code: "i ← h(k, N)", indent: 1, eli5: "Finn hjemmeplassen.", normal: "Hjemmeplass i indices.", teknisk: "" },
+      { code: "i ← h(k, N)", indent: 1, eli5: "Finn hjemmeplassen i den store tabellen med hull.", normal: "Hjemmeplass i indices.", teknisk: "" },
       { code: "while indices[i] ≠ null do", indent: 1, eli5: "Så lenge plassen er opptatt …", normal: "Linear probing.", teknisk: "" },
       { code: "e ← entries[indices[i]]", indent: 2, eli5: "Se hvilket par plassen peker på.", normal: "Følg indeksen.", teknisk: "" },
-      { code: "if e.key = k then", indent: 2, eli5: "Samme nøkkel?", normal: "Finnes k fra før?", teknisk: "" },
+      { code: "if e.key = k then", indent: 2, eli5: "Er det samme nøkkel? Da skal vi bare bytte verdien.", normal: "Finnes k fra før?", teknisk: "" },
       { code: "entries[indices[i]] ← (k, v)", indent: 3, eli5: "Bytt verdien der den står i lista.", normal: "Overskriv i entries. Rekkefølgen beholdes.", teknisk: "indices endres ikke." },
-      { code: "return", indent: 3, eli5: "Ferdig!", normal: "Ferdig.", teknisk: "" },
-      { code: "i ← (i + 1) mod N", indent: 2, eli5: "Neste plass.", normal: "Neste plass i indices.", teknisk: "", grense: MODN },
+      { code: "return", indent: 3, eli5: "Ferdig! Verdien er byttet, og paret står på samme plass i lista.", normal: "Ferdig.", teknisk: "" },
+      { code: "i ← (i + 1) mod N", indent: 2, eli5: "Ikke den rette. Vi går videre til neste plass i den store tabellen.", normal: "Neste plass i indices.", teknisk: "", grense: MODN },
       { code: "indices[i] ← |entries|", indent: 1, eli5: "Skriv ned hvor i lista det nye paret kommer til å ligge.", normal: "Den ledige plassen i indices får indeksen til det nye paret.", teknisk: "",
         grense: { q: "Hvorfor |entries| og ikke |entries| − 1?", a: t(
           "Lista teller fra 0. Har den 3 par (0, 1, 2), får det nye paret nummer 3.",
@@ -372,7 +374,7 @@
         teknisk: "Derfor husker ordboka innsettingsrekkefølgen, og entries er tettpakket." }
     ],
     bigO: { best: "O(1)", avg: "O(1) forventet amortisert", worst: "O(n)", space: "O(N + n)",
-      why: t("Som vanlig innsetting.", "Probing i indices pluss en append. Med rehash: forventet amortisert O(1).",
+      why: t("Som regel er plassen ledig eller nesten ledig. Står mange på rad, må vi gå forbi alle. Til slutt legger vi paret bakerst i lista.", "Probing i indices pluss en append. Med rehash: forventet amortisert O(1).",
         "Append i et dynamisk array er amortisert O(1). Probingen er forventet O(1). Rehash bygger bare indices på nytt.") }
   });
 
@@ -381,15 +383,15 @@
     title: "Flest forekomster med hashmap", name: "MostFrequent", params: "A",
     input: "Et array A med n ≥ 1 elementer", output: "Et element som forekommer flest ganger",
     lines: [
-      { code: "F ← empty hashmap", indent: 1, eli5: "En tom telleliste.", normal: "F teller hvor mange ganger hvert element er sett.", teknisk: "Frekvenstabell: element ↦ antall." },
+      { code: "F ← empty hashmap", indent: 1, eli5: "Vi lager en tom telleliste. Der skriver vi ned hvor mange vi har sett av hvert tall.", normal: "F teller hvor mange ganger hvert element er sett.", teknisk: "Frekvenstabell: element ↦ antall." },
       { code: "m ← A[0]", indent: 1, eli5: "Gjett at det første er vinneren.", normal: "Foreløpig beste.", teknisk: "Første iterasjon teller A[0], så F.get(m) er definert når vi sammenligner." },
       { code: "for x in A do", indent: 1, eli5: "Se på hvert element én gang.", normal: "Én gjennomgang.", teknisk: "n iterasjoner." },
-      { code: "if F.get(x) = null then", indent: 2, eli5: "Første gang vi ser dette?", normal: "Ny nøkkel?", teknisk: "" },
-      { code: "F.put(x, 0)", indent: 3, eli5: "Start på null.", normal: "Start telleren på 0.", teknisk: "" },
-      { code: "F.put(x, F.get(x) + 1)", indent: 2, eli5: "Tell én til.", normal: "Øk telleren.", teknisk: "To forventet O(1)-operasjoner." },
+      { code: "if F.get(x) = null then", indent: 2, eli5: "Er dette første gang vi ser dette tallet?", normal: "Ny nøkkel?", teknisk: "" },
+      { code: "F.put(x, 0)", indent: 3, eli5: "Da skriver vi tallet opp på lista, med null streker.", normal: "Start telleren på 0.", teknisk: "" },
+      { code: "F.put(x, F.get(x) + 1)", indent: 2, eli5: "Sett én strek til ved tallet.", normal: "Øk telleren.", teknisk: "To forventet O(1)-operasjoner." },
       { code: "if F.get(x) > F.get(m) then", indent: 2, eli5: "Har denne nå flere enn vinneren?", normal: "Er x nå hyppigere enn m?", teknisk: "" },
-      { code: "m ← x", indent: 3, eli5: "Ny vinner!", normal: "Ny beste.", teknisk: "" },
-      { code: "return m", indent: 1, eli5: "Dette er vinneren.", normal: "Ferdig.", teknisk: "" }
+      { code: "m ← x", indent: 3, eli5: "Ny vinner! Nå har dette tallet flest streker.", normal: "Ny beste.", teknisk: "" },
+      { code: "return m", indent: 1, eli5: "Tallet med flest streker er vinneren.", normal: "Ferdig.", teknisk: "" }
     ],
     bigO: { best: "O(n)", avg: "O(n) forventet", worst: "O(n²)", space: "O(n)",
       why: t("Vi ser på hvert tall én gang, og hver titt i tellelista er vanligvis rask.",
@@ -406,7 +408,7 @@
       { code: "for c in W do", indent: 1, eli5: "For hver bokstav i ordet …", normal: "Sjekk hver bokstav i W.", teknisk: "w iterasjoner." },
       { code: "if F.get(c) > G.get(c) then", indent: 2, eli5: "… trenger ordet flere av den enn du har?", normal: "Trenger W flere c-er enn S har?",
         teknisk: "get gir 0 for bokstaver som ikke finnes. Snur du > eller bytter W og S, blir svaret feil." },
-      { code: "return false", indent: 3, eli5: "Da går det ikke.", normal: "W er ikke et subanagram.", teknisk: "" },
+      { code: "return false", indent: 3, eli5: "Da går det ikke: vi har for få av den bokstaven.", normal: "W er ikke et subanagram.", teknisk: "" },
       { code: "return true", indent: 1, eli5: "Alle bokstavene holder!", normal: "Alle bokstavene finnes i nok antall.", teknisk: "Totalt O(w + s)." }
     ],
     bigO: { best: "O(w + s)", avg: "O(w + s)", worst: "O(w + s)", space: "O(w + s)",
@@ -475,7 +477,7 @@
           A[i] = { k: k, v: o.v };
           snap(L + 7, { home: home, fresh: i, occ: seen }, isNew
             ? t(show(k) + " legges på plass " + i + ".", "A[" + i + "] er null, så løkka stopper. " + show(k) + " settes inn på plass " + i + (i !== home ? ", " + seen.length + " steg fra hjemmeplassen " + home : ", rett på hjemmeplassen") + ".",
-                "A[" + i + "] = null: løkka stopper etter " + (seen.length + 1) + " prøvde plasser. Sett inn.")
+                "A[" + i + "] = null: løkka stopper etter " + tries(seen.length + 1) + ". Sett inn.")
             : t("Verdien er byttet ut.", "Paret på plass " + i + " er overskrevet.", "Overskrevet. Ingen duplikat."), isNew ? "Satt inn" : "Overskrevet", hx);
         } else {
           var p = null;
@@ -508,7 +510,7 @@
         var hit = false;
         while (A[i] != null && g++ < N) {
           if (!A[i].tomb && A[i].k === k) {
-            snap(Lg + 5, { home: home, found: i, occ: seen }, t("Funnet på plass " + i + "!", "A[" + i + "].key = " + show(k) + ". Funnet etter " + (seen.length + 1) + " prøvde plasser.", "Vellykket oppslag."), "Funnet", hx);
+            snap(Lg + 5, { home: home, found: i, occ: seen }, t("Funnet på plass " + i + "!", "A[" + i + "].key = " + show(k) + ". Funnet etter " + tries(seen.length + 1) + ".", "Vellykket oppslag."), "Funnet", hx);
             hit = true; break;
           }
           var why = A[i].tomb ? t("Plass " + i + " er merket som slettet. Vi går forbi.", "A[" + i + "] = DELETED: ikke null, så vi leter videre.", "Merket stopper ikke søket.")
@@ -519,7 +521,7 @@
           i = nk;
         }
         if (!hit) snap(Lg + 7, { home: home, miss: i, occ: seen }, t("Plass " + i + " er tom. Var " + show(k) + " her, ville den ligget før denne tomme plassen. Den finnes ikke.",
-          "A[" + i + "] = null: k finnes ikke. Returner null.", "Mislykket oppslag etter " + (seen.length + 1) + " prøvde plasser."), "Ikke funnet", hx);
+          "A[" + i + "] = null: k finnes ikke. Returner null.", "Mislykket oppslag etter " + tries(seen.length + 1) + "."), "Ikke funnet", hx);
       } else if (o.op === "del") {
         var Ld = 300;
         if (mark) {
@@ -629,7 +631,7 @@
         snap(Lg + 2, { row: i }, t("Vi leter etter " + show(k) + " i bøtte " + i + ".", hText(k, N, fixed) + ".", hText(k, N, fixed) + "."), "Søk " + show(k), hx);
         if (!B) { snap(Lg + 5, { miss: i }, t("Ingen bøtte her, så " + show(k) + " finnes ikke.", "A[" + i + "] = null: returner null.", "Mislykket oppslag i O(1)."), "Ikke funnet", hx); return; }
         for (var q = 0; q < B.length; q++) {
-          if (B[q].k === k) { snap(Lg + 8, { row: i, found: [i, q], seen: seen.slice() }, t("Funnet: " + pv(B[q]) + ".", "B[" + q + "].key = " + show(k) + ": returner " + (B[q].v != null ? B[q].v : "verdien") + ".", "Funnet etter " + (q + 1) + " sammenligninger i bøtta."), "Funnet", hx); return; }
+          if (B[q].k === k) { snap(Lg + 8, { row: i, found: [i, q], seen: seen.slice() }, t("Funnet: " + pv(B[q]) + ".", "B[" + q + "].key = " + show(k) + ": returner " + (B[q].v != null ? B[q].v : "verdien") + ".", "Funnet etter " + (q + 1) + (q === 0 ? " sammenligning" : " sammenligninger") + " i bøtta."), "Funnet", hx); return; }
           snap(Lg + 7, { row: i, cur: [i, q], seen: seen.slice() }, t("Ikke denne.", "B[" + q + "].key = " + show(B[q].k) + " ≠ " + show(k) + ".", "Ikke lik."), "Sammenlign", hx);
           seen.push([i, q]);
         }

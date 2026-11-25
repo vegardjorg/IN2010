@@ -44,18 +44,20 @@
     <!-- ================= HVA ER EN HEAP ================= -->
     <section data-panel="hva">
       <h3>Hva er en heap?</h3>
-      <div class="callout begrep"><span class="lbl">Begrep</span>
+      <p class="small muted">Bygger på trebegreper: en heap er et binærtre. Er rot, barn, løvnode og høyde nye ord, les
+        <a href="04-traer.html#fane=begreper">Blokk 4 · Trær → Begreper</a> først (5 min).</p>
+      <div class="callout begrep"><span class="lbl">Begrep: heap</span>
         En (binær) <b>heap</b> er et binærtre med to krav:
         <ol>
           <li><b>Komplett:</b> alle nivåer er fulle, unntatt kanskje det nederste, og det fylles fra venstre.</li>
           <li><b>Heap-egenskapen:</b> hver node er <b>større enn eller lik foreldernoden</b>. Dermed ligger det minste elementet alltid i roten.</li>
         </ol>
-        Forelesningene kaller den stort sett bare «heap» eller «binær heap». Eksamensoppgavene og forelesning 9 (Heapsort) skriver «min-heap» for å skille
+        Forelesningene kaller den stort sett bare «heap» eller «binær heap». Eksamensoppgavene og forelesningen om Heapsort («Litt mer sortering») skriver «min-heap» for å skille
         den fra en <b>max-heap</b>, der det er motsatt: hver node er mindre enn eller lik foreldernoden, og det
         største ligger i roten.</div>
       <div id="intro-hva"></div>
 
-      <div class="callout eli5"><span class="lbl">Som en bedrift</span>
+      <div class="callout eli5"><span class="lbl">5-åring: som en bedrift</span>
         Tenk på et organisasjonskart der sjefen alltid er den yngste. Hver person er yngre enn eller like gammel
         som alle under seg. Da vet du at den aller yngste sitter øverst, uten å lete. Men to personer på samme
         nivå kan stå i hvilken som helst rekkefølge.</div>
@@ -119,7 +121,7 @@
         For n = 6 er det <span class="mono">110</span> → «10» → høyre, så venstre. Det tar O(log n). Arrayet er likevel
         enklere og raskere, og det er det kurset og eksamen bruker.</div>
 
-      <div class="callout sensor"><span class="lbl">Sensortips</span>
+      <div class="callout sensor"><span class="lbl">Sensortips: begge kravene</span>
         Når du forklarer en heap på eksamen, nevn <b>begge</b> kravene (komplett + heap-egenskap) og indeksformlene.
         Mange mister poeng på å bare si «minste øverst».</div>
 
@@ -147,7 +149,7 @@
         elementet allerede er større enn eller likt forelderen. Å sette inn n elementer ett og ett koster O(n log n) til
         sammen. Det er raskere å bygge med BuildMinHeap (O(n)) hvis du har alle elementene på forhånd.</div>
 
-      <div class="callout felle"><span class="lbl">Vanlig felle</span>
+      <div class="callout felle"><span class="lbl">Vanlig felle: lete ovenfra</span>
         Å starte i roten og lete seg nedover etter riktig plass. Nytt element legges <b>alltid bakerst</b> (plass n), så
         treet forblir komplett, og så bobler det <b>opp</b>. Og: én innsetting er O(log n), ikke O(n log n). Den feilen
         står eksplisitt i sensorveiledningen for H2023.</div>
@@ -237,7 +239,7 @@
         Arbeidet er altså høyst n, og BuildMinHeap er O(n). Selve beviset er utenfor pensum. Det du må kunne, er
         <i>at</i> det er lineært, og intuisjonen: de mange nodene nederst er billige, og bare roten kan synke hele veien.</div>
 
-      <div class="callout felle"><span class="lbl">Vanlig felle</span>
+      <div class="callout felle"><span class="lbl">Vanlig felle: feil retning</span>
         Å gå <b>oppover</b> fra 0. BubbleDown krever at begge subtrærne allerede er heaper, og det har vi bare når vi
         går nedenfra og opp (downto). Den andre fellen: å svare O(n log n). Det er kjøretiden for n innsettinger, ikke
         for BuildMinHeap.</div>
@@ -256,7 +258,7 @@
     <section data-panel="levelorder">
       <h3>Level-order – en heap er allerede i level-order</h3>
       <div id="intro-lo"></div>
-      <div class="callout begrep"><span class="lbl">Begrep</span>
+      <div class="callout begrep"><span class="lbl">Begrep: level-order</span>
         <b>Level-order</b> betyr å besøke nodene nivå for nivå: først roten (dybde 0), så alle nodene på dybde 1 fra
         venstre mot høyre, så dybde 2, og så videre. En heap fylles nettopp slik, så <b>arrayet er level-order</b>.</div>
 
@@ -285,10 +287,10 @@
     <section data-panel="median">
       <h3>Mediankø – to heaper rygg mot rygg</h3>
       <div id="intro-med"></div>
-      <div class="callout eli5"><span class="lbl">To tårn</span>
+      <div class="callout eli5"><span class="lbl">5-åring: to bunker</span>
         Del tallene i to bunker: de små og de store. I bunken med de små vil vi kunne se det <i>største</i> tallet raskt,
-        og i bunken med de store det <i>minste</i>. Holder vi bunkene like store, ligger medianen alltid på toppen av
-        den lille bunken.</div>
+        og i bunken med de store det <i>minste</i>. Holder vi bunkene like store, eller lar den lille ha ett tall mer,
+        ligger medianen alltid på toppen av den lille bunken.</div>
 
       <div class="heapviz"><div id="tracer-med"></div></div>
       <div class="grid cols-3">
@@ -337,10 +339,10 @@
     <section data-panel="heapsort">
       <h3>Heapsort – sorter med en max-heap, rett i arrayet</h3>
       <div id="intro-hs"></div>
-      <div class="callout eli5"><span class="lbl">Aha: Selection sort med turbo</span>
-        Selection sort leter gjennom hele resten etter det minste og setter det fremst (O(n) per runde). Heapsort gjør det
-        speilvendte: flytt det største bakerst, gang på gang. Men den holder resten som en max-heap, så det største ligger
-        alltid klart i roten, og reparasjonen tar bare O(log n). Fra O(n²) til O(n log n).</div>
+      <div class="callout eli5"><span class="lbl">5-åring: selection sort med turbo</span>
+        Heapsort gjør nesten det samme som selection sort: finn det største, legg det bakerst, og gjenta. Forskjellen er
+        at heapen alltid har det største klart på toppen, så vi slipper å lete gjennom alt hver gang. Å rydde heapen etter
+        et uttak tar bare noen få steg, selv når heapen er stor.</div>
 
       <div class="heapviz hv-side"><div id="tracer-hs"></div></div>
       <div class="grid cols-2">
@@ -351,10 +353,11 @@
         <div class="pc-stack"><h4>BubbleDown (max-heap)</h4><div id="pc-bdmax"></div></div>
       </div>
       <p class="muted small">Treet viser bare heapdelen A[0..i − 1]. Den grønne halen i arrayet er ferdig sortert og
-        hører ikke lenger til heapen. Pseudokoden følger forelesning 9.</p>
+        hører ikke lenger til heapen. Pseudokoden følger forelesningen «Litt mer sortering».</p>
 
-      <div class="callout uni"><span class="lbl">Universitetsnivå</span>
-        BuildMaxHeap er O(n), og løkka gjør n runder med BubbleDown fra roten à O(log n), totalt <b>O(n log n)</b>, også i
+      <div class="callout uni"><span class="lbl">Universitetsnivå: kjøretid og egenskaper</span>
+        Selection sort bruker O(n) per runde på å lete etter det neste elementet, og det gir O(n²). Heapsort bruker bare
+        O(log n) per runde på å rydde heapen. BuildMaxHeap er O(n), og løkka gjør n runder med BubbleDown fra roten à O(log n), totalt <b>O(n log n)</b>, også i
         verste tilfelle. Den er <b>in-place</b>, fordi halen gjenbruker plassen heapen gir fra seg. Den er <b>ikke
         stabil</b>: byttet mellom roten og plass i flytter elementer langt, og like verdier kan bytte rekkefølge.
         Sammenlignet med Merge sort: samme kjøretid, men uten O(n) ekstra minne. Sammenlignet med Quicksort: ingen
@@ -430,17 +433,21 @@
       </div>
 
       <div class="callout uni"><span class="lbl">Universitetsnivå: når prioriteten endres</span>
+        Kort fortalt: Dijkstra-versjonen guiden bruker i <a href="06-grafer.html#fane=dijkstra">Blokk 6 · Grafer → Dijkstra</a>
+        trenger ikke DecreasePriority. Den legger heller inn noden på nytt og hopper over gamle oppføringer.
+        Resten av boksen forklarer hvorfor.<br><br>
         Den tradisjonelle Dijkstra legger alle noder inn med prioritet ∞ og kaller <span class="mono">DecreasePriority(queue, v, c)</span>
         når en kortere vei blir funnet. Analysen antar at dette er logaritmisk. Men en vanlig binær heap kan ikke det
         direkte, fordi vi ikke vet <i>hvor</i> i arrayet v ligger. I litteraturen løses det med såkalte <i>locators</i>
-        (Goodrich &amp; Tamassia): hver node husker plassen sin, så den kan boble opp derfra. I praksis (for eksempel med
-        Pythons heapq) brukes ofte en «lat» variant: legg bare inn v på nytt med den nye prioriteten, og hopp over utdaterte oppføringer når de
-        tas ut (<span class="mono">if cost ≠ dist[u] then continue</span>). Køen kan bli større, men kjøretiden er fortsatt
+        (Goodrich &amp; Tamassia): hver node husker plassen sin, så den kan boble opp derfra. Kurset viser derfor også en
+        versjon uten DecreasePriority: legg bare inn v på nytt med den nye prioriteten, og hopp over noder som allerede er
+        ferdige når de tas ut igjen (<span class="mono">if u ∈ visited then continue</span>). Samme «late» triks brukes ofte
+        med Pythons heapq. Køen kan bli større, men kjøretiden er fortsatt
         <span class="mono">O((|V| + |E|) · log |V|)</span>.</div>
 
       <h4>Eksamensoppgaven: bøttekø (H2022)</h4>
       <div id="exam-pk"></div>
-      <div class="callout felle"><span class="lbl">Vanlig felle</span>
+      <div class="callout felle"><span class="lbl">Vanlig felle: binær heap til bøttekø</span>
         Å svare med en binær heap. Den virker, men er O(log n) og gir lav uttelling (maks 4 av 10). Poenget er at
         prioritetene ligger i et fast, lite område. Da kan de brukes direkte som indeks, som i bøttesortering.</div>
 
@@ -463,7 +470,7 @@
       <div id="exam-test"></div>
       <h4 style="margin-top:1.5rem">Påstandene</h4>
       <div id="tf-heap"></div>
-      <div class="callout sensor"><span class="lbl">Sensortips</span>
+      <div class="callout sensor"><span class="lbl">Sensortips: sant/usant (H2022)</span>
         Sant/usant gir 1 poeng per påstand. Les «alle», «hver» og «alltid» ekstra nøye. Heap-egenskapen sier bare noe om
         forelder og barn. Påstander om hele nivåer eller søsken er nesten alltid usanne.</div>
 
@@ -775,7 +782,7 @@
     /* ================= HEAPSORT ================= */
     intro("#intro-hs", {
       eli5: "<p>Først ordner vi tallene som et tre der det STØRSTE ligger øverst. Så bytter vi toppen med det bakerste tallet. Nå står det største riktig, helt bakerst. Vi lar det nye tallet på toppen synke, og gjentar med resten. Halen bakerst blir lengre og lengre, og til slutt er alt sortert.</p>",
-      normal: "<p>Heapsort (forelesning 9): <b>BuildMaxHeap</b> på O(n). Så, for i fra n − 1 ned til 0: bytt roten (største) med <span class=\"mono\">A[i]</span>, og la den nye roten boble ned i heapen <span class=\"mono\">A[0..i − 1]</span>. O(n log n), in-place.</p>",
+      normal: "<p>Heapsort (forelesningen «Litt mer sortering»): <b>BuildMaxHeap</b> på O(n). Så, for i fra n − 1 ned til 0: bytt roten (største) med <span class=\"mono\">A[i]</span>, og la den nye roten boble ned i heapen <span class=\"mono\">A[0..i − 1]</span>. O(n log n), in-place.</p>",
       teknisk: "<p>Invariant: <span class=\"mono\">A[0..i]</span> er en max-heap, og <span class=\"mono\">A[i + 1..n − 1]</span> inneholder de n − 1 − i største elementene i sortert rekkefølge. Hver runde er en removeMax der det fjernede elementet lagres i plassen som ble ledig. O(n) + n · O(log n) = O(n log n) i alle tilfeller. In-place, men ikke stabil.</p>"
     });
     var hHs = render("#pc-hs", "heapSort"), hBmax = render("#pc-bmax", "buildMaxHeap"), hBdMax = render("#pc-bdmax", "heapBubbleDown");

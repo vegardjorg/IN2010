@@ -40,7 +40,7 @@
 
     <!-- ===================== BEGREPER ===================== -->
     <section data-panel="begreper">
-      <div class="callout begrep"><span class="lbl">Begrep</span>
+      <div class="callout begrep"><span class="lbl">Begrep: hashmap og hashset</span>
         <p>Et <b>hashmap</b> lagrer par av <b>nøkkel</b> og <b>verdi</b>, og støtter innsetting, oppslag og sletting av nøkler.
           Hver nøkkel finnes høyst én gang. Et <b>hashset</b> er det samme, bare uten verdier: det lagrer bare nøkler.
           Begge bygger på et array A med N plasser og en <b>hashfunksjon</b> h(k, N), som gir et tall mellom 0 og N − 1:
@@ -49,19 +49,19 @@
       <div id="intro-begreper"></div>
 
       <div class="grid cols-2">
-        <div class="callout eli5"><span class="lbl">ELI5</span>
+        <div class="callout eli5"><span class="lbl">5-åring: garderoben</span>
           <p>Tenk deg en garderobe med nummererte knagger. I stedet for å lete gjennom alle jakkene, har du en regel som gjør navnet ditt om til et knaggnummer.
             Henter du jakka, bruker du samme regel og går rett til riktig knagg. Av og til gir regelen samme nummer til to personer. Det kalles en <b>kollisjon</b>,
             og vi trenger en plan for hva som skjer da.</p>
         </div>
-        <div class="callout eksempel"><span class="lbl">Eksempel</span>
+        <div class="callout eksempel"><span class="lbl">Eksempel: siste siffer</span>
           <p>Med N = 10 og h(k, N) = k mod N hasher et heltall til sitt siste siffer: 93 → 3, 48 → 8 og 13 → 3.
             93 og 13 kolliderer: de vil ha samme plass.</p>
         </div>
       </div>
 
       <h3>Hashfunksjonen</h3>
-      <div class="callout begrep"><span class="lbl">Begrep</span>
+      <div class="callout begrep"><span class="lbl">Begrep: en god hashfunksjon</span>
         <ul>
           <li><b>Konsistent:</b> samme nøkkel må alltid gi samme tall. Ellers finner vi aldri nøkkelen igjen.</li>
           <li><b>Få kollisjoner:</b> ulike nøkler bør spres jevnt utover de N plassene.</li>
@@ -74,7 +74,7 @@
         <h4 style="margin:.2rem 0 .3rem">Prøv hashfunksjonene</h4>
         <p class="muted small">Skriv inn to nøkler og en N. Tall bruker k mod N. Strenger regnes ut med både summen og 31-hashen, så du ser hvem som kolliderer.</p>
       </div>
-      <div class="callout felle"><span class="lbl">Felle</span>
+      <div class="callout felle"><span class="lbl">Felle: kollisjoner kan ikke unngås</span>
         <p>Kollisjoner kan ikke unngås. Det finnes langt flere mulige nøkler enn plasser, så noen nøkler må dele plass.
           Et hashmap trenger derfor alltid en metode for å håndtere kollisjoner.</p>
       </div>
@@ -94,7 +94,7 @@
           <thead><tr><th>Egenskap</th><th>Separate chaining</th><th>Linear probing</th></tr></thead>
           <tbody>
             <tr><td>Hvor havner en kolliderende nøkkel?</td><td>I samme bøtte (bakerst)</td><td>På neste ledige plass</td></tr>
-            <tr><td data-tip="Load factor = n/N, der n er antall par og N er størrelsen på arrayet.">Load factor n/N</td><td>Kan bli større enn 1</td><td>Alltid mindre enn 1 (n &lt; N)</td></tr>
+            <tr><td data-tip="Load factor = n/N, der n er antall par og N er størrelsen på arrayet.">Load factor n/N</td><td>Kan bli større enn 1</td><td>Høyst 1 (n ≤ N). I praksis rehasher vi lenge før.</td></tr>
             <tr><td>Oppslag stopper når …</td><td>bøtta er gjennomgått</td><td>vi treffer en ledig plass (null)</td></tr>
             <tr><td>Sletting</td><td>Fjern paret fra bøtta</td><td>Må tette hullet eller merke plassen som slettet</td></tr>
             <tr><td>Forventet tid</td><td>O(1)</td><td>O(1)</td></tr>
@@ -102,7 +102,7 @@
           </tbody>
         </table>
       </div>
-      <div class="callout begrep"><span class="lbl">Begrep</span>
+      <div class="callout begrep"><span class="lbl">Begrep: Load factor</span>
         <p><b>Load factor</b> er n/N: antall nøkkel-verdi-par delt på antall plasser i arrayet. Lav Load factor gir få kollisjoner, men mye ubrukt plass.
           Kurset sikter mot omtrent mellom 1/2 og 3/4, og gjør tabellen større (rehash) når n/N når 0,75. Mer om det under <a href="#fane=kjoretid">Rehash &amp; kjøretid</a>.</p>
       </div>
@@ -113,33 +113,51 @@
 
     <!-- ===================== SEPARATE CHAINING ===================== -->
     <section data-panel="chaining" hidden>
-      <div class="callout begrep"><span class="lbl">Begrep</span>
+      <div class="callout begrep"><span class="lbl">Begrep: Separate chaining</span>
         <p>Med <b>Separate chaining</b> er hver plass i arrayet enten null eller en <b>bøtte</b>: en liste med nøkkel-verdi-par.
           Alle nøkler som hasher til plass i, ligger i bøtta A[i]. Bøtta lages først når den første nøkkelen hasher dit.</p>
       </div>
       <div id="intro-chaining"></div>
+      <div class="grid cols-2">
+        <div class="callout eli5"><span class="lbl">5-åring: en pose på hver knagg</span>
+          <p>Hva om to jakker får samme knaggnummer? Med chaining henger vi en liten pose på hver knagg, og alle jakker med samme nummer havner i samme pose.
+            For å finne jakka di går vakten til riktig knagg og ser gjennom posen. Så lenge posene er små, går det fort.</p>
+        </div>
+        <div class="callout eksempel"><span class="lbl">Enkelt eksempel</span>
+          <p>N = 10 og h(k, N) = k mod N. Vi setter inn 21, 31 og 5.</p>
+          <ul>
+            <li>21 hører hjemme på plass 1. Der er det ingen bøtte, så vi lager en: [21].</li>
+            <li>31 hører også hjemme på plass 1. Den legges bakerst i samme bøtte: [21, 31].</li>
+            <li>5 får en ny bøtte på plass 5.</li>
+          </ul>
+          <p>Ser vi etter 31, går vi rett til bøtte 1 og leter bare gjennom de to som ligger der.</p>
+        </div>
+      </div>
 
       <h3>Innsetting og oppslag, steg for steg</h3>
       <p class="muted small hs-syntax">Eget eksempel: skriv par som <code>21=a</code>, og et oppslag som <code>?21</code>. Legg til <code>N=7</code> for en annen størrelse. Tekstnøkler hashes med 31-hashen.</p>
       <div id="demo-chaining"></div>
 
       <div class="grid cols-2">
-        <div class="callout sensor"><span class="lbl">Sensortips</span>
+        <div class="callout sensor"><span class="lbl">Sensortips (H2025)</span>
           <ul>
             <li>Finnes nøkkelen fra før, skal verdien <b>overskrives</b>. Et nytt par bakerst gir duplikat og poengtrekk.</li>
             <li>Vis hvordan bøtta lages første gang (A[i] = null → ny liste med (k, v)).</li>
             <li>Si både verste og forventet kjøretid.</li>
           </ul>
         </div>
-        <div class="callout felle"><span class="lbl">Felle</span>
+        <div class="callout felle"><span class="lbl">Felle: «bare legg paret bakerst»</span>
           <p>Det er fristende å bare legge paret bakerst. Men da må vi uansett lete gjennom bøtta for å oppdage en eksisterende nøkkel,
             så innsetting koster O(1 + |B|), ikke alltid O(1).</p>
         </div>
       </div>
-      <div class="callout uni"><span class="lbl">Universitetsnivå</span>
+      <div class="callout uni"><span class="lbl">Universitetsnivå: forventet bøttelengde</span>
         <p>Med en hashfunksjon som sprer godt, har en bøtte forventet lengde n/N, altså Load factor. Holdes Load factor under en fast grense (med rehash),
           blir innsetting, oppslag og sletting forventet O(1). Hasher alle nøklene til samme bøtte, blir hver operasjon O(n).</p>
       </div>
+
+      <h3>Sjekk deg selv</h3>
+      <div id="quiz-chaining"></div>
 
       <h3>Eksamen</h3>
       <div id="exam-h2025-2"></div>
@@ -147,12 +165,27 @@
 
     <!-- ===================== LINEAR PROBING ===================== -->
     <section data-panel="probing" hidden>
-      <div class="callout begrep"><span class="lbl">Begrep</span>
+      <div class="callout begrep"><span class="lbl">Begrep: Linear probing</span>
         <p>Med <b>Linear probing</b> ligger alle parene i selve arrayet, høyst ett par per plass. Vi starter på hjemmeplassen i = h(k, N).
           Er den opptatt av en annen nøkkel, prøver vi i + 1, i + 2 og så videre, alltid mod N, slik at vi går rundt til 0 etter siste plass.
           Ledige plasser er null, og alle algoritmene stopper når de treffer en ledig plass.</p>
       </div>
       <div id="intro-probing"></div>
+      <div class="grid cols-2">
+        <div class="callout eli5"><span class="lbl">5-åring: kinoraden</span>
+          <p>Tenk på en kinorad. Du går til setet billetten sier. Er det tatt, setter du deg på neste ledige sete til høyre, og kommer du til enden av raden, fortsetter du fra starten.
+            Den som leter etter deg, starter på samme sete og går til høyre til hun finner deg eller kommer til et tomt sete. Et tomt sete betyr at du ikke er her.</p>
+        </div>
+        <div class="callout eksempel"><span class="lbl">Enkelt eksempel</span>
+          <p>N = 10 og h(k, N) = k mod N. Vi setter inn 93, 13 og 48.</p>
+          <ul>
+            <li>93 får plass 3.</li>
+            <li>13 vil også ha plass 3, men den er tatt, så 13 går til plass 4.</li>
+            <li>48 får plass 8.</li>
+          </ul>
+          <p>Ser vi etter 13, starter vi på plass 3 (feil nøkkel), går videre til plass 4 og finner den der.</p>
+        </div>
+      </div>
 
       <h3>Innsetting, oppslag og sletting</h3>
       <p class="muted small hs-syntax">Eget eksempel: tall settes inn, <code>?20</code> er et oppslag og <code>-10</code> sletter 10. Legg til <code>N=7</code> for en annen størrelse.
@@ -160,7 +193,7 @@
       <div id="demo-probing"></div>
 
       <h3>Hvorfor er sletting vanskelig?</h3>
-      <div class="callout felle"><span class="lbl">Felle</span>
+      <div class="callout felle"><span class="lbl">Felle: A[i] ← null ved sletting</span>
         <p>Setter vi bare plassen til null, kan andre nøkler bli borte. Under er 10 slettet fra tabellen fra H2022 ved å skrive null på plass 0.
           Et oppslag på 20 starter på hjemmeplassen 0, treffer null med en gang og svarer «finnes ikke», selv om 20 ligger på plass 3.</p>
       </div>
@@ -177,10 +210,18 @@
           <p class="small">Erstatt paret med et <b>slettet-merke</b>. Oppslag stopper ikke ved merker, men innsetting kan bruke dem.
             Merkene blir liggende til neste rehash, som bare setter inn de ekte parene.</p></div>
       </div>
-      <div class="callout begrep"><span class="lbl">Begrep</span>
-        <p>Hullet er på plass i, og vi ser på nøkkelen på plass j. La hjem = h(nøkkel, N). Nøkkelen kan bli stående hvis hjem ligger i det
-          <b>sirkulære intervallet (i, j]</b>, altså en av plassene i + 1, …, j (mod N). Da ble j nådd uten å gå forbi i.
-          Ellers gikk proben forbi hullet, og nøkkelen flyttes til i.</p>
+      <div class="callout begrep"><span class="lbl">Begrep: det sirkulære intervallet (i, j]</span>
+        <p>Hullet er på plass i, og vi ser på nøkkelen på plass j. Tenk at du går fra hullet og bortover til j.
+          Hjemmeplassen til nøkkelen, hjem = h(nøkkel, N), kan da ligge to steder:</p>
+        <ul>
+          <li><b>I strekningen du nettopp gikk over</b>, altså en av plassene i + 1, …, j. Det er det <b>sirkulære intervallet (i, j]</b>.
+            Da har nøkkelen aldri passert hullet, og den blir stående.</li>
+          <li><b>Utenfor den strekningen</b> (i hullet eller før det). Da gikk nøkkelen forbi hullet på vei til j.
+            Den må flyttes inn i hullet, ellers finner vi den ikke igjen.</li>
+        </ul>
+        <p>«Sirkulært» betyr at vi teller mod N, så strekningen kan gå forbi slutten av arrayet og fortsette fra 0.
+          <b>Eksempel:</b> N = 10, hullet er på plass 8 og j = 1. Strekningen er 9, 0, 1. Har nøkkelen på plass 1 hjemmeplass 0, blir den stående.
+          Har den hjemmeplass 7, må den flyttes til plass 8.</p>
       </div>
 
       <h3>Strategi 2: slettet-merker</h3>
@@ -199,20 +240,23 @@
       </div>
 
       <h3>Clustering</h3>
-      <div class="callout begrep"><span class="lbl">Begrep</span>
+      <div class="callout begrep"><span class="lbl">Begrep: clustering</span>
         <p><b>Clustering</b> betyr lange segmenter av opptatte plasser uten hull. En nøkkel som hasher inn i et slikt segment, må probe til enden av det,
           og blir selv en del av segmentet, så det vokser videre. Lav Load factor holder segmentene korte.</p>
       </div>
       <div class="card"><div id="fig-cluster"></div>
         <p class="muted small">11, 12, 13, 21, 22 og 31 satt inn med N = 10. 31 hører hjemme på plass 1, men må gå forbi seks opptatte plasser før den finner plass 6.</p></div>
 
-      <div class="callout sensor"><span class="lbl">Sensortips</span>
+      <div class="callout sensor"><span class="lbl">Sensortips (H2020 og H2022)</span>
         <ul>
           <li>Glem ikke <b>mod N</b>. Å gå utenfor arrayet ga trekk på H2022.</li>
           <li>Ved samme nøkkel skal paret overskrives.</li>
           <li>Skriv tabellen med _ for tomme plasser, og sjekk at du har tatt med rundturen fra siste til første plass.</li>
         </ul>
       </div>
+
+      <h3>Sjekk deg selv</h3>
+      <div id="quiz-probing"></div>
 
       <h3>Eksamen</h3>
       <div id="exam-h2020-4"></div>
@@ -222,6 +266,10 @@
     <!-- ===================== KJØRETID ===================== -->
     <section data-panel="kjoretid" hidden>
       <div id="intro-kjoretid"></div>
+      <div class="callout eli5"><span class="lbl">5-åring: én lang kø på én knagg</span>
+        <p>Hashing er raskt nesten alltid, men ikke alltid. Får alle samme knaggnummer, blir det én lang kø på én knagg, og vakten må lete gjennom alt.
+          Derfor sier vi O(1) forventet, men O(n) i verste tilfelle.</p>
+      </div>
       <div class="table-wrap">
         <table class="cmp-table">
           <thead><tr><th>Operasjon</th><th>Forventet</th><th>Verste tilfelle</th></tr></thead>
@@ -233,13 +281,13 @@
           </tbody>
         </table>
       </div>
-      <div class="callout felle"><span class="lbl">Felle</span>
+      <div class="callout felle"><span class="lbl">Felle: «hashing er O(1)»</span>
         <p>Skriv aldri bare «hashing er O(1)». Si <b>forventet</b> O(1) (for innsetting: forventet amortisert O(1)), og <b>O(n) i verste tilfelle</b>.
           Verste tilfelle er når mange nøkler hasher til samme plass. H2025 ga ett poeng for hver av de to delene.</p>
       </div>
 
       <h3>Rehash</h3>
-      <div class="callout begrep"><span class="lbl">Begrep</span>
+      <div class="callout begrep"><span class="lbl">Begrep: rehash</span>
         <p>En <b>rehash</b> lager et nytt, større array (kurset dobler N) og setter inn alle parene på nytt med den nye N-en.
           Hjemmeplassen h(k, N) avhenger av N, så parene havner ofte på nye plasser. Kurset sjekker før hver innsetting om n/N ≥ 0,75, og starter med N = 1.
           En rehash koster O(n).</p>
@@ -251,7 +299,7 @@
       <div id="intro-amort"></div>
       <div class="card" id="hs-amort"></div>
 
-      <div class="callout uni"><span class="lbl">Universitetsnivå</span>
+      <div class="callout uni"><span class="lbl">Universitetsnivå: forventet og amortisert</span>
         <p>«Forventet» forutsetter at hashfunksjonen sprer nøklene godt. Da er antall nøkler per plass i snitt Load factor, som rehash holder under en konstant.
           «Amortisert» betyr at enkelte innsettinger er dyre (de som utløser en rehash, O(n)), men at gjennomsnittet over mange innsettinger er O(1).
           Dobling er nøkkelen: rehashene skjer ved n ≈ 0,75 · 1, 2, 4, 8, … og summen av arbeidet er en geometrisk rekke, O(n) totalt.</p>
@@ -259,17 +307,24 @@
       <div class="card"><h4 style="margin-top:.2rem">Verste tilfelle: alt i samme bøtte</h4>
         <div id="fig-verst"></div>
         <p class="muted small">0, 10, 20, 30 og 40 med N = 10 og k mod N. Et oppslag på 40 må gå gjennom hele bøtta: O(n).</p></div>
+
+      <h3>Sjekk deg selv</h3>
+      <div id="quiz-kjoretid"></div>
     </section>
 
     <!-- ===================== PYTHON ===================== -->
     <section data-panel="python" hidden>
-      <div class="callout begrep"><span class="lbl">Begrep</span>
+      <div class="callout begrep"><span class="lbl">Begrep: Python-ordbøker</span>
         <p>En Python-<b>ordbok</b> (dict) er et hashmap. H2024 lot oss anta, som en forenkling, at ordbøker fram til Python 3.6 brukte Linear probing
           slik det undervises i IN2010: ett array med N plasser, der hver plass har plass til et helt nøkkel-verdi-par.
           Fra 3.6 er dataene delt i to: <b>entries</b>, et tettpakket dynamisk array med de n parene i innsettingsrekkefølge, og <b>indices</b>,
           et array med N plasser som bare inneholder indekser inn i entries (eller er ledig).</p>
       </div>
       <div id="intro-python"></div>
+      <div class="callout eli5"><span class="lbl">5-åring: bokhylla og lappen</span>
+        <p>Før var det som en hylle med mange tomme rom, der hver bok sto på sin faste plass. Nå står bøkene tett i en bokhylle i den rekkefølgen du kjøpte dem,
+          og en liten lapp med mange ruter sier hvilket nummer i hylla boka har.</p>
+      </div>
       <div class="grid cols-2">
         <div class="card"><h4 style="margin-top:.2rem">Før 3.6</h4><div id="fig-py-gammel"></div></div>
         <div class="card"><h4 style="margin-top:.2rem">Fra 3.6</h4><div id="fig-py-ny"></div></div>
@@ -282,20 +337,17 @@
       <div id="demo-python"></div>
 
       <h3>Fordelene med den nye strukturen</h3>
-      <div class="grid cols-2">
-        <div class="callout eksempel"><span class="lbl">Fordeler</span>
-          <ul>
-            <li><b>Innsettingsrekkefølgen bevares</b>, fordi nye par alltid legges bakerst i entries.</li>
-            <li><b>Iterasjon</b> går gjennom n par i entries, ikke gjennom N plasser med mange hull.</li>
-            <li><b>Rehash</b> rører ikke parene: bare indices lages på nytt.</li>
-            <li><b>Mindre minne:</b> de tomme plassene i indices er bare små tall, ikke hele par.</li>
-          </ul>
-        </div>
-        <div class="callout eli5"><span class="lbl">ELI5</span>
-          <p>Før var det som en hylle med mange tomme rom, der hver bok sto på sin faste plass. Nå står bøkene tett i en bokhylle i den rekkefølgen du kjøpte dem,
-            og en liten lapp med mange ruter sier hvilket nummer i hylla boka har.</p>
-        </div>
+      <div class="callout eksempel"><span class="lbl">Fordeler med indices og entries</span>
+        <ul>
+          <li><b>Innsettingsrekkefølgen bevares</b>, fordi nye par alltid legges bakerst i entries.</li>
+          <li><b>Iterasjon</b> går gjennom n par i entries, ikke gjennom N plasser med mange hull.</li>
+          <li><b>Rehash</b> rører ikke parene: bare indices lages på nytt.</li>
+          <li><b>Mindre minne:</b> de tomme plassene i indices er bare små tall, ikke hele par.</li>
+        </ul>
       </div>
+
+      <h3>Sjekk deg selv</h3>
+      <div id="quiz-python"></div>
 
       <h3>Eksamen</h3>
       <div id="exam-h2024-5"></div>
@@ -304,6 +356,16 @@
     <!-- ===================== TRIKS ===================== -->
     <section data-panel="triks" hidden>
       <div id="intro-triks"></div>
+      <div class="grid cols-2">
+        <div class="callout eli5"><span class="lbl">5-åring: huskelista</span>
+          <p>Mange eksamensoppgaver handler om «har jeg sett dette før?». Et hashset er en huskeliste der du kan sjekke et navn på et blunk.
+            I stedet for å sammenligne alle med alle, går du gjennom én gang og spør huskelista.</p>
+        </div>
+        <div class="callout snarvei"><span class="lbl">Snarvei: kjenn igjen oppgaven</span>
+          <p>Spør oppgaven «finnes x?», «har vi sett dette før?» eller «hvor mange av hver?», passer et hashset eller hashmap nesten alltid:
+            forventet O(1) per oppslag og forventet O(n) for én gjennomgang. Husk å oppgi verste tilfelle også.</p>
+        </div>
+      </div>
       <div class="table-wrap">
         <table class="cmp-table">
           <thead><tr><th>Når du skal …</th><th>Bruk</th><th>Forventet tid</th></tr></thead>
@@ -321,13 +383,13 @@
 
       <h3>Telling med hashmap</h3>
       <div id="demo-mostfreq"></div>
-      <div class="callout felle"><span class="lbl">Felle</span>
+      <div class="callout felle"><span class="lbl">Felle: forventet er ikke garantert</span>
         <p>Hashmap-operasjonene er forventet O(1), ikke garantert. Én gjennomgang med n operasjoner er derfor forventet O(n), men O(n²) i verste tilfelle.
           Er verdiene små heltall (høyst k), gir et vanlig telle-array garantert O(n + k).</p>
       </div>
 
       <h3>Frekvenstabeller: subanagram</h3>
-      <div class="callout begrep"><span class="lbl">Begrep</span>
+      <div class="callout begrep"><span class="lbl">Begrep: frekvenstabell</span>
         <p>En <b>frekvenstabell</b> for en streng er et hashmap fra bokstav til antall forekomster. W kan skrives med bokstavene i S (uten gjenbruk)
           nøyaktig når W ikke trenger flere av noen bokstav enn S har.</p>
       </div>
@@ -435,7 +497,7 @@
 
     /* ===================== BEGREPER ===================== */
     IN.explain("#intro-begreper", t(
-      "Et hashmap er som en magisk skuff-kommode: du sier navnet på tingen, og den forteller deg med en gang hvilken skuff den ligger i.",
+      "Tenk på en garderobe med nummererte knagger. Vakten ser på navnet ditt, regner ut et knaggnummer og henger jakka der. Når du kommer tilbake, regner hun ut samme nummer og går rett til riktig knagg. Hun trenger ikke lete gjennom alle jakkene. Det er hele idéen med hashing.",
       "Hashing gir forventet O(1) for innsetting, oppslag og sletting, fordi vi regner ut plassen i stedet for å lete. Prisen er at vi må håndtere kollisjoner, og at verste tilfelle er O(n).",
       "Et hashmap implementerer et map (nøkkel ↦ verdi) med et array A av størrelse N og en hashfunksjon h(k, N) ∈ {0, …, N − 1}. Ytelsen avhenger av hvor godt h sprer nøklene, og av Load factor n/N."
     ), { label: "Nivå:" });
@@ -487,7 +549,7 @@
       { q: "N = 10 og h(k, N) = k mod N. På hvilken plass hører 47 hjemme?", options: ["4", "7", "47", "0"], answer: 1,
         explain: "47 mod 10 = 7: tallet hasher til sitt siste siffer." },
       { q: "Hva er Load factor?", options: ["N/n", "n/N", "Antall kollisjoner", "Lengden på den lengste bøtta"], answer: 1,
-        explain: "Antall par n delt på antall plasser N. Med Linear probing er den alltid under 1." },
+        explain: "Antall par n delt på antall plasser N. Med Linear probing er den høyst 1, fordi hver plass har høyst ett par. Med Separate chaining kan den bli større enn 1." },
       { q: "Hvorfor er summen av tegnkodene en dårlig hashfunksjon for strenger?", options: ["Den er treg", "Den kan gi negative tall", "Alle anagrammer får samme hashverdi", "Den er ikke konsistent"], answer: 2,
         explain: "Summen bryr seg ikke om rekkefølgen, så «algorithm» og «logarithm» kolliderer alltid. 31-hashen vekter tegnene etter posisjon." },
       { q: "Hva skal skje når vi setter inn en nøkkel som allerede finnes i et hashmap?", options: ["Paret legges inn en gang til", "Den gamle verdien overskrives", "Innsettingen gir feil", "Tabellen rehashes"], answer: 1,
@@ -496,7 +558,7 @@
 
     /* ===================== SEPARATE CHAINING ===================== */
     IN.explain("#intro-chaining", t(
-      "Hver plass har en bøtte. Hører flere ting til samme plass, legger vi dem bare i samme bøtte.",
+      "Hver knagg har en liten pose. Får flere jakker samme knaggnummer, havner de i samme pose, og vakten ser gjennom posen når du skal hente jakka di.",
       "Innsetting: finn bøtta med h(k, N), let gjennom den, overskriv hvis nøkkelen finnes, og legg ellers paret bakerst. Oppslag leter i samme bøtte.",
       "Kostnaden for alle operasjonene er O(1 + |B|) for bøtta B = A[h(k, N)]. Load factor n/N kan bli større enn 1, men holdes lav med rehash."
     ), { label: "Nivå:" });
@@ -510,6 +572,15 @@
       },
       parseInput: function (s) { return HS.parseOps(s, {}); }, inputLabel: "f.eks. 21=a, 31=b, ?21"
     });
+    IN.quiz("#quiz-chaining", [
+      { q: "Tabellen har N = 7 bøtter og 14 nøkler. Hva er Load factor?", options: ["1/2", "2", "7", "14"], answer: 1,
+        explain: "14 / 7 = 2. Med en god hashfunksjon ligger det i snitt 2 nøkler i hver bøtte. Med Separate chaining kan Load factor godt være større enn 1." },
+      { q: "N = 10 og h(k, N) = k mod N. Vi setter inn (3, a), (13, b) og (3, c) med Separate chaining. Hva ligger i bøtte 3 etterpå?",
+        options: ["(3, a), (13, b), (3, c)", "(3, c), (13, b)", "(13, b), (3, c)", "(3, a), (13, b)"], answer: 1,
+        explain: "Nøkkelen 3 finnes fra før, så (3, c) overskriver (3, a) der paret står. Bøtta blir (3, c), (13, b), uten duplikat." },
+      { q: "Hvorfor må innsetting lete gjennom bøtta, selv om paret til slutt bare legges bakerst?", options: ["For å holde bøtta sortert", "For å se om nøkkelen finnes fra før, så den kan overskrives", "For å regne ut hashverdien", "Det trengs ikke"], answer: 1,
+        explain: "Hver nøkkel skal finnes høyst én gang. Derfor koster innsetting O(1 + |B|), ikke alltid O(1)." }
+    ]);
 
     /* ===================== LINEAR PROBING ===================== */
     IN.explain("#intro-probing", t(
@@ -544,6 +615,14 @@
       parseInput: function (s) { var r = HS.parseOps(s, { numbers: true, del: true }); if (r.length) r[0].mode = "mark"; return r; },
       inputLabel: "f.eks. 10, 20, 30, -10, 30"
     });
+    IN.quiz("#quiz-probing", [
+      { q: "N = 10 og h(k, N) = k mod N. Vi setter inn 9, 19 og 29 med Linear probing. Hvor havner 29?", options: ["Plass 9", "Plass 0", "Plass 1", "Utenfor arrayet"], answer: 2,
+        explain: "9 tar plass 9. 19 finner 9 opptatt og går rundt til plass 0. 29 prøver 9 og 0, som begge er opptatt, og havner på plass 1." },
+      { q: "Hvorfor kan vi ikke bare sette plassen til null når vi sletter med Linear probing?", options: ["Det tar for lang tid", "Et senere oppslag kan stoppe ved hullet og overse nøkler som ligger lenger ut", "Load factor blir feil", "Arrayet kan ikke inneholde null"], answer: 1,
+        explain: "Oppslaget stopper ved første tomme plass. En nøkkel som gikk forbi den plassen for å finne sin egen, blir da umulig å finne." },
+      { q: "N = 10. Hullet er på plass 8, og vi ser på nøkkelen på plass 1. Den har hjemmeplass 0. Hva gjør vi?", options: ["Flytter den til plass 8", "Lar den bli stående", "Flytter den til plass 0"], answer: 1,
+        explain: "Strekningen fra hullet til j er 9, 0, 1, altså (8, 1]. Hjemmeplassen 0 ligger der, så nøkkelen har ikke gått forbi hullet og kan bli stående." }
+    ]);
     draw("#fig-cluster", probeFig("Ett langt segment uten hull: plass 1–6", probeState(10, [11, 12, 13, 21, 22, 31]), { home: 1, fresh: 6 }, true));
 
     /* ===================== KJØRETID ===================== */
@@ -596,6 +675,14 @@
       paint();
     })();
     draw("#fig-verst", { parts: [{ type: "chain", N: 10, rows: chainState(10, [[0, null], [10, null], [20, null], [30, null], [40, null]]), marks: { row: 0 } }] });
+    IN.quiz("#quiz-kjoretid", [
+      { q: "Hvorfor er oppslag i et hashmap O(n) i verste tilfelle?", options: ["Fordi en rehash kan skje under oppslaget", "Fordi alle nøklene kan hashe til samme plass, så vi må lete gjennom alle", "Fordi hashfunksjonen bruker O(n) tid", "Det er det ikke: oppslag er alltid O(1)"], answer: 1,
+        explain: "Med uflaks (eller en dårlig hashfunksjon) havner alle n nøklene i samme bøtte eller samme segment. Derfor: forventet O(1), verste tilfelle O(n)." },
+      { q: "Hva skjer om vi øker N med 1 ved hver rehash i stedet for å doble?", options: ["Innsetting er fortsatt amortisert O(1)", "Innsetting blir O(n) amortisert", "Rehash blir O(1)", "Ingenting, så lenge grensen er 0,75"], answer: 1,
+        explain: "Da blir tabellen full igjen nesten med en gang, og nesten hver innsetting flytter alt. Totalarbeidet blir O(n²), altså O(n) per innsetting." },
+      { q: "Hvordan bør du oppgi kjøretiden for innsetting i et hashmap på eksamen?", options: ["O(1)", "O(n)", "Forventet amortisert O(1), og O(n) i verste tilfelle", "O(log n)"], answer: 2,
+        explain: "Bare «O(1)» er ikke nok. H2025 ga ett poeng for forventet og ett for verste tilfelle." }
+    ]);
 
     /* ===================== PYTHON ===================== */
     IN.explain("#intro-python", t(
@@ -620,6 +707,14 @@
       parseInput: function (s) { var r = HS.parseOps(s, { rehash: true, N: 8, maxN: 16 }); if (r.length) r[0].fixed = PYFIX; return r; },
       inputLabel: "f.eks. timmy=red, ola=gul, ?ola, rehash"
     });
+    IN.quiz("#quiz-python", [
+      { q: "I Python 3.6-strukturen: hvor skjer Linear probing?", options: ["I entries", "I indices", "I begge", "Ingen av dem"], answer: 1,
+        explain: "indices har N plasser med hull og brukes til probingen. entries er tettpakket, med de n parene i innsettingsrekkefølge." },
+      { q: "Hva bygges på nytt ved en rehash i den nye strukturen?", options: ["Bare indices", "Bare entries", "Både indices og entries"], answer: 0,
+        explain: "entries står som den er. Bare indices blir større, og hver indeks j settes inn på nytt med h(entries[j].key, N)." },
+      { q: "Hvorfor husker en ordbok fra Python 3.6 innsettingsrekkefølgen?", options: ["Fordi indices er sortert", "Fordi nye par alltid legges bakerst i entries", "Fordi hashfunksjonen bevarer rekkefølgen", "Fordi den bruker Separate chaining"], answer: 1,
+        explain: "Iterasjon går gjennom entries fra start til slutt, og det er nettopp rekkefølgen parene ble satt inn i." }
+    ]);
 
     /* ===================== TRIKS ===================== */
     IN.explain("#intro-triks", t(
@@ -826,7 +921,7 @@
       { s: "Å telle forekomster med et hashmap er forventet O(n) for n elementer.", answer: true, blokk: "5", tema: "triks", kilde: false,
         explain: "n operasjoner som hver er forventet O(1). I verste tilfelle O(n²)." }
     ], { id: "hashing-tf" });
-
+
   })();
   </script>
 </body>

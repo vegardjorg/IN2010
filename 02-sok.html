@@ -111,6 +111,10 @@
     <section data-panel="rettfrem">
       <h3>Rett-frem søk</h3>
       <div id="intro-rettfrem"></div>
+      <div class="callout eli5"><span class="lbl">5-åring: venninnen i kinokøen</span>
+        Du leter etter en venninne i en lang kø utenfor kinoen, og du vet ikke hvor hun står. Da må du gå langs køen
+        og se på én og én. Står hun først, er du raskt ferdig. Står hun bakerst, eller er hun ikke der i det hele
+        tatt, har du sett på alle.</div>
       <div class="grid cols-2">
         <div><div id="tracer-rettfrem"></div></div>
         <div><h4 style="margin:.2rem 0 .4rem">Pseudokode (følger demoen)</h4><div id="pc-rettfrem"></div></div>
@@ -135,6 +139,11 @@
         Det krever to ting: at arrayet er sortert, og at vi kan slå opp en vilkårlig plass <code>A[mid]</code> i konstant tid.
         Versjonen her returnerer indeksen (eller −1), så demoen kan vise hvor x står. Kursets <code>BinarySearch</code> svarer bare true/false.</div>
       <div id="intro-binaersok"></div>
+      <div class="callout eli5"><span class="lbl">5-åring: slå opp i en ordbok</span>
+        Du skal finne et ord i en ordbok. Du åpner på midten, ser om ordet ditt kommer før eller etter, og kan glemme
+        halve boka med en gang. Så gjør du det samme med halvdelen som er igjen. Det virker bare fordi ordene står i
+        alfabetisk rekkefølge. I en bok der ordene står hulter til bulter, kan du kaste akkurat den halvdelen der
+        ordet sto.</div>
       <div class="grid cols-2">
         <div><div id="tracer-binaersok"></div></div>
         <div><h4 style="margin:.2rem 0 .4rem">Pseudokode (følger demoen)</h4><div id="pc-binaersok"></div></div>
@@ -144,7 +153,8 @@
       <div class="callout uni"><span class="lbl">Universitetsnivå: hvorfor høyst ⌊log n⌋ + 1 runder?</span>
         Hver runde krymper intervallet til høyst halvparten: fra <i>m</i> elementer til høyst ⌊<i>m</i>/2⌋. Fra n kommer vi til 1 element etter
         ⌊log n⌋ halveringer, og så trengs én runde til for å sjekke det siste elementet. Med n = 1 000 000 er det høyst 20 runder, mot opptil
-        1 000 000 sammenligninger med rett-frem søk. Som rekurrens: T(n) = T(n/2) + O(1), som gir O(log n).</div>
+        1 000 000 sammenligninger med rett-frem søk. Kortversjonen T(n) = T(n/2) + O(1) betyr akkurat dette: hver runde halverer området og koster
+        like mye, og fra n ned til 1 med halvering tar omtrent log n runder. Det gir O(log n). Du trenger ikke regne på formelen på eksamen; argumentet er nok.</div>
       <div class="callout sensor"><span class="lbl">Sensor ser etter</span>
         <ul>
           <li>Kursets <code>BinarySearch</code> svarer <code>true</code>/<code>false</code>. Bruker du den til å finne en <b>indeks</b>, må du si at du har endret den. Det kostet 1p i 2023.</li>
@@ -198,6 +208,11 @@
     <section data-panel="sortersok">
       <h3>Sorter én gang, søk mange ganger <span class="tag">H2020 · 12p</span></h3>
       <div id="intro-sortersok"></div>
+      <div class="callout eli5"><span class="lbl">5-åring: bibliotekaren og lista</span>
+        En bibliotekar skal sjekke om bøkene på en liste står på hylla. Står hylla hulter til bulter, må hun gå
+        gjennom hele hylla for hver bok på lista. Bruker hun heller en kveld på å sortere hylla, kan hun etterpå
+        slå opp hver bok på et øyeblikk. Står det bare én bok på lista, lønner ikke ryddingen seg. Står det hundre,
+        gjør den det.</div>
       <h4>Regn selv: hvilken Intersection vinner?</h4>
       <div class="card">
         <div class="sok-calc">
@@ -215,14 +230,20 @@
       <div class="callout snarvei"><span class="lbl">Oppskrift</span>
         Total kostnad = <b>forarbeid + k · kostnad per søk</b>. Sammenlign «0 + k · n» (rett-frem søk) med «n log n + k · log n» (sorter én gang, så binærsøk).
         Når k er liten, vinner rett-frem søk. Når k vokser, betaler sorteringen seg.</div>
-      <h4>Faktisk eksamensoppgave</h4>
+      <h4>Eksamensoppgave</h4>
       <div id="exam-sortersok"></div>
     </section>
 
     <!-- ===================== FINN DUPLIKAT (H2023) ===================== -->
     <section data-panel="duplikat">
       <h3>Finn duplikat <span class="tag">H2023 · 12p</span></h3>
+      <p class="muted small">Forkunnskap til (c): et <b>hashset</b> er en mengde der «finnes x?» tar forventet O(1) tid, og et
+        <b>hashmap</b> gjør det samme for nøkkel → verdi. Ny? Les <a href="05-hashing.html#fane=begreper">Blokk 5 → Begreper</a> først (5 min).</p>
       <div id="intro-duplikat"></div>
+      <div class="callout eli5"><span class="lbl">5-åring: samme bursdag?</span>
+        Har to i klassen samme bursdag? Du kan spørre hvert eneste par, men det er veldig mange par. Lurere er å gå
+        rundt én gang med en liste og spørre hver elev: står datoen din allerede på lista? Hvis ikke, skriver du den
+        opp og går videre.</div>
       <div class="table-wrap">
         <table class="cmp-table">
           <thead><tr><th>Deloppgave</th><th>Antakelse</th><th>Beste idé</th><th>Kjøretid</th><th data-tip="Poeng for beste løsning, og hva svakere løsninger ga.">Uttelling (2023)</th></tr></thead>
@@ -255,7 +276,7 @@
       <div class="callout felle"><span class="lbl">Felle i (c)</span>
         Vil du sortere først, må det være en <b>sammenligningsbasert</b> algoritme (Merge sort, Heapsort, eller Quicksort – men si at Quicksort er O(n²) i verste tilfelle). Bøttesortering og radix sort går ikke,
         for oppgaven sier bare at elementene kan sammenlignes. Og sorterer du, må du huske de <i>opprinnelige</i> indeksene.</div>
-      <h4>Faktisk eksamensoppgave</h4>
+      <h4>Eksamensoppgave</h4>
       <div id="exam-duplikat"></div>
       <h4>Koden, linje for linje – (c)</h4>
       <div id="exp-dupc"></div>
@@ -265,6 +286,10 @@
     <section data-panel="kminste">
       <h3>Finn k minste <span class="tag">H2025 · 12p</span></h3>
       <div id="intro-kminste"></div>
+      <div class="callout eli5"><span class="lbl">5-åring: de tre korteste</span>
+        Du vil finne de tre korteste i klassen. Du trenger ikke stille opp hele klassen etter høyde. Du går bare
+        langs rekka og holder styr på de tre korteste du har sett så langt. Møter du noen som er kortere enn den
+        høyeste av de tre, bytter du ut den høyeste.</div>
 
       <h4>Operasjonsteller: tre algoritmer på samme input</h4>
       <div class="card">
@@ -279,7 +304,12 @@
           <div class="row" id="km-quick"></div>
           <div class="sok-meter" id="km-meter"></div>
           <p class="muted small">Tallene er faktiske sammenligninger mellom elementer, talt mens algoritmene kjører på et tilfeldig array. Nytt array hver gang du endrer noe.</p>
-          <p class="muted small">Legg merke til: på et tilfeldig array er de fleste nye tall større enn toppen av heapen av størrelse k, så de avvises etter én sammenligning, og heapen trenger sjelden å repareres. O-kolonnen er en øvre grense for hvordan arbeidet vokser i verste tilfelle, ikke et antall steg for akkurat denne inputen. Ved k = n er hele arrayet svaret, og da har heapen av størrelse k nesten ingenting å gjøre.</p>
+          <p class="muted small">Hvorfor er tallene for «heap av størrelse k» så lave? På et tilfeldig array er de fleste nye tall større
+            enn det største av de k minste vi har funnet så langt, og det tallet ligger øverst i heapen. Da kastes tallet etter
+            én sammenligning, og heapen trenger ikke ryddes.</p>
+          <p class="muted small">Husk at O-kolonnen sier hvor fort arbeidet kan vokse i verste fall. Den sier ikke hvor mange steg
+            akkurat dette arrayet trenger. (Med k = n er hele arrayet svaret: alle tallene legges rett inn i heapen, og på et
+            tilfeldig array bobler et nytt tall sjelden langt opp. Derfor blir tallet lavt også da.)</p>
         </div>
       </div>
 
@@ -303,7 +333,7 @@
           <li>I (b): en sortering som er O(n log n) også i verste tilfelle, som Merge sort. Quicksort (O(n²) i verste tilfelle) ga lavere uttelling.</li>
           <li>Et riktig svar på (c) godtas også som svar på (a) og (b) – men si det eksplisitt.</li>
         </ul></div>
-      <h4>Faktisk eksamensoppgave</h4>
+      <h4>Eksamensoppgave</h4>
       <div id="exam-kminste"></div>
       <h4>Koden, linje for linje – (c)</h4>
       <div id="exp-kminc"></div>
@@ -312,6 +342,8 @@
     <!-- ===================== ARRAY-TRIKS ===================== -->
     <section data-panel="triks">
       <h3>Array-triks</h3>
+      <p class="muted small">Forkunnskap: fanen bruker <b>hashset</b> (en mengde der «finnes x?» tar forventet O(1) tid) og
+        <b>hashmap</b> (det samme for nøkkel → verdi). Ny? Les <a href="05-hashing.html#fane=begreper">Blokk 5 → Begreper</a> først (5 min).</p>
       <div id="intro-triks"></div>
 
       <h4>Par med sum x <span class="tag">H2021 · 10p</span></h4>
@@ -329,7 +361,7 @@
             Dobbel løkke over alle par: O(n²). Sorter (Merge sort) og to pekere: O(n log n). Hashset: forventet O(n). Heltall kan også sorteres med Radix sort, og da blir sorter-og-to-pekere O(n).</div>
         </div>
       </div>
-      <h4>Faktisk eksamensoppgave</h4>
+      <h4>Eksamensoppgave</h4>
       <div id="exam-triks"></div>
 
       <div class="grid cols-3">
@@ -344,6 +376,12 @@
           <li><b>Felles elementer</b> → hashset av den ene, slå opp hvert element i den andre.</li>
           <li><b>Permutasjon</b> → frekvenstabell (forventet O(n)), eller sorter begge og sammenlign plass for plass (O(n log n)).</li>
         </ul></div>
+      <p class="muted small">«Mest frekvente» er samme oppgave som på hashing-siden, sett derfra:
+        <a href="05-hashing.html#fane=triks">Blokk 5 → Hashing som verktøy</a>.</p>
+      <div class="callout felle"><span class="lbl">Felle: hashset vet ingenting om rekkefølge</span>
+        Et hashset svarer raskt på «finnes x?», men ikke på «hva er det minste?» eller «hvilke ligger mellom 10 og 20?».
+        For «hva er det minste?» trenger du for eksempel en heap. For «hvilke ligger mellom 10 og 20?» trenger du et
+        sortert array eller et binært søketre.</div>
     </section>
 
     <!-- ===================== SANT/USANT ===================== -->
@@ -445,6 +483,8 @@
       var bo = IN.pseudo.bigO(IN.algos[algoKey], { compact: true });
       if (bo) qs("#pc-" + id).parentNode.appendChild(bo);
     }
+    // «Prøv selv»-lenke fra et eksamenskort til demoen i samme fane (som på 04–07)
+    function demoLink(fane, demo, txt) { return '<p class="small muted">Prøv selv: <a href="#fane=' + fane + "&amp;oppg=" + demo + '">' + txt + "</a>.</p>"; }
     // Pseudokode inne i et eksamenskort (BYGGEGUIDE 5.4)
     function codeBlock(key) {
       var w = el("div", { class: "sok-sol-code" }), h = el("div");
@@ -554,7 +594,7 @@
     IN.explain("#intro-rec", {
       eli5: "<p>I et bibliotek står bøkene først sortert etter tema, og innenfor hvert tema alfabetisk. Skal du finne en kokebok, går du rett til kokebokhylla og leter bare der. Hele biblioteket er ikke i alfabetisk rekkefølge, men den ene hylla er det.</p>",
       normal: "<p>Den rekursive versjonen tar grensene <code>low</code> og <code>high</code> som parametere. Kaller vi den med <code>(A, x, 0, n − 1)</code>, er det vanlig binærsøk. Kaller vi den med et kjent intervall, for eksempel <code>K[v.category]</code> i H2024, søker den bare der – og da trenger bare den delen å være sortert.</p>",
-      teknisk: "<p>Hvert kall gjør konstant arbeid og så høyst ett nytt kall på et intervall som er høyst halvparten så stort: T(n) = T(n/2) + O(1), som gir O(log n). Kallstakken blir like dyp som antall halveringer, så den rekursive versjonen bruker O(log n) ekstra minne, mens den iterative bruker O(1). Korrekthetskravet er nøyaktig at A[low..high] er sortert – resten av arrayet spiller ingen rolle.</p>"
+      teknisk: "<p>Hvert kall gjør konstant arbeid og så høyst ett nytt kall på et intervall som er høyst halvparten så stort. Etter omtrent log n halveringer er intervallet tomt, så kjøretiden er O(log n). (Kortversjonen er T(n) = T(n/2) + O(1). Den trenger du ikke regne på; argumentet om antall halveringer er det som teller.) Kallstakken blir like dyp som antall halveringer, så den rekursive versjonen bruker O(log n) ekstra minne, mens den iterative bruker O(1). Korrekthetskravet er nøyaktig at A[low..high] er sortert – resten av arrayet spiller ingen rolle.</p>"
     }, { label: "Nivå:" });
     var CAT = [3, 9, 14, 20, 2, 6, 11, 17, 25, 5, 12, 30];
     demo("rec", "binarySearchRec", {
@@ -638,7 +678,8 @@
           intro: "<p>Du har tre hjelpeprosedyrer: <code>Search(A, x)</code> (rett-frem søk, O(n)), <code>BinarySearch(A, x)</code> (binærsøk, O(log n), krever sortert input) og <code>Sort(A)</code> (O(n log n)). Begge søkene returnerer true hvis x finnes i A. De fire prosedyrene under skal skrive ut tallene som finnes i både heltallsarrayet <code>A</code> (lengde n) og <code>B</code> (lengde k).</p>",
           figs: ISECT.map(function (a) { return { cls: "code", draw: function (h) { IN.pseudo.render(h, a, { head: false, tooltips: false }); } }; }),
           outro: "<p>Tre av dem gir alltid riktig svar, én kan gi feil. Oppgi for hvert tilfelle den riktige prosedyren med lavest kjøretidskompleksitet. Er flere like gode, holder det å nevne én.</p>" +
-            IN.partsHTML(["k = 1", "k = log n", "k = n", "k = n²"])
+            IN.partsHTML(["k = 1", "k = log n", "k = n", "k = n²"]) +
+            demoLink("sortersok", "isect-table", "regn ut alle fire tilfellene i tabellen over")
         });
       })(),
       losning: [
@@ -683,7 +724,8 @@
     });
     IN.examTasks("#exam-duplikat", [{
       year: "H2023", oppgave_nr: "Oppgave 3", title: "Finn duplikat", points: 12,
-      oppgave: "<p>Arrayet <code>A</code> har sammenlignbare elementer. Nøyaktig ett element forekommer to ganger; alle andre er unike.</p><ul><li><b>(a)</b> <code>A</code> er sortert, og duplikatet <code>x</code> er oppgitt. Skriv <code>FindSortedIndicesOfDuplicate(A, x)</code>, som skriver ut de to posisjonene der <code>x</code> står, og oppgi kjøretiden.</li><li><b>(b)</b> <code>A</code> er sortert, men duplikatet er ikke oppgitt. Skriv <code>FindSortedDuplicateIndices(A)</code>, som skriver ut de to posisjonene, med kjøretid.</li><li><b>(c)</b> <code>A</code> er ikke sortert. Skriv <code>FindDuplicateIndices(A)</code>, med kjøretid.</li></ul>",
+      oppgave: "<p>Arrayet <code>A</code> har sammenlignbare elementer. Nøyaktig ett element forekommer to ganger; alle andre er unike.</p><ul><li><b>(a)</b> <code>A</code> er sortert, og duplikatet <code>x</code> er oppgitt. Skriv <code>FindSortedIndicesOfDuplicate(A, x)</code>, som skriver ut de to posisjonene der <code>x</code> står, og oppgi kjøretiden.</li><li><b>(b)</b> <code>A</code> er sortert, men duplikatet er ikke oppgitt. Skriv <code>FindSortedDuplicateIndices(A)</code>, som skriver ut de to posisjonene, med kjøretid.</li><li><b>(c)</b> <code>A</code> er ikke sortert. Skriv <code>FindDuplicateIndices(A)</code>, med kjøretid.</li></ul>" +
+        demoLink("duplikat", "tracer-dupa", "demoene over viser (a), (b) og (c) steg for steg"),
       losning: solution([
         { html: "<b>(a) O(log n).</b> Bruk et binærsøk som er endret til å returnere <i>indeksen</i> der x ligger (ikke bare true/false). Én av de to kopiene blir funnet. Fordi A er sortert, står den andre rett ved siden av: sjekk venstre nabo, ellers er det høyre.",
           code: ["findDupSorted"],
@@ -755,7 +797,8 @@
     staticCode("kminc", "findMinKHeap");
     IN.examTasks("#exam-kminste", [{
       year: "H2025", oppgave_nr: "Oppgave 6", title: "Finn k minste", points: 12,
-      oppgave: "<p>Arrayet <code>A</code> har n sammenlignbare elementer, og k er et heltall med 1 ≤ k ≤ n. Skriv prosedyren <code>FindMin(A, k)</code>, som returnerer en liste med de k minste elementene i <code>A</code>. Gi tre ulike løsninger, én i hver kjøretidsklasse: <b>(a)</b> O(k·n), <b>(b)</b> O(n log n), <b>(c)</b> O(n log k) eller O(n + k log n).</p>",
+      oppgave: "<p>Arrayet <code>A</code> har n sammenlignbare elementer, og k er et heltall med 1 ≤ k ≤ n. Skriv prosedyren <code>FindMin(A, k)</code>, som returnerer en liste med de k minste elementene i <code>A</code>. Gi tre ulike løsninger, én i hver kjøretidsklasse: <b>(a)</b> O(k·n), <b>(b)</b> O(n log n), <b>(c)</b> O(n log k) eller O(n + k log n).</p>" +
+        demoLink("kminste", "km-meter", "operasjonstelleren over sammenligner løsningene på samme input"),
       losning: solution([
         { html: "<b>(a) O(k·n):</b> gjenta k ganger: finn minste gjenværende element og legg det til svaret. Det er de k første rundene av Selection sort. Byttet sørger for at et element ikke blir plukket på nytt, også når det finnes like verdier.", code: ["findMinKSelect"] },
         { html: "<b>(b) O(n log n):</b> sorter hele A med en sortering som er O(n log n) i verste tilfelle, for eksempel Merge sort, og ta de k første. Quicksort (O(n²) i verste tilfelle) ga litt lavere uttelling, og en kvadratisk sortering enda lavere.", code: ["findMinKSort"] },
@@ -790,7 +833,8 @@
     staticCode("perm", "isPermutation");
     IN.examTasks("#exam-triks", [{
       year: "H2021", oppgave_nr: "Oppgave 10", title: "Par med sum x", points: 10,
-      oppgave: "<p>Arrayet <code>A</code> har unike heltall, og x er et heltall. Skriv ut alle par (y, z) fra A der y + z = x. Et tall på en gitt plass kan være med i høyst ett par, og rekkefølgen spiller ingen rolle. Eksempel: <code>FindSummands([0, 2, 4, 6, 8, 10], 10)</code> skriver ut (0, 10), (2, 8) og (4, 6). Lavere kjøretid gir mer uttelling.</p><ul><li><b>(a)</b> Skriv <code>FindSummands</code> når A er sortert fra minst til størst.</li><li><b>(b)</b> Skriv <code>FindSummands</code> uten at A er sortert. Hint: innsetting, oppslag og sletting i hashbaserte strukturer kan antas å være O(1).</li></ul>",
+      oppgave: "<p>Arrayet <code>A</code> har unike heltall, og x er et heltall. Skriv ut alle par (y, z) fra A der y + z = x. Et tall på en gitt plass kan være med i høyst ett par, og rekkefølgen spiller ingen rolle. Eksempel: <code>FindSummands([0, 2, 4, 6, 8, 10], 10)</code> skriver ut (0, 10), (2, 8) og (4, 6). Lavere kjøretid gir mer uttelling.</p><ul><li><b>(a)</b> Skriv <code>FindSummands</code> når A er sortert fra minst til størst.</li><li><b>(b)</b> Skriv <code>FindSummands</code> uten at A er sortert. Hint: innsetting, oppslag og sletting i hashbaserte strukturer kan antas å være O(1).</li></ul>" +
+        demoLink("triks", "tracer-tosum", "demoen over viser to pekere på et sortert array"),
       losning: solution([
         { html: "<b>(a) O(n) med to pekere:</b> start i hver ende. Er summen for liten, flytt venstre peker inn; er den for stor, flytt høyre. Ved treff skriver vi ut og flytter videre. Det virker fordi A er sortert.", code: ["findSummandsSorted"] },
         { html: "<b>(b) Forventet O(n) med hashset:</b> for hvert y, se om komplementet x − y er sett før. Fjern det ved treff, slik løsningsforslaget gjør.", code: ["findSummandsHash"] },

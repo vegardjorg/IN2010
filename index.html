@@ -211,7 +211,7 @@
         links: [["begreper", "algoritme", "Begreper → Algoritme"]] },
       { key: "d1", part: "Del 1", name: "Sant/usant", pts: "22–32 p", w: 26,
         text: "Mange korte påstander om kjøretid, stabil og in-place, heaper og trær. Rettes automatisk. Feil og ubesvart teller likt, og gjetting gir i snitt 0 – svar på alle, men tenk.",
-        links: [["sortering", "test", "Sortering"], ["sok", "test", "Søk"], ["heap", "test", "Heap"], ["traer", "test", "Trær"], ["hashing", "test", "Hashing"], ["grafer", "test", "Grafer"], ["begreper", "bigo", "Big-O"]] },
+        links: [["strategi", "eksamensteknikk&oppg=del1-ovelse", "Del 1-øving (blandet, med poengregel)"], ["sortering", "test", "Sortering"], ["sok", "test", "Søk"], ["heap", "test", "Heap"], ["traer", "test", "Trær"], ["hashing", "test", "Hashing"], ["grafer", "test", "Grafer"], ["begreper", "bigo", "Big-O"]] },
       { key: "std", part: "Del 2, først", name: "Standardoppgaven", short: "Første oppg.", pts: "10 p", w: 10,
         text: "Kjør en pensumoperasjon for hånd – innsetting i heap, hashing eller Huffman – forklar den, skriv pseudokode og oppgi kjøretid.",
         links: [["heap", "innsetting", "Heap-innsetting"], ["traer", "huffman", "Huffman", ["t24huf"]], ["hashing", "probing", "Linear probing"], ["hashing", "chaining", "Chaining"], ["hashing", "python", "Python-dict"]] },
@@ -220,7 +220,7 @@
         anchor: "eo-temaer" },
       { key: "graf", part: "Del 2, sist", name: "Grafhistorien", pts: "12–15 p", w: 14,
         text: "Gjør en historie om til en graf: hva er nodene og kantene? Velg en pensumalgoritme (BFS/DFS, Dijkstra, MST, topologisk sortering) og oppgi kjøretiden.",
-        links: [["grafer", "begreper", "Fra historie til graf"], ["grafer", "bfs", "BFS"], ["grafer", "dijkstra", "Dijkstra"], ["grafer", "mst", "MST"], ["grafer", "topologisk", "Topologisk sortering"]] }
+        links: [["grafer", "begreper&oppg=historie", "Fra historie til graf"], ["grafer", "bfs", "BFS"], ["grafer", "dijkstra", "Dijkstra"], ["grafer", "mst", "MST"], ["grafer", "topologisk", "Topologisk sortering"]] }
     ];
     var flowHost = IN.qs("#exam-flow");
     var ruler = el("div", { class: "a4-ruler" });
@@ -375,7 +375,7 @@
         else if (ready[r[4]]) name = lnk(r[4], r[5], r[2]);                                  // finnes ikke som oppgavekort: fanen
         else name = el("span", { class: "a4-off" }, [r[2] + " ", el("span", { class: "tag", text: "snart" })]);
         ol.appendChild(el("li", {}, [el("span", { class: "a4-nr", text: r[1] }), name, el("span", { class: "a4-p", text: r[3] })]));
-        if (i === 0 && DEL1[y]) ol.appendChild(el("li", { class: "a4-d1" }, [el("span", { class: "a4-nr" }), el("span", { text: "Del 1: sant/usant" }), el("span", { class: "a4-p", text: DEL1[y] })]));
+        if (i === 0 && DEL1[y]) ol.appendChild(el("li", { class: "a4-d1" }, [el("span", { class: "a4-nr" }), lnk("strategi", "eksamensteknikk&oppg=del1-ovelse", "Del 1: sant/usant"), el("span", { class: "a4-p", text: DEL1[y] })]));
       });
       mapHost.appendChild(el("div", { class: "a4-year" }, [el("h3", { text: "H20" + y.slice(1) }), ol]));
     });

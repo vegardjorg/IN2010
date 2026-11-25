@@ -315,10 +315,10 @@
         normal: "W er et subanagram hvis alt i kopien ble brukt opp. Lengden er O(1).",
         teknisk: "O(1)." }
     ],
-    bigO: { best: "O(s · w)", worst: "O(s · w)", space: "O(w)",
+    bigO: { worst: "O(s · w)", space: "O(w)",
       why: t("For hver bokstav i S leter vi gjennom hele kopien av W.",
-             "s runder, og hver runde gjør Contains og Remove på opptil w tegn: O(s · w).",
-             "O(w) for kopien pluss s · O(w) for løkka gir O(w + s · w) = O(s · w). Den lineære kostnaden ligger skjult i hjelpeprosedyrene.") }
+             "s runder, og hver runde gjør Contains og Remove på opptil w tegn: O(s · w). Det er verste tilfelle, og det er det oppgaven spør etter.",
+             "O(w) for kopien pluss s · O(w) for løkka gir O(w + s · w) = O(s · w) i verste tilfelle. Den lineære kostnaden ligger skjult i hjelpeprosedyrene. (Blir r tom tidlig, går resten av rundene fort, så beste tilfelle er lavere. Sensor spurte bare om verste tilfelle.)") }
   });
 
   /* ============================================================

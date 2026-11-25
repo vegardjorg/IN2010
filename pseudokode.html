@@ -92,7 +92,7 @@
 
     <!-- ===================== SKRIVEGUIDE ===================== -->
     <section data-panel="skriveguide">
-      <div class="callout eli5"><span class="lbl">ELI5</span>
+      <div class="callout eli5"><span class="lbl">5-åring: en oppskrift som følges bokstavelig</span>
         Tenk at du forklarer en oppskrift til noen som skal følge den helt bokstavelig. Da må du være
         tydelig: hva har du (Input), hva skal du ende med (Output), og hvert steg uten «skjønn».</div>
 
@@ -119,8 +119,8 @@
 
       <div class="callout snarvei"><span class="lbl">Snarvei</span>
         «Jeg bruker <code>MergeSort(A)</code> som er stabil og O(n log n) i verste tilfelle.» –
-        tre krav for snarvei: si hva kallet returnerer, hold kjøretiden, oppgi kjøretiden.
-        Mer i <a href="07-strategi.html">Strategi-blokken</a> (kommer).</div>
+        Tre krav når du bruker et pensumkall som snarvei: si hva kallet returnerer, sjekk at kjøretiden holder
+        kravet i oppgaven, og oppgi kjøretiden. Mer i <a href="07-strategi.html">Strategi-blokken</a>.</div>
     </section>
   </main>
 
@@ -145,13 +145,13 @@
       ["swap A[i] and A[k]", "Bytt verdiene på to plasser.", ""],
       ["return", "Gi tilbake en verdi og avslutt prosedyren.", "return mid"],
       ["Procedure Navn(A)", "Starten på en prosedyre med parameter.", "Procedure SelectionSort(A)"],
-      ["v.left / v.right / v.parent", "Felt på en node (venstre/høyre barn, forelder).", "v.left = null"],
+      ["v.left / v.right / v.parent", "Felt på en node (venstre/høyre barn, forelder).", "if v.left = null then"],
       ["⌊ x ⌋", "Rund ned til nærmeste heltall.", "⌊(low+high)/2⌋"],
       ["|V|, |E|", "Antall noder / kanter i en graf.", "O(|V| + |E|)"],
       ["∈", "«er element i».", "v ∈ V"],
       ["∞", "Uendelig (ofte startavstand i Dijkstra).", "dist[v] ← ∞"],
-      ["← indeks fra 0", "Alt er 0-indeksert på eksamen.", "Første plass er 0"],
-      ["null", "Ingen verdi / peker til ingenting.", "v.parent = null"]
+      ["A[0] … A[n − 1]", "Alt er 0-indeksert på eksamen: første plass er 0, siste er n − 1.", "for i ← 0 to n − 1 do"],
+      ["null", "Ingen verdi / peker til ingenting.", "v.parent ← null"]
     ];
     var ntb = qs("#notasjon-tbody");
     NOT.forEach(function (r) {
@@ -221,10 +221,10 @@
         explain: "Minste verdi er 1 på indeks 1, så k = 1. Deretter byttes A[0] og A[1]." },
       { q: "Hvor mange bytter gjør Selection sort <b>totalt</b> på et array med n elementer (verste tilfelle)?",
         options: ["O(1)", "O(n)", "O(n log n)", "O(n²)"], answer: 1,
-        explain: "Nøyaktig ett bytte per ytre runde → O(n) bytter, selv om det er O(n²) sammenligninger." },
+        explain: "Høyst ett bytte per ytre runde (byttet hoppes over når det minste alt står på plass i), altså høyst n − 1 bytter → O(n), selv om det er O(n²) sammenligninger." },
       { q: "Bubble sort med swapped-flagg på et allerede sortert array bruker …",
         options: ["O(n) tid (én runde uten bytter)", "O(n log n)", "O(n²) uansett", "O(log n)"], answer: 0,
-        explain: "Første runde gir ingen bytter → swapped er false → break. Det er best-case O(n)." }
+        explain: "Første runde gir ingen bytter → swapped er false → break. Det er beste tilfelle: O(n)." }
     ]);
 
     /* ---- Finn feilen ---- */

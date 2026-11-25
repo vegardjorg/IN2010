@@ -51,6 +51,13 @@
           <p class="muted small">Binærsøk O(log n) forutsetter at dataene er sortert først.</p></div>
       </div>
 
+      <h3>Kart over blokka</h3>
+      <p>Vi går fra de enkleste sorteringene til de raskeste. Først fire enkle som bytter naboer eller finner
+        det minste (selection, bubble, insertion og gnome). De er lette å forstå, men trege på store lister. Så to
+        som deler lista i to (merge og quick). Så to som ikke sammenligner elementene i det hele tatt (bøtte og
+        radix). Til slutt heapsort, som bruker en heap. Tabellen under er et oppslagsverk: skum den nå, og kom
+        tilbake til den når du har sett algoritmene i fanene.</p>
+
       <h3>Sammenlign algoritmene</h3>
       <p class="muted small">Alle tider er O(…). Hold musa over – eller trykk på – en overskrift eller celle for å se <i>hvorfor</i>.</p>
       <div class="table-wrap">
@@ -152,6 +159,10 @@
     <section data-panel="selection">
       <h3>Selection sort</h3>
       <div id="intro-selection"></div>
+      <div class="callout eli5"><span class="lbl">5-åring: let etter det minste kortet</span>
+        Du har en haug med kort på bordet. Du leter gjennom hele haugen etter det minste og legger det først i
+        rekka. Så leter du etter det minste av dem som er igjen, og legger det som nummer to. Hver runde må du se
+        gjennom alt som ligger igjen, og det er derfor det blir mye leting.</div>
       <div class="grid cols-2">
         <div><div id="tracer-selection"></div></div>
         <div><h4 style="margin:.2rem 0 .4rem">Pseudokode (følger demoen)</h4><div id="pc-selection"></div></div>
@@ -160,6 +171,12 @@
         Selection gjør høyst <b>ett bytte per runde</b> – høyst n − 1 bytter totalt. Men den må alltid
         skanne hele resten for å finne minste, så den gjør O(n²) <b>sammenligninger</b> uansett. Derfor er
         «færrest bytter» ikke det samme som «raskest».</div>
+      <div class="callout felle"><span class="lbl">Felle: hvorfor er selection ustabil, mens bubble og insertion er stabile?</span>
+        Selection sort bytter det minste elementet med det som står først i resten, og det byttet kan hoppe langt
+        forbi et likt element. Eksempel: [2a, 2b, 1] blir [1, 2b, 2a]. Bubble og insertion flytter bare forbi
+        naboer, og bare når de står strengt feil (<code>&gt;</code>). To like elementer bytter derfor aldri plass.</div>
+      <h4>Sjekk deg selv</h4>
+      <div id="quiz-selection"></div>
       <h4>Koden, linje for linje</h4>
       <div id="exp-selection"></div>
     </section>
@@ -168,6 +185,10 @@
     <section data-panel="bubble">
       <h3>Bubble sort</h3>
       <div id="intro-bubble"></div>
+      <div class="callout eli5"><span class="lbl">5-åring: bobler i brus</span>
+        Tenk på bobler i et glass brus: den største stiger til toppen først. Vi sammenligner to naboer om gangen og
+        bytter dem hvis de står feil vei. Etter én runde gjennom lista har den største havnet bakerst, etter to
+        runder de to største, og så videre.</div>
       <div class="grid cols-2">
         <div><div id="tracer-bubble"></div></div>
         <div><h4 style="margin:.2rem 0 .4rem">Pseudokode (følger demoen)</h4><div id="pc-bubble"></div></div>
@@ -176,6 +197,8 @@
         <code>swapped</code>-flagget gir O(n) i beste tilfelle: går en hel runde uten bytte, er alt sortert.
         Dette trikset virker <b>ikke</b> for selection eller insertion – deres indre løkke sammenligner
         ikke alle nabopar, så «ingen bytte i runden» betyr ikke «ferdig».</div>
+      <h4>Sjekk deg selv</h4>
+      <div id="quiz-bubble"></div>
       <h4>Koden, linje for linje</h4>
       <div id="exp-bubble"></div>
     </section>
@@ -184,6 +207,9 @@
     <section data-panel="insertion">
       <h3>Insertion sort</h3>
       <div id="intro-insertion"></div>
+      <div class="callout eli5"><span class="lbl">5-åring: kort på hånda</span>
+        Slik sorterer de fleste kort på hånda. Du tar opp ett nytt kort og skyver det til venstre forbi alle kort
+        som er større, til det står riktig. Kortene du allerede holder, er hele tiden sortert.</div>
       <div class="grid cols-2">
         <div><div id="tracer-insertion"></div></div>
         <div><h4 style="margin:.2rem 0 .4rem">Pseudokode (følger demoen)</h4><div id="pc-insertion"></div></div>
@@ -191,6 +217,10 @@
       <div class="callout eksempel"><span class="lbl">Best på nesten-sorterte data</span>
         Antall forskyvninger = antall <b>inversjoner</b> i arrayet. Er data nesten sortert, er det nesten
         ingen inversjoner → nesten O(n). Insertion er derfor et godt valg når data allerede er nesten sortert.</div>
+      <h4>Sjekk deg selv</h4>
+      <div id="quiz-insertion"></div>
+      <h4>Øv selv: sett linjene i riktig rekkefølge</h4>
+      <div id="parsons-insertion"></div>
       <h4>Koden, linje for linje</h4>
       <div id="exp-insertion"></div>
     </section>
@@ -199,6 +229,10 @@
     <section data-panel="gnome">
       <h3>Gnome sort <span class="tag">H2023 · 10p</span></h3>
       <div id="intro-gnome"></div>
+      <div class="callout eli5"><span class="lbl">5-åring: nissen og blomsterpottene</span>
+        En hagenisse går langs en rad blomsterpotter. Han ser på potten han står ved og potten rett bak. Står de
+        riktig, går han ett steg fram. Står de feil, bytter han de to pottene og går ett steg tilbake for å sjekke
+        på nytt. Når han har gått forbi den siste potten, er raden ferdig.</div>
       <div class="callout sensor exam-jump"><span class="lbl">Eksamen</span>
         <b>H2023 · Oppgave 4</b> (10p): drøft gnome sort opp mot pensum.
         <a href="#eksamen-gnome" data-jump="eksamen-gnome">Til oppgaven ↓</a></div>
@@ -223,6 +257,9 @@
         Å si at gnome er «raskere enn insertion fordi koden er kortere». Kortere kode ≠ færre operasjoner.
         Gnome gjør omtrent dobbelt så mange sammenligninger – samme O-klasse, men ikke raskere.</div>
 
+      <h4>Sjekk deg selv</h4>
+      <div id="quiz-gnome"></div>
+
       <h4>Koden, linje for linje</h4>
       <div id="exp-gnome"></div>
 
@@ -234,6 +271,10 @@
     <section data-panel="merge">
       <h3>Merge sort</h3>
       <div id="intro-merge"></div>
+      <div class="callout eli5"><span class="lbl">5-åring: del bunken med venner</span>
+        Du skal sortere en stor bunke prøver etter poengsum. Del bunken i to og gi hver halvdel til en venn, som
+        deler videre. Når en bunke bare har én prøve, er den sortert. Så går dere baklengs og fletter to sorterte
+        bunker sammen: se på de to øverste prøvene, ta den med lavest poengsum, og gjør det igjen og igjen.</div>
       <div class="grid cols-2">
         <div><div id="tracer-merge"></div></div>
         <div><h4 style="margin:.2rem 0 .4rem">Hovedprosedyre</h4><div id="pc-merge"></div></div>
@@ -245,6 +286,8 @@
       <div class="callout uni"><span class="lbl">Fra ukesoppgavene: lenkede lister</span>
         Av merge, quick og heapsort er det merge sort som passer best på <b>lenkede lister</b>: den trenger
         ikke oppslag på indeks, og kan flette ved å flytte pekere.</div>
+      <h4>Sjekk deg selv</h4>
+      <div id="quiz-merge"></div>
       <h4>Koden, linje for linje</h4>
       <h5 class="muted">MergeSort (rekursiv hovedprosedyre)</h5>
       <div id="exp-merge"></div>
@@ -256,6 +299,10 @@
     <section data-panel="quick">
       <h3>Quicksort</h3>
       <div id="intro-quick"></div>
+      <div class="callout eli5"><span class="lbl">5-åring: still deg rundt pivoten</span>
+        Klassen skal stille seg etter høyde. Velg én elev som «pivot». Alle som er lavere, stiller seg til venstre,
+        og alle som er høyere, stiller seg til høyre. Nå står pivoten på riktig plass for godt. Gjør det samme i
+        hver gruppe, helt til hver gruppe har høyst én elev.</div>
       <div class="grid cols-2">
         <div><div id="tracer-quick"></div></div>
         <div><h4 style="margin:.2rem 0 .4rem">Partition (følger demoen)</h4><div id="pc-quick"></div></div>
@@ -273,6 +320,8 @@
         Prøv «Sortert (verst)»: med siste element som pivot er pivoten alltid størst, partisjonen blir
         maksimalt skjev, og rekursjonstreet blir n høyt → <b>O(n²)</b>. Derfor fraråder sensor quicksort når oppgaven krever
         O(n log n) i verste fall.</div>
+      <h4>Sjekk deg selv</h4>
+      <div id="quiz-quick"></div>
       <h4>Koden, linje for linje</h4>
       <h5 class="muted">Quicksort (rekursiv hovedprosedyre)</h5>
       <div id="exp-quick"></div>
@@ -284,6 +333,10 @@
     <section data-panel="bucket">
       <h3>Bøttesortering <span class="tag">H2024 · 10p</span></h3>
       <div id="intro-bucket"></div>
+      <div class="callout eli5"><span class="lbl">5-åring: én kurv per farge</span>
+        Du skal sortere sokker etter farge, og du vet på forhånd hvilke farger som finnes. Da setter du fram én kurv
+        per farge og legger hver sokk rett i sin kurv. Du sammenligner aldri to sokker med hverandre. Til slutt
+        tømmer du kurvene i fast rekkefølge: først den hvite, så den røde, så den blå.</div>
       <div class="callout sensor exam-jump"><span class="lbl">Eksamen</span>
         <b>H2024 · Oppgave 3</b> (10p), <b>H2021 · Oppgave 2</b> (3p) og <b>H2020 · Oppgave 7d</b> (6p).
         <a href="#eksamen-bucket" data-jump="eksamen-bucket">Til oppgavene ↓</a></div>
@@ -314,6 +367,9 @@
         O(n log n), og koster poeng når O(n) var mulig. Og: legger du forrest i bøtta, ryker stabiliteten – og
         med den rekkefølgen innen hver kategori.</div>
 
+      <h4>Sjekk deg selv</h4>
+      <div id="quiz-bucket"></div>
+
       <h4>Koden, linje for linje</h4>
       <div id="exp-bucket"></div>
 
@@ -325,6 +381,10 @@
     <section data-panel="radix">
       <h3>Radix sort</h3>
       <div id="intro-radix"></div>
+      <div class="callout eli5"><span class="lbl">5-åring: ett siffer om gangen</span>
+        Sorter tallene etter siste siffer først, så etter nest siste, og så videre. Hver gang bruker du ti bøtter,
+        0 til 9. Tall med samme siffer kommer ut av bøtta i samme rekkefølge som de gikk inn. Derfor ødelegger ikke
+        en ny runde det de forrige rundene har ordnet.</div>
       <div class="grid cols-2 demo-wide">
         <div><div id="tracer-radix"></div></div>
         <div><h4 style="margin:.2rem 0 .4rem">Pseudokode (følger demoen)</h4><div id="pc-radix"></div></div>
@@ -343,6 +403,9 @@
         Å bruke en ustabil sortering i hver runde. Da kan en runde stokke om tall med likt siffer, og
         arbeidet fra de forrige rundene går tapt. Radix trenger en <b>stabil</b> bøttesortering per siffer.</div>
 
+      <h4>Sjekk deg selv</h4>
+      <div id="quiz-radix"></div>
+
       <h4>Koden, linje for linje</h4>
       <div id="exp-radix"></div>
     </section>
@@ -350,7 +413,13 @@
     <!-- HEAPSORT -->
     <section data-panel="heap">
       <h3>Heapsort</h3>
+      <p class="muted small">Bygger på <a href="03-heap.html#fane=hva">Blokk 3 · Heap</a> (fanene «Hva er en heap?»,
+        «RemoveMin» og «BuildHeap»). Har du ikke sett heapen før, les dem først.</p>
       <div id="intro-heapsort"></div>
+      <div class="callout eli5"><span class="lbl">5-åring: vinneren på pallen</span>
+        Heapsort er som en kåring der den beste alltid står øverst på pallen. Du tar vinneren ned og setter den på
+        den bakerste ledige plassen i rekka. Så rydder du pallen så den nye beste kommer øverst, og gjentar. Rekka
+        fylles bakfra, så til slutt står alle i riktig rekkefølge.</div>
 
       <div class="heapviz hv-side"><div id="tracer-heapsort"></div></div>
       <p class="muted small">Treet viser bare heapdelen A[0..i − 1]. Den grønne halen i arrayet er ferdig sortert og
@@ -398,7 +467,7 @@
     <section data-panel="test">
       <h3>Sant eller usant – sortering</h3>
       <p class="muted small">Prøv deg selv på påstander i eksamensstil. Svar Sant/Usant, trykk
-        <b>Sjekk svar</b> for antall riktige, og bruk <b>Fasit</b>/<b>Forklaring</b> på hver påstand når du
+        <b>Sjekk svar</b> for antall riktige, og bruk <b>Fasit</b>/<b>Forklar</b> på hver påstand når du
         vil se mer. Svarene huskes i nettleseren din.</p>
       <h3 id="eksamen-test" class="exam-anchor" style="margin-top:1rem">Eksamen H2021 · Oppgave 3 <span class="tag">10p</span></h3>
       <p class="muted small">A er et array med n elementer, og 0 ≤ i &lt; n. «Runde» betyr én iterasjon av den
@@ -601,6 +670,76 @@
       IN.pseudo.explainer("#exp-bdmax", IN.algos.heapBubbleDown, {});
     })();
 
+    /* ---- Sjekk deg selv: én kort quiz per algoritmefane ---- */
+    var QUIZ = {
+      selection: [
+        { q: "Er selection sort stabil?",
+          options: ["Nei – et langt bytte kan sende et element forbi et annet med samme verdi", "Ja – den bruker streng &lt;", "Ja – den bytter bare naboer", "Ja – fordi den gjør så få bytter"], answer: 0,
+          explain: "Nei. Eksempel: [2a, 2b, 1]. Det minste (1) byttes med 2a, og vi får [1, 2b, 2a]. Den strenge &lt; hjelper ikke, for det er det lange byttet som snur rekkefølgen." },
+        { q: "Hvor mange sammenligninger gjør selection sort på et array som allerede er sortert?",
+          options: ["O(1)", "O(n)", "O(n log n)", "O(n²)"], answer: 3,
+          explain: "Den skanner alltid hele resten for å finne det minste: (n − 1) + (n − 2) + … + 1 = n(n − 1)/2, altså O(n²). Det finnes ingen tidlig stopp." }
+      ],
+      bubble: [
+        { q: "Hva står garantert på riktig plass etter første runde av bubble sort?",
+          options: ["Det største elementet, helt bakerst", "Det minste elementet, helt først", "Ingenting ennå", "Det midterste elementet"], answer: 0,
+          explain: "Det største boblet forbi alle naboene sine og havnet bakerst. Det minste kan ha flyttet seg bare ett hakk mot venstre." },
+        { q: "Hvorfor er bubble sort stabil?",
+          options: ["Den bytter bare naboer, og bare når venstre er strengt større", "Den bruker et hjelpearray", "Den har swapped-flagget", "Fordi den er O(n²)"], answer: 0,
+          explain: "To like naboer byttes aldri, fordi betingelsen er streng (&gt;). Da kan ingen av dem passere den andre." }
+      ],
+      insertion: [
+        { q: "Når er insertion sort raskest, og hvor rask er den da?",
+          options: ["Når lista allerede er sortert: O(n)", "Når lista er omvendt sortert: O(n)", "Alltid: O(n log n)", "Når lista er sortert: O(1)"], answer: 0,
+          explain: "Hvert nytt element sammenlignes én gang med naboen foran og blir stående. Det blir én rask runde gjennom lista: O(n). Vi må fortsatt se på alle n elementene, så O(1) er umulig." },
+        { q: "Hva er antall forskyvninger i insertion sort lik?",
+          options: ["Antall inversjoner (par som står i feil rekkefølge)", "Alltid n − 1", "log n", "Antall like elementer"], answer: 0,
+          explain: "Hver forskyvning flytter ett element forbi ett større element foran seg, og fjerner dermed nøyaktig én inversjon." }
+      ],
+      gnome: [
+        { q: "Hvilken pensumalgoritme er gnome sort mest i slekt med?",
+          options: ["Insertion sort", "Merge sort", "Bøttesortering", "Quicksort"], answer: 0,
+          explain: "Den flytter et element bakover på plass med nabobytter, akkurat som insertion skyver det på plass. Samme antall bytter, men omtrent dobbelt så mange sammenligninger." },
+        { q: "Hva skjer med i rett etter et bytte?",
+          options: ["i ← i − 1: nissen går ett steg tilbake", "i ← i + 1: nissen går ett steg fram", "i ← 0: nissen begynner på nytt", "Ingenting"], answer: 0,
+          explain: "Etter byttet kan det nye paret bak ham også stå feil, så han går tilbake og sjekker." }
+      ],
+      merge: [
+        { q: "Hvorfor er merge sort O(n log n) også i verste fall?",
+          options: ["Den deler alltid i to like store deler, og flettingen koster O(n) per nivå", "Den velger en god pivot", "Den stopper tidlig på sortert input", "Den bruker bøtter"], answer: 0,
+          explain: "Delingen avhenger ikke av verdiene, så det blir alltid log n nivåer. På hvert nivå ser flettingen på alle n elementene til sammen." },
+        { q: "Hvorfor er ikke merge sort in-place?",
+          options: ["Flettingen bruker hjelpearrayer (L og R)", "Den bytter elementer over lange avstander", "Den er rekursiv", "Den er stabil"], answer: 0,
+          explain: "In-place betyr ingen ekstra datastruktur til å mellomlagre elementene. Flettingen kopierer halvdelene ut i L og R. (Rekursjon alene gjør ikke en sortering «ikke in-place» – quicksort er rekursiv og in-place.)" }
+      ],
+      quick: [
+        { q: "Når blir quicksort O(n²)?",
+          options: ["Når pivoten hver gang er det minste eller største elementet", "Når pivoten alltid havner midt i", "Når arrayet har få elementer", "Aldri"], answer: 0,
+          explain: "Da blir den ene siden tom og den andre bare ett element mindre. Rekursjonstreet blir omtrent n høyt i stedet for log n, og hvert nivå koster O(n)." },
+        { q: "Hva vet vi om pivoten rett etter Partition?",
+          options: ["Den står på sin endelige plass", "Den står først i arrayet", "Den står sist i arrayet", "Ingenting"], answer: 0,
+          explain: "Alt til venstre er mindre enn eller likt pivoten, og alt til høyre er større enn eller likt. Da flytter pivoten seg aldri mer." }
+      ],
+      bucket: [
+        { q: "Hvorfor gjelder ikke O(n log n)-grensen for bøttesortering?",
+          options: ["Den sammenligner aldri to elementer med hverandre", "Den er rekursiv", "Den bruker binærsøk", "Den er in-place"], answer: 0,
+          explain: "Grensen gjelder sortering som bare sammenligner. Bøttesortering bruker nøkkelen direkte som indeks. Med N bøtter og n elementer tar det O(N + n)." },
+        { q: "Hva skjer hvis du legger elementene <i>forrest</i> i bøtta, men fortsatt tar dem ut forfra?",
+          options: ["Stabiliteten ryker: like nøkler kommer ut i motsatt rekkefølge", "Ingenting endrer seg", "Kjøretiden blir O(n²)", "Sorteringen blir in-place"], answer: 0,
+          explain: "Det siste elementet du la inn, kommer da ut først. Alle med samme nøkkel blir snudd." }
+      ],
+      radix: [
+        { q: "Hvorfor må hver runde i radix sort være stabil?",
+          options: ["Ellers kan en runde ødelegge rekkefølgen de forrige rundene laget for tall med likt siffer", "For at den skal bli O(n log n)", "For at den skal bli in-place", "Det trenger den ikke"], answer: 0,
+          explain: "Etter runden på enerplassen står for eksempel 21 foran 23. Runden på tierplassen ser bare at begge har 2. Er den stabil, beholder de rekkefølgen, og 21 havner riktig foran 23." },
+        { q: "Hvilket siffer sorterer radix sort på i første runde?",
+          options: ["Det minst betydningsfulle (enerplassen)", "Det mest betydningsfulle", "Et tilfeldig siffer", "Det midterste sifferet"], answer: 0,
+          explain: "Vi begynner bakerst. Den siste runden (det viktigste sifferet) bestemmer mest, og stabiliteten tar vare på resten." }
+      ]
+    };
+    Object.keys(QUIZ).forEach(function (id) { IN.quiz("#quiz-" + id, QUIZ[id]); });
+    IN.pseudo.parsons("#parsons-insertion", IN.algos.insertionSort, {});
+
     /* ---- Sant/usant: Blokk 1 (fra eksamen H2022, sant/usant-samlingen og ukesoppgavene; parafrasert) ---- */
     IN.tfTest("#tf-sortering", [
       { s: "Den sorteringsalgoritmen som gjør færrest bytter har alltid lavest kjøretid.", answer: false,
@@ -698,6 +837,8 @@
       IN.pseudo.render(pc, IN.algos[algoKey], {});
       return box;
     }
+    function demoLink(fane, demo, txt) { return '<p class="small muted">Prøv selv: <a href="#fane=' + fane + "&amp;oppg=" + demo + '">' + txt + "</a>.</p>"; }
+    EXAM_FALLBACK.bucket.oppgave += demoLink("bucket", "tracer-bucket", "bøttedemoen over viser fordel og samle steg for steg");
     EXAM_FALLBACK.bucket.losning = losningMedKode(EXAM_FALLBACK.bucket.losning, "etymologySort",
       "Slik kan (a) skrives i pseudokode:");
 
@@ -734,6 +875,8 @@
         ]
       }
     };
+    EXAM_EXTRA.stabilitet.oppgave += demoLink("bucket", "tracer-bucket", "i bøttedemoen over får like tall bokstaver, så du ser om rekkefølgen holder");
+    EXAM_EXTRA.subanagrams.oppgave += demoLink("bucket", "tracer-bucket", "bøttedemoen over viser hvorfor «legg bakerst, ta ut forfra» holder like nøkler i rekkefølge");
     EXAM_EXTRA.subanagrams.losning = losningMedKode(EXAM_EXTRA.subanagrams.losning, "sortSubanagrams",
       "Løsningen i pseudokode:");
     IN.examTasks("#exam-bucket", [EXAM_FALLBACK.bucket, EXAM_EXTRA.stabilitet, EXAM_EXTRA.subanagrams]);

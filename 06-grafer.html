@@ -15,9 +15,8 @@
   <main id="main" class="wrap">
     <div class="pagehead">
       <h1>Blokk 6 · Grafer</h1>
-      <p class="lead">Grafer modellerer alt som henger sammen: venner, veier, avhengigheter og nettverk.
-        Nesten alle grafoppgaver på eksamen løses med en håndfull algoritmer fra kurset – nøkkelen er å kjenne dem igjen.
-        Steg deg gjennom hver algoritme, se pseudokoden lyse opp, og lær kjøretiden og hvorfor.</p>
+      <p class="lead">Søk, rekkefølge, korteste vei, spenntrær og sammenheng – hver algoritme med stegvis demo, pseudokode, kjøretid og eksamensoppgaver.</p>
+      <details class="badge-fold" id="badge-fold" open><summary>16 eksamensoppgaver om grafer (H2020–H2025)</summary>
       <div class="badges">
         <span class="badge" data-go="begreper" data-card="h2020-3"><b>H2020</b> · Grafegenskaper · <span class="pts">8p</span></span>
         <span class="badge" data-go="mst" data-card="h2020-8"><b>H2020</b> · Fire typer grafer · <span class="pts">38p</span></span>
@@ -36,6 +35,7 @@
         <span class="badge" data-go="sykler" data-card="h2025-2"><b>H2025</b> · Sykler i grafer · <span class="pts">11p</span></span>
         <span class="badge" data-go="mst" data-card="h2025-6"><b>H2025</b> · Kollektivtilbudet i Oslo · <span class="pts">15p</span></span>
       </div>
+      </details>
     </div>
 
     <div class="tabs" role="tablist" aria-label="Emner om grafer">
@@ -53,7 +53,7 @@
 
     <!-- ===================== BEGREPER ===================== -->
     <section data-panel="begreper">
-      <div class="callout begrep"><span class="lbl">Begrep</span>
+      <div class="callout begrep"><span class="lbl">Begrep: graf, node og kant</span>
         <p>En <b>graf</b> G = (V, E) består av en mengde <b>noder</b> V og en mengde <b>kanter</b> E. En kant forbinder to noder.
           I en <b>urettet</b> graf skriver vi kanten som {u, v}, og den kan følges begge veier. I en <b>rettet</b> graf skriver vi (u, v), og den går bare fra u til v.
           To noder med en kant mellom seg er <b>naboer</b>. I en <b>vektet</b> graf har hver kant en vekt w(u, v), f.eks. avstand, tid eller pris.
@@ -71,9 +71,9 @@
       </div>
 
       <h3>Stier, sykler og sammenheng</h3>
-      <div class="callout begrep"><span class="lbl">Begrep</span>
+      <div class="callout begrep"><span class="lbl">Begrep: sti, sykel og sammenheng</span>
         <ul>
-          <li><b>Sti:</b> en følge noder forbundet av kanter, der ingen node gjentas. (En <b>vei</b> tillater at noder gjentas, men ikke kanter.)</li>
+          <li><b>Sti:</b> en følge noder forbundet av kanter, der ingen node gjentas. En <b>vei</b> er løsere: der er det bare kantene som ikke kan gjentas, så samme node kan dukke opp flere ganger. (Slik bruker forelesningen ordene.)</li>
           <li><b>Sykel:</b> en sti med minst tre noder der også første og siste node er forbundet. I en rettet graf må kantene peke «rundt», og da holder det med to noder (u → v → u).</li>
           <li><b>Asyklisk:</b> uten sykler. En rettet asyklisk graf kalles en <b>DAG</b>.</li>
           <li><b>Sammenhengende:</b> det finnes en sti mellom alle par av noder. En graf som ikke er det, faller i <b>komponenter</b>.</li>
@@ -90,23 +90,23 @@
         <div class="card"><h4 style="margin-top:.2rem">To komponenter</h4><div class="gv-mini" id="mini-komp"></div>
           <p class="muted small">Ikke sammenhengende: det finnes ingen sti fra A til E.</p></div>
       </div>
-      <div class="callout eli5"><span class="lbl">ELI5</span>
+      <div class="callout eli5"><span class="lbl">5-åring: et kart med byer</span>
         <p>Tenk på et kart over byer og veier. Byene er nodene, veiene er kantene. Enveiskjørte gater er rettede kanter.
           Står det hvor mange minutter det tar å kjøre en vei, er grafen vektet. Kan du kjøre fra hvilken som helst by til hvilken som helst annen, er grafen sammenhengende.</p>
       </div>
 
       <h3>Hvordan lagrer vi en graf?</h3>
       <div class="grid cols-2">
-        <div class="callout begrep" style="margin-top:0"><span class="lbl">Naboliste</span>
+        <div class="callout begrep"><span class="lbl">Naboliste</span>
           <p>For hver node lagrer vi en liste (eller mengde) med naboene. Plass O(|V| + |E|). Å gå gjennom naboene til u tar O(deg(u)).
             Det er dette alle kjøretidene i kurset forutsetter.</p></div>
-        <div class="callout begrep" style="margin-top:0"><span class="lbl">Nabomatrise</span>
+        <div class="callout begrep"><span class="lbl">Nabomatrise</span>
           <p>En |V| × |V|-tabell der M[u][v] sier om (u, v) ∈ E. Plass O(|V|²). «Er u og v naboer?» tar O(1), men å finne alle naboene til u tar O(|V|).</p></div>
       </div>
-      <div class="callout felle"><span class="lbl">Felle</span>
+      <div class="callout felle"><span class="lbl">Felle: nabomatrise gir ikke lineær tid</span>
         <p>Med nabomatrise blir BFS og DFS O(|V|²), ikke O(|V| + |E|), fordi hver node må sjekke en hel rad. Skriv hvilken representasjon du antar hvis det betyr noe.</p>
       </div>
-      <div class="callout uni"><span class="lbl">Universitetsnivå</span>
+      <div class="callout uni"><span class="lbl">Universitetsnivå: log(|E|) og log(|V|)</span>
         <p>I en enkel graf er |E| ≤ |V|². Derfor er log(|E|) ≤ 2 · log(|V|), og O(log(|E|)) = O(log(|V|)). Det er grunnen til at Dijkstra og Prim kan skrives med log(|V|) selv om prioritetskøen kan inneholde opptil |E| elementer.
           For en sammenhengende graf er |E| ≥ |V| − 1, så der er O(|V| + |E|) = O(|E|).</p>
       </div>
@@ -124,7 +124,7 @@
             <tr><td>Dijkstra</td><td data-tip="Høyst én innsetting per kant i prioritetskøen, og hver heap-operasjon er O(log(|V|)).">O((|V| + |E|) · log(|V|))</td><td>Korteste vei, vekter ≥ 0</td></tr>
             <tr><td>Bellman-Ford</td><td data-tip="|V| − 1 runder, og hver runde relakserer alle |E| kantene.">O(|V| · |E|)</td><td>Korteste vei med negative vekter, finner negative sykler</td></tr>
             <tr><td>Prim</td><td data-tip="Hver kant settes inn i og tas ut av prioritetskøen, O(log(|V|)) hver gang.">O(|E| · log(|V|))</td><td>Minimalt spenntre</td></tr>
-            <tr><td>Kruskal</td><td data-tip="Sorteringen av kantene dominerer: O(|E| · log(|E|)) = O(|E| · log(|V|)).">O(|E| · log(|V|))</td><td>Minimalt spenntre / spennskog</td></tr>
+            <tr><td>Kruskal</td><td data-tip="Forutsetter en rask «er u og v i samme tre?»-sjekk. Da dominerer sorteringen av kantene: O(|E| · log(|E|)) = O(|E| · log(|V|)).">O(|E| · log(|V|))</td><td>Minimalt spenntre / spennskog</td></tr>
             <tr><td>Sterkt sammenhengende komponenter</td><td data-tip="To dybde-først søk og én snuing av alle kantene.">O(|V| + |E|)</td><td>Grupper som kan nå hverandre</td></tr>
             <tr><td>Separasjonsnoder</td><td data-tip="Ett dybde-først søk med depth og low.">O(|V| + |E|)</td><td>2-sammenheng</td></tr>
             <tr><td>Naiv 2-sammenheng</td><td data-tip="Fjern hver node én gang og sjekk sammenheng med et søk: |V| søk à O(|V| + |E|).">O(|V| · (|V| + |E|))</td><td>Sammenligning: unngå på eksamen</td></tr>
@@ -132,11 +132,37 @@
         </table>
       </div>
 
+      <div id="historie">
+        <h3>Fra historie til graf</h3>
+        <p>På eksamen er grafen nesten aldri tegnet. Du får en historie om byer, venner, emner eller kabler, og må selv se grafen og velge algoritme. Still deg disse fem spørsmålene:</p>
+        <div class="callout snarvei"><span class="lbl">Sjekkliste: fem spørsmål</span>
+          <ol>
+            <li>Hva er <b>nodene</b>? (byer, personer, emner, kryss …)</li>
+            <li>Hva er <b>kantene</b>? (veier, vennskap, «må tas før» …)</li>
+            <li>Er kantene <b>rettet</b>? Går forbindelsen bare én vei?</li>
+            <li>Er kantene <b>vektet</b>? Kan en vekt være <b>negativ</b>?</li>
+            <li>Hva <b>spør</b> de om? Korteste vei, en rekkefølge, billigst å koble alt, eller om alt henger sammen?</li>
+          </ol>
+          <p>Når du har svart på de fem, er algoritmen nesten valgt:</p>
+          <ul>
+            <li>Uvektet, «færrest steg» eller «innen k ledd»: <b>BFS</b>.</li>
+            <li>Vektet, ingen negative vekter: <b>Dijkstra</b>. Negative vekter: <b>Bellman-Ford</b> (eller topologisk sortering i en DAG).</li>
+            <li>«Må komme før»: <b>topologisk sortering</b>.</li>
+            <li>«Koble sammen alt så billig som mulig»: <b>minimalt spenntre</b> (Prim eller Kruskal).</li>
+            <li>«Alt som kan nås fra …»: ett <b>søk</b> (BFS eller DFS).</li>
+            <li>«Kan alle nå alle?» i en rettet graf: <b>sterkt sammenhengende komponenter</b>. «Tåler at én node faller ut?»: <b>separasjonsnoder</b>.</li>
+          </ul>
+        </div>
+        <h4>Øv selv: åtte små historier</h4>
+        <p class="muted small">Tenk gjennom de fem spørsmålene før du velger. Forklaringen viser noder, kanter, retning, vekter og kjøretid.</p>
+        <div id="quiz-historie"></div>
+      </div>
+
       <h3>Eksamen</h3>
       <div id="exam-h2020-3"></div>
       <div id="exam-h2022-2"></div>
       <div id="exam-h2022-5"></div>
-      <div class="callout sensor"><span class="lbl">Sensortips</span>
+      <div class="callout sensor"><span class="lbl">Sensortips: begreper og kjøretider</span>
         <ul>
           <li>Begrepsoppgaver gir ofte 1p per linje. Sjekk definisjonen i hodet før du svarer: «tre» krever både sammenheng og ingen sykler.</li>
           <li>Kjøretider oppgis med |V| og |E|. Skriv O(|V| + |E|), ikke O(n).</li>
@@ -146,33 +172,35 @@
 
     <!-- ===================== BFS ===================== -->
     <section data-panel="bfs" hidden>
-      <div class="callout begrep"><span class="lbl">Begrep</span>
+      <div class="callout begrep"><span class="lbl">Begrep: bredde-først søk</span>
         <p><b>Bredde-først søk (BFS)</b> besøker grafen lag for lag: først startnoden, så alle naboene, så naboenes naboer, og så videre.
           En <b>kø</b> (først inn, først ut) holder styr på hvem som står for tur. Nodene merkes som besøkt når de oppdages, så ingen kommer i køen to ganger.</p>
       </div>
       <div id="intro-bfs"></div>
+      <div class="grid cols-2">
+        <div class="callout eli5"><span class="lbl">5-åring: ringer i vannet</span>
+          <p>Du kaster en stein i vannet. Ringene sprer seg utover: først de nærmeste, så de litt lenger unna. BFS sprer seg på samme måte fra startnoden.</p></div>
+        <div class="callout eksempel"><span class="lbl">Eksempel: avstand fra A</span>
+          <p>Fra A i eksempelgrafen under: A (0), så B og C (1), så D og E (2), så F (3) og til slutt G (4). Tallet er antall kanter fra A, og det er den korteste avstanden i antall kanter.</p></div>
+      </div>
       <h3>Steg for steg</h3>
       <div id="demo-bfs"></div>
-      <div class="grid cols-2">
-        <div class="callout eli5" style="margin-top:0"><span class="lbl">ELI5</span>
-          <p>Du kaster en stein i vannet. Ringene sprer seg utover: først de nærmeste, så de litt lenger unna. BFS sprer seg på samme måte fra startnoden.</p></div>
-        <div class="callout eksempel" style="margin-top:0"><span class="lbl">Eksempel</span>
-          <p>Fra A i eksempelgrafen: A (0), så B og C (1), så D og E (2), så F (3) og til slutt G (4). Tallet er antall kanter fra A, og det er den korteste avstanden i antall kanter.</p></div>
-      </div>
       <h3>Hele grafen: BFSFull</h3>
       <p class="muted small">BFSVisit når bare det som henger sammen med s. For å besøke alle nodene starter vi på nytt fra hver node som ikke er besøkt.</p>
       <div class="grid cols-2">
         <div id="pc-bfsfull"></div>
-        <div class="callout uni" style="margin-top:0"><span class="lbl">Universitetsnivå</span>
+        <div class="callout uni"><span class="lbl">Universitetsnivå: hvorfor korteste stier?</span>
           <p>BFS gir <b>korteste stier i uvektede grafer</b>: køen inneholder alltid noder på avstand d foran noder på avstand d + 1, så første gang vi oppdager en node, er det via en korteste sti.
             Lagrer vi forelderen til hver node når den oppdages, får vi BFS-treet, og stien leses baklengs fra målet. Med vekter holder ikke dette – da trengs Dijkstra.</p></div>
       </div>
-      <div class="callout felle"><span class="lbl">Felle</span>
+      <div class="callout felle"><span class="lbl">Felle: merk for sent</span>
         <p>Merk noden som besøkt når den <b>legges i køen</b>, ikke når den tas ut. Ellers kan samme node legges i køen mange ganger (én gang per nabo), og antall køoperasjoner kan bli O(|E|) i stedet for O(|V|).</p>
       </div>
+      <h4>Øv selv</h4>
+      <div id="quiz-bfs"></div>
       <h3>Eksamen</h3>
       <div id="exam-h2024-4"></div>
-      <div class="callout sensor"><span class="lbl">Sensortips</span>
+      <div class="callout sensor"><span class="lbl">Sensortips (H2024): «innen k ledd»</span>
         <ul>
           <li>«Innen k ledd», «nærmeste først» eller «færrest mulig steg» i en uvektet graf: tenk BFS.</li>
           <li>Glemmer du begrensningen (her k), trekker sensor poeng selv om resten er riktig.</li>
@@ -182,18 +210,22 @@
 
     <!-- ===================== DFS ===================== -->
     <section data-panel="dfs" hidden>
-      <div class="callout begrep"><span class="lbl">Begrep</span>
+      <div class="callout begrep"><span class="lbl">Begrep: dybde-først søk</span>
         <p><b>Dybde-først søk (DFS)</b> går så langt som mulig langs én sti før det snur. Når en node ikke har flere ubesøkte naboer, går vi tilbake til forrige node og prøver neste nabo der.
           DFS skrives naturlig rekursivt – kallstakken er stakken som husker hvor vi skal tilbake.</p>
       </div>
       <div id="intro-dfs"></div>
+      <div class="callout eli5"><span class="lbl">5-åring: labyrint med garnnøste</span>
+        <p>Du går inn i en labyrint med et garnnøste. Du går så langt du kan i én retning. Møter du en blindvei, ruller du opp garnet tilbake til forrige kryss og prøver en gang du ikke har gått før.
+          Kritt på veggen viser hvor du har vært, så du ikke går samme vei to ganger.</p>
+      </div>
       <h3>Steg for steg</h3>
       <p class="muted small">Demoen kjører DFSFull: når DFSVisit er ferdig og noen noder ikke er nådd, starter den på nytt fra neste ubesøkte node. Prøv eksempelet «To komponenter».</p>
       <div id="demo-dfs"></div>
       <h3>Hele grafen: DFSFull</h3>
       <div class="grid cols-2">
         <div id="pc-dfsfull"></div>
-        <div class="callout uni" style="margin-top:0"><span class="lbl">Universitetsnivå</span>
+        <div class="callout uni"><span class="lbl">Universitetsnivå: komponenter og postorder</span>
           <p>I en urettet graf starter den ytre løkka i DFSFull ett nytt søk per <b>sammenhengende komponent</b>. Tell kallene, så har du antall komponenter.
             Rekkefølgen nodene blir <i>ferdige</i> i (postorder), er grunnlaget for topologisk sortering med DFS og for sterkt sammenhengende komponenter.</p></div>
       </div>
@@ -210,13 +242,16 @@
           </tbody>
         </table>
       </div>
-      <div class="callout felle"><span class="lbl">Felle</span>
+      <div class="callout felle"><span class="lbl">Felle: rekkefølgen på naboene</span>
         <p>Rekkefølgen avhenger av hvilken rekkefølge naboene ligger i. På eksamen står det ofte at naboene behandles alfabetisk – gjør det, ellers får du en annen (men også gyldig) rekkefølge.</p>
       </div>
+      <h4>Øv selv: sett linjene i DFSVisit i riktig rekkefølge</h4>
+      <div id="parsons-dfs"></div>
+      <div id="quiz-dfs"></div>
       <h3>Eksamen</h3>
       <div id="exam-h2022-7"></div>
       <div id="exam-h2021-11"></div>
-      <div class="callout sensor"><span class="lbl">Sensortips</span>
+      <div class="callout sensor"><span class="lbl">Sensortips: felles visited</span>
         <ul>
           <li>Del visited mellom alle søkene. Et nytt visited per startnode gjør løsningen kvadratisk, og sensor trekker for det.</li>
           <li>«Alt som kan nås fra …» er et søk. Det spiller sjelden noen rolle om du velger BFS eller DFS.</li>
@@ -226,36 +261,39 @@
 
     <!-- ===================== TOPOLOGISK SORTERING ===================== -->
     <section data-panel="topologisk" hidden>
-      <div class="callout begrep"><span class="lbl">Begrep</span>
+      <div class="callout begrep"><span class="lbl">Begrep: topologisk ordning og inngrad</span>
         <p>En <b>topologisk ordning</b> av en rettet graf er en rekkefølge av alle nodene slik at u kommer før v for hver kant (u, v). Den finnes hvis og bare hvis grafen er en <b>DAG</b>.
           <b>Inngraden</b> til en node er antall kanter som går inn til den. En node med inngrad 0 har ingen forgjengere og kan komme først.</p>
       </div>
       <div id="intro-topologisk"></div>
+      <div class="grid cols-2">
+        <div class="callout eli5"><span class="lbl">5-åring: kle på seg</span>
+          <p>Du skal kle på deg. Sokkene må på før skoene, og buksa før beltet. Du starter med noe som ikke venter på noe annet, og hver gang du er ferdig med et plagg, blir kanskje et nytt plagg «klart».</p></div>
+        <div class="callout eksempel"><span class="lbl">Eksempel: mange riktige svar</span>
+          <p>Demoen under gir B, D, F, A, C, E, G. A, B, C, D, E, F, G er også gyldig. En DAG kan ha mange topologiske ordninger – alle er riktige svar.</p></div>
+      </div>
       <h3>Steg for steg</h3>
       <p class="muted small">Eksempel: emner (A–G) med forkunnskapskrav. En kant (u, v) betyr at u må tas før v. Prøv også «Med sykel».</p>
       <div id="demo-topsort"></div>
-      <div class="grid cols-2">
-        <div class="callout eli5" style="margin-top:0"><span class="lbl">ELI5</span>
-          <p>Du skal kle på deg. Sokkene må på før skoene, og buksa før beltet. Du starter med noe som ikke venter på noe annet, og hver gang du er ferdig med et plagg, blir kanskje et nytt plagg «klart».</p></div>
-        <div class="callout eksempel" style="margin-top:0"><span class="lbl">Eksempel</span>
-          <p>Demoen gir B, D, F, A, C, E, G. A, B, C, D, E, F, G er også gyldig. En DAG kan ha mange topologiske ordninger – alle er riktige svar.</p></div>
-      </div>
       <h3>Med dybde-først søk</h3>
       <p class="muted small">Kurset viser også en DFS-variant: push hver node på en stakk når den er <b>ferdig</b>. Tar du dem av fra toppen, kommer de i topologisk rekkefølge.</p>
       <div class="grid cols-2">
         <div><h4 style="margin:.2rem 0 .4rem">DFSTopSort</h4><div id="pc-dfstopsort"></div></div>
         <div><h4 style="margin:.2rem 0 .4rem">DFSVisit (pusher når ferdig)</h4><div id="pc-dfsvisitstack"></div></div>
       </div>
-      <div class="callout uni"><span class="lbl">Universitetsnivå</span>
+      <div class="callout uni"><span class="lbl">Universitetsnivå: korteste vei i en DAG</span>
         <p><b>Korteste vei i en DAG</b> (også med negative vekter): gå gjennom nodene i topologisk rekkefølge og relakser kantene ut fra hver node.
           Når vi kommer til u, er alle stier inn til u allerede behandlet, så dist[u] er riktig. Totalt O(|V| + |E|), raskere enn både Dijkstra og Bellman-Ford.</p>
       </div>
-      <div class="callout felle"><span class="lbl">Felle</span>
+      <div class="callout felle"><span class="lbl">Felle: DFS-varianten ser ikke sykler</span>
         <p>DFS-varianten sjekker ikke selv om grafen har en sykel – den gir bare en rekkefølge. Varianten med inngrader oppdager sykelen gratis: |output| &lt; |V|.</p>
       </div>
+      <h4>Øv selv: sett linjene i TopSort i riktig rekkefølge</h4>
+      <div id="parsons-topsort"></div>
+      <div id="quiz-topologisk"></div>
       <h3>Eksamen</h3>
       <div id="exam-h2021-13"></div>
-      <div class="callout sensor"><span class="lbl">Sensortips</span>
+      <div class="callout sensor"><span class="lbl">Sensortips (H2021): prioritetskø blant de klare</span>
         <ul>
           <li>«u må komme før v» er topologisk sortering. Er det i tillegg et kriterium for hvem som skal velges blant de klare, bytt stakken ut med en prioritetskø.</li>
         </ul>
@@ -264,19 +302,19 @@
 
     <!-- ===================== KORTESTE VEI ===================== -->
     <section data-panel="dijkstra" hidden>
-      <div class="callout begrep"><span class="lbl">Begrep</span>
+      <div class="callout begrep"><span class="lbl">Begrep: korteste vei og relaksering</span>
         <p>Lengden av en sti i en vektet graf er summen av vektene langs den. <b>Korteste vei</b> fra s til v er stien med lavest sum, og dist[v] er lengden av den.
           Å <b>relaksere</b> en kant (u, v) betyr å sjekke om veien via u er kortere enn det vi vet om v: er dist[u] + w(u, v) &lt; dist[v], oppdaterer vi dist[v].</p>
       </div>
       <div id="intro-dijkstra"></div>
+      <div class="grid cols-2">
+        <div class="callout eli5"><span class="lbl">5-åring: vann i rør</span>
+          <p>Du heller vann i startnoden. Vannet renner langs rørene, og lange rør tar lengre tid. Dijkstra skriver opp når vannet kommer fram til hver node – den første gangen er den raskeste.</p></div>
+        <div class="callout eksempel"><span class="lbl">Eksempel: avstander fra A</span>
+          <p>I den urettede grafen under, fra A: C = 2, B = 3 (via C, ikke den direkte kanten med vekt 4), D = 8, E = 10, F = 13. Steg gjennom demoen og se at avstandene blir endelige i akkurat denne rekkefølgen.</p></div>
+      </div>
       <h3>Dijkstra steg for steg</h3>
       <div id="demo-dijkstra"></div>
-      <div class="grid cols-2">
-        <div class="callout eli5" style="margin-top:0"><span class="lbl">ELI5</span>
-          <p>Du heller vann i startnoden. Vannet renner langs rørene, og lange rør tar lengre tid. Dijkstra skriver opp når vannet kommer fram til hver node – den første gangen er den raskeste.</p></div>
-        <div class="callout eksempel" style="margin-top:0"><span class="lbl">Eksempel</span>
-          <p>Fra A: C = 2, B = 3 (via C, ikke den direkte kanten med vekt 4), D = 8, E = 10, F = 13. Her blir treet av korteste stier tilfeldigvis likt det minimale spenntreet, men det gjelder ikke generelt: i en trekant med A–B 2, B–C 2 og A–C 3 bruker korteste stier fra A kanten A–C (totalvekt 5), mens det minimale spenntreet bruker A–B og B–C (totalvekt 4).</p></div>
-      </div>
 
       <h3>Negative vekter: Bellman-Ford</h3>
       <div class="grid cols-2">
@@ -284,13 +322,13 @@
           <div class="gv-mini" id="fig-neg"></div>
           <p class="muted small">Dijkstra fra S gjør A ferdig med dist 2 før den ser kanten B → A med vekt −4. Senere oppdateres dist[A] til 1, men da er C allerede ferdig med 3. Riktig svar er 2 (S → B → A → C).</p>
         </div>
-        <div class="callout felle" style="margin-top:0"><span class="lbl">Felle</span>
+        <div class="callout felle"><span class="lbl">Felle: Dijkstra og negative vekter</span>
           <p>Dijkstra forutsetter at ingen vekter er negative. Med negative vekter kan en node som alt er «ferdig», få en kortere vei senere, og svaret kan bli feil.
             Å legge til en konstant på alle vektene hjelper ikke: det straffer stier med mange kanter.</p></div>
       </div>
       <div class="grid cols-2">
         <div><h4 style="margin:.2rem 0 .4rem">BellmanFord</h4><div id="pc-bellman"></div></div>
-        <div class="callout uni" style="margin-top:0"><span class="lbl">Universitetsnivå</span>
+        <div class="callout uni"><span class="lbl">Universitetsnivå: hvorfor |V| − 1 runder?</span>
           <p>Bellman-Ford relakserer <i>alle</i> kantene |V| − 1 ganger. Etter runde i er dist riktig for noder med en korteste sti på høyst i kanter.
             En ekstra runde avslører <b>negative sykler</b>: blir noe fortsatt kortere, kan vi gå rundt i sykelen og gjøre veien vilkårlig kort – da finnes det ingen korteste vei.
             I en urettet graf blir hver kant to rettede kanter, så én negativ kant {u, v} er i seg selv en negativ sykel (u → v → u).</p></div>
@@ -308,36 +346,41 @@
           </tbody>
         </table>
       </div>
+      <h4>Øv selv</h4>
+      <div id="quiz-dijkstra"></div>
       <h3>Eksamen</h3>
       <div id="exam-h2021-7"></div>
-      <div class="callout sensor"><span class="lbl">Sensortips</span>
+      <div class="callout sensor"><span class="lbl">Sensortips: velg raskeste algoritme som virker</span>
         <ul>
           <li>Velg den <i>raskeste</i> algoritmen som virker. Bellman-Ford virker på alt uten negative sykler, men er sjelden svaret.</li>
           <li>«Korteste vei til ett mål fra mange startsteder»: snu kantene og kjør Dijkstra én gang fra målet.</li>
+          <li>«Korteste vei fra s til t som er innom m» (ukeoppgave): kjør Dijkstra fra s og fra m, og svar dist<sub>s</sub>[m] + dist<sub>m</sub>[t]. To kjøringer gir samme kjøretid, O((|V| + |E|) · log(|V|)).</li>
         </ul>
       </div>
     </section>
 
     <!-- ===================== MINIMALE SPENNTRÆR ===================== -->
     <section data-panel="mst" hidden>
-      <div class="callout begrep"><span class="lbl">Begrep</span>
+      <div class="callout begrep"><span class="lbl">Begrep: spenntre og minimalt spenntre</span>
         <p>Et <b>spenntre</b> for en sammenhengende, urettet graf er et tre som inneholder alle nodene og bare kanter fra grafen. Det har |V| − 1 kanter.
           Et <b>minimalt spenntre</b> er et spenntre med lavest mulig sum av vekter. Er grafen ikke sammenhengende, får vi i stedet en <b>spennskog</b>: ett spenntre per komponent.
           Både Prim og Kruskal er <b>grådige</b>: de tar alltid den billigste kanten som er lov.</p>
       </div>
       <div id="intro-mst"></div>
+      <div class="callout eli5"><span class="lbl">5-åring: strøm til alle husene</span>
+        <p>Alle husene i en bygd skal få strøm, og hver mulig kabel har en pris. Du vil bruke minst mulig penger.
+          Prim starter i ett hus og kobler hele tiden på den billigste kabelen fra nettet til et hus som ikke har strøm ennå.
+          Kruskal kjøper de billigste kablene først, men aldri en kabel mellom to hus som alt har strøm fra samme nett – den ville bare laget en ring.</p>
+      </div>
       <h3>Prim steg for steg</h3>
       <p class="muted small">Prim lar ett tre vokse fra en startnode. Hver gang tar den den letteste kanten som går ut av treet.</p>
       <div id="demo-prim"></div>
       <h3>Kruskal steg for steg</h3>
       <p class="muted small">Kruskal ser på alle kantene, sortert fra lettest til tyngst, og tar med hver kant som ikke lager en sykel. Kurset beskriver Kruskal med ord; pseudokoden er vår egen.</p>
       <div id="demo-kruskal"></div>
-      <div class="grid cols-2">
-        <div class="callout eli5" style="margin-top:0"><span class="lbl">ELI5</span>
-          <p>Alle husene i en bygd skal få strøm, og hver kabel har en pris. Du vil bruke minst mulig penger. Prim starter i ett hus og kobler på det billigste naboen hver gang. Kruskal kjøper de billigste kablene først, men aldri en kabel mellom to hus som alt har strøm fra samme nett.</p></div>
-        <div class="callout uni" style="margin-top:0"><span class="lbl">Universitetsnivå</span>
-          <p>Hvorfor er grådig trygt her? Del nodene i to grupper på hvilken som helst måte. Den letteste kanten mellom gruppene kan alltid være med i et minimalt spenntre: bytter vi den inn for en tyngre kant mellom gruppene, blir treet ikke dyrere.
-            Prim bruker dette med «treet» og «resten» som gruppene. Kruskal bruker det med de to trærne kanten kobler sammen.</p></div>
+      <div class="callout uni"><span class="lbl">Universitetsnivå: hvorfor grådig er trygt</span>
+        <p>Hvorfor er grådig trygt her? Del nodene i to grupper på hvilken som helst måte. Den letteste kanten mellom gruppene kan alltid være med i et minimalt spenntre: bytter vi den inn for en tyngre kant mellom gruppene, blir treet ikke dyrere.
+          Prim bruker dette med «treet» og «resten» som gruppene. Kruskal bruker det med de to trærne kanten kobler sammen.</p>
       </div>
       <div class="table-wrap">
         <table class="cmp-table">
@@ -350,15 +393,19 @@
           </tbody>
         </table>
       </div>
-      <div class="callout felle"><span class="lbl">Felle</span>
-        <p>Er flere kanter like tunge, kan det finnes flere minimale spenntrær med samme totalvekt. Er alle vektene ulike, er det minimale spenntreet entydig.
-          Og: et minimalt spenntre gir ikke korteste veier. Stien mellom to noder i treet kan være mye lengre enn den korteste veien i grafen.</p>
+      <div class="callout felle"><span class="lbl">Felle: entydighet, og MST er ikke korteste vei</span>
+        <p>Er flere kanter like tunge, kan det finnes flere minimale spenntrær med samme totalvekt. Er alle vektene ulike, er det minimale spenntreet entydig.</p>
+        <p>Et minimalt spenntre gjør summen av <i>alle</i> kantene minst. Det sier ingenting om at stien mellom to bestemte noder i treet er kortest.
+          Eksempel: en trekant med A–B 2, B–C 2 og A–C 3. Det minimale spenntreet er A–B og B–C (totalvekt 4), og der er stien fra A til C 4 lang.
+          Korteste vei fra A til C er den direkte kanten med vekt 3, så treet av korteste stier fra A er A–B og A–C (totalvekt 5).</p>
       </div>
+      <h4>Øv selv</h4>
+      <div id="quiz-mst"></div>
       <h3>Eksamen</h3>
       <div id="exam-h2023-6"></div>
       <div id="exam-h2025-6"></div>
       <div id="exam-h2020-8"></div>
-      <div class="callout sensor"><span class="lbl">Sensortips</span>
+      <div class="callout sensor"><span class="lbl">Sensortips: «billigst å koble sammen alt»</span>
         <ul>
           <li>«Billigst mulig å koble sammen alt» = minimalt spenntre. Nevn algoritmen, datastrukturen (prioritetskø) og kjøretiden.</li>
           <li>Dijkstra løser et annet problem. Å svare Dijkstra på et spenntreproblem gir få eller ingen poeng.</li>
@@ -368,28 +415,30 @@
 
     <!-- ===================== STERKT SAMMENHENGENDE KOMPONENTER ===================== -->
     <section data-panel="scc" hidden>
-      <div class="callout begrep"><span class="lbl">Begrep</span>
+      <div class="callout begrep"><span class="lbl">Begrep: sterkt sammenhengende komponent</span>
         <p>En rettet graf er <b>sterkt sammenhengende</b> hvis det finnes en sti fra hver node til hver annen node, i riktig retning.
           En <b>sterkt sammenhengende komponent</b> er en største mulig gruppe noder der alle kan nå alle. Hver node ligger i nøyaktig én slik komponent (kanskje alene).
           Slår vi sammen hver komponent til én node, får vi <b>komponentgrafen</b>, og den er alltid en DAG.</p>
       </div>
       <div id="intro-scc"></div>
+      <div class="grid cols-2">
+        <div class="callout eli5"><span class="lbl">5-åring: enveiskjørte gater</span>
+          <p>I en by med bare enveiskjørte gater er en «gruppe» noen kryss der du kan kjøre fra hvilket som helst av dem til hvilket som helst annet og hjem igjen. Algoritmen finner alle slike grupper.</p></div>
+        <div class="callout eksempel"><span class="lbl">Eksempel: tre komponenter</span>
+          <p>I demoen under er komponentene {A, B, C}, {G, H} og {D, E, F}. Komponentgrafen har kantene {A, B, C} → {D, E, F}, {A, B, C} → {G, H} og {G, H} → {D, E, F}.</p></div>
+      </div>
       <h3>Steg for steg (Kosaraju)</h3>
       <p class="muted small">Fase 1: dybde-først søk som pusher nodene når de er ferdige. Fase 2: snu alle kantene, og kjør dybde-først søk i rekkefølgen fra stakken. Hvert søk finner én komponent.</p>
       <div id="demo-scc"></div>
-      <div class="grid cols-2">
-        <div class="callout eli5" style="margin-top:0"><span class="lbl">ELI5</span>
-          <p>I en by med bare enveiskjørte gater er en «gruppe» noen kryss der du kan kjøre fra hvilket som helst av dem til hvilket som helst annet og hjem igjen. Algoritmen finner alle slike grupper.</p></div>
-        <div class="callout eksempel" style="margin-top:0"><span class="lbl">Eksempel</span>
-          <p>I demoen er komponentene {A, B, C}, {G, H} og {D, E, F}. Komponentgrafen har kantene {A, B, C} → {D, E, F}, {A, B, C} → {G, H} og {G, H} → {D, E, F}.</p></div>
-      </div>
-      <div class="callout felle"><span class="lbl">Felle</span>
+      <div class="callout felle"><span class="lbl">Felle: naivt søk og feil rekkefølge</span>
         <p>Å kjøre et søk fra hver node og sjekke hvem som når hverandre, er O(|V| · (|V| + |E|)). Kosaraju er O(|V| + |E|). Rekkefølgen i andre fase må være fra <i>toppen</i> av stakken.</p>
       </div>
+      <h4>Øv selv</h4>
+      <div id="quiz-scc"></div>
       <h3>Eksamen</h3>
       <div id="exam-h2024-8"></div>
       <div id="exam-h2022-11"></div>
-      <div class="callout sensor"><span class="lbl">Sensortips</span>
+      <div class="callout sensor"><span class="lbl">Sensortips: rundturer og grupper</span>
         <ul>
           <li>«Grupper der alle kan nå alle», «rundturer» og «sykler i en rettet graf» peker mot sterkt sammenhengende komponenter.</li>
           <li>En komponent med bare én node er ikke en sykel (uten løkker). Ta den ikke med når du skal finne sykler.</li>
@@ -399,28 +448,31 @@
 
     <!-- ===================== SYKLER ===================== -->
     <section data-panel="sykler" hidden>
-      <div class="callout begrep"><span class="lbl">Begrep</span>
+      <div class="callout begrep"><span class="lbl">Begrep: sykel i urettet og rettet graf</span>
         <p>En <b>sykel</b> er en sti som kommer tilbake til der den startet. I en urettet graf må den ha minst tre noder – å gå fram og tilbake langs samme kant teller ikke.
           I en rettet graf må kantene peke rundt, og to noder holder (u → v → u). Urettede og rettede grafer trenger ulike algoritmer.</p>
       </div>
       <div id="intro-sykler"></div>
+      <div class="callout eli5"><span class="lbl">5-åring: merket i skogen</span>
+        <p>Du går tur i skogen og setter et merke på hvert tre du passerer. Plutselig står du ved et merke du selv satte tidligere – og det er ikke treet du nettopp gikk forbi. Da vet du at du har gått i ring.</p>
+      </div>
       <h3>Urettet graf: dybde-først søk med forelder</h3>
       <p class="muted small">Møter vi en besøkt nabo som ikke er noden vi kom fra, har vi gått i ring.</p>
       <div id="demo-cyc-u"></div>
       <div class="grid cols-2">
         <div><h4 style="margin:.2rem 0 .4rem">HasCycle (ytre løkke)</h4><div id="pc-hascycle"></div></div>
-        <div class="callout uni" style="margin-top:0"><span class="lbl">Universitetsnivå</span>
+        <div class="callout uni"><span class="lbl">Universitetsnivå: tell kanter</span>
           <p>Alternativ uten søk etter sykelen selv: en skog med c komponenter har nøyaktig |V| − c kanter. Tell komponentene med DFSFull. Er |E| &gt; |V| − c, finnes det en sykel. Begge metodene er O(|V| + |E|).</p></div>
       </div>
       <h3>Rettet graf: topologisk sortering som teller</h3>
       <p class="muted small">Noder på en sykel venter på hverandre og får aldri inngrad 0. Teller vi hvor mange som blir behandlet, er svaret «sykel» hvis det er færre enn |V|.</p>
       <div id="demo-cyc-d"></div>
-      <div class="callout uni"><span class="lbl">Universitetsnivå</span>
+      <div class="callout uni"><span class="lbl">Universitetsnivå: tre tilstander</span>
         <p>Et alternativ er DFS med <b>tre tilstander</b>: ubesøkt, «på stakken» (påbegynt) og ferdig. Møter vi en node som er på stakken, har vi funnet en kant tilbake til en forfeder, altså en sykel.
           En vanlig visited-mengde holder ikke i rettede grafer: en ferdig node kan nås fra flere kanter uten at det finnes en sykel (som i en diamant A → B → D, A → C → D).
           Du kan også bruke sterkt sammenhengende komponenter: det finnes en sykel hvis og bare hvis en komponent har mer enn én node (når grafen ikke har løkker).</p>
       </div>
-      <div class="callout felle"><span class="lbl">Felle</span>
+      <div class="callout felle"><span class="lbl">Felle: forelderen, diamanter og flere komponenter</span>
         <ul>
           <li>Urettet: glemmer du å hoppe over forelderen, svarer algoritmen «sykel» for alle grafer med minst én kant.</li>
           <li>Rettet: å bruke urettet-algoritmen gir feil svar for diamanter.</li>
@@ -430,7 +482,7 @@
       <h3>Eksamen</h3>
       <div id="exam-h2025-2"></div>
       <div id="exam-h2023-7"></div>
-      <div class="callout sensor"><span class="lbl">Sensortips</span>
+      <div class="callout sensor"><span class="lbl">Sensortips: ett søk, ikke ett per node</span>
         <ul>
           <li>Et nytt søk fra hver node (med nytt visited hver gang) gir O(|V| · (|V| + |E|)) og bare delvis uttelling.</li>
           <li>Bruker du en algoritme fra kurset, forklar kort hvordan den virker hvis oppgaven ber om det.</li>
@@ -440,12 +492,16 @@
 
     <!-- ===================== 2-SAMMENHENG ===================== -->
     <section data-panel="sammenheng" hidden>
-      <div class="callout begrep"><span class="lbl">Begrep</span>
+      <div class="callout begrep"><span class="lbl">Begrep: separasjonsnode og 2-sammenheng</span>
         <p>En <b>separasjonsnode</b> er en node som gjør grafen usammenhengende hvis vi fjerner den (sammen med kantene dens).
           En sammenhengende graf er <b>2-sammenhengende</b> hvis den ikke har noen separasjonsnoder: uansett hvilken node som faller ut, henger resten sammen.
           Mer generelt er en graf <b>k-sammenhengende</b> hvis den henger sammen selv om vi fjerner hvilke som helst k − 1 noder.</p>
       </div>
       <div id="intro-sammenheng"></div>
+      <div class="callout eli5"><span class="lbl">5-åring: byen alle veiene går gjennom</span>
+        <p>Tenk på et veinett. Henger det sammen, kan du kjøre fra hvilken som helst by til hvilken som helst annen. En separasjonsnode er en by som alle veiene mellom to deler av landet går gjennom.
+          Stenger du den byen, blir landet delt i to.</p>
+      </div>
 
       <h3>Komponenter</h3>
       <p>Antall komponenter i en urettet graf finner vi med DFSFull eller BFSFull: hvert nytt søk fra den ytre løkka er en ny komponent. Gi hver node nummeret til søket som fant den, så vet vi også hvilken komponent hver node er i.
@@ -460,7 +516,8 @@
       </div>
 
       <h3>Separasjonsnoder i lineær tid</h3>
-      <p class="muted small">Ett dybde-først søk holder. depth[u] er dybden i DFS-treet. low[u] er den laveste dybden vi kan nå fra subtreet til u ved å bruke én kant som ikke er med i DFS-treet.</p>
+      <p class="muted small">Ett dybde-først søk holder. <b>depth[u]</b> er dybden til u i DFS-treet (roten har dybde 0).
+        <b>low[u]</b> svarer på spørsmålet: hvor høyt opp i DFS-treet kan vi komme hvis vi starter i u, går nedover i subtreet til u og så tar én kant som ikke er med i treet? «Høyt» betyr lav dybde, så low[u] er den laveste dybden vi kan nå slik.</p>
       <div class="grid cols-2">
         <div><h4 style="margin:.2rem 0 .4rem">SeparationVertices</h4><div id="pc-sep"></div></div>
         <div><h4 style="margin:.2rem 0 .4rem">Visit</h4><div id="pc-sepvisit"></div></div>
@@ -468,13 +525,14 @@
       <details class="card" style="margin-top:.6rem"><summary><b>Koden, linje for linje</b> (SeparationVertices og Visit)</summary>
         <div id="exp-sep"></div><div id="exp-sepvisit"></div>
       </details>
-      <div class="callout uni"><span class="lbl">Universitetsnivå</span>
-        <p>Hvorfor virker low? En node u (ikke roten) er en separasjonsnode nøyaktig når den har et barn v i DFS-treet der ingen node i subtreet til v har en kant til en node <i>over</i> u. Det er det depth[u] ≤ low[v] sier.
-          <code>IsBiconnected(G)</code> er da bare «er SeparationVertices(G) tom?». Den naive metoden – fjern hver node og sjekk sammenheng – er O(|V| · (|V| + |E|)).</p>
+      <div class="callout uni"><span class="lbl">Universitetsnivå: hvorfor low virker</span>
+        <p>Se på en node u (ikke roten) og et barn v av u i DFS-treet. Har ingen node nede i subtreet til v en kant som går høyere opp enn u, er u den eneste forbindelsen mellom subtreet og resten av grafen. Fjerner vi u, faller subtreet av. Det er akkurat det testen depth[u] ≤ low[v] sjekker.
+          Roten behandles for seg: den er en separasjonsnode bare hvis den har minst to barn i DFS-treet.</p>
+        <p><code>IsBiconnected(G)</code> er da bare «er SeparationVertices(G) tom?». Den naive metoden – fjern hver node og sjekk sammenheng – er O(|V| · (|V| + |E|)).</p>
       </div>
       <h3>Eksamen</h3>
       <div id="exam-h2021-12"></div>
-      <div class="callout sensor"><span class="lbl">Sensortips</span>
+      <div class="callout sensor"><span class="lbl">Sensortips: 2-sammenheng og komponenter</span>
         <ul>
           <li>«Det skal finnes en alternativ rute uansett hvilken node som faller ut» = 2-sammenheng. Nevn separasjonsnoder og kjøretiden O(|V| + |E|).</li>
           <li>Komponenter: én felles visited, ett søk per komponent.</li>
@@ -649,7 +707,9 @@
 
     /* ===================== MST ===================== */
     IN.explain("#intro-mst", t(
-      "Vi vil koble sammen alle punktene med billigst mulig tråder, uten å kaste bort tråd på ringer.",
+      "<p>Kommunen skal koble alle husene til strømnettet, og hver mulig kabel har en pris. Alle husene skal henge sammen, men vi vil ikke kaste bort penger på ekstra kabler som lager ringer.</p>" +
+      "<ul><li><b>Prim</b> vokser fra ett hus og tar alltid den billigste kabelen ut til et hus som ikke er koblet til ennå.</li>" +
+      "<li><b>Kruskal</b> ser på alle kablene fra billigst til dyrest og tar med hver kabel som ikke lager en ring.</li></ul>",
       "Et minimalt spenntre kobler sammen alle nodene med lavest mulig totalvekt. Prim lar ett tre vokse med den letteste kanten ut av treet. Kruskal tar kantene i stigende rekkefølge og hopper over dem som lager sykler. Begge er O(|E| · log(|V|)).",
       "Begge bygger på samme faktum: den letteste kanten mellom to deler av nodene kan alltid være med i et minimalt spenntre. Prim trenger en prioritetskø; Kruskal trenger sortering og en rask måte å sjekke «samme tre?»."
     ), { label: "Nivå:" });
@@ -668,7 +728,9 @@
 
     /* ===================== SYKLER ===================== */
     IN.explain("#intro-sykler", t(
-      "En sykel er en rundtur: du kan gå i ring og komme tilbake der du startet.",
+      "<p>En sykel er en rundtur: du følger kantene og kommer tilbake dit du startet. Vi finner den med et dybde-først søk.</p>" +
+      "<ul><li><b>Urettet graf:</b> møter vi en node vi har besøkt før, og den ikke er den vi nettopp kom fra, har vi gått i ring.</li>" +
+      "<li><b>Rettet graf:</b> der er det lurere å telle. Noder som står i ring, venter på hverandre og blir aldri «klare». Blir noen aldri klare, finnes det en ring.</li></ul>",
       "Urettet: dybde-først søk, og hopp over kanten tilbake til forelderen. Møter vi en annen besøkt nabo, er det en sykel. Rettet: tell hvor mange noder topologisk sortering får behandlet. Begge er O(|V| + |E|).",
       "I en urettet graf er hver kant som ikke er med i DFS-treet, en kant tilbake til en forfeder, og den lukker en sykel. I en rettet graf kan en kant til en ferdig node være helt uskyldig, så der trengs tre tilstander eller inngradsmetoden."
     ), { label: "Nivå:" });
@@ -682,7 +744,7 @@
     IN.explain("#intro-sammenheng", t(
       "Er det en bro i nettet som alt avhenger av? Hvis én person i en vennegjeng er den eneste som kjenner folk i to grupper, faller gjengen fra hverandre når hun ikke kommer.",
       "En separasjonsnode er en node som deler grafen i flere deler hvis den fjernes. En graf uten slike er 2-sammenhengende. De finnes med ett dybde-først søk som holder styr på depth og low: O(|V| + |E|).",
-      "2-sammenheng betyr at det finnes to stier mellom hvert par av noder som ikke deler noen andre noder. Kurset finner separasjonsnodene med depth/low i ett DFS. Roten behandles for seg: den er en separasjonsnode hvis den har mer enn ett barn i DFS-treet."
+      "Kurset definerer 2-sammenheng via separasjonsnoder: grafen er sammenhengende, og ingen enkeltnode kan dele den. Separasjonsnodene finnes med depth og low i ett DFS. Roten behandles for seg: den er en separasjonsnode hvis den har mer enn ett barn i DFS-treet. (Ekstra, ikke pensum: med minst tre noder er det det samme som at hvert par av noder har to stier mellom seg som ikke deler andre noder.)"
     ), { label: "Nivå:" });
     pcBlock("#pc-sep", "sepVertices", "#exp-sep");
     pcBlock("#pc-sepvisit", "sepVisit", "#exp-sepvisit");
@@ -724,6 +786,103 @@
       });
       draw();
     })();
+
+    /* ===================== ØV SELV: quiz og Parsons ===================== */
+    // Sidehodet: eksamensmerkene foldes sammen på smale skjermer (åpne som standard på desktop)
+    (function () {
+      var f = qs("#badge-fold");
+      try { if (f && window.matchMedia && matchMedia("(max-width: 640px)").matches) f.open = false; } catch (e) {}
+    })();
+
+    // Fra historie til graf (Begreper). Historiene er omskrevne mønstre fra eksamen og ukeoppgaver.
+    IN.quiz("#quiz-historie", [
+      { q: "<b>Fly.</b> Et flyselskap har ruter mellom byer. Noen ruter går bare én vei, og hver rute har en pris. Hva er den billigste reisen fra Oslo til Tromsø?",
+        options: ["Bredde-først søk", "Dijkstra", "Minimalt spenntre", "Topologisk sortering"], answer: 1,
+        explain: "<b>Noder:</b> byer. <b>Kanter:</b> ruter, <b>rettet</b> (noen går bare én vei) og <b>vektet</b> med pris, ingen negative priser. «Billigst fra A til B» er korteste vei med vekter ≥ 0: <b>Dijkstra</b> fra Oslo, O((|V| + |E|) · log(|V|)). BFS teller bare antall flyreiser, ikke pris." },
+      { q: "<b>Emner.</b> Noen emner har forkunnskapskrav: de krever at du har tatt et annet emne først. I hvilken rekkefølge kan du ta alle emnene?",
+        options: ["Topologisk sortering", "Dijkstra", "Sterkt sammenhengende komponenter", "Bredde-først søk"], answer: 0,
+        explain: "<b>Noder:</b> emner. <b>Kanter:</b> (u, v) når u må tas før v, altså <b>rettet</b> og <b>uvektet</b>. «Må komme før» er <b>topologisk sortering</b>, O(|V| + |E|). Har grafen en sykel, finnes det ingen gyldig rekkefølge, og |output| &lt; |V| avslører det." },
+      { q: "<b>Fiber.</b> Kommunen vil legge fiberkabel mellom bygdene. Det er kjent hva hver mulig kabel koster. Alle bygdene skal henge sammen, så billig som mulig.",
+        options: ["Dijkstra fra én bygd", "Bellman-Ford", "Minimalt spenntre (Prim eller Kruskal)", "Bredde-først søk"], answer: 2,
+        explain: "<b>Noder:</b> bygder. <b>Kanter:</b> mulige kabler, <b>urettet</b> (en kabel virker begge veier) og <b>vektet</b> med kostnad. «Billigst å koble sammen alt» er et <b>minimalt spenntre</b>: Prim eller Kruskal, O(|E| · log(|V|)). Dijkstra gir korteste vei fra én bygd, ikke det billigste nettet (H2023 «Blindern»)." },
+      { q: "<b>Konsert.</b> Du vil invitere venner, venners venner og så videre, men ingen som er mer enn k vennskapsledd unna deg.",
+        options: ["Bredde-først søk fra deg", "Dybde-først søk med vanlig visited", "Minimalt spenntre", "Topologisk sortering"], answer: 0,
+        explain: "<b>Noder:</b> personer. <b>Kanter:</b> vennskap, <b>urettet</b> og <b>uvektet</b>. «Innen k ledd» betyr avstand ≤ k i antall kanter, og det er nøyaktig det <b>BFS</b> regner ut, O(|V| + |E|). Et DFS med vanlig visited kan nå en person via en omvei først og så overse noen som er innen k ledd (H2024)." },
+      { q: "<b>Kollektivnett.</b> Holdeplasser er koblet med strekninger som går begge veier. Blir det full stopp ved én holdeplass – hvilken som helst – skal alle andre fortsatt kunne reise mellom hverandre.",
+        options: ["Minimalt spenntre", "Sterkt sammenhengende komponenter", "Bellman-Ford", "Separasjonsnoder (2-sammenheng)"], answer: 3,
+        explain: "<b>Noder:</b> holdeplasser. <b>Kanter:</b> strekninger, <b>urettet</b>. Vektene spiller ingen rolle her. Garantien betyr at ingen holdeplass er en <b>separasjonsnode</b>, altså at grafen er <b>2-sammenhengende</b>. Ett DFS med depth og low, O(|V| + |E|) (H2025)." },
+      { q: "<b>Enveiskjørt.</b> En by har bare enveiskjørte gater. Hvilke kryss hører sammen i grupper der du kan kjøre fra hvert kryss til hvert annet i gruppa og hjem igjen?",
+        options: ["Bredde-først søk fra ett kryss", "Topologisk sortering", "Sterkt sammenhengende komponenter", "Prim"], answer: 2,
+        explain: "<b>Noder:</b> kryss. <b>Kanter:</b> gater, <b>rettet</b> (enveiskjørt) og <b>uvektet</b>. «Alle kan nå alle» i en rettet graf er <b>sterkt sammenhengende komponenter</b> (Kosaraju), O(|V| + |E|). Er det bare én komponent, kommer du fra hvor som helst til hvor som helst." },
+      { q: "<b>Billetter.</b> Noen strekninger får negativ billettpris, så du får penger for å reise dem. Prisen kan være ulik i de to retningene. Kan man tjene vilkårlig mye ved å reise rundt og rundt?",
+        options: ["Dijkstra", "Bellman-Ford", "Minimalt spenntre", "Topologisk sortering"], answer: 1,
+        explain: "<b>Noder:</b> holdeplasser. <b>Kanter:</b> én i hver retning per strekning, altså <b>rettet</b>, fordi prisen kan være ulik begge veier. <b>Vektet</b>, og vektene kan være <b>negative</b>. «Tjene vilkårlig mye» betyr en negativ sykel, og den finner <b>Bellman-Ford</b> i kontrollrunden, O(|V| · |E|). Dijkstra tåler ikke negative vekter (H2025)." },
+      { q: "<b>Søppel.</b> Et program bruker noen objekter direkte. Alt som kan nås fra dem via referanser, skal beholdes. Resten skal slettes.",
+        options: ["Ett søk med alle startobjektene og felles visited", "Et nytt søk med nytt visited fra hvert startobjekt", "Dijkstra", "Separasjonsnoder"], answer: 0,
+        explain: "<b>Noder:</b> objekter. <b>Kanter:</b> referanser, <b>rettet</b> (u peker på v) og <b>uvektet</b>. «Alt som kan nås fra en mengde» er <b>ett søk</b> (BFS eller DFS) med alle startnodene og én felles visited, O(|V| + |E|). Nytt visited per startobjekt kan bli kvadratisk, og sensor trakk for det (H2022)." }
+    ]);
+
+    IN.quiz("#quiz-bfs", [
+      { q: "Hvorfor finner BFS korteste vei i en <i>uvektet</i> graf, men ikke i en vektet?",
+        options: ["BFS går lag for lag og teller kanter, ikke vekt", "BFS bruker en stakk", "BFS besøker hver node to ganger"], answer: 0,
+        explain: "BFS tar først alle som er én kant unna, så alle som er to kanter unna, og så videre. Den teller kanter. I en vektet graf kan en vei med flere, men lette kanter være kortere enn en vei med få, tunge kanter. Da trengs Dijkstra." },
+      { q: "Når bør BFS merke en node som besøkt?",
+        options: ["Når den tas ut av køen", "Når den legges i køen", "Når alle naboene er sett på"], answer: 1,
+        explain: "Merker vi først ved uttak, kan samme node havne i køen én gang per nabo. Merker vi når den legges i køen, kommer hver node inn høyst én gang." }
+    ]);
+
+    IN.quiz("#quiz-dfs", [
+      { q: "Hvorfor trenger DFS en visited-mengde?",
+        options: ["For å finne korteste vei", "For å ikke gå i ring og besøke samme node om og om igjen", "For å sortere naboene"], answer: 1,
+        explain: "I en graf med sykler kunne DFS ellers gått rundt for alltid. Uten sykler ville den fortsatt besøkt samme node mange ganger. Med visited blir hver node besøkt én gang, og søket er O(|V| + |E|)." },
+      { q: "Oppgaven spør: «Hvilke noder kan nås fra s?» Hvilket søk bør du velge?",
+        options: ["Bare BFS virker", "Bare DFS virker", "Begge virker, og begge er O(|V| + |E|)"], answer: 2,
+        explain: "Begge søkene finner alt som kan nås fra s. Valget betyr noe først når oppgaven bryr seg om rekkefølge eller avstand: «færrest steg» eller «innen k ledd» krever BFS." },
+      { q: "Du skal finne korteste vei i antall kanter i en uvektet graf. BFS eller DFS?",
+        options: ["BFS", "DFS", "Det spiller ingen rolle"], answer: 0,
+        explain: "BFS finner nodene i rekkefølge etter avstand, så første gang en node oppdages, er det via en korteste vei. DFS kan finne en node via en lang omvei først." }
+    ]);
+    IN.pseudo.parsons("#parsons-dfs", A.dfsVisit, {});
+
+    IN.quiz("#quiz-topologisk", [
+      { q: "Hva må gjelde for at en graf skal ha en topologisk ordning?",
+        options: ["Den er rettet og har ingen sykler (en DAG)", "Den er urettet og sammenhengende", "Alle vektene er ≥ 0"], answer: 0,
+        explain: "Hver kant (u, v) sier at u må komme før v. Det gir bare mening når kantene har retning, og en sykel ville krevd at en node kommer før seg selv. Vekter spiller ingen rolle." },
+      { q: "Du kjører TopSort (med inngrader) på en graf som har en sykel. Hva skjer?",
+        options: ["Den går i evig løkke", "Nodene på sykelen får aldri inngrad 0, så |output| &lt; |V|", "Den gir en gyldig rekkefølge likevel"], answer: 1,
+        explain: "Nodene på sykelen venter på hverandre, så inngraden deres blir aldri 0. De kommer aldri med i output, og testen |output| &lt; |V| avslører sykelen. Algoritmen stopper alltid, fordi stakken blir tom." }
+    ]);
+    IN.pseudo.parsons("#parsons-topsort", A.topSort, {});
+
+    IN.quiz("#quiz-dijkstra", [
+      { q: "Hva forutsetter Dijkstra om grafen?",
+        options: ["At den ikke har sykler", "At ingen kanter har negativ vekt", "At den er urettet"], answer: 1,
+        explain: "Dijkstra virker på rettede og urettede grafer, med og uten sykler. Men den antar at en node som er tatt ut av køen, aldri får en kortere vei senere. Med negative vekter kan det skje." },
+      { q: "Se på figuren med den negative kanten B → A. Hvilken avstand ender Dijkstra med for C?",
+        options: ["2, som er riktig", "3, som er feil", "1"], answer: 1,
+        explain: "A tas ut med avstand 2, og C får 3 via A. Først når B tas ut (avstand 5), oppdages B → A med vekt −4, og dist[A] senkes til 1. Men A er allerede i visited, så den nye lappen for A kastes, og kanten A → C blir aldri sjekket på nytt. C står fast på 3, mens riktig svar er 2." },
+      { q: "Hvorfor kan samme node ligge flere ganger i prioritetskøen i kursets Dijkstra?",
+        options: ["Fordi grafen kan ha sykler", "Fordi vi legger inn en ny lapp når vi finner en kortere vei, i stedet for å endre den gamle", "Fordi hver node legges inn én gang per nabo uansett"], answer: 1,
+        explain: "Kursets versjon uten DecreasePriority setter inn v på nytt hver gang dist[v] blir mindre. Tas en gammel lapp ut senere, er noden allerede i visited, og vi hopper over den. Høyst én innsetting per kant gir O((|V| + |E|) · log(|V|))." }
+    ]);
+
+    IN.quiz("#quiz-mst", [
+      { q: "Gir et minimalt spenntre korteste vei mellom to noder?",
+        options: ["Ja, alltid", "Nei, ikke nødvendigvis", "Bare hvis grafen er rettet"], answer: 1,
+        explain: "Et minimalt spenntre gjør den <i>totale</i> kostnaden minst. Stien mellom to bestemte noder i treet kan være lengre enn den korteste veien i grafen, som i trekanten over (A til C er 4 i treet, men 3 direkte)." },
+      { q: "Grafen er ikke sammenhengende. Hva gir Kruskal, og hva gir Prim?",
+        options: ["Kruskal gir en minimal spennskog, Prim bare treet for komponenten med startnoden", "Begge gir en minimal spennskog", "Begge gir feil"], answer: 0,
+        explain: "Kruskal ser på alle kantene, så hver komponent får sitt eget minimale spenntre. Prim vokser fra én startnode og når aldri de andre komponentene." }
+    ]);
+
+    IN.quiz("#quiz-scc", [
+      { q: "Hvorfor snur Kosaraju alle pilene før andre runde?",
+        options: ["For at søket skal holde seg inne i én komponent", "For å gjøre grafen urettet", "For å finne korteste vei"], answer: 0,
+        explain: "I den snudde grafen når vi fra u bare noder som kan nå u i den opprinnelige grafen. Starter vi i rekkefølgen fra stakken, lekker ikke søket over i en annen komponent. Komponentene er de samme i begge grafene." },
+      { q: "En sterkt sammenhengende komponent har bare én node (og ingen løkke). Er den en sykel?",
+        options: ["Ja", "Nei"], answer: 1,
+        explain: "En sykel i en rettet graf krever minst to noder (u → v → u) når grafen ikke har løkker. Komponenter med én node må utelates når du skal finne rundturer (H2024)." }
+    ]);
 
     /* ===================== EKSAMEN (gjengitt med egne ord) ===================== */
     // H2020: G (urettet) og H (rettet) med samme, umerkede noder
@@ -825,7 +984,7 @@
           "<b>G1.</b> G1 har B, C og F. G2 har bare C og E.",
           "<b>G2.</b> B – C – F og B – C – E – F. (I et tre som G1 finnes det bare én sti.)",
           "<b>Ingen.</b> Begge er sammenhengende, altså én komponent.", "<b>Ingen.</b>", "<b>G2.</b> C – E – F – C.",
-          "<b>G2.</b> Fjern en kant på sykelen C – E – F. (Sensor strøk dette punktet fordi formuleringen var uklar: G1 er alt et tre og har ingen kant å fjerne.)",
+          "<b>G2.</b> Fjern en kant på sykelen C – E – F. (Sensor strøk dette punktet fordi formuleringen var uklar. Vår tolkning: G1 er alt et tre, så det er uklart om den skal telle med.)",
           "<b>Begge.</b> Ingen løkker, ingen parallelle kanter, ingen retning og ingen vekter."]),
         kjerne: "<p>Separasjonsnoder i et tre: alle noder som ikke er løvnoder. En sykel gir alternative stier og fjerner separasjonsnoder.</p>",
         tips: ["Tell kanter: et sammenhengende tre har |V| − 1. Én kant til gir nøyaktig én sykel."] },
@@ -858,7 +1017,7 @@
           "<b>Bredde-først søk (BFS)</b>: det besøker nodene lag for lag, altså venner før venners venner."], [JAZZ],
           { outro: "<p class=\"small\">Linja <code>if dist[u] &lt; k</code> gjør at noder på avstand k blir talt med, men at vi ikke går videre fra dem. Om du teller deg selv (s) med, spiller liten rolle – si hva du velger.</p>" }),
         kjerne: "<p>«Innen k ledd» = korteste avstand i antall kanter ≤ k. Det er nøyaktig det BFS beregner.</p>",
-        tips: ["Sensor godtok også et dybdebegrenset DFS. Men pass på: et DFS med vanlig visited kan nå en node via en lang omvei først og deretter nekte å gå videre fra den – da kan noder innen k ledd bli oversett. BFS har ikke dette problemet.",
+        tips: ["Sensors eget løsningsforslag er et dybdebegrenset DFS med felles visited. Pass på svakheten: DFS kan nå en node via en lang omvei først, merke den som besøkt og så nekte å gå videre fra den – da kan noder innen k ledd bli oversett. BFS når hver node via en korteste sti først, så den har ikke dette problemet. Velg BFS.",
           "Å ignorere k ga 3 poengs trekk på (b)."] },
 
       "h2022-7": { year: "H2022", title: "Garbage collection", oppgave_nr: "Oppgave 8", points: 8,
@@ -1059,10 +1218,42 @@
         explain: "Kruskal tar med hver kant som ikke lager en sykel, så hver komponent får sitt eget minimale spenntre." },
       { s: "Komponentgrafen (der hver sterkt sammenhengende komponent er én node) kan ha sykler.", answer: false, blokk: "6",
         explain: "En sykel mellom komponenter ville betydd at de alle kan nå hverandre – da hadde de vært én komponent. Komponentgrafen er alltid en DAG." },
-      { s: "O(log(|E|)) er det samme som O(log(|V|)).", answer: true, blokk: "6",
-        explain: "|E| ≤ |V|², så log(|E|) ≤ 2 · log(|V|)." }
+      { s: "I en enkel graf er log(|E|) = O(log(|V|)).", answer: true, blokk: "6",
+        explain: "|E| ≤ |V|², så log(|E|) ≤ 2 · log(|V|). Derfor kan Dijkstra og Prim skrives med log(|V|)." },
+      // BFS og DFS
+      { s: "Dybde-først søk finner korteste vei (i antall kanter) i en uvektet graf.", answer: false, blokk: "6",
+        explain: "DFS går dypt langs én sti og kan nå en node via en lang omvei først. Det er BFS som går lag for lag og gir korteste vei i antall kanter." },
+      { s: "BFSVisit(G, s, visited) besøker alle nodene i G, også dem i andre komponenter enn s.", answer: false, blokk: "6",
+        explain: "Et søk fra s når bare det som henger sammen med s. For å besøke alle nodene trengs BFSFull, som starter et nytt søk fra hver node som ikke er besøkt." },
+      { s: "I en urettet graf er antall nye søk som den ytre løkka i DFSFull starter, lik antall sammenhengende komponenter.", answer: true, blokk: "6",
+        explain: "Hvert søk besøker hele komponenten sin, og visited deles. Neste søk starter derfor alltid i en ny komponent." },
+      { s: "BFS og DFS fra samme startnode besøker alltid nodene i samme rekkefølge.", answer: false, blokk: "6",
+        explain: "BFS tar alle naboene før den går videre (lag for lag). DFS går så dypt som mulig først. I eksempelgrafen fra A besøker BFS C før D, mens DFS går A, B, D før den kommer til C." },
+      { s: "BFS bruker en kø, mens DFS kan skrives med en stakk eller med rekursjon.", answer: true, blokk: "6",
+        explain: "Køen (først inn, først ut) gir lag-for-lag-rekkefølgen. I rekursiv DFS er kallstakken stakken som husker hvor vi skal tilbake." },
+      // Grafegenskaper
+      { s: "I et tre finnes det nøyaktig én sti mellom hvert par av noder.", answer: true, blokk: "6",
+        explain: "Det finnes minst én fordi treet er sammenhengende. Fantes det to ulike stier, ville de sammen gitt en sykel, og et tre har ingen sykler." },
+      { s: "Fjerner vi én kant fra et tre, faller det i nøyaktig to komponenter.", answer: true, blokk: "6",
+        explain: "Mellom endenodene fantes bare én sti, nemlig kanten selv. Uten den kan de ikke nå hverandre, men hver av dem henger fortsatt sammen med sin egen del." },
+      { s: "En komplett urettet graf med |V| noder har |V| · (|V| − 1) / 2 kanter.", answer: true, blokk: "6",
+        explain: "Hver av de |V| nodene har en kant til de |V| − 1 andre. Da telles hver kant to ganger, én gang fra hver ende, så vi deler på 2." },
+      { s: "En komplett graf med minst tre noder har ingen separasjonsnoder.", answer: true, blokk: "6",
+        explain: "Fjerner vi én node, er resten fortsatt en komplett graf, og den henger sammen. Grafen er altså 2-sammenhengende." },
+      { s: "I et tre med minst tre noder er alle nodene som ikke er løvnoder, separasjonsnoder.", answer: true, blokk: "6",
+        explain: "En indre node har minst to naboer, og den eneste stien mellom dem går gjennom noden. Fjerner vi den, faller treet i flere deler. Løvnodene er ikke separasjonsnoder." },
+      { s: "En graf som har en sykel, kan ikke ha separasjonsnoder.", answer: false, blokk: "6",
+        explain: "Moteksempel: to trekanter som deler én node. Begge trekantene er sykler, men den felles noden er en separasjonsnode – uten den faller grafen i to." },
+      { s: "En rettet graf uten løkker der hver node har minst én kant ut, må ha en sykel.", answer: true, blokk: "6",
+        explain: "Følg en kant ut fra node til node. Grafen har bare |V| noder, så etter høyst |V| steg må vi komme til en node vi har vært i før. Da har vi gått i ring." },
+      { s: "En DAG med minst én node har alltid minst én node med inngrad 0.", answer: true, blokk: "6",
+        explain: "Hadde alle nodene en kant inn, kunne vi fulgt kantene baklengs for alltid og måttet komme tilbake til en node vi har sett – en sykel. Det er derfor topologisk sortering alltid har en node å starte med." },
+      { s: "Er alle kantvektene ulike, finnes det bare ett minimalt spenntre.", answer: true, blokk: "6",
+        explain: "Med ulike vekter er det aldri uavgjort om hvilken kant som er lettest, så det minimale spenntreet er entydig. Like vekter kan gi flere spenntrær med samme totalvekt." },
+      { s: "Prim finner et minimalt spenntre også når noen kanter har negativ vekt.", answer: true, blokk: "6",
+        explain: "Argumentet for Prim er bare at den letteste kanten ut av treet er trygg å ta med. Det gjelder uansett fortegn. Det er Dijkstra som ikke tåler negative vekter, fordi den summerer vekter langs stier." }
     ], { id: "grafer-tf" });
-
+
   })();
   </script>
 </body>

@@ -123,7 +123,7 @@
         "Hopp over naboer vi allerede har oppdaget.",
         "Oppslag i en hashmengde er O(1) i forventning."),
       L("add v to visited", 4,
-        "Kryss av for v.",
+        "Vi setter kryss ved v med en gang vi ser den. Da havner ikke v i køen en gang til.",
         "Merk v som oppdaget.",
         "Å merke her (og ikke ved uttak) er det som gjør at hver node havner i køen bare én gang."),
       L("queue.enqueue(v)", 4,
@@ -143,13 +143,13 @@
     input: "En graf G = (V, E)",
     output: "Ingenting – alle noder blir besøkt, også i andre komponenter",
     lines: [
-      L("visited ← empty set", 1, "Ingen er besøkt ennå.", "En felles mengde for hele søket.", "Mengden deles av alle kallene, så ingen node besøkes to ganger."),
+      L("visited ← empty set", 1, "Vi lager én liste med kryss som alle søkene deler, så ingen node blir besøkt to ganger.", "En felles mengde for hele søket.", "Mengden deles av alle kallene, så ingen node besøkes to ganger."),
       L("for v ∈ V do", 1, "Vi går gjennom alle nodene.", "Prøv hver node som start.", "Løkka gir O(|V|) arbeid i tillegg til selve søkene."),
-      L("if v ∉ visited then", 2, "Er v ikke besøkt?", "Bare noder vi ikke har nådd ennå, starter et nytt søk.", "Hver gang denne testen slår til, har vi funnet en ny komponent (i en urettet graf)."),
-      L("BFSVisit(G, v, visited)", 3, "Søk ut fra v.", "Besøk alt som kan nås fra v.", "Summert over alle kall: O(|V| + |E|).")
+      L("if v ∉ visited then", 2, "Har ingen av søkene nådd v ennå? Da starter vi et nytt søk derfra.", "Bare noder vi ikke har nådd ennå, starter et nytt søk.", "Hver gang denne testen slår til, har vi funnet en ny komponent (i en urettet graf)."),
+      L("BFSVisit(G, v, visited)", 3, "Vi sprer oss ut fra v, lag for lag, og setter kryss ved alt vi når.", "Besøk alt som kan nås fra v.", "Summert over alle kall: O(|V| + |E|).")
     ],
     bigO: { best: "O(|V| + |E|)", avg: "O(|V| + |E|)", worst: "O(|V| + |E|)", space: "O(|V|)",
-      why: t("Alle noder og kanter blir sett på én gang.", "Hver node besøkes én gang, og hver kant sjekkes fra begge ender.", "Den ytre løkka er O(|V|), og kallene deler visited, så til sammen blir det O(|V| + |E|).") }
+      why: t("Hver node blir besøkt én gang, og hver kant blir sett på fra begge ender. Mer arbeid enn det blir det ikke.", "Hver node besøkes én gang, og hver kant sjekkes fra begge ender.", "Den ytre løkka er O(|V|), og kallene deler visited, så til sammen blir det O(|V| + |E|).") }
   });
 
   reg(IN.gen, "grBFS", function (inp) {
@@ -211,7 +211,7 @@
         "Gå gjennom naboene til u.",
         "Med naboliste: O(1 + antall naboer) per node, O(|E|) totalt."),
       L("if v ∉ visited then", 2,
-        "Har vi ikke vært hos v?",
+        "Har vi ikke vært hos v før? Bare da går vi dit. Ellers kunne vi gått i ring for alltid.",
         "Bare naboer vi ikke har besøkt, fører til et nytt kall.",
         "Uten denne testen ville DFS gått i ring i en graf med sykler."),
       L("DFSVisit(G, v, visited)", 3,
@@ -231,13 +231,13 @@
     input: "En graf G = (V, E)",
     output: "Ingenting – alle noder blir besøkt",
     lines: [
-      L("visited ← empty set", 1, "Ingen er besøkt ennå.", "Én felles mengde for hele søket.", "Felles visited er det som gjør totalen lineær."),
+      L("visited ← empty set", 1, "Vi lager én liste med kryss som alle søkene deler, så ingen node blir besøkt to ganger.", "Én felles mengde for hele søket.", "Felles visited er det som gjør totalen lineær."),
       L("for v ∈ V do", 1, "Vi går gjennom alle nodene.", "Prøv hver node som start.", "O(|V|) iterasjoner."),
-      L("if v ∉ visited then", 2, "Er v ikke besøkt?", "Start et nytt søk bare fra noder vi ikke har nådd.", "I en urettet graf: hvert nye kall her er en ny sammenhengende komponent."),
-      L("DFSVisit(G, v, visited)", 3, "Gå dypt ut fra v.", "Besøk alt som kan nås fra v.", "Kallene deler visited, så summen av arbeidet er O(|V| + |E|).")
+      L("if v ∉ visited then", 2, "Har ingen av søkene nådd v ennå? Da starter vi et nytt søk derfra.", "Start et nytt søk bare fra noder vi ikke har nådd.", "I en urettet graf: hvert nye kall her er en ny sammenhengende komponent."),
+      L("DFSVisit(G, v, visited)", 3, "Vi går så dypt vi kan ut fra v og setter kryss ved alt vi når.", "Besøk alt som kan nås fra v.", "Kallene deler visited, så summen av arbeidet er O(|V| + |E|).")
     ],
     bigO: { best: "O(|V| + |E|)", avg: "O(|V| + |E|)", worst: "O(|V| + |E|)", space: "O(|V|)",
-      why: t("Alle noder og kanter blir sett på.", "Hver node besøkes én gang, hver kant sjekkes fra begge ender.", "Ytre løkke O(|V|) pluss O(|V| + |E|) for alle DFSVisit-kallene til sammen.") }
+      why: t("Hver node blir besøkt én gang, og hver kant blir sett på fra begge ender. Mer arbeid enn det blir det ikke.", "Hver node besøkes én gang, hver kant sjekkes fra begge ender.", "Ytre løkke O(|V|) pluss O(|V| + |E|) for alle DFSVisit-kallene til sammen.") }
   });
 
   reg(IN.gen, "grDFS", function (inp) {
@@ -303,7 +303,7 @@
       "Lista vi bygger opp: den topologiske ordningen.",
       "Når en node legges i output, ligger alle nodene med kant inn til den allerede der."),
     L("for v ∈ V do", 1,
-      "Vi ser på alle nodene.",
+      "Vi går gjennom alle nodene én gang og teller hvor mange hver av dem venter på.",
       "Gå gjennom alle nodene én gang.",
       "Å telle inngrader for alle noder tar O(|V| + |E|)."),
     L("inDeg[v] ← indegree(v)", 2,
@@ -319,7 +319,7 @@
       "Gjenta til ingen flere noder er klare.",
       "Hver node pushes høyst én gang, så løkka går høyst |V| ganger."),
     L("u ← stack.pop()", 2,
-      "Vi tar en som er klar.",
+      "Vi tar en av dem som ikke venter på noe. Hvem av de klare vi tar, spiller ingen rolle.",
       "Ta ut en node med inngrad 0.",
       "Hvilken vi tar, avgjør bare hvilken av de gyldige ordningene vi får."),
     L("append u to output", 2,
@@ -371,15 +371,15 @@
     lines: [
       L("stack ← empty stack", 1, "En bunke for de som er klare.", "Samme oppsett som topologisk sortering.", "Vi trenger ikke selve ordningen, bare antallet."),
       L("processed ← 0", 1, "Vi teller hvor mange som blir klare.", "Antall noder som har fått inngrad 0.", "Erstatter output-lista; O(1) plass i stedet for O(|V|)."),
-      L("for v ∈ V do", 1, "Vi ser på alle nodene.", "Tell inngrader.", "O(|V| + |E|)."),
+      L("for v ∈ V do", 1, "Vi går gjennom alle nodene og teller hvor mange hver av dem venter på.", "Tell inngrader.", "O(|V| + |E|)."),
       L("inDeg[v] ← indegree(v)", 2, "Hvor mange må komme før v?", "Antall kanter inn til v.", "Antall (x, v) ∈ E."),
       L("if inDeg[v] = 0 then stack.push(v)", 2, "Ingen før v? Da er v klar.", "Noder uten forgjengere starter.", "Ingen slik node ⇒ sykel."),
-      L("while stack is not empty do", 1, "Så lenge noen er klare …", "Gjenta til stakken er tom.", "Høyst |V| runder."),
-      L("u ← stack.pop()", 2, "Ta en som er klar.", "Ta ut en node med inngrad 0.", ""),
-      L("processed ← processed + 1", 2, "Én til er klar.", "Tell u som behandlet.", ""),
+      L("while stack is not empty do", 1, "Så lenge noen er klare, fortsetter vi. Er bunken tom, er vi ferdige.", "Gjenta til stakken er tom.", "Høyst |V| runder."),
+      L("u ← stack.pop()", 2, "Vi tar en av dem som ikke venter på noe lenger.", "Ta ut en node med inngrad 0.", ""),
+      L("processed ← processed + 1", 2, "Vi teller at én til slapp gjennom. Til slutt ser vi om alle kom med.", "Tell u som behandlet.", ""),
       L("for (u, v) ∈ E do", 2, "Se på dem som ventet på u.", "Kantene ut fra u.", "Hver kant én gang: O(|E|)."),
-      L("inDeg[v] ← inDeg[v] − 1", 3, "v venter på én mindre.", "Tell ned inngraden til v.", ""),
-      L("if inDeg[v] = 0 then stack.push(v)", 3, "Klar nå?", "Push v når den ikke venter på noen.", ""),
+      L("inDeg[v] ← inDeg[v] − 1", 3, "u er gjort, så v har én mindre å vente på.", "Tell ned inngraden til v.", ""),
+      L("if inDeg[v] = 0 then stack.push(v)", 3, "Venter v ikke på noen lenger? Da legger vi v i bunken med de klare.", "Push v når den ikke venter på noen.", ""),
       L("return processed < |V|", 1,
         "Ble noen aldri klare? Da står de i ring.",
         "Har vi ikke behandlet alle nodene, finnes det en sykel.",
@@ -390,7 +390,7 @@
                "processed ≤ |V| gjelder alltid, så «≤» ville gjort testen meningsløs. processed = |V| ⇔ G er en DAG.") })
     ],
     bigO: { best: "O(|V| + |E|)", avg: "O(|V| + |E|)", worst: "O(|V| + |E|)", space: "O(|V|)",
-      why: t("Samme arbeid som topologisk sortering.", "Hver node og kant behandles én gang.", "Lineært i |V| + |E|. Sammenlign: et nytt søk fra hver node ville gitt O(|V| · (|V| + |E|)).") }
+      why: t("Vi gjør det samme som topologisk sortering, bare at vi teller i stedet for å skrive opp rekkefølgen. Hver node og hver kant blir behandlet én gang.", "Hver node og kant behandles én gang.", "Lineært i |V| + |E|. Sammenlign: et nytt søk fra hver node ville gitt O(|V| · (|V| + |E|)).") }
   });
 
   // Steggenerator for begge: lines = { push0, pop, out, dec, pushv, check, ret }
@@ -465,22 +465,22 @@
     output: "En stakk der nodene, tatt av fra toppen, kommer i topologisk rekkefølge",
     lines: [
       L("stack ← empty stack", 1, "En bunke vi legger ferdige noder på.", "Nodene pushes når de er ferdige.", "Den sist ferdige ligger øverst."),
-      L("visited ← empty set", 1, "Ingen er besøkt.", "Felles visited for alle kallene.", ""),
-      L("for u ∈ V do", 1, "Vi prøver alle nodene.", "Som DFSFull.", "O(|V|) iterasjoner."),
+      L("visited ← empty set", 1, "Vi lager én liste med kryss som alle søkene deler.", "Felles visited for alle kallene.", ""),
+      L("for u ∈ V do", 1, "Vi prøver hver node som start, så vi får med alle – også dem ingen peker på.", "Som DFSFull.", "O(|V|) iterasjoner."),
       L("if u ∉ visited then DFSVisit(G, u, visited, stack)", 2, "Ikke besøkt? Gå dypt derfra.", "DFS fra hver ubesøkt node. Varianten av DFSVisit pusher u når den er ferdig.", "Alle kallene til sammen: O(|V| + |E|)."),
       L("return stack", 1, "Ta av fra toppen, så får du rekkefølgen.", "Toppen av stakken er en node uten forgjengere.",
         "For hver kant (u, v) blir v ferdig før u (v er enten besøkt alt, eller besøkes inni kallet for u). Derfor ligger u over v.")
     ],
     bigO: { best: "O(|V| + |E|)", avg: "O(|V| + |E|)", worst: "O(|V| + |E|)", space: "O(|V|)",
-      why: t("Et vanlig dybde-først søk.", "Som DFSFull, pluss én push per node.", "O(|V| + |E|). Merk: denne varianten sjekker ikke selv om G har en sykel.") }
+      why: t("Det er et vanlig dybde-først søk gjennom hele grafen. Å legge hver node i bunken koster nesten ingenting ekstra.", "Som DFSFull, pluss én push per node.", "O(|V| + |E|). Merk: denne varianten sjekker ikke selv om G har en sykel.") }
   });
   reg(IN.algos, "dfsVisitStack", {
     title: "DFSVisit som pusher ferdige noder",
     name: "DFSVisit", params: "G, u, visited, stack",
     lines: [
-      L("add u to visited", 1, "Kryss av for u.", "Merk u som besøkt.", ""),
-      L("for (u, v) ∈ E do", 1, "Se på naboene.", "Gå gjennom kantene ut fra u.", ""),
-      L("if v ∉ visited then DFSVisit(G, v, visited, stack)", 2, "Ny? Gå dit.", "Rekursivt kall på ubesøkte naboer.", ""),
+      L("add u to visited", 1, "Vi setter kryss ved u, så vi ikke kommer hit igjen.", "Merk u som besøkt.", ""),
+      L("for (u, v) ∈ E do", 1, "Vi ser på alle pilene ut fra u, én om gangen.", "Gå gjennom kantene ut fra u.", ""),
+      L("if v ∉ visited then DFSVisit(G, v, visited, stack)", 2, "Har vi ikke vært hos denne naboen? Da går vi dit, og så langt vi kan derfra, før vi kommer tilbake.", "Rekursivt kall på ubesøkte naboer.", ""),
       L("stack.push(u)", 1, "Nå er alt etter u gjort. Legg u på bunken.", "u er ferdig: alt som kan nås fra u, ligger alt på stakken.",
         "Push skjer i <b>postorder</b>. Det er det som gjør at u havner over alle nodene den peker til.")
     ]
@@ -498,14 +498,14 @@
         "Alle avstander starter som ∞ (ukjent).",
         "dist[v] er hele tiden en øvre grense for den korteste avstanden."),
       L("visited ← empty set", 1,
-        "Ingen er ferdige ennå.",
+        "Her skriver vi opp stedene vi er helt sikre på avstanden til. Lista er tom i starten.",
         "Noder som er ferdige: avstanden deres er endelig.",
         "En node legges i visited første gang den tas ut av køen."),
       L("queue ← priority queue containing s with priority 0", 1,
         "Vi starter med s, og det koster 0 å være der.",
         "En prioritetskø (min-heap) med s, prioritet 0.",
         "Køen gir oss alltid noden med lavest foreløpig avstand."),
-      L("dist[s] ← 0", 1, "Fra s til s er det 0.", "Avstanden til start er 0.", ""),
+      L("dist[s] ← 0", 1, "Vi står allerede i s, så det koster ingenting å komme dit.", "Avstanden til start er 0.", ""),
       L("while queue is not empty do", 1, "Så lenge det er noe i køen …", "Gjenta til køen er tom.", "Køen kan ha flere oppføringer for samme node, høyst én per kant."),
       L("u ← RemoveMin(queue)", 2,
         "Vi tar den som er nærmest.",
@@ -519,7 +519,7 @@
         "Er u ferdig fra før? Da er dette en gammel lapp. Kast den.",
         "Gamle oppføringer for u hoppes over.",
         "Vi legger inn v på nytt i stedet for å senke prioriteten. Utdaterte oppføringer kastes her."),
-      L("add u to visited", 2, "Nå er u ferdig.", "dist[u] er endelig.", ""),
+      L("add u to visited", 2, "Nå vet vi sikkert hvor langt det er til u. Den avstanden endrer seg aldri mer.", "dist[u] er endelig.", ""),
       L("for (u, v) ∈ E do", 2, "Se på alle veier ut fra u.", "Gå gjennom kantene ut fra u.", "Hver kant behandles én gang (fra hver ende i en urettet graf)."),
       L("c ← dist[u] + w(u, v)", 3, "Hvor langt blir det til v hvis vi går via u?", "Lengden på stien til v via u.", ""),
       L("if c < dist[v] then", 3, "Er det kortere enn det vi visste?", "Fant vi en kortere vei til v?", "Dette kalles å <b>relaksere</b> kanten (u, v)."),
@@ -531,7 +531,7 @@
       L("return dist", 1, "Nå vet vi hvor langt det er til alle.", "Returner avstandene.", "Noder som ikke kan nås fra s, har fortsatt dist = ∞.")
     ],
     bigO: { best: "O(1)", avg: "O((|V| + |E|) · log(|V|))", worst: "O((|V| + |E|) · log(|V|))", space: "O(|V| + |E|)",
-      why: t("Hver gang vi legger noe i eller tar noe ut av køen, koster det litt (log). Det skjer omtrent én gang per kant.",
+      why: t("Hver gang vi legger en lapp i køen eller tar en ut, må køen ryddes litt. Det går fort, også når køen er stor. Vi legger inn høyst én lapp per vei vi ser på, så arbeidet vokser med antall veier og steder.",
              "Høyst én innsetting per kant og ett uttak per oppføring, hver O(log |V|). Best: s har ingen naboer.",
              "Høyst |E| + 1 oppføringer i køen. Hver Insert/RemoveMin er O(log |E|) = O(log |V|), siden |E| ≤ |V|². I tillegg O(|V| + |E|) for løkkene. Kurset skriver O((|V| + |E|) · log(|V|)).") }
   });
@@ -609,7 +609,7 @@
     output: "dist: korteste avstand fra s til hver node, eller feil ved negativ sykel",
     lines: [
       L("dist ← empty map with ∞ as default", 1, "Alle avstander er ukjente.", "Alle starter som ∞.", ""),
-      L("dist[s] ← 0", 1, "Fra s til s er det 0.", "Avstanden til start er 0.", ""),
+      L("dist[s] ← 0", 1, "Vi står allerede i s, så det koster ingenting å komme dit.", "Avstanden til start er 0.", ""),
       L("repeat |V| − 1 times", 1,
         "Vi går over alle veiene mange ganger, så de gode nyhetene rekker å spre seg.",
         "Gjenta |V| − 1 runder.",
@@ -618,15 +618,15 @@
           a: t("Den lengste veien uten å gå i ring besøker alle nodene, og den har én kant mindre enn antall noder.",
                "En korteste sti uten sykler besøker hver node høyst én gang, så den har høyst |V| − 1 kanter. Hver runde gjør stiene én kant lengre, så |V| − 1 runder holder.",
                "Uten negative sykler finnes det en enkel korteste sti, med høyst |V| − 1 kanter. Induksjon på antall kanter gir at dist er riktig etter |V| − 1 runder. Runde nummer |V| brukes bare til å oppdage negative sykler (linje 8–9).") }),
-      L("for (u, v) ∈ E do", 2, "Se på hver eneste vei.", "Gå gjennom alle kantene.", "O(|E|) per runde."),
+      L("for (u, v) ∈ E do", 2, "I hver runde ser vi på hver eneste vei i hele grafen, én om gangen.", "Gå gjennom alle kantene.", "O(|E|) per runde."),
       L("c ← dist[u] + w(u, v)", 3, "Hvor langt blir det via u?", "Lengden via u.", "Med ∞ + w = ∞."),
-      L("if c < dist[v] then dist[v] ← c", 3, "Kortere? Skriv det opp.", "Relakser kanten.", ""),
-      L("for (u, v) ∈ E do", 1, "En siste kontrollrunde.", "Gå gjennom alle kantene én gang til.", ""),
+      L("if c < dist[v] then dist[v] ← c", 3, "Er veien via u kortere enn det vi visste? Da skriver vi opp den nye, kortere avstanden.", "Relakser kanten.", ""),
+      L("for (u, v) ∈ E do", 1, "Nå skal alt være riktig. Vi går gjennom alle veiene én gang til for å kontrollere det.", "Gå gjennom alle kantene én gang til.", ""),
       L("if dist[u] + w(u, v) < dist[v] then error \"negativ sykel\"", 2,
         "Blir noe fortsatt kortere? Da finnes det en ring som gjør veien kortere hver gang vi går rundt.",
         "Kan noe fortsatt forbedres, finnes det en negativ sykel som kan nås fra s.",
         "Etter |V| − 1 runder er alle enkle stier tatt med. En forbedring nå betyr en sti med minst |V| kanter som er kortere, altså en sykel med negativ total vekt."),
-      L("return dist", 1, "Ferdig.", "Returner avstandene.", "")
+      L("return dist", 1, "Ingenting ble kortere i kontrollrunden. Nå vet vi hvor kort veien til hver node kan bli.", "Returner avstandene.", "")
     ],
     bigO: { best: "O(|V| · |E|)", avg: "O(|V| · |E|)", worst: "O(|V| · |E|)", space: "O(|V|)",
       why: t("Vi går over alle kantene nesten like mange ganger som det er noder.", "|V| − 1 runder, hver over alle |E| kanter.", "(|V| − 1) · |E| + |E| relakseringer à O(1): O(|V| · |E|).") }
@@ -652,7 +652,7 @@
         "Er u ikke med i treet ennå?",
         "Kanter til noder som alt er i treet, kastes. De ville laget en sykel.",
         "Begge ender i treet ⇒ kanten ville lukket en sykel."),
-      L("parents[u] ← p", 3, "u hekter seg på p.", "Kanten (p, u) blir med i spenntreet.", ""),
+      L("parents[u] ← p", 3, "u blir med i treet, koblet til p med den billigste kabelen vi fant.", "Kanten (p, u) blir med i spenntreet.", ""),
       L("for (u, v) ∈ E do", 3, "Se på alle kanter ut fra u.", "Gå gjennom kantene ut fra den nye noden.", ""),
       L("Insert(queue, (u, v)) with priority w(u, v)", 4,
         "Legg dem i køen, ordnet på pris.",
@@ -720,10 +720,10 @@
         "Kanten er med bare hvis den ikke lager en sykel.",
         "Samme tre ⇒ det finnes alt en sti mellom u og v, så kanten ville lukket en sykel."),
       L("add {u, v} to T", 3, "Ta med kabelen. Nå henger de to trærne sammen.", "Ta med kanten. To trær slås sammen til ett.", "Grådig: den letteste kanten mellom to trær er trygg."),
-      L("return T", 1, "Ferdig.", "T er en minimal spennskog.", "Er G sammenhengende, har T |V| − 1 kanter og er et spenntre.")
+      L("return T", 1, "Alle kablene er prøvd. De vi tok med, kobler sammen alt så billig som mulig.", "T er en minimal spennskog.", "Er G sammenhengende, har T |V| − 1 kanter og er et spenntre.")
     ],
     bigO: { best: "O(|E| · log(|V|))", avg: "O(|E| · log(|V|))", worst: "O(|E| · log(|V|))", space: "O(|V| + |E|)",
-      why: t("Det meste av tiden går med til å sortere kablene.", "Sorteringen dominerer: O(|E| · log(|E|)).",
+      why: t("Det meste av tiden går med til å sortere kablene.", "Sorteringen dominerer: O(|E| · log(|E|)), forutsatt at «samme tre?» kan sjekkes raskt.",
              "Sortering O(|E| · log(|E|)), og log(|E|) ≤ 2 · log(|V|). Det forutsetter at «samme tre?» kan sjekkes raskt, med en egen struktur som holder styr på hvilket tre hver node er i.") }
   });
 
@@ -784,15 +784,15 @@
         "Kjør DFS-varianten av topologisk sortering. Den virker selv om G har sykler.",
         "Noden øverst på stakken ligger i en komponent som ingen annen komponent har kant inn til (en «kilde» i komponentgrafen)."),
       L("Gr ← ReverseGraph(G)", 1,
-        "Så snur vi alle pilene.",
+        "Så snur vi alle pilene. Hvem som hører til samme gruppe, endrer seg ikke av det.",
         "Lag den omvendte grafen: hver kant (u, v) blir (v, u).",
         "G og Gr har nøyaktig de samme sterkt sammenhengende komponentene. O(|V| + |E|)."),
       L("visited ← empty set", 1, "Ingen er besøkt i runde to.", "Ny visited for andre fase.", ""),
-      L("components ← empty set", 1, "Her samler vi gruppene.", "Komponentene vi finner.", ""),
+      L("components ← empty set", 1, "Her samler vi gruppene vi finner. Den er tom i starten.", "Komponentene vi finner.", ""),
       L("while stack is not empty do", 1, "Så lenge bunken ikke er tom …", "Gå gjennom nodene i stakk-rekkefølge.", ""),
-      L("u ← stack.pop()", 2, "Ta den øverste.", "Ta ut den som ble ferdig sist.", ""),
+      L("u ← stack.pop()", 2, "Vi tar den som ble ferdig sist i første runde. Den ligger øverst i bunken.", "Ta ut den som ble ferdig sist.", ""),
       L("if u ∉ visited then", 2, "Er den ikke med i en gruppe ennå?", "Bare noder som ikke er i en komponent ennå.", ""),
-      L("component ← empty set", 3, "Ny gruppe.", "Start en ny komponent.", ""),
+      L("component ← empty set", 3, "Vi starter en ny gruppe: en klubb der alle kan nå alle.", "Start en ny komponent.", ""),
       L("DFSVisit(Gr, u, visited, component)", 3,
         "Gå dypt fra u med snudde piler. Alle vi når, er i samme gruppe.",
         "DFS i Gr fra u. Alt den når (og som ikke er besøkt), er komponenten til u.",
@@ -801,11 +801,11 @@
           a: t("Med snudde piler kommer vi ikke ut av gruppen og over i en ny gruppe ved et uhell.",
                "I G kunne et søk fra u lekke over i andre komponenter som u peker til. I Gr peker de pilene inn mot u i stedet, så søket stopper ved grensen.",
                "Topp av stakken ligger i en kilde-komponent i G, altså en sluk-komponent i Gr. DFS fra en sluk kan ikke forlate den. Etter at den er fjernet (besøkt), gjelder det samme for neste.") }),
-      L("add component to components", 3, "Gruppen er ferdig.", "Lagre komponenten.", ""),
-      L("return components", 1, "Ferdig.", "Returner alle komponentene.", "Hver node er i nøyaktig én komponent.")
+      L("add component to components", 3, "Alle vi nådde, er med. Gruppen er ferdig, og vi legger den til de andre.", "Lagre komponenten.", ""),
+      L("return components", 1, "Nå er hver node med i nøyaktig én gruppe. Vi gir tilbake alle gruppene.", "Returner alle komponentene.", "Hver node er i nøyaktig én komponent.")
     ],
     bigO: { best: "O(|V| + |E|)", avg: "O(|V| + |E|)", worst: "O(|V| + |E|)", space: "O(|V| + |E|)",
-      why: t("To dybde-først søk og én snuing av pilene.", "DFSTopSort, ReverseGraph og den andre DFS-en er hver O(|V| + |E|).", "Tre lineære passeringer. Gr tar O(|V| + |E|) plass.") }
+      why: t("Vi går gjennom grafen to ganger og snur alle pilene én gang. Hver av de tre jobbene ser på hver node og hver pil omtrent én gang.", "DFSTopSort, ReverseGraph og den andre DFS-en er hver O(|V| + |E|).", "Tre lineære passeringer. Gr tar O(|V| + |E|) plass.") }
   });
 
   reg(IN.gen, "grSCC", function (inp) {
@@ -869,14 +869,14 @@
     input: "En urettet graf G = (V, E)",
     output: "true hvis G har en sykel, ellers false",
     lines: [
-      L("visited ← empty set", 1, "Ingen er besøkt.", "Felles visited for alle komponentene.", ""),
-      L("for u ∈ V do", 1, "Vi prøver alle nodene.", "Sjekk hver komponent.", "Grafen kan ha flere komponenter, og sykelen kan ligge i hvilken som helst av dem."),
-      L("if u ∉ visited then", 2, "Ny bit av grafen?", "Start et søk i hver ny komponent.", ""),
-      L("if HasCycleFrom(G, null, u, visited) then return true", 3, "Fant vi en ring der?", "DFS fra u. Roten har ingen forelder (null).", "Summert over alle komponentene: O(|V| + |E|)."),
-      L("return false", 1, "Ingen ringer noe sted.", "Ingen komponent hadde en sykel: G er en skog.", "")
+      L("visited ← empty set", 1, "Vi lager én liste med kryss som alle søkene deler.", "Felles visited for alle komponentene.", ""),
+      L("for u ∈ V do", 1, "Grafen kan bestå av flere biter, så vi prøver å starte et søk fra hver node.", "Sjekk hver komponent.", "Grafen kan ha flere komponenter, og sykelen kan ligge i hvilken som helst av dem."),
+      L("if u ∉ visited then", 2, "Har vi ikke vært her? Da har vi funnet en bit av grafen vi ikke har lett i ennå.", "Start et søk i hver ny komponent.", ""),
+      L("if HasCycleFrom(G, null, u, visited) then return true", 3, "Vi leter etter en ring i denne biten. Finner vi en, er vi ferdige med en gang.", "DFS fra u. Roten har ingen forelder (null).", "Summert over alle komponentene: O(|V| + |E|)."),
+      L("return false", 1, "Vi lette i alle bitene og fant ingen ring. Da er grafen et tre, eller flere trær.", "Ingen komponent hadde en sykel: G er en skog.", "")
     ],
     bigO: { best: "O(1)", avg: "O(|V| + |E|)", worst: "O(|V| + |E|)", space: "O(|V|)",
-      why: t("Et vanlig dybde-først søk.", "Hver node besøkes én gang; vi kan stoppe tidlig når vi finner en sykel.", "Som DFSFull: O(|V| + |E|). Faktisk bare O(|V|): før vi finner en sykel, har vi bare gått langs kanter i DFS-treet, og en skog har høyst |V| − 1 kanter.") }
+      why: t("Hver node besøkes høyst én gang, og hver kant ses på fra begge ender. Det tar like lang tid som et vanlig dybde-først søk.", "Hver node besøkes én gang; vi kan stoppe tidlig når vi finner en sykel.", "Som DFSFull: O(|V| + |E|), og det er svaret sensor forventer. (Ekstra, ikke pensum: før vi finner en sykel, har vi bare fulgt kanter i DFS-treet, og en skog har høyst |V| − 1 kanter. Derfor stopper søket etter O(|V|) arbeid.)") }
   });
   reg(IN.algos, "hasCycleFrom", {
     title: "DFS som leter etter en sykel (urettet)",
@@ -884,8 +884,8 @@
     input: "Urettet graf G, forelderen p (eller null), noden u og visited",
     output: "true hvis DFS fra u finner en sykel",
     lines: [
-      L("add u to visited", 1, "Kryss av for u.", "Merk u som besøkt.", ""),
-      L("for (u, v) ∈ E do", 1, "Se på naboene til u.", "Gå gjennom naboene.", ""),
+      L("add u to visited", 1, "Vi setter kryss ved u, så vi kjenner den igjen hvis vi kommer hit en annen vei.", "Merk u som besøkt.", ""),
+      L("for (u, v) ∈ E do", 1, "Vi ser på alle som u er koblet til, én om gangen.", "Gå gjennom naboene.", ""),
       L("if v = p then continue", 2,
         "Den vi nettopp kom fra, teller ikke.",
         "Hopp over kanten tilbake til forelderen.",
@@ -900,7 +900,7 @@
         "Det er en bakoverkant: v er en forfeder til u i DFS-treet, så stien v → … → u pluss kanten {u, v} er en sykel."),
       L("if HasCycleFrom(G, u, v, visited) then return true", 2,
         "Gå videre til v, og husk at vi kom fra u.", "Rekursivt kall med u som forelder til v.", "Svaret bobler opp gjennom kallstakken."),
-      L("return false", 1, "Ingen ring her.", "Ingen sykel i subtreet under u.", "")
+      L("return false", 1, "Vi kom oss gjennom alle naboene til u uten å møte et kryss. Her er det ingen ring.", "Ingen sykel i subtreet under u.", "")
     ]
   });
 
@@ -958,9 +958,9 @@
     input: "En sammenhengende urettet graf G = (V, E)",
     output: "seps: alle separasjonsnodene i G",
     lines: [
-      L("depth, low, seps ← empty map, empty map, empty set", 1, "Tre tomme lister vi fyller under søket.", "Delte variabler for alle kallene.", "depth = dybden i DFS-treet; low = laveste dybde vi kan nå via subtreet."),
-      L("r ← an arbitrary node in V", 1, "Vi velger et startpunkt.", "Velg en rot.", ""),
-      L("depth[r] ← 0", 1, "Roten er på dybde 0.", "Roten får dybde 0.", "depth fungerer også som visited: en node er besøkt når den har fått en dybde."),
+      L("depth, low, seps ← empty map, empty map, empty set", 1, "Vi gjør klar tre notatblokker: hvor dypt hver node ligger, hvor høyt den kan klatre, og hvilke noder som holder grafen sammen.", "Delte variabler for alle kallene.", "depth = dybden i DFS-treet; low = laveste dybde vi kan nå via subtreet."),
+      L("r ← an arbitrary node in V", 1, "Vi velger en hvilken som helst node å starte i. Den blir roten i treet vi lager.", "Velg en rot.", ""),
+      L("depth[r] ← 0", 1, "Roten ligger øverst, på dybde 0. At den har fått en dybde, betyr også at vi har vært der.", "Roten får dybde 0.", "depth fungerer også som visited: en node er besøkt når den har fått en dybde."),
       L("Visit(G, r)", 1, "Vi går dypt gjennom hele grafen.", "Ett DFS fra roten.", "O(|V| + |E|)."),
       L("if r has more than one child in the DFS tree then add r to seps", 1,
         "Roten er spesiell: den er en separasjonsnode bare hvis den har flere grener.",
@@ -970,22 +970,22 @@
           a: t("Det finnes ingen node over roten som kunne blitt avskåret, så vi må sjekke på en annen måte.",
                "Testen depth[u] ≤ low[v] er alltid sann for roten (dybde 0). Derfor sjekker vi i stedet om roten har mer enn ett barn.",
                "For roten gir low-testen ingen informasjon, siden low ≥ 0 = depth[r] alltid. Antall DFS-barn avgjør.") }),
-      L("return seps", 1, "Ferdig.", "Returner separasjonsnodene.", "G er 2-sammenhengende hvis og bare hvis seps er tom (og |V| ≥ 3).")
+      L("return seps", 1, "Nå har vi alle knutepunktene. Fjerner vi ett av dem, faller grafen i flere deler.", "Returner separasjonsnodene.", "G er 2-sammenhengende hvis og bare hvis seps er tom (og |V| ≥ 3).")
     ],
     bigO: { best: "O(|V| + |E|)", avg: "O(|V| + |E|)", worst: "O(|V| + |E|)", space: "O(|V|)",
-      why: t("Ett dybde-først søk.", "Ett DFS med O(1) ekstra arbeid per kant.", "Den naive metoden (fjern hver node og sjekk sammenheng) er O(|V| · (|V| + |E|)).") }
+      why: t("Vi går gjennom grafen én gang og noterer litt ekstra underveis. Det tar like lang tid som et vanlig dybde-først søk.", "Ett DFS med O(1) ekstra arbeid per kant.", "Den naive metoden (fjern hver node og sjekk sammenheng) er O(|V| · (|V| + |E|)).") }
   });
   reg(IN.algos, "sepVisit", {
     title: "Visit (separasjonsnoder)",
     name: "Visit", params: "G, u",
     lines: [
       L("low[u] ← depth[u]", 1, "Foreløpig kommer vi ikke høyere enn der vi står.", "low starter som dybden til u.", ""),
-      L("for (u, v) ∈ E do", 1, "Se på naboene.", "Gå gjennom naboene til u.", ""),
-      L("if v ∈ depth then", 2, "Har vi vært hos v før?", "v er besøkt (har fått dybde).", "Kanten {u, v} er en kant opp i treet (eller til forelderen)."),
-      L("low[u] ← Min(low[u], depth[v])", 3, "Via denne kanten kommer vi opp til v.", "Oppdater low med dybden til v.", ""),
-      L("else", 2, "Ellers er v ny.", "v er ikke besøkt ennå.", "Da blir {u, v} en kant i DFS-treet."),
-      L("depth[v] ← depth[u] + 1", 3, "v er ett hakk dypere.", "v blir barn av u i DFS-treet.", ""),
-      L("Visit(G, v)", 3, "Gå dypt fra v.", "Rekursivt kall.", ""),
+      L("for (u, v) ∈ E do", 1, "Vi ser på alle som u er koblet til, én om gangen.", "Gå gjennom naboene til u.", ""),
+      L("if v ∈ depth then", 2, "Har v allerede fått en dybde? Da har vi vært hos v før.", "v er besøkt (har fått dybde).", "Kanten {u, v} går opp til en forfeder (kanskje forelderen), eller ned til en etterkommer som allerede er ferdig – samme kant sett fra den andre enden. I det siste tilfellet er depth[v] > depth[u] ≥ low[u], så Min endrer ingenting."),
+      L("low[u] ← Min(low[u], depth[v])", 3, "Via denne kanten kan vi klatre til v. Ligger v høyere opp enn vi har klart før, noterer vi det.", "Oppdater low med dybden til v.", ""),
+      L("else", 2, "Har vi ikke vært hos v før, blir v et nytt barn under u.", "v er ikke besøkt ennå.", "Da blir {u, v} en kant i DFS-treet."),
+      L("depth[v] ← depth[u] + 1", 3, "v ligger ett hakk lenger ned i treet enn u.", "v blir barn av u i DFS-treet.", ""),
+      L("Visit(G, v)", 3, "Vi går dypt fra v og finner ut hvor høyt alle under v kan klatre.", "Rekursivt kall.", ""),
       L("low[u] ← Min(low[u], low[v])", 3, "Det v kommer opp til, kommer u også opp til.", "low arves oppover fra barna.", ""),
       L("if depth[u] ≠ 0 and depth[u] ≤ low[v] then add u to seps", 3,
         "Kommer ingen under v høyere opp enn u? Da er u den eneste broen. Fjerner vi u, faller v av.",

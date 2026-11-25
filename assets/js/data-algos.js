@@ -71,7 +71,7 @@
       snap(2, { sorted: sorted, target: i }, { i: i },
         t("Nå skal vi fylle plass " + i + ". Vi leter etter det minste tallet blant dem som er igjen.",
           "i = " + i + ": finn minste i A[" + i + "..].",
-          "Ytre iterasjon i = " + i + ". Sortert prefiks [0.." + (i - 1) + "]."), "Ny plass");
+          "Ytre iterasjon i = " + i + ". " + (i === 0 ? "Sortert prefiks: tomt (ingen elementer er plassert ennå)." : "Sortert prefiks [0.." + (i - 1) + "].")), "Ny plass");
       k = i;
       snap(3, { sorted: sorted, target: i, min: k }, { i: i, k: k },
         t("Vi antar at det minste er her på plass " + i + " (verdi " + A[i] + ") inntil vi finner noe mindre.",
@@ -80,7 +80,7 @@
       for (j = i + 1; j < n; j++) {
         var less = A[j] < A[k];
         snap(5, { sorted: sorted, target: i, min: k, compare: [j] }, { i: i, k: k, j: j },
-          t("Vi ser på A[" + j + "] = " + A[j] + ". Det minste vi har er A[" + k + "] = " + A[k] + ". " +
+          t("Vi ser på tallet " + A[j] + " (det står på plass " + j + "). Det minste vi har sett så langt er " + A[k] + " (det står på plass " + k + "). " +
               (less ? "Oi – " + A[j] + " er mindre!" : A[j] + " er ikke mindre, så vi beholder " + A[k] + "."),
             "Sammenlign A[" + j + "]=" + A[j] + " med minste A[" + k + "]=" + A[k] + (less ? " → nytt minimum." : " → ingen endring."),
             "j = " + j + ": A[j] &lt; A[k]? " + (less ? "ja" : "nei") + "."), less ? "Mindre funnet" : null);
@@ -176,7 +176,7 @@
       for (var j = 0; j < n - 1 - i; j++) {
         var gt = A[j] > A[j + 1];
         snap(5, { sorted: tail, compare: [j, j + 1] }, { j: j },
-          t("Er A[" + j + "]=" + A[j] + " større enn A[" + (j + 1) + "]=" + A[j + 1] + "? " + (gt ? "Ja." : "Nei."),
+          t("Er " + A[j] + " større enn naboen sin til høyre, " + A[j + 1] + "? " + (gt ? "Ja, da står de feil vei." : "Nei, da får de stå."),
             "Sammenlign naboene " + A[j] + " og " + A[j + 1] + (gt ? " → bytt." : " → ok."),
             "A[j] &gt; A[j + 1]? " + (gt ? "ja" : "nei")), gt ? "Bytter" : null);
         if (gt) {
@@ -248,13 +248,13 @@
     for (var i = 1; i < n; i++) {
       var key = A[i];
       snap(3, { sorted: sortedPrefix(i), target: i }, { i: i },
-        t("Vi plukker opp A[" + i + "] = " + key + " for å sette det inn blant de sorterte til venstre.",
+        t("Vi plukker opp tallet " + key + " (på plass " + i + ") for å sette det inn blant de sorterte til venstre.",
           "key = " + key + " skal settes inn i A[0.." + (i - 1) + "].",
           "i=" + i + ", key=" + key + "."), "Plukk opp");
       var j = i - 1;
       while (j >= 0 && A[j] > key) {
         snap(5, { sorted: sortedPrefix(i), compare: [j], target: j + 1 }, { j: j },
-          t("A[" + j + "] = " + A[j] + " er større enn " + key + ", så vi skyver det ett hakk til høyre.",
+          t("Tallet " + A[j] + " er større enn " + key + ", så vi skyver det ett hakk til høyre.",
             "A[" + j + "]=" + A[j] + " > " + key + " → skyv til høyre.",
             "A[j] &gt; key → A[j + 1] ← A[j]."), "Skyv");
         A[j + 1] = A[j]; j--;
@@ -322,7 +322,7 @@
     while (i < n && guard++ < 400) {
       if (i > 0 && A[i - 1] > A[i]) {
         snap(4, { compare: [i - 1, i] }, { i: i },
-          t("Tallet bak (A[" + (i - 1) + "]=" + A[i - 1] + ") er større enn A[" + i + "]=" + A[i] + ". Bytt!",
+          t("Tallet bak nissen (" + A[i - 1] + ") er større enn tallet han står på (" + A[i] + "). Bytt!",
             "A[" + (i - 1) + "]>" + "A[" + i + "] → bytt.",
             "i=" + i + ": A[i−1]>A[i] → swap."), "Bytter");
         var tmp = A[i - 1]; A[i - 1] = A[i]; A[i] = tmp;
@@ -478,7 +478,7 @@
     bigO: {
       best: "O(n log n)", avg: "O(n log n)", worst: "O(n log n)", space: "O(n)", stable: true, inplace: false,
       why: t(
-        "Vi deler bunken i to om og om igjen – det gir få «etasjer» (log n). På hver etasje fletter vi alle tallene én gang (n). Likt uansett hvordan tallene lå.",
+        "Vi deler i to helt til hver bunke har ett kort. Det blir ikke mange delinger: selv 1000 kort trenger bare omtrent 10 runder. I hver runde ser vi på hvert kort én gang når vi fletter. Det er like mye jobb uansett hvordan kortene lå fra før.",
         "log n nivåer med splitting, O(n) flettearbeid per nivå → O(n log n) alltid. Trenger et hjelpearray på O(n), så ikke in-place. Stabil.",
         "Vi halverer til bitene har ett element, så det blir log n nivåer. På hvert nivå flettes alle n elementene én gang, O(n) per nivå, til sammen O(n log n). Delingen bryr seg ikke om input, så best = snitt = verst. Fletteregelen «ta fra venstre ved likhet» (≤) bevarer stabiliteten. Prisen er et hjelpearray, en ekstra datastruktur, så merge er ikke in-place."
       )
@@ -519,7 +519,7 @@
         normal: "Skriv R[j] til A og gå videre i R.",
         teknisk: "Ett element skrives tilbake; j flyttes." },
       { code: "k ← k + 1", indent: 2,
-        eli5: "Neste plass i A.",
+        eli5: "Vi går videre til neste plass i arrayet, der neste kort skal legges ned.",
         normal: "Neste skriveplass i A.",
         teknisk: "k øker med én per iterasjon." },
       { code: "kopier resten av L og R", indent: 1,
@@ -651,7 +651,7 @@
         normal: "Hopp over elementer som alt hører til venstre.",
         teknisk: "left stopper på første element > pivot." },
       { code: "left ← left + 1", indent: 3,
-        eli5: "Et skritt til høyre.",
+        eli5: "«left» tar ett skritt til høyre og ser på neste tall.",
         normal: "Flytt left mot høyre.",
         teknisk: "left ← left + 1." },
       { code: "while right ≥ left and A[right] ≥ pivot do", indent: 2,
@@ -659,7 +659,7 @@
         normal: "Hopp over elementer som alt hører til høyre.",
         teknisk: "right stopper på første element < pivot." },
       { code: "right ← right − 1", indent: 3,
-        eli5: "Et skritt til venstre.",
+        eli5: "«right» tar ett skritt til venstre og ser på neste tall.",
         normal: "Flytt right mot venstre.",
         teknisk: "right ← right − 1." },
       { code: "if left < right then", indent: 2,
@@ -997,13 +997,13 @@
         normal: "Gå gjennom kategoriene i rekkefølge.",
         teknisk: "N runder." },
       { code: "for v in B[c] do", indent: 2,
-        eli5: "Ordene tas ut forfra.",
+        eli5: "Vi tar ordene ut av bøtta forfra, i samme rekkefølge som vi la dem inn. Da står de fortsatt alfabetisk.",
         normal: "Ta ut ordene i den rekkefølgen de kom inn.",
         teknisk: "Til sammen n ord." },
       { code: "A[j] ← v", indent: 3,
         eli5: "Ordet legges tilbake i arrayet.", normal: "Skriv tilbake.", teknisk: "O(1)." },
       { code: "j ← j + 1", indent: 3,
-        eli5: "Neste plass.", normal: "Neste ledige plass.", teknisk: "j ender på n." },
+        eli5: "Vi flytter oss til neste ledige plass i arrayet, så neste ord ikke skriver over dette.", normal: "Neste ledige plass.", teknisk: "j ender på n." },
       { code: "return A", indent: 1,
         eli5: "Ferdig – gruppert etter kategori, alfabetisk i hver gruppe.",
         normal: "Sortert etter kategori, stabilt.",
@@ -1033,7 +1033,7 @@
         normal: "Ny lengde?",
         teknisk: "Oppslag i hashmap: O(1)." },
       { code: "B[k] ← empty list", indent: 3,
-        eli5: "Da lager vi en.", normal: "Lag en tom bøtte.", teknisk: "O(1)." },
+        eli5: "Da setter vi fram en ny, tom bøtte for denne lengden.", normal: "Lag en tom bøtte.", teknisk: "O(1)." },
       { code: "append A[i] to B[k]", indent: 2,
         eli5: "Ordet legges bakerst i bøtta.",
         normal: "Bakerst – da holder bøtta seg alfabetisk.",
@@ -1045,13 +1045,13 @@
         normal: "Sorter de N ulike lengdene synkende, og gå gjennom dem.",
         teknisk: "Å sortere de N nøklene koster O(N log N)." },
       { code: "for w in B[k] do", indent: 2,
-        eli5: "Ordene tas ut forfra.", normal: "I den rekkefølgen de kom inn.", teknisk: "Til sammen n ord." },
+        eli5: "Vi tar ordene ut av bøtta forfra. Siden de ble lagt inn alfabetisk, kommer de ut alfabetisk.", normal: "I den rekkefølgen de kom inn.", teknisk: "Til sammen n ord." },
       { code: "A[j] ← w", indent: 3,
-        eli5: "Ordet legges tilbake.", normal: "Skriv tilbake.", teknisk: "O(1)." },
+        eli5: "Ordet legges tilbake i arrayet, på neste ledige plass.", normal: "Skriv tilbake.", teknisk: "O(1)." },
       { code: "j ← j + 1", indent: 3,
-        eli5: "Neste plass.", normal: "Neste ledige plass.", teknisk: "j ender på n." },
+        eli5: "Vi flytter oss til neste ledige plass, så neste ord ikke skriver over dette.", normal: "Neste ledige plass.", teknisk: "j ender på n." },
       { code: "return A", indent: 1,
-        eli5: "Ferdig!", normal: "Sortert etter lengde, stabilt.",
+        eli5: "Ferdig! De lengste ordene står først, og ord med like mange bokstaver står fortsatt alfabetisk.", normal: "Sortert etter lengde, stabilt.",
         teknisk: "O(N log N + n), der N ≤ n er antall ulike lengder." }
     ]
   };

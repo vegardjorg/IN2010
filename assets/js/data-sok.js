@@ -256,7 +256,7 @@
       why: t(
         "Akkurat som vanlig binærsøk halverer vi bunken hver gang. Men hvert nytt «hjelper-kall» må huskes til svaret kommer tilbake, og det tar litt plass.",
         "Hvert kall halverer intervallet, så det blir ca. log n kall. Kallene ligger på kallstakken samtidig, derfor O(log n) ekstra minne (den iterative versjonen bruker O(1)).",
-        "Kjøretiden følger T(n) = T(n/2) + O(1), som gir O(log n). Kallstakken blir like dyp som antall halveringer, så minnebruken er O(log n). Kaller du med low og high fra et kjent delintervall, er n her lengden av intervallet."
+        "Hvert kall gjør konstant arbeid og sender et intervall som er høyst halvparten så stort videre. Fra n ned til ett element med halvering tar omtrent log n kall, så kjøretiden er O(log n). (Kortversjonen er T(n) = T(n/2) + O(1). Den trenger du ikke regne på; det er argumentet om antall halveringer som teller på eksamen.) Kallstakken blir like dyp som antall halveringer, så minnebruken er O(log n). Kaller du med low og high fra et kjent delintervall, er n her lengden av intervallet."
       )
     }
   });
@@ -403,7 +403,7 @@
         normal: "Skriv ut de to indeksene.",
         teknisk: "Utskriften er konstant arbeid. Kjøretiden bestemmes av hvor mange nabopar løkka måtte se på før den fant dette." },
       { code: "return", indent: 3,
-        eli5: "Og så er vi ferdige.",
+        eli5: "Og så er vi ferdige. Det finnes bare ett tall som står to ganger, så vi trenger ikke lete videre.",
         normal: "Stopp – det finnes bare ett duplikat.",
         teknisk: "Tidlig retur. I verste fall ligger duplikatet helt bakerst, og da har vi sjekket alle n − 1 parene: O(n)." }
     ],
@@ -456,7 +456,7 @@
         normal: "Skriv ut lagret indeks og nåværende indeks.",
         teknisk: "H[A[i]] er indeksen til første forekomst." },
       { code: "return", indent: 3,
-        eli5: "Ferdig!",
+        eli5: "Ferdig! Det finnes bare ett tall som står to ganger, så resten trenger vi ikke se på.",
         normal: "Stopp – det finnes bare ett duplikat.",
         teknisk: "Vi returnerer med en gang. Oppgaven lover nøyaktig ett duplikat, så det er ingenting mer å lete etter." },
       { code: "H[A[i]] ← i", indent: 2,
@@ -731,7 +731,7 @@
       { code: "if x − y ∈ S then", indent: 2, eli5: "Har vi allerede sett «makkeren» som gjør summen riktig?", normal: "Finnes komplementet x − y blant dem vi har sett?", teknisk: "Komplement-trikset: y + z = x ⇔ z = x − y. Oppslag, forventet O(1)." },
       { code: "print(y, x − y)", indent: 3, eli5: "Ja! Da har vi et par.", normal: "Skriv ut paret.", teknisk: "Komplementet er sett før, så y og x − y er et par." },
       { code: "S.remove(x − y)", indent: 3, eli5: "Vi tar makkeren ut av posen, så den ikke brukes to ganger.", normal: "Fjern komplementet, slik løsningsforslaget gjør.", teknisk: "Med unike tall i A kan x − y uansett bare matches én gang, så fjerningen er strengt tatt ikke nødvendig. Den gjør det tydelig at hvert tall inngår i høyst ett par, og den holder settet lite." },
-      { code: "else", indent: 2, eli5: "Ellers …", normal: "Ingen makker ennå:", teknisk: "x − y er ikke i S ennå, så y kan selv bli makker for et senere tall." },
+      { code: "else", indent: 2, eli5: "Ellers har tallet ingen makker ennå. Da …", normal: "Ingen makker ennå:", teknisk: "x − y er ikke i S ennå, så y kan selv bli makker for et senere tall." },
       { code: "S.add(y)", indent: 3, eli5: "… legger vi tallet i posen og går videre.", normal: "Husk y til senere.", teknisk: "Innsetting, forventet O(1)." }
     ],
     bigO: {
@@ -774,7 +774,7 @@
     input: "To arrayer A og B",
     output: "Skriver ut hvert element som finnes i begge (én gang per element)",
     lines: [
-      { code: "S ← new HashSet", indent: 1, eli5: "En tom pose.", normal: "Tomt hashset.", teknisk: "Forventet O(1) per operasjon." },
+      { code: "S ← new HashSet", indent: 1, eli5: "Vi tar fram en tom pose. I den skal vi legge tallene fra A, så vi raskt kan sjekke om et tall er der.", normal: "Tomt hashset.", teknisk: "Forventet O(1) per operasjon." },
       { code: "for each y in A do", indent: 1, eli5: "Alle tallene fra A …", normal: "Gå gjennom A.", teknisk: "|A| runder." },
       { code: "S.add(y)", indent: 2, eli5: "… legger vi i posen.", normal: "Legg y i settet.", teknisk: "Innsetting." },
       { code: "for each z in B do", indent: 1, eli5: "Så ser vi på tallene i B.", normal: "Gå gjennom B.", teknisk: "|B| runder." },

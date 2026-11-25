@@ -44,7 +44,7 @@
 
     <!-- ===================== BEGREPER ===================== -->
     <section data-panel="begreper">
-      <div class="callout begrep"><span class="lbl">Begrep</span>
+      <div class="callout begrep"><span class="lbl">Begrep: tre</span>
         <p>Et <b>tre</b> er en samling <b>noder</b> koblet sammen med <b>kanter</b>, uten sykler. Én node er <b>roten</b>.
           Alle andre noder har nøyaktig én <b>forelder</b>. Nodene under en node er <b>barna</b> dens, og barn av samme forelder er <b>søsken</b>.
           En node uten barn er en <b>løvnode</b>. En node med minst ett barn er en <b>intern node</b>.</p>
@@ -63,21 +63,22 @@
       </div>
 
       <div class="grid cols-2">
-        <div class="callout eli5"><span class="lbl">ELI5</span>
+        <div class="callout eli5"><span class="lbl">5-åring: slektstre</span>
           <p>Tenk på et slektstre snudd opp-ned. Oldemor står øverst (roten). Barna hennes står under, og barnebarna under dem igjen.
             <b>Dybde</b> er hvor mange trinn du må gå ned fra toppen for å nå noen.
             <b>Høyde</b> er hvor mange trinn det er fra noen og ned til den yngste i deres gren.</p>
         </div>
-        <div class="callout eksempel"><span class="lbl">Eksempel</span>
+        <div class="callout eksempel"><span class="lbl">Eksempel: kurstreet</span>
           <p>I kurstreet over er <code>e</code> roten med dybde 0. <code>h</code>, <code>i</code> og <code>j</code> er løvnoder med høyde 0.
             <code>g</code> har høyde 1, og hele treet har høyde 2. Subtreet med rot <code>f</code> består av <code>f</code>, <code>h</code> og <code>i</code>.</p>
         </div>
       </div>
 
       <h3>Dybde, høyde og nivå</h3>
-      <div class="callout begrep"><span class="lbl">Begrep</span>
+      <div class="callout begrep"><span class="lbl">Begrep: sti, dybde og høyde</span>
         <ul>
-          <li><b>Sti:</b> en følge noder der hver er forbundet med neste med en kant. <b>Lengden</b> måles i kanter.</li>
+          <li><b>Sti:</b> en følge noder der hver er forbundet med neste med en kant, og der ingen node gjentas. <b>Lengden</b> måles i kanter.
+            I et tre finnes det nøyaktig én sti mellom to noder. <span class="muted small">(Samme definisjon som for grafer, se <a href="06-grafer.html#fane=begreper">Blokk 6 · Grafer → Begreper</a>.)</span></li>
           <li><b>Dybden</b> til en node er lengden på stien fra roten ned til den. Roten har dybde 0.</li>
           <li><b>Høyden</b> til en node er lengden på den lengste stien fra den ned til en løvnode. En løvnode har høyde 0, og et tomt tre (null) har høyde −1. Høyden til treet er høyden til roten.</li>
           <li><b>Nivå</b> <span class="muted small">(standardbegrep)</span>: alle noder med samme dybde. Nivå d er nodene med dybde d.</li>
@@ -94,7 +95,7 @@
       </details>
 
       <h3>Typer binærtrær</h3>
-      <div class="callout begrep"><span class="lbl">Begrep</span>
+      <div class="callout begrep"><span class="lbl">Begrep: binærtre</span>
         <p>Et <b>binærtre</b> er et tre der hver node har høyst to barn, et <b>venstre barn</b> og et <b>høyre barn</b>. Rekkefølgen betyr noe: et venstre barn alene er ikke det samme som et høyre barn alene.</p>
       </div>
       <div class="grid cols-3">
@@ -108,11 +109,11 @@
           <div class="tv-mini" id="mini-balansert"></div>
           <p class="muted small">Høyden er O(log n). Et AVL-tre er balansert fordi venstre og høyre subtre aldri skiller seg med mer enn 1 i høyde.</p></div>
       </div>
-      <div class="callout felle"><span class="lbl">Felle</span>
+      <div class="callout felle"><span class="lbl">Felle: fullt, komplett eller perfekt?</span>
         <p>Ulike lærebøker bruker «fullt», «komplett» og «perfekt» litt ulikt. På eksamen er det tryggest å skrive én setning om hva du mener, f.eks. «komplett: alle nivåer fulle unntatt det nederste, som er fylt fra venstre».</p>
       </div>
 
-      <div class="callout uni"><span class="lbl">Universitetsnivå</span>
+      <div class="callout uni"><span class="lbl">Universitetsnivå: høyde og antall noder</span>
         <p>På dybde d kan et binærtre ha høyst 2<sup>d</sup> noder. Et binærtre med høyde h har derfor høyst
           1 + 2 + … + 2<sup>h</sup> = 2<sup>h+1</sup> − 1 noder. Snur vi det, må et binærtre med n noder ha høyde minst ⌊log n⌋.
           Høyden er høyst n − 1 (en kjede). Nesten alle trealgoritmer i kurset koster O(h). Hele poenget med balanserte trær er å presse h ned mot log n.</p>
@@ -161,20 +162,31 @@
 
     <!-- ===================== TRAVERSERINGER ===================== -->
     <section data-panel="trav" hidden>
-      <div class="callout begrep"><span class="lbl">Begrep</span>
+      <div class="callout begrep"><span class="lbl">Begrep: traversering</span>
         <p>En <b>traversering</b> besøker alle nodene i et tre nøyaktig én gang. Rekkefølgen er det som skiller dem:
           <b>preorder</b> (noden før barna), <b>inorder</b> (venstre, noden, høyre), <b>postorder</b> (barna før noden) og
           <b>level-order</b> (nivå for nivå, også kalt bredde først).</p>
       </div>
       <div id="intro-trav"></div>
-      <div class="callout eksempel"><span class="lbl">Eksempel</span>
-        <p>Kurstreet (<code>e</code> med barna <code>f</code> og <code>g</code>, <code>f</code> med <code>h</code> og <code>i</code>, <code>g</code> med <code>j</code> til venstre):</p>
-        <ul class="small">
-          <li>Preorder: <code>e f h i g j</code></li>
-          <li>Inorder: <code>h f i e j g</code></li>
-          <li>Postorder: <code>h i f j g e</code></li>
-          <li>Level-order: <code>e f g h i j</code></li>
-        </ul>
+      <div class="grid cols-2">
+        <div class="callout eli5"><span class="lbl">5-åring: runde i et stort hus</span>
+          <p>Tenk deg at du skal innom alle rommene i et stort hus der gangene deler seg. Du tar alltid venstre gang før høyre, og går tilbake samme vei.</p>
+          <ul class="small">
+            <li><b>Preorder:</b> du skriver navnet på rommet idet du kommer inn.</li>
+            <li><b>Postorder:</b> du skriver det idet du går ut for siste gang.</li>
+            <li><b>Inorder</b> (bare binærtrær): du skriver det når du er ferdig med venstre gang, før du tar den høyre.</li>
+            <li><b>Level-order:</b> du blir ferdig med én etasje før du går videre til neste.</li>
+          </ul>
+        </div>
+        <div class="callout eksempel"><span class="lbl">Eksempel: kurstreet</span>
+          <p>Kurstreet (<code>e</code> med barna <code>f</code> og <code>g</code>, <code>f</code> med <code>h</code> og <code>i</code>, <code>g</code> med <code>j</code> til venstre):</p>
+          <ul class="small">
+            <li>Preorder: <code>e f h i g j</code></li>
+            <li>Inorder: <code>h f i e j g</code></li>
+            <li>Postorder: <code>h i f j g e</code></li>
+            <li>Level-order: <code>e f g h i j</code></li>
+          </ul>
+        </div>
       </div>
 
       <div class="tv-switch" role="group" aria-label="Velg traversering" data-switch="trav" id="trav-switch">
@@ -190,18 +202,18 @@
         <div data-sub="level" id="demo-level" hidden></div>
       </div>
 
-      <div class="callout uni"><span class="lbl">Universitetsnivå</span>
+      <div class="callout uni"><span class="lbl">Universitetsnivå: skjult stakk eller kø</span>
         <p>De rekursive traverseringene bruker <b>kallstakken</b> som en skjult stakk, så de går i dybden først. Ekstra minne er O(h).
           Level-order bruker en eksplisitt <b>kø</b> og går i bredden. Køen kan holde et helt nivå, så minnet er O(n) i verste fall.
           Pre- og postorder gir mening for generelle trær (besøk alle barna i rekkefølge). Inorder krever et binærtre, fordi «midten» bare er definert når det er et venstre og et høyre barn.</p>
       </div>
-      <div class="callout felle"><span class="lbl">Felle</span>
+      <div class="callout felle"><span class="lbl">Felle: sortert inorder og kø</span>
         <p>Inorder gir sortert rekkefølge <b>bare</b> i et binært søketre. Og level-order trenger en <b>kø</b>: med en stakk får du en dybde-først-rekkefølge.</p>
       </div>
 
       <h3>Eksamen</h3>
       <div id="exam-h2025-4"></div>
-      <div class="callout sensor"><span class="lbl">Sensortips</span>
+      <div class="callout sensor"><span class="lbl">Sensortips (H2025)</span>
         <ul>
           <li>Si hvilken datastruktur du bruker (kø!) og at Enqueue/Dequeue er O(1). Da følger O(n) direkte.</li>
           <li>Null-sjekk barna før du legger dem i køen, eller sjekk etter Dequeue. En av dem må være med.</li>
@@ -215,18 +227,18 @@
 
     <!-- ===================== BINÆRT SØKETRE ===================== -->
     <section data-panel="bst" hidden>
-      <div class="callout begrep"><span class="lbl">Begrep</span>
+      <div class="callout begrep"><span class="lbl">Begrep: søketre-egenskapen</span>
         <p>Et <b>binært søketre</b> (BST) er et binærtre der hver node v oppfyller <b>søketre-egenskapen</b>:
           alle elementer i venstre subtre er mindre enn v.element, og alle i høyre subtre er større.
           Kravet gjelder hele subtrærne, ikke bare de direkte barna.</p>
       </div>
       <div id="intro-bst"></div>
       <div class="grid cols-2">
-        <div class="callout eli5"><span class="lbl">ELI5</span>
+        <div class="callout eli5"><span class="lbl">5-åring: høyere eller lavere</span>
           <p>Det er som å spille «høyere eller lavere». Ved hver node spør du: er tallet mitt mindre? Gå til venstre. Større? Gå til høyre.
             Hvert svar lar deg glemme en hel gren.</p>
         </div>
-        <div class="callout eksempel"><span class="lbl">Eksempel</span>
+        <div class="callout eksempel"><span class="lbl">Eksempel: rekkefølgen avgjør formen</span>
           <p>Setter vi inn 50, 30, 70, 20, 40, 60, 80, blir 50 roten. 30 og 70 blir barna, og de fire siste blir løvnoder. Høyden er 2.
             Setter vi inn de samme tallene sortert (20, 30, …, 80), blir treet en kjede med høyde 6.</p>
         </div>
@@ -273,20 +285,23 @@
       <h3>Skriv ut et intervall (InRange)</h3>
       <div class="grid cols-2">
         <div><div id="pc-range"></div></div>
-        <div class="callout uni" style="margin-top:0"><span class="lbl">Universitetsnivå</span>
+        <div class="callout uni" style="margin-top:0"><span class="lbl">Universitetsnivå: beskjæring</span>
           <p>InRange er en inorder med <b>beskjæring</b>: et subtre der intervallet ikke kan treffe, hoppes over. Da besøker vi to stier, én mot hvert endepunkt av intervallet, pluss de k treffene: O(h + k). Uten beskjæring blir det en vanlig inorder på O(n).</p></div>
       </div>
       <details class="card"><summary><b>Koden, linje for linje</b> (InRange)</summary><div id="exp-range"></div></details>
 
-      <div class="callout felle"><span class="lbl">Felle</span>
+      <div class="callout felle"><span class="lbl">Felle: O(log n) uten balanse</span>
         <p>Kjøretiden for et vanlig BST er O(h), og h kan være n − 1. Skriv aldri «O(log n)» uten å si at treet er balansert.</p>
+      </div>
+      <div class="callout snarvei"><span class="lbl">Snarvei: sjekk svaret med inorder</span>
+        <p>Inorder av et binært søketre gir alltid elementene i sortert rekkefølge. Har du tegnet et tre etter innsetting eller fjerning, kan du lese det i inorder. Kommer tallene ikke stigende, har du gjort en feil.</p>
       </div>
 
       <h3>Eksamen</h3>
       <div id="exam-h2020-2"></div>
       <div id="exam-h2021-8"></div>
       <div id="exam-h2022-10"></div>
-      <div class="callout sensor"><span class="lbl">Sensortips</span>
+      <div class="callout sensor"><span class="lbl">Sensortips (H2020–H2022)</span>
         <ul>
           <li>Oppgi kjøretiden som O(h), og si hva h er for et balansert tre og for en kjede.</li>
           <li>Fjerning med to barn: si eksplisitt at du bruker etterfølgeren (eller forgjengeren), og at den har høyst ett barn.</li>
@@ -300,16 +315,16 @@
 
     <!-- ===================== DIAMETER ===================== -->
     <section data-panel="diameter" hidden>
-      <div class="callout begrep"><span class="lbl">Begrep</span>
+      <div class="callout begrep"><span class="lbl">Begrep: diameter</span>
         <p><b>Diameteren</b> til et binærtre er lengden (i kanter) på den lengste stien mellom to noder i treet.
           Stien kan gå opp og ned igjen. Den trenger ikke gå gjennom roten.</p>
       </div>
       <div id="intro-diameter"></div>
       <div class="grid cols-2">
-        <div class="callout eli5"><span class="lbl">ELI5</span>
+        <div class="callout eli5"><span class="lbl">5-åring: den lengste turen</span>
           <p>Tenk deg treet som et nett av stier. Diameteren er den lengste turen du kan gå uten å gå samme vei to ganger. Hver node spør barna sine: «Hvor dypt går det under deg, og hva er den lengste turen hos deg?»</p>
         </div>
-        <div class="callout eksempel"><span class="lbl">Eksempel</span>
+        <div class="callout eksempel"><span class="lbl">Eksempel: ikke gjennom roten</span>
           <p>I eksempelet «Ikke gjennom roten» har roten bare ett barn. Den lengste stien går fra <code>d</code> opp til <code>a</code> og ned til <code>e</code>, og har lengde 4. Stien gjennom roten er bare 3 lang.</p>
         </div>
       </div>
@@ -319,28 +334,31 @@
         <p>Det er fristende å kalle <code>Height(v.left) + Height(v.right) + 2</code> for hver node. Men Height er selv O(n), så for en skjev kjede blir det O(n²).
           H2023 ga opptil 8 poeng for lineær løsning, og 5 for kvadratisk. Returner høyde og diameter <b>samtidig</b>, som over.</p>
       </div>
-      <div class="callout uni"><span class="lbl">Universitetsnivå</span>
+      <div class="callout uni"><span class="lbl">Universitetsnivå: postorder-mønsteret</span>
         <p>Diameter er et typisk <b>postorder-mønster</b>: svaret for v bygges av svarene fra barna, så hver node trenger bare O(1) arbeid. Å returnere et par (h, d) er en vanlig teknikk for å slippe å regne ut samme verdi flere ganger.</p>
       </div>
 
       <h3>Eksamen</h3>
       <div id="exam-h2023-5"></div>
-      <div class="callout sensor"><span class="lbl">Sensortips</span>
+      <div class="callout sensor"><span class="lbl">Sensortips (H2023)</span>
         <ul>
           <li>Tell kanter, ikke noder. En løvnode alene har diameter 0.</li>
           <li>Vis at du vet at stien ikke trenger å gå gjennom roten. Max over de tre kandidatene er hele poenget.</li>
           <li>Oppgi O(n), og forklar at hver node besøkes én gang.</li>
         </ul>
       </div>
+
+      <h3>Øv selv</h3>
+      <div id="quiz-diameter"></div>
     </section>
 
     <!-- ===================== LCA ===================== -->
     <section data-panel="lca" hidden>
-      <div class="callout begrep"><span class="lbl">Begrep</span>
+      <div class="callout begrep"><span class="lbl">Begrep: laveste felles forfeder</span>
         <p>Den <b>laveste felles forfederen</b> til u og v er den dypeste noden som har både u og v som etterkommere. En node regnes som etterkommer av seg selv, så hvis u er forfeder til v, er svaret u.</p>
       </div>
       <div id="intro-lca"></div>
-      <div class="callout eli5"><span class="lbl">ELI5</span>
+      <div class="callout eli5"><span class="lbl">5-åring: to slektninger møtes</span>
         <p>To slektninger leter etter sin nærmeste felles slektning. Den som står lengst nede i slektstreet, klatrer opp ett trinn om gangen til de står like høyt. Så klatrer de sammen til de møtes.</p>
       </div>
 
@@ -359,34 +377,37 @@
         </div>
       </div>
 
-      <div class="callout uni"><span class="lbl">Universitetsnivå</span>
+      <div class="callout uni"><span class="lbl">Universitetsnivå: hvorfor O(h)</span>
         <p>Begge variantene er O(h). Generell versjon: hvert kall løfter én node ett nivå, og summen av dybdene er høyst 2h.
           BST-versjonen følger én sti fra roten. En løsning som går gjennom hele treet (O(n)) er riktig, men H2024 ga bare delvis uttelling for den.</p>
       </div>
 
       <h3>Eksamen</h3>
       <div id="exam-h2024-6"></div>
-      <div class="callout sensor"><span class="lbl">Sensortips</span>
+      <div class="callout sensor"><span class="lbl">Sensortips (H2024)</span>
         <ul>
           <li>Bruk informasjonen du får (parent, depth). Da blir løsningen kort og O(h).</li>
           <li>Husk tilfellet der den ene noden er forfeder til den andre.</li>
           <li>BST-varianten: bruk ≤ i splittsjekken, ellers mister du tilfellet x = v.element.</li>
         </ul>
       </div>
+
+      <h3>Øv selv</h3>
+      <div id="quiz-lca"></div>
     </section>
 
     <!-- ===================== AVL ===================== -->
     <section data-panel="avl" hidden>
-      <div class="callout begrep"><span class="lbl">Begrep</span>
+      <div class="callout begrep"><span class="lbl">Begrep: AVL-tre og balansefaktor</span>
         <p>Et <b>AVL-tre</b> er et binært søketre der hver node har <b>balansefaktor</b> −1, 0 eller 1.
           Balansefaktoren er høyden til venstre subtre minus høyden til høyre subtre. Etter innsetting eller fjerning repareres brudd med <b>rotasjoner</b> på veien opp.</p>
       </div>
       <div id="intro-avl"></div>
       <div class="grid cols-2">
-        <div class="callout eli5"><span class="lbl">ELI5</span>
+        <div class="callout eli5"><span class="lbl">5-åring: en mobil som skal henge rett</span>
           <p>Tenk på en mobil som henger fra taket. Blir den ene siden for tung, vipper den. En rotasjon er å flytte opphengspunktet, så den henger rett igjen, uten å bytte rekkefølgen på tingene.</p>
         </div>
-        <div class="callout eksempel"><span class="lbl">Eksempel</span>
+        <div class="callout eksempel"><span class="lbl">Eksempel: knekk gir dobbel rotasjon</span>
           <p>Setter vi inn 30, 10, 20, får 30 balansefaktor 2, og 10 er høyretung. Det er en knekk, så vi trenger en <b>dobbel rotasjon</b>: venstrerotasjon på 10, så høyrerotasjon på 30. Resultat: 20 med barna 10 og 30.</p>
         </div>
       </div>
@@ -428,8 +449,10 @@
         <div id="pc-avlrem"></div><div id="exp-avlrem"></div>
       </details>
 
-      <div class="callout uni"><span class="lbl">Universitetsnivå</span>
-        <p>Hvorfor er høyden O(log n)? La N(h) være det minste antall noder et AVL-tre med høyde h kan ha. Det minste treet har ett subtre med høyde h − 1 og ett med h − 2, så N(h) = 1 + N(h − 1) + N(h − 2).
+      <div class="callout uni"><span class="lbl">Universitetsnivå: hvorfor høyden er O(log n)</span>
+        <p><b>Poenget:</b> selv det skjeveste AVL-treet har så mange noder at høyden alltid er O(log n). Derfor er søk, innsetting og fjerning O(log n).
+          Det er dette du må kunne. Utregningen under er ikke pensum, bare for de nysgjerrige.</p>
+        <p>La N(h) være det minste antall noder et AVL-tre med høyde h kan ha. Det minste treet har ett subtre med høyde h − 1 og ett med h − 2, så N(h) = 1 + N(h − 1) + N(h − 2).
           Det vokser som Fibonacci-tallene, altså eksponentielt i h. Snur vi det, er h = O(log n).
           Andre balanserte søketrær du kan høre om, er <b>rød-svarte trær</b>.</p>
       </div>
@@ -437,32 +460,35 @@
       <h3>Eksamen</h3>
       <div id="exam-h2020-6"></div>
       <div id="exam-h2022-3"></div>
-      <div class="callout sensor"><span class="lbl">Sensortips</span>
+      <div class="callout sensor"><span class="lbl">Sensortips (H2020 og H2022)</span>
         <ul>
           <li>Tegn treet etter <b>hver</b> innsetting, og skriv hvilken rotasjon du gjør, og rundt hvilken node.</li>
           <li>Oppdater høyder nedenfra og opp. Sjekk balansefaktoren i alle noder på stien til roten.</li>
           <li>En dobbel rotasjon er to enkle. Teller oppgaven rotasjoner, teller den som to.</li>
         </ul>
       </div>
+
+      <h3>Øv selv</h3>
+      <div id="quiz-avl"></div>
     </section>
 
     <!-- ===================== ANTI-AVL ===================== -->
     <section data-panel="antiavl" hidden>
-      <div class="callout begrep"><span class="lbl">Begrep</span>
+      <div class="callout begrep"><span class="lbl">Begrep: Anti-AVL</span>
         <p><b>Anti-AVL</b> (fra H2025) er et påfunnet tre som gjør det motsatte av AVL: hver gang en node på veien har et venstre barn, gjøres en høyrerotasjon. Resultatet blir alltid en <b>høyrekjede</b>, altså så ubalansert som mulig.</p>
       </div>
       <div id="intro-antiavl"></div>
-      <div class="callout eli5"><span class="lbl">ELI5</span>
+      <div class="callout eli5"><span class="lbl">5-åring: alle på én rekke</span>
         <p>Det er som en kø der alle skal stå på én rekke. Prøver noen å stille seg ved siden av, blir de dyttet inn i rekka.</p>
       </div>
       <div id="demo-antiavl"></div>
-      <div class="callout uni"><span class="lbl">Universitetsnivå</span>
+      <div class="callout uni"><span class="lbl">Universitetsnivå: invarianten</span>
         <p>Invarianten er at ingen node har venstre barn. En innsetting kan lage høyst ett venstre barn, og én høyrerotasjon fjerner det igjen. Derfor holder det med <code>if</code>, og hver innsetting gjør høyst én rotasjon.
           Høyden blir n − 1, så innsetting og søk er O(n) i verste fall, mot O(log n) i et AVL-tre.</p>
       </div>
       <h3>Eksamen</h3>
       <div id="exam-h2025-3"></div>
-      <div class="callout sensor"><span class="lbl">Sensortips</span>
+      <div class="callout sensor"><span class="lbl">Sensortips (H2025)</span>
         <ul>
           <li>Tell rotasjonene nøye ved å spore hver innsetting for seg.</li>
           <li>Begrunn hvorfor treet blir en kjede: invarianten «ingen venstre barn» holder etter hver innsetting.</li>
@@ -472,14 +498,14 @@
 
     <!-- ===================== HUFFMAN ===================== -->
     <section data-panel="huffman" hidden>
-      <div class="callout begrep"><span class="lbl">Begrep</span>
+      <div class="callout begrep"><span class="lbl">Begrep: Huffman-koding</span>
         <p><b>Huffman-koding</b> gir hvert symbol et binært kodeord, slik at vanlige symboler får korte koder og sjeldne får lange.
           Kodene er <b>prefiksfrie</b>: ingen kode er starten på en annen. Derfor kan en bitstreng dekodes entydig uten skilletegn.
           Symbolene ligger i løvnodene, og koden er stien fra roten: venstre = 0, høyre = 1.</p>
       </div>
       <div id="intro-huffman"></div>
       <div class="grid cols-2">
-        <div class="callout eli5"><span class="lbl">ELI5</span>
+        <div class="callout eli5"><span class="lbl">5-åring: korte kallenavn</span>
           <p>Bokstaven du bruker oftest, får det korteste kallenavnet. Vi bygger treet nedenfra ved å hekte sammen de to sjeldneste bokstavene igjen og igjen, til alle henger i samme tre.</p>
         </div>
         <div class="callout eksempel"><span class="lbl">Eksempel (H2024)</span>
@@ -492,13 +518,13 @@
       <h3>Kode og dekode</h3>
       <div class="card tv-codec" id="codec"></div>
 
-      <div class="callout uni"><span class="lbl">Universitetsnivå</span>
+      <div class="callout uni"><span class="lbl">Universitetsnivå: grådig og optimal</span>
         <p>Huffman er en <b>grådig</b> algoritme: den slår alltid sammen de to sjeldneste. Den gir en optimal prefikskode, altså minst mulig total lengde Σ f(s) · |kode(s)|.
           Med en min-heap som prioritetskø blir kjøretiden O(n log n) for n symboler. Ved like frekvenser kan treet bli forskjellig, men den totale lengden blir den samme.</p>
       </div>
 
       <h3>Prefikstre (trie)</h3>
-      <div class="callout begrep"><span class="lbl">Begrep</span>
+      <div class="callout begrep"><span class="lbl">Begrep: prefikstre</span>
         <p>Et <b>prefikstre</b> (trie) lagrer strenger tegn for tegn langs stier fra roten. Strenger med felles start deler sti. Et Huffman-tre er et binært prefikstre over kodeordene.
           Oppslag av en streng med lengde k tar O(k), uavhengig av hvor mange strenger som er lagret.</p>
       </div>
@@ -507,7 +533,7 @@
       <div id="exam-h2024-2"></div>
       <div id="exam-h2021-5"></div>
       <div id="exam-h2022-8"></div>
-      <div class="callout sensor"><span class="lbl">Sensortips</span>
+      <div class="callout sensor"><span class="lbl">Sensortips (H2021 og H2024)</span>
         <ul>
           <li>Skriv køen etter hver sammenslåing. Da ser sensor at du tar de to minste hver gang.</li>
           <li>Merk kantene med 0 og 1, og si hvilken regel du bruker.</li>
@@ -817,7 +843,9 @@
 
     /* ===================== TRAVERSERINGER ===================== */
     IN.explain("#intro-trav", t(
-      "Vi skal hilse på alle i treet, én gang hver. Spørsmålet er bare i hvilken rekkefølge.",
+      "<p>Vi skal hilse på alle i treet, én gang hver. Alle traverseringene besøker de samme nodene. Det eneste som skiller dem, er <i>når</i> vi sier navnet på en node:</p>" +
+      "<ul><li>før vi går ned til barna (preorder),</li><li>etter at alle barna er ferdige (postorder),</li><li>mellom venstre og høyre barn (inorder).</li></ul>" +
+      "<p>Level-order er annerledes: den tar én etasje om gangen, ovenfra og ned, og bruker en kø for å huske hvem som står for tur.</p>",
       "Alle fire besøker hver node én gang, så alle er O(n). Forskjellen er når en node behandles i forhold til barna. Velg rekkefølgen etter hva du trenger: inorder for sortert, postorder når forelderen trenger svar fra barna.",
       "Pre-, in- og postorder er dybde-først-traverseringer (rekursjon, implisitt stakk). Level-order er bredde-først (eksplisitt FIFO-kø). Kjøretiden er O(n) for alle, minnet O(h) for de rekursive og O(n) for level-order."
     ), { label: "Nivå:" });
@@ -831,7 +859,8 @@
 
     /* ===================== BST ===================== */
     IN.explain("#intro-bst", t(
-      "Et søketre holder tallene i orden, slik at du kan finne et tall uten å se på alle.",
+      "<p>Et binært søketre er som leken «høyere eller lavere». Står du ved en node og leter etter et mindre tall, går du til venstre. Leter du etter et større tall, går du til høyre.</p>" +
+      "<p>Det gjelder overalt i treet: alt til venstre for en node er mindre, og alt til høyre er større, ikke bare barna rett under. Er treet pent og jevnt, slipper du å se på omtrent halvparten av det som er igjen for hvert steg. Er det skjevt, hjelper det lite.</p>",
       "Søk, innsetting og fjerning følger én sti fra roten, så de koster O(h). Hvor god h er, avhenger av rekkefølgen tallene ble satt inn i.",
       "Søketre-egenskapen er en invariant: inorder gir sortert rekkefølge. Alle tre operasjonene er O(h), med h mellom ⌊log n⌋ og n − 1. Vanlige BST-er gir ingen garanti for h. Det er AVL-treets jobb."
     ), { label: "Nivå:" });
@@ -891,10 +920,16 @@
         "Kurstreet": KURS,
         "Kjede": [1, 2, 3, 4]
       } });
+    IN.quiz("#quiz-diameter", [
+      { q: "Må den lengste stien i et binærtre gå gjennom roten?",
+        options: ["Ja, alltid", "Nei, den kan ligge helt inne i ett subtre", "Bare hvis treet er balansert", "Bare hvis roten har to barn"], answer: 1,
+        explain: "Nei. Har roten for eksempel bare ett barn, kan den lengste stien ligge helt inne i det subtreet. Derfor tar Diameter maks av tre kandidater i hver node: stien gjennom noden (hL + hR + 2), og diameteren i venstre og i høyre subtre." }
+    ]);
 
     /* ===================== LCA ===================== */
     IN.explain("#intro-lca", t(
-      "Vi finner det nærmeste stedet der to grener i treet møtes.",
+      "<p>Laveste felles forfeder er det nærmeste stedet der to slektninger møtes i slektstreet. Tenk at begge klatrer oppover mot roten. Den første noden der veiene deres møtes, er svaret. Er den ene selv forfeder til den andre, er den ene svaret.</p>" +
+      "<p>I et søketre er det enda lettere. Gå ned fra roten. Der veien til de to tallene deler seg, ett til venstre og ett til høyre, står svaret. Kommer du til ett av tallene før veien deler seg, er det tallet svaret.</p>",
       "Generelt tre: løft den dypeste noden ett nivå om gangen til de to møtes. Søketre: start i roten og gå mot x og y så lenge begge ligger på samme side.",
       "Begge løsningene er O(h). Den generelle bruker parent- og depth-pekere. Søketre-versjonen bruker ordningen og stopper i splittpunktet x ≤ v.element ≤ y."
     ), { label: "Nivå:" });
@@ -904,10 +939,16 @@
     mountDemo("#demo-lcabst", { algo: "lcaBST", parseInput: parseKeysX, inputLabel: "nøkler / x, y, f.eks. 50,30,70 / 30, 70",
       presets: { "20 og 40": [{ keys: BST7.slice(), x: 20, y: 40 }], "60 og 80": [{ keys: BST7.slice(), x: 60, y: 80 }],
                  "30 og 40 (forfeder)": [{ keys: BST7.slice(), x: 30, y: 40 }], "20 og 80": [{ keys: BST7.slice(), x: 20, y: 80 }] } });
+    IN.quiz("#quiz-lca", [
+      { q: "Du leter etter LCA av x = 3 og y = 9 i et binært søketre. På veien ned fra roten står du i en node med element 5. Hva gjør du?",
+        options: ["Går til venstre", "Går til høyre", "Stopper: noden med 5 er svaret", "Går tilbake til roten"], answer: 2,
+        explain: "3 ligger til venstre for 5 og 9 til høyre. Veien til de to deler seg her, så 5 er den laveste felles forfederen. Det er testen x ≤ v.element ≤ y i LCABST." }
+    ]);
 
     /* ===================== AVL ===================== */
     IN.explain("#intro-avl", t(
-      "Et AVL-tre passer på at det aldri blir for skjevt. Blir det skjevt, vrir det seg tilbake.",
+      "<p>Et AVL-tre er et søketre som passer på at det ikke blir skjevt. Etter hver innsetting går vi opp mot roten og sjekker hver node: er den ene siden mer enn ett nivå høyere enn den andre? Da vrir vi litt på treet. Det kaller vi en rotasjon. Det er som å flytte opphenget på en mobil så den henger rett igjen.</p>" +
+      "<p>Rekkefølgen er den samme etter vridningen: mindre til venstre, større til høyre.</p>",
       "Etter vanlig BST-innsetting går vi tilbake opp, oppdaterer høyden og sjekker balansefaktoren i hver node. Er den −2 eller 2, roterer vi. Da holder høyden seg O(log n), og alle operasjoner blir O(log n).",
       "Invariant: |b(v)| ≤ 1 for alle v. Etter én innsetting er |b| høyst 2 langs stien. Én enkel eller dobbel rotasjon i den laveste ubalanserte noden gjenoppretter den. Fjerning kan kreve rotasjoner på flere nivåer."
     ), { label: "Nivå:" });
@@ -948,10 +989,16 @@
     pcBlock("#pc-seth", null, "setHeight");
     pcBlock("#pc-bf", "#exp-bf", "balanceFactor");
     pcBlock("#pc-avlrem", "#exp-avlrem", "avlRemove");
+    IN.quiz("#quiz-avl", [
+      { q: "Hvorfor holder det med én enkel eller dobbel rotasjon ved <b>innsetting</b> i et AVL-tre?",
+        options: ["Fordi rotasjoner er O(1)", "Fordi subtreet får samme høyde som før innsettingen, så alt over er i balanse igjen", "Fordi bare roten kan bli ubalansert", "Fordi AVL-trær aldri trenger mer enn én rotasjon, heller ikke ved fjerning"], answer: 1,
+        explain: "Innsettingen gjorde subtreet ett nivå høyere. Etter rotasjonen i den laveste ubalanserte noden har subtreet samme høyde som før innsettingen, så ingen noder lenger opp ser noen forskjell. Ved fjerning er det annerledes: der kan det trengs rotasjoner på flere nivåer." }
+    ]);
 
     /* ===================== ANTI-AVL ===================== */
     IN.explain("#intro-antiavl", t(
-      "Anti-AVL er en lek: vi vil ha et så skjevt tre som mulig, og vrir bort alle venstre barn.",
+      "<p>Anti-AVL er en lek med motsatt mål av AVL. AVL vil holde treet jevnt, men her vil vi gjøre det så skjevt som mulig. Hver gang en node får et venstre barn, vrir vi treet så barnet går opp og noden går ned til høyre for det.</p>" +
+      "<p>Etter hver innsetting står derfor alle nodene på én lang rekke mot høyre, som en trapp. Mindre til venstre og større til høyre gjelder hele tiden.</p>",
       "InsertAntiAVL er vanlig BST-innsetting, men på veien tilbake opp sjekker vi om noden har fått et venstre barn. Har den det, gjør vi en høyrerotasjon. Resultatet er alltid en sortert høyrekjede.",
       "Rotasjonen bevarer søketre-egenskapen, og invarianten «ingen venstre barn» gir høyst én rotasjon per innsetting. Høyden er n − 1, så innsetting er O(n) i verste fall."
     ), { label: "Nivå:" });
@@ -1132,13 +1179,13 @@
           parts: [{ t: "Forklar hvorfor to noder i samme tre alltid har en felles forfeder.", p: 1 },
             { t: "Hver node har bare feltene <code>v.parent</code>, <code>v.children</code> og <code>v.depth</code>. Skriv <code>LCA(u, v)</code>.", p: 5 },
             { t: "Nå er treet et binært søketre med unike heltall og feltene <code>v.element</code>, <code>v.left</code> og <code>v.right</code>. Du får roten og to verdier x &lt; y som begge finnes i treet. Finn noden som er LCA.", p: 5 },
-            { t: "Oppgi kjøretiden til (c), både i verste fall og når treet er balansert.", p: 1 }],
+            { t: "Oppgi kjøretiden til (c), både i verste fall og når treet er balansert. Har du ikke svart på (c), kan du oppgi kjøretiden til løsningen din på (b) i stedet.", p: 1 }],
           outro: demoLink("lca", "demo-lca", "LCA-demoen over (knappen «Binært søketre (c)» viser søketre-versjonen)")
         }),
         losning: sol(["Roten er forfeder til alle noder.",
           "Løft den dypeste av de to ett nivå om gangen til de er like (prosedyren LCA under). Eksempler fra treet: LCA(g, j) = e og LCA(e, j) = e.",
           "Start i roten. Ligger v.element mellom x og y (med ≤), er v svaret. Er y &lt; v.element, gå til venstre, ellers til høyre (LCABST under).",
-          "O(h): O(n) i verste fall og O(log n) når treet er balansert. Løsningen i (b) har samme kjøretid."], ["lca", "lcaBST"]),
+          "O(h): O(n) i verste fall og O(log n) når treet er balansert. Oppgaven lot deg oppgi kjøretiden til (b) hvis du ikke hadde svart på (c). Den er også O(h)."], ["lca", "lcaBST"]),
         kjerne: "<p>Bruk strukturen du får: parent/depth i b), søketre-ordningen i c). Da holder det å følge én sti.</p>",
         tips: ["O(h) gir full uttelling i b) og c). En lineær løsning ga høyst 3 av 5.", "Husk tilfellet der den ene noden er forfeder til den andre."] },
 

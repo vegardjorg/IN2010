@@ -37,6 +37,11 @@
         <b>Algoritme:</b> en presis, endelig oppskrift med steg som løser et problem.
         <b>Datastruktur:</b> en måte å organisere og lagre data på, slik at operasjonene vi trenger blir effektive.</div>
 
+      <div class="callout eli5"><span class="lbl">5-åring: en oppskrift</span>
+        En algoritme er som en oppskrift. Den er en liste med steg som gir samme kake hver gang hvis du følger dem
+        nøye. Den må ta slutt en gang, for ingen oppskrift sier «rør for alltid». Og hvert steg må være så tydelig at
+        hvem som helst kan gjøre det.</div>
+
       <h3>Forklaring</h3>
       <div id="ex-algoritme"></div>
 
@@ -65,8 +70,17 @@
         <i>hvilken</i> input vi ser på; Big-O sier hvor raskt kjøretiden vokser i <i>det</i> tilfellet. Derfor
         gir vi gjerne én kjøretid for beste tilfelle (f.eks. O(n)) og en annen for verste (f.eks. O(n²)).</div>
 
+      <div class="callout eli5"><span class="lbl">5-åring: lapper og håndhilsing</span>
+        Tenk deg at du skal dele ut én lapp til hver elev. Blir klassen dobbelt så stor, tar det dobbelt så lang tid.
+        Skal derimot alle håndhilse på alle, blir det omtrent fire ganger så mye jobb når klassen dobles. Store O sier
+        hvor fort jobben vokser når det blir flere. Den sier ikke hvor mange sekunder det tar.</div>
+
       <h3>Forklaring</h3>
       <div id="ex-bigo"></div>
+
+      <div class="callout felle"><span class="lbl">Felle: hvilken logaritme?</span>
+        log₂ n og log₁₀ n er like i O. De skiller seg bare med en fast faktor (log₂ n er omtrent 3,3 · log₁₀ n), og
+        faste faktorer forsvinner i O. Skriv bare <span class="mono">O(log n)</span>.</div>
 
       <h3>Voksehierarki – lek med n</h3>
       <p class="muted small">Dra i n og se hvor ulikt klassene vokser. Skru på logaritmisk skala når
@@ -96,6 +110,10 @@
         <b>Stabil:</b> like elementer beholder sin innbyrdes rekkefølge etter sortering.
         <b>In-place:</b> algoritmen sorterer i selve arrayet, uten en ekstra datastruktur (som et hjelpearray
         eller bøtter) å mellomlagre elementene i. Merge sort er det klassiske moteksempelet.</div>
+
+      <div class="callout eli5"><span class="lbl">5-åring: køen i klassen</span>
+        Elevene står i kø sortert etter fornavn. Nå sorterer læreren dem etter klasse. En stabil sortering passer på
+        at to elever i samme klasse står i samme rekkefølge som før. Ingen sniker forbi en klassekamerat.</div>
 
       <h3>Forklaring</h3>
       <div id="ex-stabil"></div>
@@ -134,6 +152,8 @@
       </div>
       <p class="muted small">In-place betyr at algoritmen ikke mellomlagrer elementene i en ekstra datastruktur.
         Derfor er quicksort in-place, mens merge sort (hjelpearray) og bøtte/radix (bøttene) ikke er det.</p>
+      <p class="muted small">Eksamen: H2021 · Oppgave 2 (3p) spør om en sortering var stabil. Oppgaven med løsning ligger under
+        <a href="01-sortering.html#fane=bucket&amp;oppg=exam-h2021-2">Sortering → Bøtte</a>.</p>
     </section>
 
     <!-- ADT -->
@@ -141,6 +161,10 @@
       <div class="callout begrep"><span class="lbl">Begrep</span>
         En <b>abstrakt datatype (ADT)</b> sier HVA du kan gjøre (operasjonene), ikke HVORDAN. En
         <b>datastruktur</b> er en konkret implementasjon. Samme ADT kan ha flere datastrukturer.</div>
+
+      <div class="callout eli5"><span class="lbl">5-åring: fjernkontrollen</span>
+        En ADT er som knappene på en fjernkontroll. Du vet hva «neste kanal» og «volum opp» gjør, men ikke hvordan
+        det er bygd inni. Datastrukturen er selve elektronikken. De samme knappene kan bygges på flere måter.</div>
 
       <h3>Forklaring</h3>
       <div id="ex-adt"></div>
@@ -162,6 +186,10 @@
         En <b>rekursiv</b> algoritme kaller seg selv på et mindre problem. Den trenger et <b>basistilfelle</b>
         (som stopper) og et <b>rekursivt steg</b> (som nærmer seg basis).</div>
 
+      <div class="callout eli5"><span class="lbl">5-åring: russiske dukker</span>
+        Tenk på russiske dukker. For å komme til den minste åpner du én dukke og gjør nøyaktig det samme med dukken
+        inni. Du fortsetter til du kommer til den lille som ikke kan åpnes. Den er basistilfellet, og der stopper du.</div>
+
       <h3>Forklaring</h3>
       <div id="ex-rekursjon"></div>
 
@@ -173,19 +201,19 @@
       </div>
 
       <div class="callout uni"><span class="lbl">Universitetsnivå</span>
-        Rekurrensen <span class="mono">T(n) = 2·T(n/2) + n</span> (del i to, gjør O(n) arbeid per nivå) har
-        <span class="mono">log n</span> nivåer med O(n) arbeid hver → <span class="mono">O(n log n)</span>.
-        Dette er mønsteret bak merge sort.</div>
+        Noen ganger ser du en formel som <span class="mono">T(n) = 2·T(n/2) + n</span>: del i to, og gjør O(n) arbeid for å
+        sette sammen. Du trenger ikke løse slike ligninger på eksamen. Les den som en kortversjon av det du ser i
+        rekursjonstreet: <span class="mono">log n</span> nivåer, og hvert nivå gjør til sammen n arbeid. Det gir
+        <span class="mono">O(n log n)</span>, og det er mønsteret bak merge sort.</div>
     </section>
 
     <!-- SANT/USANT -->
     <section data-panel="test">
-      <h3>Sant eller usant – begreper</h3>
-      <p class="muted small">Svar Sant/Usant, trykk <b>Sjekk svar</b>, og bruk <b>Fasit</b>/<b>Forklar</b> på hver påstand. Svarene huskes i nettleseren din.</p>
-      <h3 style="margin-top:1rem">Test deg selv – begreper</h3>
+      <h3>Test deg selv – begreper</h3>
       <p class="muted small">Disse påstandene har aldri stått på eksamen. De er laget ut fra hva eksamenene og
         sensorveiledningene H2020–H2025 tester igjen og igjen, så du kan sjekke at du kan det sensor ser etter.
         De oftest testede står først.</p>
+      <p class="muted small">Svar Sant/Usant, trykk <b>Sjekk svar</b>, og bruk <b>Fasit</b>/<b>Forklar</b> på hver påstand. Svarene huskes i nettleseren din.</p>
       <div data-tf-gen="begreper"></div>
     </section>
   </main>
@@ -204,7 +232,7 @@
 
     /* ---- Nivådelte forklaringer ---- */
     IN.explain("#ex-algoritme", {
-      eli5: "<p>En <b>algoritme</b> er en oppskrift: gjør dette, så dette, så dette – og da får du svaret. En <b>datastruktur</b> er som en smart skuff der du legger tingene dine slik at du finner dem kjapt.</p>",
+      eli5: "<p>En <b>algoritme</b> er oppskriften: gjør dette, så dette, så dette – og da får du svaret. En <b>datastruktur</b> er kjøkkenet der du har lagt tingene dine. Ligger krydderne sortert i en skuff, finner du dem kjapt. Ligger alt i én stor haug, må du lete hver gang. Den samme oppskriften går altså fortere eller tregere alt etter hvordan kjøkkenet er ryddet.</p>",
       normal: "<p>En <b>algoritme</b> er en presis, endelig steg-for-steg-prosedyre fra input til output. En <b>datastruktur</b> organiserer data slik at operasjonene vi bryr oss om (søk, innsetting, sletting, finn-minste …) blir effektive.</p>",
       teknisk: "<p>En <b>algoritme</b> er en veldefinert beregningsprosedyre som for et gyldig input terminerer med korrekt output; vi måler den i tid/plass som funksjon av inputstørrelsen. En <b>datastruktur</b> er en konkret organisering av data med et sett operasjoner og tilhørende kjøretidsgarantier (f.eks. heap: finn-min O(1), innsetting O(log n)).</p>"
     }, { label: "Nivå:" });
@@ -228,7 +256,7 @@
     }, { label: "Nivå:" });
 
     IN.explain("#ex-rekursjon", {
-      eli5: "<p>Rekursjon er som russiske dukker: for å åpne den store må du åpne den litt mindre inni, helt til den minste som ikke kan åpnes (basis). Så setter du alt sammen igjen.</p>",
+      eli5: "<p>Når du har kommet inn til den minste dukken, er du ikke ferdig: nå setter du dukkene sammen igjen. Den siste du åpnet, lukker du først. Datamaskinen gjør det samme med kallene. Hvert kall venter på at kallet inni blir ferdig, og så blir det selv ferdig. Det er det du ser i demoen under: kallene stables opp, og så «foldes» de tilbake ett og ett.</p>",
       normal: "<p>En rekursiv funksjon løser et problem ved å kalle seg selv på en mindre del, og kombinere svarene. Den må ha et basistilfelle for å stoppe.</p>",
       teknisk: "<p>Hvert kall løser en mindre utgave av samme problem og har sine egne lokale variabler. For å finne kjøretiden teller vi kall og arbeid per kall: fakultet gjør n kall med O(1) arbeid hver, altså O(n).</p>"
     }, { label: "Nivå:" });
