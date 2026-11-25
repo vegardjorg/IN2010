@@ -440,19 +440,38 @@
     var follow = o.instant == null;                 // følger den globale bryteren
     var answers = {}, checked = false, open = {}, reported = false, cur = 0;
     function has(id) { return answers[id] != null; }
+    /* Lagrede svar er knyttet til punktets plass i lista (id = indeks). Kommer det et nytt punkt eller
+       en endret påstand i en ny versjon, ville et gammelt svar havnet på feil spørsmål. Derfor lagres et
+       fingeravtrykk per punkt (tekst + svaralternativer + fasit), og et svar hentes bare tilbake når
+       punktet er helt uendret. Lagring fra før fingeravtrykkene (uten h) forkastes. */
+    function fp(it) {
+      var s = String(it.prompt) + "|" + it.choices.map(function (c) { return String(c.value); }).join(",") + "|" + String(it.key), h = 5381;
+      for (var i = 0; i < s.length; i++) h = ((h * 33) ^ s.charCodeAt(i)) >>> 0;
+      return h.toString(36);
+    }
+    var fps = {};
+    items.forEach(function (it) { fps[it.id] = fp(it); });
     if (spec.storeKey) {
       try {
         var saved = JSON.parse(IN.store.get(spec.storeKey, "null"));
-        if (saved && saved.a && typeof saved.a === "object") {
+        if (saved && saved.a && typeof saved.a === "object" && saved.h && typeof saved.h === "object") {
+          var savedN = 0, kept = 0;
+          Object.keys(saved.a).forEach(function () { savedN++; });
           items.forEach(function (it) {
             var v = saved.a[it.id];
-            if (v != null && it.choices.some(function (c) { return c.value === v; })) answers[it.id] = v;
+            if (v === undefined) return;
+            if (saved.h[it.id] === fps[it.id] && it.choices.some(function (c) { return c.value === v; })) { answers[it.id] = v; kept++; }
           });
-          checked = !!saved.c;
+          // «Sjekket» gjelder bare når alt som var besvart, fortsatt hører til de samme spørsmålene
+          checked = !!saved.c && kept === savedN && Object.keys(saved.h).length === items.length;
         }
       } catch (e) {}
     }
-    function persist() { if (spec.storeKey) IN.store.set(spec.storeKey, JSON.stringify({ a: answers, c: checked })); }
+    function persist() {
+      if (!spec.storeKey) return;
+      var h = {}; Object.keys(fps).forEach(function (k) { h[k] = fps[k]; });
+      IN.store.set(spec.storeKey, JSON.stringify({ a: answers, c: checked, h: h }));
+    }
     function instant() { return follow ? IN.svarStraks.get() : !!o.instant; }
     // "" (ingen tilbakemelding) | "right" | "wrong" | "blank" (ubesvart etter sjekk)
     function state(it) {
@@ -1416,7 +1435,27 @@
   IN.pageId = function () { return (document.body && document.body.getAttribute("data-page")) || "index"; };
   (function () {
     var KEY = "in2010:fremdrift:v1";
-    function load() { try { var o = JSON.parse(IN.store.get(KEY, "{}")); return (o && typeof o === "object" && !Array.isArray(o)) ? o : {}; } catch (e) { return {}; } }
+    /* Lagret fremdrift kan være skrevet av en eldre versjon eller være ødelagt. Hver post må være et
+       vanlig objekt, og tallfeltene må være endelige tall; alt annet kastes eller ryddes bort her,
+       så resten av siden aldri ser en post med feil form. */
+    var NUMS = ["t", "score", "best", "max", "last"];
+    function cleanRec(r) {
+      if (!r || typeof r !== "object" || Array.isArray(r)) return null;
+      NUMS.forEach(function (p) {
+        if (r[p] == null) return;
+        var n = typeof r[p] === "number" ? r[p] : parseFloat(r[p]);
+        if (isFinite(n)) r[p] = n; else delete r[p];
+      });
+      if (r.status != null && typeof r.status !== "string") delete r.status;
+      return r;
+    }
+    function cleanAll(o) {
+      var out = {};
+      if (!o || typeof o !== "object" || Array.isArray(o)) return out;
+      Object.keys(o).forEach(function (k) { var r = cleanRec(o[k]); if (r) out[k] = r; });
+      return out;
+    }
+    function load() { try { return cleanAll(JSON.parse(IN.store.get(KEY, "{}"))); } catch (e) { return {}; } }
     function save(all) { IN.store.set(KEY, JSON.stringify(all)); }
     function emit(key, rec) { try { document.dispatchEvent(new CustomEvent("in:progress", { detail: { key: key, rec: rec } })); } catch (e) {} }
     IN.progress = {
@@ -1441,11 +1480,11 @@
       exportCode: function () { try { return btoa(unescape(encodeURIComponent(JSON.stringify(load())))); } catch (e) { return ""; } },
       importCode: function (s) {
         try {
-          var o = JSON.parse(decodeURIComponent(escape(atob(String(s).replace(/\s+/g, "")))));
-          if (!o || typeof o !== "object" || Array.isArray(o)) return false;
-          var a = load();
+          var raw = JSON.parse(decodeURIComponent(escape(atob(String(s).replace(/\s+/g, "")))));
+          if (!raw || typeof raw !== "object" || Array.isArray(raw)) return false;
+          var o = cleanAll(raw), a = load();
           Object.keys(o).forEach(function (k) {   // nyeste vinner per nøkkel
-            if (o[k] && typeof o[k] === "object" && (!a[k] || (o[k].t || 0) >= (a[k].t || 0))) a[k] = o[k];
+            if (!a[k] || (o[k].t || 0) >= (a[k].t || 0)) a[k] = o[k];
           });
           save(a); emit(null, null); return true;
         } catch (e) { return false; }
@@ -1515,6 +1554,52 @@
     document.body.classList.add("has-crash-ret");
   }
 
+  /* ---------- Ny versjon av guiden? ----------
+     IN.VERSION er versjonen denne kopien av skriptene ble lagd med (samme som ?v= i HTML-en og
+     version.json; alle tre settes av plan/bump-versjon.py). Siden sjekker version.json uten
+     mellomlager ved oppstart, når fanen blir synlig igjen og hver halvtime. Er den nyere, vises en
+     liten melding med «Oppdater». Fremdrift og svar ligger i localStorage og overlever oppdateringen.
+     Virker bare over http(s): via file:// finnes det ingen gammel kopi å bekymre seg for. */
+  IN.VERSION = "20261125d";
+  function initVersionCheck() {
+    if (!/^https?:$/.test(location.protocol) || !window.fetch) return;
+    var DISMISS = "in2010:ny-versjon-skjult", last = 0, shown = null;
+    function check() {
+      if (Date.now() - last < 60000) return;
+      last = Date.now();
+      fetch("version.json?t=" + Date.now(), { cache: "no-store" })
+        .then(function (r) { return r.ok ? r.json() : null; })
+        .then(function (j) {
+          var v = j && typeof j.v === "string" ? j.v : null;
+          if (!v || v <= IN.VERSION || v === shown) return;      // samme eller eldre (f.eks. mellomlagret version.json)
+          var skjult = null; try { skjult = sessionStorage.getItem(DISMISS); } catch (e) {}
+          if (skjult === v) return;
+          show(v);
+        })
+        .catch(function () {});
+    }
+    function show(v) {
+      shown = v;
+      var old = qs(".ny-versjon"); if (old) old.remove();
+      var box = el("div", { class: "ny-versjon", role: "status" });
+      var go = el("button", { class: "btn primary sm", type: "button", text: "Oppdater" });
+      go.addEventListener("click", function () {
+        go.disabled = true; go.textContent = "Henter …";
+        // Hent siden på nytt forbi nettleserens mellomlager, så lastes den inn med de nye filene
+        fetch(location.href.split("#")[0], { cache: "reload" }).catch(function () {})
+          .then(function () { location.reload(); });
+      });
+      var x = el("button", { class: "ny-versjon-x", type: "button", "aria-label": "Skjul meldingen", text: "×",
+        onclick: function () { try { sessionStorage.setItem(DISMISS, v); } catch (e) {} box.remove(); } });
+      box.appendChild(el("span", { text: "Det finnes en ny versjon av guiden." }));
+      box.appendChild(go); box.appendChild(x);
+      document.body.appendChild(box);
+    }
+    setTimeout(check, 3000);
+    document.addEventListener("visibilitychange", function () { if (document.visibilityState === "visible") check(); });
+    setInterval(function () { if (document.visibilityState === "visible") check(); }, 30 * 60000);
+  }
+
   /* ---------- Oppstart ---------- */
   function boot() {
     buildNav();
@@ -1522,6 +1607,7 @@
     IN.tabs(document);
     initBadges();
     initCrashReturn();
+    initVersionCheck();
     // Genererte sant/usant-påstander (data-tf.js): <div data-tf-gen="sortering"></div>
     qsa("[data-tf-gen]").forEach(function (host) {
       var sek = host.getAttribute("data-tf-gen");

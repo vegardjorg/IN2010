@@ -1478,6 +1478,16 @@ body[data-page="strategi"] .bigo-compact .bigo-val { white-space: normal; overfl
 .crash-ret-x{background:transparent;border:0;color:inherit;font-size:1.2rem;line-height:1;min-width:36px;min-height:36px;border-radius:50%;cursor:pointer}
 .crash-ret-x:hover,.crash-ret-x:focus-visible{background:rgba(255,255,255,.18)}
 body.has-crash-ret{padding-bottom:64px}
+/* Melding om ny versjon (core.js initVersionCheck) */
+.ny-versjon{position:fixed;right:16px;bottom:max(16px,env(safe-area-inset-bottom));z-index:61;display:flex;align-items:center;gap:.5rem;max-width:calc(100vw - 32px);
+  background:var(--color-surface-container-lowest);color:var(--color-on-surface);border:1px solid var(--color-outline-variant);border-radius:var(--radius-md);
+  box-shadow:0 4px 14px rgba(0,0,0,.2);padding:.45rem .4rem .45rem .9rem;font-size:var(--text-sm)}
+.ny-versjon .btn{flex:none}
+.ny-versjon-x{flex:none;background:transparent;border:0;color:inherit;font-size:1.2rem;line-height:1;min-width:32px;min-height:32px;border-radius:50%;cursor:pointer}
+.ny-versjon-x:hover,.ny-versjon-x:focus-visible{background:var(--color-surface-container)}
+body.has-crash-ret .ny-versjon{bottom:72px}
+@media (max-width:520px){.ny-versjon{left:16px;right:16px;justify-content:space-between}}
+@media print{.ny-versjon{display:none}}
 @media print{.crash-ret,.et-self{display:none}}
 
 /* ===== Lister & stakk ===== */
@@ -2310,3 +2320,5 @@ body[data-page="crash"] .cr-step { scroll-margin-top: 0; }
 .vl.is-off { min-height: 0 !important; }
 /* Antall-pillen øverst til høyre: variabellinja starter under den, så de aldri overlapper */
 .sp-frame.has-count > .sp-stage > .vl { margin-top: .25rem; }
+/* Søk: lange kjøretider («O(n log n) + …») i den kompakte Big-O-ruta brytes i stedet for å gjøre siden bred på 375 px */
+[data-page="sok"] .bigo-compact .bigo-val { white-space: normal; overflow-wrap: anywhere; }

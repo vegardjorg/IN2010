@@ -968,7 +968,8 @@
      valgfritt data-mock.js (IN.MOCK) og denne fila. Sjekkene leses via
      nøklene sine i registeret, aldri via innholdet (TF_GEN, algos osv.).
      ============================================================ */
-  var C = IN.CRASH, RANK = { E: 0, S: 1, G: 2 }, LEN = {}, STEPS = [], BYID = {};
+  // Uten prototype: en ødelagt lagret verdi som «constructor» skal ikke se ut som et gyldig steg/lengde
+  var C = IN.CRASH, RANK = { E: 0, S: 1, G: 2 }, LEN = Object.create(null), STEPS = [], BYID = Object.create(null);
   LENGDER.forEach(function (L) { LEN[L.id] = L; });
   ETAPPER.forEach(function (e) { e.steg.forEach(function (s) { s.etappe = e; STEPS.push(s); BYID[s.id] = s; }); });
   var SANN = { "høy": 0, "middels": 1, "lav": 2 };
