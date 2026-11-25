@@ -134,7 +134,7 @@
     var box = el("div", { class: "hs-arr", role: "list" });
     p.items.forEach(function (x, i) {
       var c = "hs-acell";
-      if (has(m.done, i)) c += " is-occ";
+      if (has(m.done, i)) c += " is-done";
       if (m.cur === i) c += " is-cur";
       box.appendChild(el("div", { class: c, role: "listitem" }, [el("span", { class: "hs-k", text: txt(x) }), el("span", { class: "hs-i", text: String(i) })]));
     });
@@ -164,7 +164,7 @@
      v.idx = plass (probe/arr/entries) eller bøtte (chain), v.at = [r, j] for en node i bøtte r,
      v.part = hvilken del av steget (standard 0). Leser klassene fra den ferdig tegnede cella. */
   var DOT = [["is-cur", "compare"], ["is-row", "compare"], ["is-found", "target"], ["is-fresh", "min"], ["is-moved", "min"],
-    ["is-repl", "min"], ["is-hole", "swap"], ["is-miss", "swap"], ["is-occ", "occ"]];
+    ["is-repl", "min"], ["is-hole", "swap"], ["is-miss", "swap"], ["is-occ", "occ"], ["is-done", "sorted"]];
   function dotOf(partEls, v) {
     var pe = partEls[v.part || 0];
     if (!pe) return null;

@@ -18,7 +18,8 @@
     if (inArr(marks.compare, i)) return "compare";
     if (marks.min === i) return "min";
     if (inArr(marks.target, i)) return "target";
-    if (inArr(marks.sorted, i) || marks.found === i) return "sorted";
+    if (marks.found === i) return "target";            // funnet = mål/svar (blå), som på de andre sidene
+    if (inArr(marks.sorted, i)) return "sorted";
     if (inArr(marks.part, i)) return "part";
     return "";
   }

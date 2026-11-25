@@ -393,10 +393,10 @@
     }
     var left = i > 0 && A[i - 1] === x;
     snap(3, { found: i, compare: i > 0 ? [i - 1] : [] }, { i: i }, null, t("Står det en " + x + " rett til venstre?" + (left ? " Ja!" : " Nei."), "i &gt; 0 og A[i − 1] = x? " + (left ? "Ja." : "Nei."), "Sjekker A[" + (i - 1) + "]" + (i > 0 ? " = " + A[i - 1] : " (finnes ikke, i = 0)") + "."), "Nabo");
-    if (left) snap(4, { sorted: [i - 1, i] }, { i: i }, null, t("Kopiene står på plass " + (i - 1) + " og " + i + ".", "print(" + (i - 1) + ", " + i + ").", "Utskrift (" + (i - 1) + ", " + i + "). Totalt O(log n)."), "Ferdig");
+    if (left) snap(4, { target: [i - 1, i] }, { i: i }, null, t("Kopiene står på plass " + (i - 1) + " og " + i + ".", "print(" + (i - 1) + ", " + i + ").", "Utskrift (" + (i - 1) + ", " + i + "). Totalt O(log n)."), "Ferdig");
     else {
       snap(5, { found: i, compare: [i + 1] }, { i: i }, null, t("Da må den andre kopien stå til høyre.", "else: kopien står på i + 1.", "Forutsetningen sier x forekommer to ganger, så A[i + 1] = x."), "Nabo");
-      snap(6, { sorted: [i, i + 1] }, { i: i }, null, t("Kopiene står på plass " + i + " og " + (i + 1) + ".", "print(" + i + ", " + (i + 1) + ").", "Utskrift (" + i + ", " + (i + 1) + "). Totalt O(log n)."), "Ferdig");
+      snap(6, { target: [i, i + 1] }, { i: i }, null, t("Kopiene står på plass " + i + " og " + (i + 1) + ".", "print(" + i + ", " + (i + 1) + ").", "Utskrift (" + i + ", " + (i + 1) + "). Totalt O(log n)."), "Ferdig");
     }
     return steps;
   };
@@ -443,7 +443,7 @@
       var eq = A[i] === A[i + 1];
       snap(3, { compare: [i, i + 1] }, { i: i, j: i + 1 }, t("Er " + A[i] + " og " + A[i + 1] + " like?" + (eq ? " Ja!" : " Nei."), "A[" + i + "] = A[" + (i + 1) + "]? " + (eq ? "Ja." : "Nei."), "Nabopar nr. " + cmp + ": (" + i + ", " + (i + 1) + ")."), "Naboer");
       if (eq) {
-        snap(4, { sorted: [i, i + 1] }, { i: i, j: i + 1 }, t("Duplikatet står på plass " + i + " og " + (i + 1) + ".", "print(" + i + ", " + (i + 1) + ").", "Funnet etter " + cmp + " av maks " + (n - 1) + " sammenligninger."), "Funnet");
+        snap(4, { target: [i, i + 1] }, { i: i, j: i + 1 }, t("Duplikatet står på plass " + i + " og " + (i + 1) + ".", "print(" + i + ", " + (i + 1) + ").", "Funnet etter " + cmp + " av maks " + (n - 1) + " sammenligninger."), "Funnet");
         return steps;
       }
     }
@@ -505,11 +505,11 @@
       var seen = Object.prototype.hasOwnProperty.call(H, v);
       snap(4, { compare: [i] }, { i: i }, t("Har vi sett " + v + " før?" + (seen ? " Ja!" : " Nei."), v + " ∈ H? " + (seen ? "Ja." : "Nei."), "Oppslag på nøkkel " + v + ": " + (seen ? "finnes, på indeks " + H[v] + "." : "finnes ikke.")), "Har jeg sett den?");
       if (seen) {
-        snap(5, { sorted: [H[v], i] }, { i: i }, t("Vi så " + v + " på plass " + H[v] + ", og nå igjen på plass " + i + ".", "print(" + H[v] + ", " + i + ").", "Utskrift (" + H[v] + ", " + i + ") etter " + (i + 1) + " av " + n + " elementer."), "Funnet");
+        snap(5, { target: [H[v], i] }, { i: i }, t("Vi så " + v + " på plass " + H[v] + ", og nå igjen på plass " + i + ".", "print(" + H[v] + ", " + i + ").", "Utskrift (" + H[v] + ", " + i + ") etter " + (i + 1) + " av " + n + " elementer."), "Funnet");
         return steps;
       }
       ops++; H[v] = i; order.push(v);
-      snap(7, { target: i }, { i: i }, t("Vi skriver «" + v + " → plass " + i + "» i notatboka.", "H[" + v + "] ← " + i + ".", "Innsetting " + v + " → " + i + "."), "Husk", v);
+      snap(7, { min: i }, { i: i }, t("Vi skriver «" + v + " → plass " + i + "» i notatboka.", "H[" + v + "] ← " + i + ".", "Innsetting " + v + " → " + i + "."), "Husk", v);
     }
     steps.push({ line: null, array: clone(A), marks: {}, ptrs: {}, map: mapView(), vars: [ix("i"), vv("n", n)], info: [["oppslag + innsettinger", ops]], text: t("Ingen tall kom igjen.", "Ingen duplikat.", "Ingen duplikat: forutsetningen gjelder ikke."), tag: "Ingen" });
     return steps;
@@ -793,7 +793,7 @@
     var A = clone(s.A).sort(num).filter(function (v, z, a) { return z === 0 || v !== a[z - 1]; });
     var n = A.length, steps = [], pairs = [], found = [], rounds = 0, y;
     function snap(line, marks, p, text, tag) {
-      var m = marks || {}; m.sorted = found.slice();
+      var m = marks || {}; m.target = found.slice();
       steps.push({ line: line, array: clone(A), marks: m, ptrs: p,
         vars: [ix("i", i), ix("j", j), vv("y", y), vv("x", x), vv("n", n)],
         info: [["runder", rounds], ["par", pairs.length ? pairs.join(" ") : "–"]], text: text, tag: tag });

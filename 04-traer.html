@@ -2,11 +2,12 @@
 <html lang="nb">
 <head>
   <meta charset="utf-8">
+  <link rel="icon" href="data:,">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Blokk 4 · Trær · IN2010</title>
   <meta name="description" content="Trær i IN2010: begreper, traverseringer, binære søketrær, diameter, laveste felles forfeder, AVL og rotasjoner, Anti-AVL og Huffman – med stegvise demoer, pseudokode og eksamensoppgaver.">
   <script>(function(){try{var d=document.documentElement;var t=localStorage.getItem('in-theme');if(t!=='dark'&&t!=='system')t='light';if(t!=='system')d.setAttribute('data-theme',t);var l=localStorage.getItem('in-level');if(l!=='eli5'&&l!=='teknisk')l='normal';d.setAttribute('data-level',l);}catch(e){document.documentElement.setAttribute('data-theme','light');document.documentElement.setAttribute('data-level','normal');}})();</script>
-  <link rel="stylesheet" href="assets/css/styles.css?v=20261125h">
+  <link rel="stylesheet" href="assets/css/styles.css?v=20261125i">
   <style>
     /* Sidelokalt: stakk-kolonner ved siden av treet (fanen «Uten rekursjon»). Bare designtokens fra styles.css. */
     .itv { display: flex; flex-direction: column; gap: .55rem; min-width: 0; }
@@ -683,17 +684,17 @@
     <p class="muted small">IN2010 · Blokk 4 · Trær. Egne forklaringer og demoer basert på pensum. Eksamensoppgavene er gjengitt ordrett fra eksamensarkene (UiO, IN2010), med kildelinje og eventuelle avvik på hvert kort.</p>
   </footer>
 
-  <script src="assets/js/core.js?v=20261125h"></script>
-  <script src="assets/js/varline.js?v=20261125h"></script>
-  <script src="assets/js/symboler.js?v=20261125h"></script>
-  <script src="assets/js/data-tf.js?v=20261125h"></script>
-  <script src="assets/js/pseudocode.js?v=20261125h"></script>
-  <script src="assets/js/stepplayer.js?v=20261125h"></script>
-  <script src="assets/js/viz-bars.js?v=20261125h"></script>
-  <script src="assets/js/viz-tree.js?v=20261125h"></script>
-  <script src="assets/js/data-algos.js?v=20261125h"></script>
-  <script src="assets/js/data-traer.js?v=20261125h"></script>
-  <script src="assets/js/perfekt/traer.js?v=20261125h"></script>
+  <script src="assets/js/core.js?v=20261125i"></script>
+  <script src="assets/js/varline.js?v=20261125i"></script>
+  <script src="assets/js/symboler.js?v=20261125i"></script>
+  <script src="assets/js/data-tf.js?v=20261125i"></script>
+  <script src="assets/js/pseudocode.js?v=20261125i"></script>
+  <script src="assets/js/stepplayer.js?v=20261125i"></script>
+  <script src="assets/js/viz-bars.js?v=20261125i"></script>
+  <script src="assets/js/viz-tree.js?v=20261125i"></script>
+  <script src="assets/js/data-algos.js?v=20261125i"></script>
+  <script src="assets/js/data-traer.js?v=20261125i"></script>
+  <script src="assets/js/perfekt/traer.js?v=20261125i"></script>
   <script>
   (function () {
     "use strict";
@@ -713,7 +714,7 @@
     var LEG_LCA = [{ cls: "compare", label: "u (klatrer)" }, { color: ALTC, label: "v (den andre noden)" }, { color: PATHC, label: "Sti de har klatret" }, { cls: "target", label: "LCA (svaret)" }];
     var LEG_LCABST = [{ cls: "compare", label: "Gjeldende node" }, { color: ALTC, label: "Søker etter (x, y)" }, { color: PATHC, label: "Sti" }, { cls: "target", label: "LCA (svaret)" }];
     var LEG_AVL = [{ cls: "compare", label: "Gjeldende node" }, { color: PATHC, label: "Sti / kall i gang" }, { cls: "min", label: "Ny node" }, { cls: "swap", label: "Roteres / ubalansert" }, { cls: "sorted", label: "Ferdig" }];
-    var LEG_DIAM = [{ cls: "compare", label: "Kallet som regner nå" }, { color: PATHC, label: "Har en ramme på kallstakken" }, { color: "var(--c-swap)", label: "Lengste sti så langt (kanter)" }, { cls: "sorted", label: "Ferdig (h, d)" }, { cls: "target", label: "Roten (svaret)" }];
+    var LEG_DIAM = [{ cls: "compare", label: "Kallet som regner nå" }, { color: PATHC, label: "Har en ramme på kallstakken" }, { cls: "min", label: "Lengste sti så langt (kanter)" }, { cls: "sorted", label: "Ferdig (h, d)" }, { cls: "target", label: "Roten (svaret)" }];
     var LEGEND = [
       { cls: "compare", label: "Gjeldende node" },
       { cls: "target", label: "Funnet / mål" },

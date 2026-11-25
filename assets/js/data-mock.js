@@ -5,7 +5,7 @@
    Felter:
    - oppgave: html med deloppgaver i <ol class="et-parts"> (poengene summerer til 10).
    - losning: array med steg (html), vises som nummerert liste.
-   - kjerne: kjernepoenget, kjøretid og «Slik ville poengene trolig blitt gitt (vårt anslag)» (callout.sensor).
+   - kjerne: kjernepoenget, kjøretid og «Slik ville poengene trolig blitt gitt (vårt anslag)» (callout.eksempel: vårt anslag, ikke sensors ord, så nøytral).
    - tips: «Feller», én felle per element.
    - eli5: «5-åring: …» (egen linje; vises ikke av IN.examTask, løypa viser den selv).
    - side: { page, fane } for dyplenke til fanen som forklarer operasjonen.
@@ -162,7 +162,7 @@
     }).join("") + "</ol>";
   }
   function sensor(items) {
-    return '<div class="callout sensor"><div class="lbl">Slik ville poengene trolig blitt gitt (vårt anslag)</div><ul>' +
+    return '<div class="callout eksempel"><div class="lbl">Slik ville poengene trolig blitt gitt (vårt anslag)</div><ul>' +
       items.map(function (x) { return "<li>" + x + "</li>"; }).join("") + "</ul></div>";
   }
   function fig(html, cap) {
@@ -1098,7 +1098,7 @@
     rm: [{ cls: "min", label: "minste (roten, x)" }, { color: "var(--vf-teal)", label: "kopieres (siste → roten)" },
       { cls: "target", label: "elementet som synker (i)" }, { cls: "compare", label: "barna som sammenlignes" }, { cls: "swap", label: "byttes" }],
     hs: [{ cls: "target", label: "plass i / noden som synker" }, { cls: "compare", label: "sammenlignes" }, { cls: "swap", label: "byttes" }, { cls: "sorted", label: "sortert hale" }],
-    hash: [{ cls: "compare", label: "Plassen vi ser på" }, { cls: "sorted", label: "Prøvd (kollisjon)" }, { cls: "min", label: "Satt inn / flyttet" },
+    hash: [{ cls: "compare", label: "Plassen vi ser på" }, { cls: "tried", label: "Prøvd (kollisjon)" }, { cls: "min", label: "Satt inn / flyttet" },
       { cls: "target", label: "Funnet" }, { cls: "swap", label: "Hull / ikke funnet" }],
     avl: [{ cls: "compare", label: "Gjeldende node" }, { color: PATHC, label: "Sti / kall i gang" }, { cls: "min", label: "Ny node" }, { cls: "swap", label: "Roteres / ubalansert" }, { cls: "sorted", label: "Ferdig" }],
     rem: [{ cls: "compare", label: "Gjeldende node" }, { color: PATHC, label: "Sti / kall i gang" }, { color: DELC, label: "Fjernes" }, { cls: "target", label: "Etterfølger / erstatter" }],

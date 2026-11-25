@@ -2,11 +2,12 @@
 <html lang="nb">
 <head>
   <meta charset="utf-8">
+  <link rel="icon" href="data:,">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Blokk 1 · Sortering · IN2010</title>
   <meta name="description" content="Sorteringsalgoritmer i IN2010: selection, bubble, insertion, gnome, merge, quick, bøtte, radix og heapsort – med stegvise demoer og Big-O.">
   <script>(function(){try{var d=document.documentElement;var t=localStorage.getItem('in-theme');if(t!=='dark'&&t!=='system')t='light';if(t!=='system')d.setAttribute('data-theme',t);var l=localStorage.getItem('in-level');if(l!=='eli5'&&l!=='teknisk')l='normal';d.setAttribute('data-level',l);}catch(e){document.documentElement.setAttribute('data-theme','light');document.documentElement.setAttribute('data-level','normal');}})();</script>
-  <link rel="stylesheet" href="assets/css/styles.css?v=20261125h">
+  <link rel="stylesheet" href="assets/css/styles.css?v=20261125i">
 </head>
 <body data-page="sortering">
   <a class="skip-link" href="#main">Hopp til innhold</a>
@@ -293,7 +294,7 @@
         alltid <code>A[i + j]</code>, fordi i + j elementer er skrevet. Tar vi fra venstre ved likhet
         (<code>≤</code>), blir sorteringen <b>stabil</b>. Halvdelene lages som nye arrayer, en ekstra
         datastruktur, så merge sort er ikke in-place.</div>
-      <div class="callout felle"><span class="lbl">Venstre halvdel er den minste</span>
+      <div class="callout eksempel"><span class="lbl">Venstre halvdel er den minste</span>
         Kurset deler med <code>i ← ⌊n/2⌋</code> og tar <code>A[0..i − 1]</code> til venstre. Med n = 5 får
         venstre 2 elementer og høyre 3. Skal du tegne delingen på eksamen, del på samme måte.</div>
       <div class="callout uni"><span class="lbl">Fra ukesoppgavene: lenkede lister</span>
@@ -332,7 +333,7 @@
         Kurset lar <code>ChoosePivot</code> velge <b>tilfeldig</b> eller ta <b>median-av-tre</b> (medianen av
         første, midterste og siste element). Demoen tar bare siste element, så du kan se hva som går galt
         når pivoten er dårlig.</div>
-      <div class="callout felle"><span class="lbl">Verste tilfelle</span>
+      <div class="callout eksempel"><span class="lbl">Verste tilfelle</span>
         Prøv «Sortert (verst)»: med siste element som pivot er pivoten alltid størst, partisjonen blir
         maksimalt skjev, og rekursjonstreet får høyde n − 1 → <b>O(n²)</b>. Quicksort er likevel ofte et
         greit valg: i H2023 oppgave 3c kaller sensorveiledningen den «også et godt valg», men sier at du bør
@@ -511,17 +512,17 @@
 
   <footer class="footer">IN2010-guide · Blokk 1 · Sortering</footer>
 
-  <script src="assets/js/core.js?v=20261125h"></script>
-  <script src="assets/js/symboler.js?v=20261125h"></script>
-  <script src="assets/js/data-tf.js?v=20261125h"></script>
-  <script src="assets/js/pseudocode.js?v=20261125h"></script>
-  <script src="assets/js/stepplayer.js?v=20261125h"></script>
-  <script src="assets/js/varline.js?v=20261125h"></script>
-  <script src="assets/js/viz-bars.js?v=20261125h"></script>
-  <script src="assets/js/viz-buckets.js?v=20261125h"></script>
-  <script src="assets/js/data-algos.js?v=20261125h"></script>
-  <script src="assets/js/data-heap.js?v=20261125h"></script>
-  <script src="assets/js/perfekt/sortering.js?v=20261125h"></script>
+  <script src="assets/js/core.js?v=20261125i"></script>
+  <script src="assets/js/symboler.js?v=20261125i"></script>
+  <script src="assets/js/data-tf.js?v=20261125i"></script>
+  <script src="assets/js/pseudocode.js?v=20261125i"></script>
+  <script src="assets/js/stepplayer.js?v=20261125i"></script>
+  <script src="assets/js/varline.js?v=20261125i"></script>
+  <script src="assets/js/viz-bars.js?v=20261125i"></script>
+  <script src="assets/js/viz-buckets.js?v=20261125i"></script>
+  <script src="assets/js/data-algos.js?v=20261125i"></script>
+  <script src="assets/js/data-heap.js?v=20261125i"></script>
+  <script src="assets/js/perfekt/sortering.js?v=20261125i"></script>
   <script>
   (function () {
     var IN = window.IN, qs = IN.qs;

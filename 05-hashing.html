@@ -2,11 +2,12 @@
 <html lang="nb">
 <head>
   <meta charset="utf-8">
+  <link rel="icon" href="data:,">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Blokk 5 · Hashing · IN2010</title>
   <meta name="description" content="Hashing i IN2010: hashfunksjoner, Separate chaining, Linear probing med sletting, Load factor og rehash, Python 3.6-ordbøker og hashing som verktøy – med stegvise demoer, pseudokode og eksamensoppgaver.">
   <script>(function(){try{var d=document.documentElement;var t=localStorage.getItem('in-theme');if(t!=='dark'&&t!=='system')t='light';if(t!=='system')d.setAttribute('data-theme',t);var l=localStorage.getItem('in-level');if(l!=='eli5'&&l!=='teknisk')l='normal';d.setAttribute('data-level',l);}catch(e){document.documentElement.setAttribute('data-theme','light');document.documentElement.setAttribute('data-level','normal');}})();</script>
-  <link rel="stylesheet" href="assets/css/styles.css?v=20261125h">
+  <link rel="stylesheet" href="assets/css/styles.css?v=20261125i">
 </head>
 <body data-page="hashing">
   <a class="skip-link" href="#main">Hopp til innhold</a>
@@ -424,16 +425,16 @@
     <p class="muted small">IN2010 · Blokk 5 · Hashing. Egne forklaringer og demoer basert på pensum. Eksamensoppgavene og sensorveiledningene er gjengitt ordrett med kildelinje, og avvik fra eksamensarket står i hvert kort.</p>
   </footer>
 
-  <script src="assets/js/core.js?v=20261125h"></script>
-  <script src="assets/js/symboler.js?v=20261125h"></script>
-  <script src="assets/js/data-tf.js?v=20261125h"></script>
-  <script src="assets/js/pseudocode.js?v=20261125h"></script>
-  <script src="assets/js/stepplayer.js?v=20261125h"></script>
-  <script src="assets/js/varline.js?v=20261125h"></script>
-  <script src="assets/js/viz-hash.js?v=20261125h"></script>
-  <script src="assets/js/data-algos.js?v=20261125h"></script>
-  <script src="assets/js/data-hashing.js?v=20261125h"></script>
-  <script src="assets/js/perfekt/hashing.js?v=20261125h"></script>
+  <script src="assets/js/core.js?v=20261125i"></script>
+  <script src="assets/js/symboler.js?v=20261125i"></script>
+  <script src="assets/js/data-tf.js?v=20261125i"></script>
+  <script src="assets/js/pseudocode.js?v=20261125i"></script>
+  <script src="assets/js/stepplayer.js?v=20261125i"></script>
+  <script src="assets/js/varline.js?v=20261125i"></script>
+  <script src="assets/js/viz-hash.js?v=20261125i"></script>
+  <script src="assets/js/data-algos.js?v=20261125i"></script>
+  <script src="assets/js/data-hashing.js?v=20261125i"></script>
+  <script src="assets/js/perfekt/hashing.js?v=20261125i"></script>
   <script>
   (function () {
     "use strict";
@@ -444,7 +445,7 @@
     /* ---------- Fellesoppsett for demoer ---------- */
     var LEGEND = [
       { cls: "compare", label: "Plassen vi ser på" },
-      { cls: "sorted", label: "Prøvd (kollisjon)" },
+      { cls: "tried", label: "Prøvd (kollisjon)" },
       { cls: "min", label: "Satt inn / flyttet" },
       { cls: "target", label: "Funnet" },
       { cls: "swap", label: "Hull / ikke funnet" }
@@ -625,7 +626,7 @@
       },
       legend: [
         { cls: "compare", label: "Plassen vi ser på" },
-        { cls: "sorted", label: "Prøvd (kollisjon)" },
+        { cls: "tried", label: "Prøvd (kollisjon)" },
         { cls: "min", label: "Satt inn" },
         { cls: "target", label: "Funnet" },
         { cls: "swap", label: "Nytt merke / ikke funnet" },

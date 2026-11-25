@@ -2,11 +2,12 @@
 <html lang="nb">
 <head>
   <meta charset="utf-8">
+  <link rel="icon" href="data:,">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Blokk 3 · Heap · IN2010</title>
   <meta name="description" content="Binære heaper i IN2010: array-representasjon, insert (boble opp), removeMin (boble ned), BuildMinHeap på O(n), level-order, mediankø, Heapsort og prioritetskøer – med stegvise demoer og eksamensoppgaver.">
   <script>(function(){try{var d=document.documentElement;var t=localStorage.getItem('in-theme');if(t!=='dark'&&t!=='system')t='light';if(t!=='system')d.setAttribute('data-theme',t);var l=localStorage.getItem('in-level');if(l!=='eli5'&&l!=='teknisk')l='normal';d.setAttribute('data-level',l);}catch(e){document.documentElement.setAttribute('data-theme','light');document.documentElement.setAttribute('data-level','normal');}})();</script>
-  <link rel="stylesheet" href="assets/css/styles.css?v=20261125h">
+  <link rel="stylesheet" href="assets/css/styles.css?v=20261125i">
 </head>
 <body data-page="heap">
   <a class="skip-link" href="#main">Hopp til innhold</a>
@@ -121,7 +122,7 @@
         For n = 6 er det <span class="mono">110</span> → «10» → høyre, så venstre. Det tar O(log n). Arrayet er likevel
         enklere og raskere, og det er det kurset og eksamen bruker.</div>
 
-      <div class="callout snarvei"><span class="lbl">Eksamenstips: begge kravene</span>
+      <div class="callout snarvei"><span class="lbl">Vårt råd: begge kravene</span>
         Når du forklarer en heap på eksamen, nevn <b>begge</b> kravene (komplett + heap-egenskap) og indeksformlene.
         «Minste øverst» alene er en ufullstendig forklaring, fordi den ikke sier noe om formen.</div>
 
@@ -275,7 +276,7 @@
 
       <h4>Eksamensoppgaven</h4>
       <div id="exam-levelorder"></div>
-      <div class="callout snarvei"><span class="lbl">Eksamenstips (H2025)</span>
+      <div class="callout sensor"><span class="lbl">Eksamenstips (H2025)</span>
         I (a) er det ingen triks: skriv at arrayet allerede er i level-order, og vis en enkel løkke (eller returner A).
         Et bredde-først søk på heapen er unødvendig arbeid. Det enkle svaret viser at du har forstått array-representasjonen.</div>
 
@@ -470,7 +471,7 @@
       <div id="exam-test"></div>
       <h4 style="margin-top:1.5rem">Påstandene</h4>
       <div id="tf-heap"></div>
-      <div class="callout snarvei"><span class="lbl">Eksamenstips: sant/usant (H2022)</span>
+      <div class="callout sensor"><span class="lbl">Eksamenstips: sant/usant (H2022)</span>
         Oppgaven har ti påstander og 10 poeng, så det er trolig 1 poeng per påstand (sensorveiledningen sier ikke noe om
         poengfordelingen). Les «alle», «hver» og «alltid» ekstra nøye. Heap-egenskapen sier bare noe om forelder og barn,
         så en påstand om at <i>verdiene</i> er ordnet mellom hele nivåer eller mellom søsken er usann. Påstander om
@@ -486,17 +487,17 @@
 
   <footer class="footer">IN2010-guide · Blokk 3 · Heap</footer>
 
-  <script src="assets/js/core.js?v=20261125h"></script>
-  <script src="assets/js/varline.js?v=20261125h"></script>
-  <script src="assets/js/viz-tree.js?v=20261125h"></script>
-  <script src="assets/js/symboler.js?v=20261125h"></script>
-  <script src="assets/js/data-tf.js?v=20261125h"></script>
-  <script src="assets/js/pseudocode.js?v=20261125h"></script>
-  <script src="assets/js/stepplayer.js?v=20261125h"></script>
-  <script src="assets/js/viz-bars.js?v=20261125h"></script>
-  <script src="assets/js/data-algos.js?v=20261125h"></script>
-  <script src="assets/js/data-heap.js?v=20261125h"></script>
-  <script src="assets/js/perfekt/heap.js?v=20261125h"></script>
+  <script src="assets/js/core.js?v=20261125i"></script>
+  <script src="assets/js/varline.js?v=20261125i"></script>
+  <script src="assets/js/viz-tree.js?v=20261125i"></script>
+  <script src="assets/js/symboler.js?v=20261125i"></script>
+  <script src="assets/js/data-tf.js?v=20261125i"></script>
+  <script src="assets/js/pseudocode.js?v=20261125i"></script>
+  <script src="assets/js/stepplayer.js?v=20261125i"></script>
+  <script src="assets/js/viz-bars.js?v=20261125i"></script>
+  <script src="assets/js/data-algos.js?v=20261125i"></script>
+  <script src="assets/js/data-heap.js?v=20261125i"></script>
+  <script src="assets/js/perfekt/heap.js?v=20261125i"></script>
   <script>
   (function () {
     var IN = window.IN, qs = IN.qs, el = IN.el;

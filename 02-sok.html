@@ -2,11 +2,12 @@
 <html lang="nb">
 <head>
   <meta charset="utf-8">
+  <link rel="icon" href="data:,">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Blokk 2 · Søk · IN2010</title>
   <meta name="description" content="Søk i IN2010: rett-frem søk, binærsøk med varianter, sorter-én-gang-avveiningen, finn duplikat, finn k minste og array-triks med hashing – med stegvise demoer og kjøretid.">
   <script>(function(){try{var d=document.documentElement;var t=localStorage.getItem('in-theme');if(t!=='dark'&&t!=='system')t='light';if(t!=='system')d.setAttribute('data-theme',t);var l=localStorage.getItem('in-level');if(l!=='eli5'&&l!=='teknisk')l='normal';d.setAttribute('data-level',l);}catch(e){document.documentElement.setAttribute('data-theme','light');document.documentElement.setAttribute('data-level','normal');}})();</script>
-  <link rel="stylesheet" href="assets/css/styles.css?v=20261125h">
+  <link rel="stylesheet" href="assets/css/styles.css?v=20261125i">
 </head>
 <body data-page="sok">
   <a class="skip-link" href="#main">Hopp til innhold</a>
@@ -216,8 +217,8 @@
       <h4>Regn selv: hvilken Intersection vinner?</h4>
       <div class="card">
         <div class="sok-calc">
-          <div class="row"><span class="lbl muted small">n =</span><span id="isect-n"></span></div>
-          <div class="row"><span class="lbl muted small">k =</span><span id="isect-k"></span></div>
+          <div class="row"><span class="lbl muted small">n =</span><span id="isect-n" class="vk" role="group" aria-label="Velg n"></span></div>
+          <div class="row"><span class="lbl muted small">k =</span><span id="isect-k" class="vk" role="group" aria-label="Velg k"></span></div>
           <div class="table-wrap">
             <table class="cmp-table" id="isect-table">
               <thead><tr><th>Prosedyre</th><th>Idé</th><th>Kjøretid</th><th>Omtrent antall steg</th></tr></thead>
@@ -399,16 +400,16 @@
   </main>
   <footer class="footer">IN2010-guide · Blokk 2 · Søk</footer>
 
-  <script src="assets/js/core.js?v=20261125h"></script>
-  <script src="assets/js/symboler.js?v=20261125h"></script>
-  <script src="assets/js/data-tf.js?v=20261125h"></script>
-  <script src="assets/js/pseudocode.js?v=20261125h"></script>
-  <script src="assets/js/stepplayer.js?v=20261125h"></script>
-  <script src="assets/js/varline.js?v=20261125h"></script>
-  <script src="assets/js/viz-bars.js?v=20261125h"></script>
-  <script src="assets/js/data-algos.js?v=20261125h"></script>
-  <script src="assets/js/data-sok.js?v=20261125h"></script>
-  <script src="assets/js/perfekt/sok.js?v=20261125h"></script>
+  <script src="assets/js/core.js?v=20261125i"></script>
+  <script src="assets/js/symboler.js?v=20261125i"></script>
+  <script src="assets/js/data-tf.js?v=20261125i"></script>
+  <script src="assets/js/pseudocode.js?v=20261125i"></script>
+  <script src="assets/js/stepplayer.js?v=20261125i"></script>
+  <script src="assets/js/varline.js?v=20261125i"></script>
+  <script src="assets/js/viz-bars.js?v=20261125i"></script>
+  <script src="assets/js/data-algos.js?v=20261125i"></script>
+  <script src="assets/js/data-sok.js?v=20261125i"></script>
+  <script src="assets/js/perfekt/sok.js?v=20261125i"></script>
   <script>
   (function () {
     "use strict";
@@ -477,7 +478,7 @@
     var DIM = "color-mix(in srgb, var(--c-default) 30%, transparent)";
     var LEG_SEARCH = [
       { cls: "compare", label: "sammenlignes nå" },
-      { cls: "sorted", label: "funnet" },
+      { cls: "target", label: "funnet" },
       { cls: "default", label: "utenfor søkeområdet (blek)", color: DIM }
     ];
 
@@ -552,7 +553,7 @@
     IN.registerEngine("sokside", { viz: "vizBars", file: "assets/js/viz-bars.js", host: "et-bars-host",
       render: function (s, ctx) { renderSearch(s, ctx); } });
     function legOf(base, key) { return base.concat(IN.varLine ? IN.varLine.legend(SPENN[key]) : []); }
-    function marksSvar(last) { return last && last.marks && last.marks.sorted ? last.marks.sorted.join(", ") : null; }
+    function marksSvar(last) { return last && last.marks && last.marks.target ? [].concat(last.marks.target).join(", ") : null; }
 
     function solution(items) {
       var ol = el("ol");
@@ -601,7 +602,7 @@
       generate: IN.gen.linearSearch,
       presets: { "Finnes (x = 9)": [7, 2, 9, 4, 1, 8, 6, 3, 9], "Ligger først": [5, 2, 9, 4, 1, 8, 5], "Finnes ikke": [7, 2, 9, 4, 1, 8, 6, 3, 5] },
       parseInput: parseWithX(10), inputLabel: "f.eks. 7,2,9,4 ; 9",
-      legend: [{ cls: "compare", label: "sammenlignes nå" }, { cls: "sorted", label: "funnet" }, { cls: "default", label: "allerede sjekket (blek)", color: DIM }]
+      legend: [{ cls: "compare", label: "sammenlignes nå" }, { cls: "target", label: "funnet" }, { cls: "default", label: "allerede sjekket (blek)", color: DIM }]
     });
     IN.pseudo.explainer("#exp-rettfrem", IN.algos.linearSearch, {});
 
@@ -695,7 +696,7 @@
         IN.clear(box);
         items.forEach(function (it) {
           var v = it.id != null ? it.id : it, lbl = it.lbl || fmt(it);
-          box.appendChild(el("button", { class: "btn sm" + (String(st[key]) === String(v) ? " primary" : ""), type: "button", text: lbl, "aria-pressed": String(st[key]) === String(v) ? "true" : "false",
+          box.appendChild(el("button", { class: "btn sm", type: "button", text: lbl, "aria-pressed": String(st[key]) === String(v) ? "true" : "false",
             onclick: function () { st[key] = v; paint(); } }));
         });
       }
@@ -774,20 +775,20 @@
       generate: IN.gen.findDupSorted,
       presets: { "Kopien til venstre": [2, 4, 7, 11, 11, 15, 18, 21, 25, 11], "Kopien til høyre": [1, 3, 5, 8, 8, 13, 20, 8], "Kopien først": [4, 4, 6, 9, 12, 14, 17, 4] },
       parseInput: parseWithX(12), inputLabel: "f.eks. 1,3,5,5,9 ; 5",
-      legend: [{ cls: "compare", label: "sammenlignes nå" }, { cls: "sorted", label: "funnet" }, { cls: "default", label: "utenfor søkeområdet (blek)", color: DIM }]
+      legend: [{ cls: "compare", label: "sammenlignes nå" }, { cls: "target", label: "funnet" }, { cls: "default", label: "utenfor søkeområdet (blek)", color: DIM }]
     });
     demo("dupb", "findDupScan", {
       generate: IN.gen.findDupScan,
       presets: { "Duplikat i midten": [2, 5, 7, 9, 9, 12, 15, 18], "Duplikat bakerst": [1, 3, 4, 6, 8, 10, 13, 13], "Duplikat først": [3, 3, 5, 6, 9, 11] },
       inputLabel: "f.eks. 1,4,4,7,9",
-      legend: [{ cls: "compare", label: "naboparet som sammenlignes" }, { cls: "sorted", label: "duplikatet" }, { cls: "default", label: "ferdig sjekket (blek)", color: DIM }]
+      legend: [{ cls: "compare", label: "naboparet som sammenlignes" }, { cls: "target", label: "duplikatet" }, { cls: "default", label: "ferdig sjekket (blek)", color: DIM }]
     });
     demo("dupc", "findDupHash", {
       generate: IN.gen.findDupHash,
       presets: { "Usortert": [7, 3, 9, 1, 6, 3, 8], "Duplikat langt unna": [5, 2, 8, 4, 9, 1, 7, 5], "Duplikat bakerst": [4, 8, 1, 6, 2, 9, 2] },
       inputLabel: "f.eks. 5,2,8,2,9",
       countControl: { min: 3, max: 9 },
-      legend: [{ cls: "compare", label: "slås opp i H" }, { cls: "target", label: "legges inn i H" }, { cls: "sorted", label: "duplikatet" }, { cls: "default", label: "ferdig sjekket (blek)", color: DIM }]
+      legend: [{ cls: "compare", label: "slås opp i H" }, { cls: "min", label: "legges inn i H" }, { cls: "target", label: "duplikatet" }, { cls: "default", label: "ferdig sjekket (blek)", color: DIM }]
     });
     IN.examTasks("#exam-duplikat", [{
       key: "H2023-3", year: "H2023", oppgave_nr: "Oppgave 3", title: "Finn duplikat", points: 12,
@@ -809,17 +810,17 @@
         { engine: "sokside", gen: "findDupSorted", input: [2, 4, 7, 11, 11, 15, 18, 21, 25, 11], inputNavn: "Sortert, x = 11",
           presets: { "Kopien til høyre": [1, 3, 5, 8, 8, 13, 20, 8], "Kopien først": [4, 4, 6, 9, 12, 14, 17, 4] },
           parseInput: parseWithX(12), inputLabel: "f.eks. 1,3,5,5,9 ; 5", pseudo: "findDupSorted",
-          legend: legOf([{ cls: "compare", label: "sammenlignes nå" }, { cls: "sorted", label: "funnet" }, { cls: "default", label: "utenfor søkeområdet (blek)", color: DIM }], "findDupSorted"),
+          legend: legOf([{ cls: "compare", label: "sammenlignes nå" }, { cls: "target", label: "funnet" }, { cls: "default", label: "utenfor søkeområdet (blek)", color: DIM }], "findDupSorted"),
           label: "(a) Binærsøk og se på naboene", del: "(a)", fasit: "3, 4", svar: marksSvar },
         { engine: "sokside", gen: "findDupScan", input: [2, 5, 7, 9, 9, 12, 15, 18], inputNavn: "Sortert, duplikat i midten",
           presets: { "Duplikat bakerst": [1, 3, 4, 6, 8, 10, 13, 13], "Duplikat først": [3, 3, 5, 6, 9, 11] },
           inputLabel: "f.eks. 1,4,4,7,9", pseudo: "findDupScan",
-          legend: legOf([{ cls: "compare", label: "naboparet som sammenlignes" }, { cls: "sorted", label: "duplikatet" }, { cls: "default", label: "ferdig sjekket (blek)", color: DIM }], "findDupScan"),
+          legend: legOf([{ cls: "compare", label: "naboparet som sammenlignes" }, { cls: "target", label: "duplikatet" }, { cls: "default", label: "ferdig sjekket (blek)", color: DIM }], "findDupScan"),
           label: "(b) Sammenlign nabopar", del: "(b)", fasit: "3, 4", svar: marksSvar },
         { engine: "sokside", gen: "findDupHash", input: [7, 3, 9, 1, 6, 3, 8], inputNavn: "Usortert",
           presets: { "Duplikat langt unna": [5, 2, 8, 4, 9, 1, 7, 5], "Duplikat bakerst": [4, 8, 1, 6, 2, 9, 2] },
           inputLabel: "f.eks. 5,2,8,2,9", countControl: { min: 3, max: 9 }, pseudo: "findDupHash",
-          legend: legOf([{ cls: "compare", label: "slås opp i H" }, { cls: "target", label: "legges inn i H" }, { cls: "sorted", label: "duplikatet" }, { cls: "default", label: "ferdig sjekket (blek)", color: DIM }], "findDupHash"),
+          legend: legOf([{ cls: "compare", label: "slås opp i H" }, { cls: "min", label: "legges inn i H" }, { cls: "target", label: "duplikatet" }, { cls: "default", label: "ferdig sjekket (blek)", color: DIM }], "findDupHash"),
           label: "(c) Hashmap fra verdi til første indeks", del: "(c)", fasit: "1, 5", svar: marksSvar }
       ],
       losning: solution([
@@ -934,7 +935,7 @@
       generate: IN.gen.findSummandsSorted,
       presets: { "x = 10": [0, 2, 4, 6, 8, 10, 10], "x = 15": [1, 3, 5, 7, 8, 10, 12, 14, 15], "Ingen par (x = 4)": [3, 5, 6, 9, 11, 4] },
       parseInput: parseWithX(12), inputLabel: "f.eks. 0,2,4,6,8,10 ; 10",
-      legend: [{ cls: "compare", label: "paret som summeres" }, { cls: "sorted", label: "funnet par" }]
+      legend: [{ cls: "compare", label: "paret som summeres" }, { cls: "target", label: "funnet par" }]
     });
     staticCode("tosumh", "findSummandsHash");
     staticCode("freq", "mostFrequent");
@@ -956,7 +957,7 @@
         engine: "sokside", gen: "findSummandsSorted", input: [0, 2, 4, 6, 8, 10, 10], inputNavn: "Eksempelet fra arket (x = 10)",
         presets: { "x = 15": [1, 3, 5, 7, 8, 10, 12, 14, 15], "Ingen par (x = 4)": [3, 5, 6, 9, 11, 4] },
         parseInput: parseWithX(12), inputLabel: "f.eks. 0,2,4,6,8,10 ; 10", pseudo: "findSummandsSorted",
-        legend: legOf([{ cls: "compare", label: "paret som summeres" }, { cls: "sorted", label: "funnet par" }], "findSummandsSorted"),
+        legend: legOf([{ cls: "compare", label: "paret som summeres" }, { cls: "target", label: "funnet par" }], "findSummandsSorted"),
         label: "(a) To pekere på eksempelet fra arket", del: "(a)",
         svar: function (last) {
           var p = last && last.info ? last.info.filter(function (x) { return x[0] === "par"; })[0] : null;
