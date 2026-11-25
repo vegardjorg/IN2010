@@ -83,53 +83,9 @@
   IN.pseudo.tokenize = tokenize;
   IN.pseudo.symPlain = symPlain;
 
-  /* ---------- Hover-tooltip for pseudokodelinjer ----------
-     Delt, flytende boks. Viser nivåstyrt forklaring for linja man peker på,
-     slik at man kan sjekke raskt uten å gå ned til linjeforklareren. */
-  function tipEl() {
-    var t = document.getElementById("pc-tip");
-    if (!t) {
-      t = el("div", { id: "pc-tip", class: "pc-tip", role: "tooltip" });
-      t.hidden = true;
-      document.body.appendChild(t);
-    }
-    return t;
-  }
-  function attachTooltips(box, lines) {
-    var tip = tipEl();
-    function textFor(n) {
-      var l = lines[n - 1];
-      if (!l || l.proc) return "";
-      var txt = IN.level.pick({ eli5: l.eli5, normal: l.normal, teknisk: l.teknisk }) || "";
-      return txt + grenseHTML(l.grense);
-    }
-    function show(row, n) {
-      // Koden har egen forklaring under seg (attachNotes): da ingen flytende boks oppå de andre linjene.
-      if (box._notes) { hide(); return; }
-      var txt = textFor(n);
-      if (!txt) { hide(); return; }
-      tip.innerHTML = txt;
-      tip.hidden = false;
-      var r = row.getBoundingClientRect();
-      var tw = tip.getBoundingClientRect().width;
-      var vw = document.documentElement.clientWidth;
-      var left = window.pageXOffset + r.left;
-      var maxLeft = window.pageXOffset + vw - tw - 10;
-      if (left > maxLeft) left = Math.max(window.pageXOffset + 8, maxLeft);
-      tip.style.left = left + "px";
-      tip.style.top = (window.pageYOffset + r.bottom + 6) + "px";
-    }
-    function hide() { tip.hidden = true; }
-    IN.qsa(".pc-line", box).forEach(function (row) {
-      var n = +row.getAttribute("data-line");
-      if (!textFor(n)) return;
-      row.classList.add("has-tip");
-      row.addEventListener("mouseenter", function () { show(row, n); });
-      row.addEventListener("mouseleave", hide);
-      row.addEventListener("focus", function () { show(row, n); });
-      row.addEventListener("blur", hide);
-    });
-  }
+  /* Linjeforklaring: ingen flytende boks over koden. All pseudokode som ikke er
+     linjeforklareren selv får «klikk en linje → forklaring under koden» (attachNotes),
+     så forklaringen aldri dekker neste linje man vil trykke på. */
 
   function indentGuides(n) {
     var s = "";
@@ -209,8 +165,6 @@
         });
       });
     }
-    // Hover-forklaring (på som standard; av i linjeforklareren som alt har sidepanel).
-    if (opts.tooltips !== false) attachTooltips(box, lines);
 
     var handleObj = {
       el: box,
@@ -229,6 +183,8 @@
     };
     // Demoens pseudokode huskes, så linjeforklareren kan bruke den i stedet for å vise koden to ganger (F10).
     if (!opts.interactive) REG.push({ algo: algo, box: box, handle: handleObj });
+    // Linjeforklaring under koden (av i linjeforklareren, som har eget sidepanel).
+    if (!opts.interactive && opts.tooltips !== false) attachNotes({ box: box, handle: handleObj }, algo);
     return handleObj;
   };
   var REG = [];
