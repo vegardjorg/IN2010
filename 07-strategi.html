@@ -1,0 +1,1040 @@
+<!doctype html>
+<html lang="nb">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Blokk 7 · Strategi · IN2010</title>
+  <meta name="description" content="Strategi i IN2010: les kjøretiden ut av løkker og rekursjon, kjenn igjen algoritmestrategiene kurset bruker, forstå P, NP og reduksjoner, og svar slik sensor belønner – med drilloppgaver og eksamensoppgaver.">
+  <script>(function(){try{var d=document.documentElement;var t=localStorage.getItem('in-theme');if(t&&t!=='system')d.setAttribute('data-theme',t);var l=localStorage.getItem('in-level')||'normal';d.setAttribute('data-level',l);}catch(e){document.documentElement.setAttribute('data-level','normal');}})();</script>
+  <link rel="stylesheet" href="assets/css/styles.css">
+</head>
+<body data-page="strategi">
+  <a class="skip-link" href="#main">Hopp til innhold</a>
+  <header id="topnav"></header>
+
+  <main id="main" class="wrap">
+    <div class="pagehead">
+      <h1>Blokk 7 · Strategi</h1>
+      <p class="lead">Nesten hver eksamensoppgave ender med «oppgi kjøretiden» og «lavere kjøretid gir mer uttelling».
+        Her lærer du å lese kjøretiden rett ut av koden, å kjenne igjen strategiene bak algoritmene i pensum,
+        hva P og NP egentlig betyr, og hvordan du skriver svar som sensor gir poeng for.</p>
+      <div class="badges">
+        <span class="badge" data-go="pnp" data-card="h2021-6"><b>H2021</b> · P og NP · <span class="pts">8p</span></span>
+        <span class="badge" data-go="pnp" data-card="h2020-8"><b>H2020</b> · Verifikator og NP · <span class="pts">10p</span></span>
+        <span class="badge" data-go="kjoretid" data-card="h2020-7a"><b>H2020</b> · Kjøretid for subanagram · <span class="pts">4p</span></span>
+        <span class="badge" data-go="kjoretid" data-card="h2022-2"><b>H2022</b> · Litt av hvert · <span class="pts">10p</span></span>
+        <span class="badge" data-go="strategier" data-card="h2020-7c"><b>H2020</b> · To strategier · <span class="pts">6p</span></span>
+      </div>
+    </div>
+
+    <div class="tabs" role="tablist" aria-label="Emner om strategi">
+      <button data-tab="kjoretid">Kjøretidsanalyse</button>
+      <button data-tab="strategier">Strategier</button>
+      <button data-tab="pnp">P og NP</button>
+      <button data-tab="eksamensteknikk">Eksamensteknikk</button>
+      <button data-tab="test">Sant/usant</button>
+    </div>
+
+    <!-- ===================== KJØRETIDSANALYSE ===================== -->
+    <section data-panel="kjoretid">
+      <div class="callout begrep"><span class="lbl">Begrep</span>
+        <p><b>Kjøretidsanalyse</b> er å telle hvor mange steg en algoritme bruker, som funksjon av størrelsen på input (n).
+          En tilordning, en sammenligning, et regnestykke, et arrayoppslag og en <code>return</code> koster ett steg hver.
+          En løkke koster det kroppen koster, ganger antall runder. Et kall koster det prosedyren som kalles koster.
+          Til slutt forenkler vi med O: konstanter blir borte, og bare det største leddet blir igjen. 4n² + 5n + 3 er O(n²).</p>
+      </div>
+      <div id="intro-kjoretid"></div>
+
+      <h3>Seks regler for å lese kode</h3>
+      <div class="st-rules">
+        <div class="card st-rule"><span class="st-rule-n">1</span><h4>Sekvens: legg sammen</h4>
+          <p class="small">To biter etter hverandre koster summen. Det største leddet vinner: O(n log n) + O(n) = O(n log n).</p></div>
+        <div class="card st-rule"><span class="st-rule-n">2</span><h4>Løkke: runder × kropp</h4>
+          <p class="small">Tell hvor mange ganger løkka går, og gang med hva én runde koster. n runder à O(1) = O(n).</p></div>
+        <div class="card st-rule"><span class="st-rule-n">3</span><h4>Nøsting: gang sammen</h4>
+          <p class="small">En løkke inni en løkke ganges. Men sjekk grensen: går den indre til 9, er den O(1), ikke O(n).</p></div>
+        <div class="card st-rule"><span class="st-rule-n">4</span><h4>Halvering: log n</h4>
+          <p class="small">Halveres (eller dobles) noe hver runde, går løkka omtrent log n ganger. Det er der log kommer fra.</p></div>
+        <div class="card st-rule"><span class="st-rule-n">5</span><h4>Kall: se inni</h4>
+          <p class="small">Et kall er ikke gratis. <code>Search</code>, <code>Contains</code>, <code>Remove</code> og kopiering på arrayer er lineære.</p></div>
+        <div class="card st-rule"><span class="st-rule-n">6</span><h4>Rekursjon: kall × arbeid</h4>
+          <p class="small">Tell antall kall og arbeid per kall, eller antall nivåer og arbeid per nivå. To kall på n − 1 gir 2ⁿ.</p></div>
+      </div>
+
+      <h3>Én kodebit per kompleksitetsklasse</h3>
+      <p class="muted small">Dette er de klassene kurset bruker, fra raskest til tregest. Hold musa over en linje for å se hva den koster.</p>
+      <div class="st-switch" role="group" aria-label="Velg kompleksitetsklasse" id="arketype-btns"></div>
+      <div class="grid cols-2 st-arch">
+        <div><div id="arketype-pc"></div><div id="arketype-bigo"></div></div>
+        <div class="card" id="arketype-info" aria-live="polite"></div>
+      </div>
+
+      <h3>Doblingstesten</h3>
+      <p class="muted small">Hva skjer med antall runder når n dobles? Svaret avslører klassen: dobbelt så mye er lineært, fire ganger så mye er kvadratisk, én runde ekstra er logaritmisk.</p>
+      <div class="card">
+        <div class="st-switch" role="group" aria-label="Velg kodebit" id="dobling-btns"></div>
+        <div class="grid cols-2">
+          <div id="dobling-pc"></div>
+          <div>
+            <div class="table-wrap" style="margin-top:0"><table class="st-dtab" id="dobling-tab"></table></div>
+            <p class="small" id="dobling-txt" aria-live="polite"></p>
+          </div>
+        </div>
+      </div>
+
+      <h3>Samme problem, tre algoritmer</h3>
+      <p class="small">SumTo(n) skal regne ut 1 + 2 + … + n. Alle tre gir samme svar, men de er i hver sin klasse.
+        Kjøretiden tilhører <b>algoritmen</b>, ikke problemet. Dette er også eksamens røde tråd: finn en løsning som virker, og se så om den kan gjøres raskere.</p>
+      <div class="grid cols-3 st-sumto">
+        <div><div id="pc-sumto1"></div><div id="bo-sumto1"></div></div>
+        <div><div id="pc-sumto2"></div><div id="bo-sumto2"></div></div>
+        <div><div id="pc-sumto3"></div><div id="bo-sumto3"></div></div>
+      </div>
+
+      <div class="callout uni"><span class="lbl">Universitetsnivå</span>
+        <p><b>Definisjonen av O.</b> f(n) er O(g(n)) hvis det finnes en konstant c &gt; 0 slik at f(n) ≤ c · g(n) for alle n som er store nok.
+          Eksempel: 3n² + 5n + 2 ≤ 4n² så snart n ≥ 6, så 3n² + 5n + 2 er O(n²).</p>
+        <p>O er en <b>øvre grense</b>. En algoritme som er O(log n), er derfor også O(n) og O(n²). På eksamen skal du likevel oppgi den <b>laveste</b> klassen du kan begrunne: å svare O(n²) på en lineær algoritme er ikke feil matematikk, men det gir ikke poeng.</p>
+        <p><b>Rekursjon.</b> Kurset bruker ingen rekurrensformler. Tegn heller kalltreet for deg: Merge sort har log n nivåer og O(n) arbeid per nivå, altså O(n log n). Quicksort med dårlig pivot har n nivåer med lineært arbeid, altså O(n²).</p>
+      </div>
+      <div class="callout felle"><span class="lbl">Felle</span>
+        <ul>
+          <li><b>«O betyr verste tilfelle»</b> er feil. Tilfelle (beste/verste) og veksttakt er to forskjellige spørsmål. Rett-frem søk er O(1) i beste og O(n) i verste tilfelle. Begge skrives med O.</li>
+          <li><b>To løkker er ikke alltid n².</b> Står de etter hverandre, legges de sammen. Er den indre grensen en konstant, er den O(1).</li>
+          <li><b>Skjulte løkker.</b> En «enkel» linje som <code>if Contains(L, x)</code> kan koste O(n).</li>
+          <li><b>To variabler.</b> Har input to størrelser (n og k, w og s), skal svaret ha begge. Si alltid hva variablene betyr.</li>
+        </ul>
+      </div>
+
+      <h3>Drill: hva er kjøretiden?</h3>
+      <p class="muted small">Les koden, velg svar, og les forklaringen på nivået du vil. Prikkene viser hvor du er og hva du har svart. Oppgi verste tilfelle der ikke annet står.</p>
+      <div id="drill"></div>
+
+      <h3>Øv selv</h3>
+      <div id="quiz-kjoretid"></div>
+
+      <h3>Eksamen</h3>
+      <div id="exam-h2020-7a"></div>
+      <div id="exam-h2022-2"></div>
+      <div class="callout sensor"><span class="lbl">Sensortips</span>
+        <ul>
+          <li>Oppgi kjøretiden <b>og</b> én setning om hvorfor: «løkka går n ganger, og hver runde er O(1)». Det er ofte et eget poeng.</li>
+          <li>Kjøretiden må stemme med <b>din</b> løsning, ikke med den beste mulige.</li>
+          <li>Definer variablene før du bruker dem. H2020 trakk 3 poeng for å bruke n uten å si hva n var.</li>
+          <li>For hashing: skriv både forventet O(1) og verste tilfelle O(n). Bare den ene ga trekk i H2025.</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- ===================== STRATEGIER ===================== -->
+    <section data-panel="strategier" hidden>
+      <div class="callout begrep"><span class="lbl">Begrep</span>
+        <p>En <b>strategi</b> er en måte å tenke på når du skal finne en algoritme. Kurset setter bare ett navn aktivt på algoritmene sine:
+          <b>grådig</b> (Prim, Kruskal og Dijkstra). Det bruker også «brute force» og «naiv» om løsninger som følger definisjonen direkte.
+          Resten av kortene under er mønstre som går igjen i pensum og på eksamen, beskrevet med hva de gjør.</p>
+      </div>
+      <div id="intro-strategier"></div>
+
+      <div class="st-strats">
+        <div class="card st-strat">
+          <h4>Rett fram (brute force)</h4>
+          <p class="small"><b>Idé:</b> gjør nøyaktig det definisjonen sier, uten triks.</p>
+          <p class="small"><b>Fra pensum:</b> finn separasjonsnoder ved å fjerne hver node og kjøre DFS, O(|V| · (|V| + |E|)). Sjekk alle par i en dobbel løkke, O(n²). CheckBST med FindMin og FindMax i hver node, O(n²).</p>
+          <p class="small st-verdict"><b>Bra:</b> lett å få riktig, og et trygt utgangspunkt. <b>Men:</b> på eksamen gir det oftest bare delvis uttelling når det finnes noe raskere.</p>
+        </div>
+        <div class="card st-strat">
+          <h4>Prøv alle muligheter</h4>
+          <p class="small"><b>Idé:</b> gå gjennom alle kandidater (alle utfyllinger, alle delmengder) og sjekk hver av dem.</p>
+          <p class="small"><b>Fra pensum:</b> Sudoku, der vi ikke kjenner noen effektiv algoritme. H2020 Strategi 2 slo opp alle de 2ˢ delmengdene av bokstavene i S.</p>
+          <p class="small st-verdict"><b>Bra:</b> virker for alt som kan sjekkes. <b>Men:</b> antallet kandidater vokser eksponentielt, så det er bare brukbart når input er lite.</p>
+        </div>
+        <div class="card st-strat">
+          <h4>Grådig</h4>
+          <p class="small"><b>Idé:</b> ta det valget som ser best ut akkurat nå, og angre aldri.</p>
+          <p class="small"><b>Fra pensum:</b> Prim legger alltid til den billigste kanten ut av treet. Kruskal tar den billigste kanten som ikke lager sykel. Dijkstra låser alltid noden med minst avstand. Huffman følger samme mønster: slå sammen de to sjeldneste.</p>
+          <p class="small st-verdict"><b>Bra:</b> enkelt og raskt. <b>Men:</b> det grådige valget er ikke alltid riktig, så du trenger en grunn til at det virker. Se eksempelet under.</p>
+        </div>
+        <div class="card st-strat">
+          <h4>Del opp og løs bitene</h4>
+          <p class="small"><b>Idé:</b> del input i mindre biter, løs bitene rekursivt, og sett svarene sammen.</p>
+          <p class="small"><b>Fra pensum:</b> Merge sort (del i to, sorter, flett), Quicksort (del rundt en pivot), binærsøk (kast halvparten) og nesten alle trealgoritmer (svaret for v bygges av svarene fra barna, som i Diameter).</p>
+          <p class="small st-verdict"><b>Analyse:</b> nivåer × arbeid per nivå. Halveres input, er det log n nivåer. <span class="muted">Andre lærebøker kaller dette «splitt og hersk». IN2010 bruker ikke den merkelappen, så beskriv heller hva algoritmen gjør.</span></p>
+        </div>
+        <div class="card st-strat">
+          <h4>Gjør jobben én gang</h4>
+          <p class="small"><b>Idé:</b> bruk litt tid på forhånd, så blir hver spørring billig.</p>
+          <p class="small"><b>Fra pensum:</b> sorter A én gang og binærsøk k ganger, O(n log n + k log n), i stedet for k rett-frem søk, O(k · n) (H2020). Bygg et hashmap av ordboka én gang (H2020 Strategi 2). BuildHeap og så k uttak (H2025).</p>
+          <p class="small st-verdict"><b>Lønner seg</b> når det kommer mange spørringer. For én spørring er forarbeidet ofte bortkastet.</p>
+        </div>
+        <div class="card st-strat">
+          <h4>Velg riktig datastruktur</h4>
+          <p class="small"><b>Idé:</b> det tunge arbeidet blir billig hvis dataene ligger i en struktur som passer.</p>
+          <p class="small"><b>Fra pensum:</b> hashset for «har jeg sett denne før?», forventet O(n) i stedet for O(n²). Et array med plass k + 1 som teller forekomster, O(n + k) (H2021). Heap når du gjentatte ganger trenger den minste. Prefikstre mot hashmap (H2022) er et valg mellom minne og tid.</p>
+          <p class="small st-verdict"><b>Husk:</b> oppgi hva strukturen koster, også i verste tilfelle.</p>
+        </div>
+        <div class="card st-strat">
+          <h4>Oversett til noe du kan</h4>
+          <p class="small"><b>Idé:</b> skriv om problemet til et problem du allerede har en algoritme for.</p>
+          <p class="small"><b>Fra pensum:</b> gjør historien om til en graf og kjør BFS, Dijkstra eller MST. Snu kantene for å finne avstanden fra alle noder til ett mål på én kjøring (H2024). Samme tanke ligger bak <a href="#fane=pnp">reduksjoner</a>.</p>
+          <p class="small st-verdict"><b>På eksamen</b> kan du bruke pensumalgoritmer som byggeklosser. Si hva de returnerer og hva de koster.</p>
+        </div>
+      </div>
+
+      <h3>Når det grådige valget slår feil</h3>
+      <div class="grid cols-2">
+        <div class="card"><div id="greedy-graf"></div>
+          <p class="muted small">Rettet graf med én negativ kant (b → a har vekt −4). Start i s.</p></div>
+        <div>
+          <p class="small">Dijkstra, slik den vanligvis beskrives, regner en node som <b>ferdig</b> når den tas ut av køen med minst avstand. Det er det grådige valget.</p>
+          <ol class="small">
+            <li>s tas ut med 0. a får 2, b får 5.</li>
+            <li>a tas ut med 2 og låses. t får 3.</li>
+            <li>t tas ut med 3 og låses.</li>
+            <li>b tas ut med 5. Kanten b → a gir 5 − 4 = 1, men a er allerede låst, og t fikk aldri vite det.</li>
+          </ol>
+          <div class="table-wrap"><table>
+            <thead><tr><th>Node</th><th>Dijkstra svarer</th><th>Riktig</th></tr></thead>
+            <tbody><tr><td>a</td><td>2</td><td><b>1</b> (s → b → a)</td></tr><tr><td>t</td><td>3</td><td><b>2</b> (s → b → a → t)</td></tr></tbody>
+          </table></div>
+          <p class="small">Uten negative kanter kan en senere vei aldri bli kortere, og da holder det grådige valget. Med negative kanter bruker vi Bellman-Ford.</p>
+        </div>
+      </div>
+
+      <h3>Fra naiv til rask: samme oppgave, ulike strategier</h3>
+      <p class="small">Mange eksamensoppgaver kan løses på flere måter, og poengene følger kjøretiden. «Finn to like tall i A» er et typisk eksempel:</p>
+      <div class="table-wrap">
+        <table class="cmp-table">
+          <thead><tr><th>Strategi</th><th>Idé</th><th>Kjøretid</th></tr></thead>
+          <tbody>
+            <tr><td>Rett fram</td><td>Sammenlign alle par i en dobbel løkke</td><td class="mono">O(n²)</td></tr>
+            <tr><td>Gjør jobben én gang</td><td>Sorter, og sammenlign naboer</td><td class="mono">O(n log n)</td></tr>
+            <tr><td>Riktig datastruktur</td><td>Hashset: har jeg sett tallet før?</td><td class="mono">forventet O(n)</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="small">Se <a href="02-sok.html#fane=duplikat">Finn duplikat under Søk</a> for hele oppgaven fra H2023, og <a href="#fane=eksamensteknikk">kjøretidstrappen</a> for hvor mye hvert trinn ga.</p>
+
+      <h3>Øv selv: hvilken strategi?</h3>
+      <div id="quiz-strategier"></div>
+
+      <h3>Eksamen</h3>
+      <div id="exam-h2020-7c"></div>
+      <div class="callout sensor"><span class="lbl">Sensortips</span>
+        <ul>
+          <li>I en drøfting: si hva hver strategi avhenger av, og <b>når</b> hver av dem er best. Det holder ikke å kåre én vinner.</li>
+          <li>Kall strategien ved navn bare når du er sikker. Ellers er det bedre å beskrive hva den gjør.</li>
+          <li>Begynner du med en rett-fram-løsning, skriv den ferdig og oppgi kjøretiden. En riktig, treg løsning gir poeng. En rask løsning som er feil, gir ofte 0.</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- ===================== P OG NP ===================== -->
+    <section data-panel="pnp" hidden>
+      <div class="callout begrep"><span class="lbl">Begrep</span>
+        <p>Hittil har vi målt hvor rask en <b>algoritme</b> er. Nå spør vi hvor vanskelig et <b>problem</b> er. Det avgjøres av den beste algoritmen som <i>kan</i> finnes, ikke bare de vi kjenner.
+          For å sammenligne problemer ser vi på <b>avgjørelsesproblemer</b>: en <b>instans</b> og et spørsmål med svaret JA eller NEI.</p>
+      </div>
+      <div id="intro-pnp"></div>
+
+      <h3>Avgjørelsesproblemer</h3>
+      <div class="st-probs">
+        <div class="card st-prob"><h4>PATH</h4><p class="small"><b>Instans:</b> en graf G og to noder s og t.<br><b>Spørsmål:</b> finnes det en sti fra s til t?</p><span class="tag st-tag-p">I P: BFS, O(|V| + |E|)</span></div>
+        <div class="card st-prob"><h4>SORT</h4><p class="small"><b>Instans:</b> to arrayer A1 og A2.<br><b>Spørsmål:</b> er A2 den sorterte utgaven av A1?</p><span class="tag st-tag-p">I P</span></div>
+        <div class="card st-prob"><h4>MST-k</h4><p class="small"><b>Instans:</b> en vektet, sammenhengende graf G og et tall k.<br><b>Spørsmål:</b> finnes det et spenntre med total vekt mindre enn k?</p><span class="tag st-tag-p">I P: Prim eller Kruskal</span></div>
+        <div class="card st-prob"><h4>HAMILTONSYKEL</h4><p class="small"><b>Instans:</b> en urettet graf G.<br><b>Spørsmål:</b> finnes det en sykel som er innom hver node nøyaktig én gang?</p><span class="tag st-tag-npc">NP-komplett</span></div>
+        <div class="card st-prob"><h4>SUDOKU</h4><p class="small"><b>Instans:</b> et delvis utfylt n × n-brett.<br><b>Spørsmål:</b> kan resten fylles ut etter reglene?</p><span class="tag st-tag-npc">NP-komplett (store brett)</span></div>
+        <div class="card st-prob"><h4>SAT</h4><p class="small"><b>Instans:</b> en logisk formel med variabler.<br><b>Spørsmål:</b> finnes det sann/usann-verdier som gjør formelen sann?</p><span class="tag st-tag-npc">Det første som ble bevist NP-hardt</span></div>
+        <div class="card st-prob"><h4>HALT</h4><p class="small"><b>Instans:</b> en algoritme A og et input x.<br><b>Spørsmål:</b> stopper A når den kjøres på x?</p><span class="tag st-tag-u">Uavgjørbart</span></div>
+      </div>
+      <p class="muted small">Et rikere problem («finn den korteste stien») er minst like vanskelig som avgjørelsesversjonen («finnes en sti med lengde høyst k?»). Klarer vi det rike, klarer vi også JA/NEI-spørsmålet.</p>
+
+      <h3>P: kan løses i polynomiell tid</h3>
+      <div class="callout begrep"><span class="lbl">Begrep</span>
+        <p><b>P</b> er avgjørelsesproblemene som kan løses i <b>polynomiell tid</b>, altså O(nᵏ) for en konstant k. Tenk «k nøstede løkker opp til n».
+          Nesten alle algoritmene i pensum er polynomielle. O(2ⁿ) er ikke polynomielt, fordi n står i eksponenten.</p>
+      </div>
+      <div class="callout uni"><span class="lbl">Universitetsnivå</span>
+        <p>Polynomiell betyr ikke automatisk rask. En O(n¹⁰⁰)-algoritme er polynomiell, men selv for n = 2 er 2¹⁰⁰ steg langt mer enn noen datamaskin rekker.
+          Slike eksponenter dukker heldigvis sjelden opp i praksis, og derfor kaller vi P de håndterbare problemene.</p>
+      </div>
+
+      <h3>NP: et JA-svar kan sjekkes i polynomiell tid</h3>
+      <div class="callout begrep"><span class="lbl">Begrep</span>
+        <p>Et <b>sertifikat</b> er et løsningsforslag som beviser et JA-svar, for eksempel en utfylt Sudoku eller en rekkefølge av nodene.
+          En <b>verifikator</b> sjekker sertifikatet. <b>NP</b> er avgjørelsesproblemene der JA-instanser kan <b>verifiseres i polynomiell tid</b> når vi får et sertifikat.
+          Å <i>finne</i> sertifikatet kan være vanskelig. Å <i>sjekke</i> det skal være lett.</p>
+      </div>
+      <div class="callout felle"><span class="lbl">Felle</span>
+        <p><b>NP betyr ikke «ikke polynomiell».</b> Navnet står for <i>nondeterministic polynomial time</i>, fra en annen, likeverdig definisjon som ikke er pensum.
+          Alt i P er også i NP: kan du løse problemet raskt, kan du sjekke et svar raskt (bare løs det og sammenlign). Altså er P ⊆ NP.</p>
+      </div>
+
+      <h4>Prøv selv: vær verifikatoren</h4>
+      <p class="small">Klikk nodene i den rekkefølgen du vil foreslå. Forslaget C er sertifikatet. Verifikatoren sjekker bare at hver nabo i C har en kant, også fra den siste tilbake til den første. Den leter aldri etter en annen sykel.</p>
+      <div class="grid cols-2">
+        <div class="card">
+          <div id="ham-graf"></div>
+          <div class="st-cert" id="ham-cert" aria-live="polite"></div>
+          <div class="btn-row">
+            <button class="btn sm primary" type="button" id="ham-step">Ett steg</button>
+            <button class="btn sm" type="button" id="ham-run">Sjekk alt</button>
+            <button class="btn sm ghost" type="button" id="ham-reset">↺ Tøm</button>
+          </div>
+          <div class="btn-row" id="ham-ex"></div>
+          <p class="small" id="ham-msg" aria-live="polite"></p>
+        </div>
+        <div><div id="ham-pc"></div><div id="ham-bigo"></div></div>
+      </div>
+
+      <h3>Er P = NP?</h3>
+      <div class="grid cols-2">
+        <div class="card st-venn-card">
+          <svg class="st-venn" viewBox="0 0 440 250" role="img" aria-label="P ligger inni NP. NP-hardt overlapper NP, og overlappet er NP-komplett. Tegningen viser situasjonen hvis P er ulik NP.">
+            <ellipse class="st-v-nph" cx="318" cy="125" rx="112" ry="100"/>
+            <ellipse class="st-v-np" cx="150" cy="125" rx="135" ry="100"/>
+            <ellipse class="st-v-p" cx="118" cy="135" rx="62" ry="50"/>
+            <text class="st-v-lbl" x="118" y="130" text-anchor="middle">P</text>
+            <text class="st-v-sm" x="118" y="150" text-anchor="middle">PATH, SORT, MST-k</text>
+            <text class="st-v-lbl" x="105" y="58" text-anchor="middle">NP</text>
+            <text class="st-v-lbl" x="365" y="70" text-anchor="middle">NP-hardt</text>
+            <text class="st-v-sm" x="245" y="112" text-anchor="middle">NP-</text>
+            <text class="st-v-sm" x="245" y="126" text-anchor="middle">komplett</text>
+            <text class="st-v-sm" x="245" y="146" text-anchor="middle">SAT</text>
+            <text class="st-v-sm" x="370" y="135" text-anchor="middle">ikke i NP</text>
+          </svg>
+          <p class="muted small">Slik tror de fleste det ser ut (P ≠ NP). Ingen har bevist det.</p>
+        </div>
+        <div>
+          <p class="small"><b>Ingen vet.</b> P ⊆ NP er sikkert, men om P = NP eller P ≠ NP, er et av de store åpne problemene i matematikk og informatikk. Det er utlovet en million dollar for et bevis den ene eller andre veien.</p>
+          <p class="small">De fleste tror P ≠ NP. Da finnes det problemer der det er lett å sjekke et svar, men umulig å finne et raskt.</p>
+          <div class="callout felle"><span class="lbl">Felle</span>
+            <p>Skriv aldri at noe er «bevist» om P og NP. H2021 testet begge retningene, og begge var usanne.</p>
+          </div>
+        </div>
+      </div>
+
+      <h3>Reduksjoner: oversett ett problem til et annet</h3>
+      <div class="callout begrep"><span class="lbl">Begrep</span>
+        <p>En <b>reduksjon</b> fra A til B er en algoritme som i polynomiell tid gjør en instans av A om til en instans av B, slik at JA blir JA og NEI blir NEI.
+          Da kan vi løse A ved å oversette og spørre en løser for B. Konklusjonen er at <b>B er minst like vanskelig som A</b>.</p>
+      </div>
+      <div class="st-reduce" aria-hidden="true">
+        <span class="st-r-box">instans av A</span><span class="st-r-arrow">oversett i polynomiell tid →</span>
+        <span class="st-r-box">instans av B</span><span class="st-r-arrow">løs B →</span>
+        <span class="st-r-box">JA/NEI for A</span>
+      </div>
+      <div class="grid cols-2">
+        <div>
+          <h4 style="margin:.2rem 0 .4rem">Det minste eksempelet: EVEN til ODD</h4>
+          <div id="pc-evenodd"></div>
+        </div>
+        <div class="card">
+          <label class="st-fld">n =<input type="number" id="eo-n" value="6" step="1" style="width:6rem" aria-label="Instans av EVEN"></label>
+          <div class="small" id="eo-out" aria-live="polite"></div>
+        </div>
+      </div>
+      <div class="callout uni"><span class="lbl">Universitetsnivå</span>
+        <p>Reduksjoner kan se rare ut. Forelesningen reduserer SCC-k («har G minst k sterkt sammenhengende komponenter?») til SORT: løs SCC-k direkte med Kosaraju, som er polynomielt, og lag så en SORT-instans med kjent svar.
+          Ved JA lager vi A1 = A2 = [1, 2, 3], og ved NEI lager vi A1 = [1, 2, 3] og A2 = [2, 1, 3]. Det er lov, fordi oversettelsen bare må gå i polynomiell tid og bevare svaret.
+          Samme triks viser at nesten alle problemer i P kan reduseres til hverandre. Unntaket er de to trivielle problemene som alltid svarer JA eller alltid NEI, fordi de mangler en instans med det motsatte svaret.</p>
+      </div>
+
+      <h3>NP-hardt og NP-komplett</h3>
+      <div class="grid cols-2">
+        <div class="callout begrep" style="margin-top:0"><span class="lbl">NP-hardt</span>
+          <p>Et problem er <b>NP-hardt</b> hvis det er minst like vanskelig som <b>alle</b> problemer i NP: alt i NP kan reduseres til det. SAT var det første som ble bevist NP-hardt.
+            Et NP-hardt problem trenger ikke selv ligge i NP.</p>
+        </div>
+        <div class="callout begrep" style="margin-top:0"><span class="lbl">NP-komplett</span>
+          <p>Et problem er <b>NP-komplett</b> hvis det er <b>både</b> i NP <b>og</b> NP-hardt. Det er de vanskeligste problemene i NP. Eksempler: SAT, HAMILTONSYKEL, KNAPSACK (som avgjørelsesproblem) og Sudoku på store brett.</p>
+        </div>
+      </div>
+      <div class="card">
+        <h4 style="margin-top:.2rem">Oppskrift: vis at et nytt problem X er NP-hardt</h4>
+        <ol class="small">
+          <li>Velg et problem du vet er NP-hardt, for eksempel SAT.</li>
+          <li>Lag en reduksjon <b>fra SAT til X</b>: oversett enhver SAT-instans til en X-instans i polynomiell tid, med samme svar.</li>
+          <li>Da er X minst like vanskelig som SAT, og dermed NP-hardt.</li>
+          <li>Vil du vise at X er NP-komplett, viser du i tillegg at X er i NP, for eksempel med en verifikator.</li>
+        </ol>
+      </div>
+      <div class="callout felle"><span class="lbl">Felle: retningen</span>
+        <p>Å redusere X <i>til</i> SAT viser bare at X ikke er vanskeligere enn SAT. Det sier ingenting om at X er vanskelig. Pilen skal gå <b>fra</b> det kjente vanskelige problemet <b>til</b> det nye.</p>
+      </div>
+      <div class="callout eksempel"><span class="lbl">Derfor er NP-komplett så viktig</span>
+        <p>Alt i NP kan reduseres til et NP-komplett problem. Finner noen en polynomiell algoritme for ett eneste NP-komplett problem, kan alt i NP løses i polynomiell tid, og da er P = NP.
+          Alle NP-komplette problemer kan også reduseres til hverandre.</p>
+      </div>
+
+      <h3>Problemer som ingen algoritme kan løse</h3>
+      <div class="callout begrep"><span class="lbl">Begrep</span>
+        <p>Noen avgjørelsesproblemer er <b>uavgjørbare</b>: det er bevist at ingen algoritme gir riktig svar på alle instanser i endelig tid. Det klassiske eksempelet er <b>stoppeproblemet</b> (HALT).
+          Det hjelper ikke med en raskere datamaskin. Slike problemer ligger utenfor både P og NP.</p>
+      </div>
+      <div class="callout uni"><span class="lbl">Universitetsnivå: hvorfor HALT ikke kan løses</span>
+        <p>Anta at det finnes en algoritme H(A, x) som alltid svarer riktig på om A stopper på x. Lag en ny algoritme D(A): spør H(A, A). Sier H «stopper», går D i evig løkke. Sier H «stopper ikke», svarer D JA og stopper.
+          Kjør nå D på seg selv. Stopper D(D)? Hvis ja, sa H «stopper ikke», og D stoppet likevel. Hvis nei, sa H «stopper», og D gikk likevel i evig løkke. Begge deler er umulig, så H kan ikke finnes.
+          Dette beviste Alan Turing i 1936.</p>
+      </div>
+
+      <h3>Øv selv</h3>
+      <div id="quiz-pnp"></div>
+
+      <h3>Eksamen</h3>
+      <div id="exam-h2021-6"></div>
+      <div id="exam-h2020-8"></div>
+      <div class="callout sensor"><span class="lbl">Sensortips</span>
+        <ul>
+          <li>En verifikator skal <b>sjekke sertifikatet</b>, ikke lete etter en løsning. H2020 ga 0 poeng for BFS eller DFS som prøvde å finne sykelen.</li>
+          <li>Husk kanten fra den siste noden tilbake til den første. Den kostet 1 poeng i H2020.</li>
+          <li>«Hvorfor er problemet i NP?» besvares med definisjonen: verifikatoren går i polynomiell tid, så JA-instanser kan sjekkes i polynomiell tid.</li>
+          <li>I H2021 ga et feil <b>eller blankt</b> svar −1, og summen ble aldri under 0. Svar på alle, men tenk deg om.</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- ===================== EKSAMENSTEKNIKK ===================== -->
+    <section data-panel="eksamensteknikk" hidden>
+      <div class="callout begrep"><span class="lbl">Begrep</span>
+        <p>Sensorveiledningene H2020–H2025 belønner det samme år etter år: en <b>riktig</b> løsning, så <b>rask</b> som mulig, skrevet <b>presist</b>, med <b>kjøretid og begrunnelse</b>.
+          Her er oppgavetypene og hva sensor ser etter i hver.</p>
+      </div>
+      <div id="intro-teknikk"></div>
+
+      <h3>Oppgavetypene</h3>
+      <div class="st-types">
+        <details class="card st-type" open><summary><b>Skriv en algoritme</b> <span class="muted small">pseudokode eller presis tekst</span></summary>
+          <ul class="small">
+            <li>Pseudokoden skal være lett å forstå, entydig og presis. Det finnes ingen fasit for syntaks.</li>
+            <li>En presis forklaring med ord kan gi full uttelling, og kan slå uklar pseudokode.</li>
+            <li>Lavere kjøretid gir mer uttelling. Ofte er det et fast tak per kjøretid (se trappen under).</li>
+            <li>Du kan bruke pensumalgoritmer og -datastrukturer som byggeklosser. Det står eksplisitt i oppgavesettene fra 2023.</li>
+            <li>Riktig idé med feil i pseudokoden gir delvis uttelling. En idé som gir feil svar, gir lite eller ingenting.</li>
+          </ul></details>
+        <details class="card st-type" open><summary><b>Oppgi kjøretiden</b> <span class="muted small">ofte 1–2 poeng for seg</span></summary>
+          <ul class="small">
+            <li>Kjøretiden skal stemme med din egen løsning. Feil eller manglende kjøretid ga −1 per deloppgave i H2023.</li>
+            <li>Uttrykk den i variabler som er definert: n, |V|, |E|, h, k.</li>
+            <li>Si hvilket tilfelle du mener, særlig for hashing (forventet O(1), verste O(n)) og søketrær (O(h), som er O(n) for en kjede).</li>
+            <li>Står det «begrunn kort», holder én setning: «hver node besøkes én gang med O(1) arbeid».</li>
+          </ul></details>
+        <details class="card st-type"><summary><b>Begrunn eller forklar</b> <span class="muted small">ofte «maks fire setninger»</span></summary>
+          <ul class="small">
+            <li>Én påstand per setning. Svar på akkurat det som spørres om.</li>
+            <li>Spørsmål av typen «gjelder det alltid?» besvares best med et moteksempel.</li>
+            <li>Argumenter generelt, ikke bare ut fra eksempelet i oppgaven. Et eksempel viser ikke at noe alltid gjelder.</li>
+          </ul></details>
+        <details class="card st-type"><summary><b>Drøft</b> <span class="muted small">sammenlign to løsninger</span></summary>
+          <ul class="small">
+            <li>Dekk begge alternativene, både kjøretid og minne der det er relevant.</li>
+            <li>Si <b>når</b> hvert alternativ er best: «Strategi 2 lønner seg når S er kort og ordboka stor».</li>
+            <li>Definer variablene og bruk O-notasjon. Gjør rimelige antagelser, og skriv dem ned.</li>
+            <li>Her har sensor mest skjønn, og en klar tekst teller. En setning sensor ikke forstår, gir ingen poeng.</li>
+          </ul></details>
+        <details class="card st-type"><summary><b>Kjør for hånd</b> <span class="muted small">heap, AVL, Huffman, hashing</span></summary>
+          <ul class="small">
+            <li>Vis mellomtilstandene: treet etter hver innsetting, køen etter hver sammenslåing, tabellen etter hver kollisjon.</li>
+            <li>Skriv hvilken regel du bruker (hvilken rotasjon, hvilken kant som får 0 og 1).</li>
+          </ul></details>
+        <details class="card st-type"><summary><b>Sant/usant og flervalg</b> <span class="muted small">rettes automatisk</span></summary>
+          <ul class="small">
+            <li>Blankt teller som galt. Fra 2023 regnes poengene i del 1 ut fra hvor mange flere enn halvparten du har riktig, så ren gjetting gir i snitt 0.</li>
+            <li>Svar på alle, men tenk: hver påstand du faktisk kan, løfter deg over streken.</li>
+          </ul></details>
+      </div>
+
+      <h3>Kjøretidstrappen</h3>
+      <p class="muted small">Poengene følger kjøretiden. Velg en oppgave og se hvor mye hvert trinn ga ifølge sensorveiledningen.</p>
+      <div class="card">
+        <div class="st-switch" role="group" aria-label="Velg eksamensoppgave" id="trapp-btns"></div>
+        <div id="trapp" aria-live="polite"></div>
+      </div>
+
+      <h3>Svarmal for en algoritmeoppgave</h3>
+      <div class="card">
+        <ol class="small st-mal">
+          <li><b>Idé i én eller to setninger.</b> «Jeg går gjennom treet i postorder og returnerer høyde og diameter samtidig.» Selv om koden sklir, har sensor sett at du har forstått.</li>
+          <li><b>Pseudokode</b> med <code>←</code> for tilordning, 0-indeksering og navn du bruker konsekvent.</li>
+          <li><b>Spesialtilfeller:</b> tomt input, null, én node, like verdier, siste element.</li>
+          <li><b>Kjøretid med begrunnelse</b>, i variabler du har definert.</li>
+          <li><b>Les oppgaven én gang til.</b> Skal du returnere eller skrive ut? Er input sortert? Er tallene unike?</li>
+        </ol>
+        <p class="muted small">Mer om å skrive pseudokode: <a href="pseudokode.html#fane=skriveguide">Pseudokode-skolen → Skriveguide</a>.</p>
+      </div>
+
+      <h3>Pensum som byggeklosser</h3>
+      <p class="small">Du kan kalle pensumalgoritmer uten å skrive dem selv. Tre krav: si hva kallet returnerer, sørg for at det ikke ødelegger kjøretiden, og ta med kostnaden i analysen.</p>
+      <div class="table-wrap">
+        <table class="cmp-table">
+          <thead><tr><th>Byggekloss</th><th>Gir deg</th><th>Kjøretid</th></tr></thead>
+          <tbody>
+            <tr><td>Merge sort / Heapsort</td><td>Sortert array</td><td class="mono">O(n log n)</td></tr>
+            <tr><td>Bucket sort</td><td>Stabil sortering når nøklene er 0 … N − 1</td><td class="mono">O(N + n)</td></tr>
+            <tr><td>Binærsøk</td><td>Finn x i et sortert array</td><td class="mono">O(log n)</td></tr>
+            <tr><td>Hashset / hashmap</td><td>Innsetting, oppslag og sletting</td><td class="mono">forventet O(1), verst O(n)</td></tr>
+            <tr><td>Heap: Insert / RemoveMin</td><td>Den minste, igjen og igjen</td><td class="mono">O(log n)</td></tr>
+            <tr><td>BuildHeap</td><td>Heap fra et usortert array</td><td class="mono">O(n)</td></tr>
+            <tr><td>Søk i binært søketre</td><td>Oppslag, innsetting, fjerning</td><td class="mono">O(h), O(log n) i AVL</td></tr>
+            <tr><td>BFS / DFS</td><td>Nåbarhet, korteste vei uten vekter, komponenter</td><td class="mono">O(|V| + |E|)</td></tr>
+            <tr><td>Topologisk sortering</td><td>Rekkefølge i en DAG</td><td class="mono">O(|V| + |E|)</td></tr>
+            <tr><td>Dijkstra (med heap)</td><td>Korteste vei, ingen negative kanter</td><td class="mono">O((|V| + |E|) log |V|)</td></tr>
+            <tr><td>Bellman-Ford</td><td>Korteste vei med negative kanter</td><td class="mono">O(|V| · |E|)</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="callout felle"><span class="lbl">Når byggeklossen ikke er lov</span>
+        <ul>
+          <li>Når oppgaven ber deg skrive nettopp den algoritmen. Skal du skrive HeapInsert, kan du ikke bare kalle Insert.</li>
+          <li>Når den sprenger målet. Krever oppgaven O(n), kan du ikke sortere med Merge sort først.</li>
+          <li>Når forutsetningen mangler. Binærsøk krever sortert input, og FindMin er bare O(h) i et søketre (H2022 CheckBST).</li>
+        </ul>
+      </div>
+
+      <h3>Sikringssetninger</h3>
+      <p class="muted small">Korte setninger som gjør svaret entydig. Kopier og tilpass.</p>
+      <div id="sikring"></div>
+
+      <h3>Sjekkliste før du leverer</h3>
+      <div class="card" id="sjekk"></div>
+    </section>
+
+    <!-- ===================== SANT/USANT ===================== -->
+    <section data-panel="test" hidden>
+      <h3>Sant eller usant?</h3>
+      <p class="muted small">Ta stilling til hver påstand, og sjekk svarene. Forklaringen viser hvorfor.</p>
+      <div id="tf-strategi"></div>
+
+      <h3 style="margin-top:2rem">Test deg selv – strategi</h3>
+      <p class="muted small">Disse påstandene har aldri stått på eksamen. De er laget ut fra hva eksamenene og
+        sensorveiledningene H2020–H2025 tester igjen og igjen, så du kan sjekke at du kan det sensor ser etter.
+        De oftest testede står først.</p>
+      <div data-tf-gen="strategi"></div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <p class="muted small">IN2010 · Blokk 7 · Strategi. Egne forklaringer og demoer basert på pensum. Eksamensoppgavene er gjengitt med egne ord.</p>
+  </footer>
+
+  <script src="assets/js/core.js"></script>
+  <script src="assets/js/data-tf.js"></script>
+  <script src="assets/js/pseudocode.js"></script>
+  <script src="assets/js/stepplayer.js"></script>
+  <script src="assets/js/viz-bars.js"></script>
+  <script src="assets/js/data-algos.js"></script>
+  <script src="assets/js/data-strategi.js"></script>
+  <script>
+  (function () {
+    "use strict";
+    var IN = window.IN, qs = IN.qs, qsa = IN.qsa, el = IN.el, A = IN.algos, ST = IN.strategi;
+    function t(e, n, k) { return { eli5: e, normal: n, teknisk: k }; }
+    function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
+
+    // Pseudokode + kompakt Big-O-boks
+    function pcBlock(pcSel, boSel, key) {
+      IN.pseudo.render(qs(pcSel), A[key], {});
+      if (boSel) { var b = qs(boSel); IN.clear(b); b.appendChild(IN.pseudo.bigO(A[key], { compact: true })); }
+    }
+    // Knapperad der én er valgt (aria-pressed)
+    function switchRow(host, items, onPick, start) {
+      var btns = items.map(function (it, i) {
+        return el("button", { class: "btn sm", type: "button", text: it.label, "aria-pressed": i === (start || 0) ? "true" : "false",
+          onclick: function () { btns.forEach(function (b) { b.setAttribute("aria-pressed", b === this ? "true" : "false"); }, this); onPick(it, i); } });
+      });
+      btns.forEach(function (b) { host.appendChild(b); });
+      onPick(items[start || 0], start || 0);
+    }
+
+    /* ---------- Liten grafmotor (SVG) ----------
+       G = { nodes: { id: [x, y] }, edges: [[a, b, w?]], directed }
+       o = { w, h, edge: { "a|b": "ok" | "bad" | "on" }, order: { id: nr }, label } */
+    var MID = 0;
+    function ekey(a, b, dir) { return dir || a < b ? a + "|" + b : b + "|" + a; }
+    function gsvg(G, o) {
+      o = o || {};
+      var W = o.w || 320, H = o.h || 220, R = 15, mid = "st-arr-" + (++MID), es = o.edge || {}, ord = o.order || {};
+      var s = '<svg class="st-graph" viewBox="0 0 ' + W + " " + H + '" role="img" aria-label="' + esc(o.label || "Graf") + '">';
+      if (G.directed) s += '<defs><marker id="' + mid + '" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path class="st-arrow" d="M0,0 L10,5 L0,10 z"/></marker></defs>';
+      G.edges.forEach(function (e) {
+        var p = G.nodes[e[0]], q = G.nodes[e[1]], dx = q[0] - p[0], dy = q[1] - p[1], L = Math.sqrt(dx * dx + dy * dy) || 1;
+        var x1 = p[0] + dx / L * R, y1 = p[1] + dy / L * R, x2 = q[0] - dx / L * (R + (G.directed ? 2 : 0)), y2 = q[1] - dy / L * (R + (G.directed ? 2 : 0));
+        var st = es[ekey(e[0], e[1], G.directed)];
+        s += '<line class="st-gedge' + (st ? " is-" + st : "") + '" x1="' + x1 + '" y1="' + y1 + '" x2="' + x2 + '" y2="' + y2 + '"' + (G.directed ? ' marker-end="url(#' + mid + ')"' : "") + "/>";
+        if (e[2] != null) {
+          var mx = (p[0] + q[0]) / 2 - dy / L * 11, my = (p[1] + q[1]) / 2 + dx / L * 11 + 4;
+          s += '<text class="st-gw' + (e[2] < 0 ? " neg" : "") + '" x="' + mx + '" y="' + my + '" text-anchor="middle">' + String(e[2]).replace("-", "−") + "</text>";
+        }
+      });
+      Object.keys(G.nodes).forEach(function (id) {
+        var p = G.nodes[id], on = ord[id] != null;
+        s += '<g class="st-gnode' + (on ? " is-sel" : "") + (o.click ? " click" : "") + '" data-id="' + id + '"' + (o.click ? ' tabindex="0" role="button" aria-label="Node ' + id + (on ? ", nummer " + ord[id] + " i sertifikatet" : "") + '"' : "") + ">" +
+          '<circle cx="' + p[0] + '" cy="' + p[1] + '" r="' + R + '"/><text x="' + p[0] + '" y="' + (p[1] + 5) + '" text-anchor="middle">' + id + "</text>";
+        if (on) s += '<text class="st-gord" x="' + (p[0] + 15) + '" y="' + (p[1] - 12) + '" text-anchor="middle">' + ord[id] + "</text>";
+        s += "</g>";
+      });
+      return s + "</svg>";
+    }
+
+    var HAMG = { nodes: { a: [160, 30], b: [272, 86], c: [272, 170], d: [160, 205], e: [48, 170], f: [48, 86] },
+      edges: [["a", "b"], ["b", "c"], ["c", "d"], ["d", "e"], ["e", "f"], ["f", "a"], ["a", "c"], ["b", "e"], ["d", "f"]] };
+    function hasEdge(G, u, v) { return G.edges.some(function (e) { return (e[0] === u && e[1] === v) || (e[0] === v && e[1] === u); }); }
+
+    /* ===================== KJØRETIDSANALYSE ===================== */
+    IN.explain("#intro-kjoretid", t(
+      "Vi vil vite hvor mye ekstra arbeid algoritmen får når oppgaven blir større. Får vi dobbelt så mange tall, tar det da dobbelt så lang tid, fire ganger så lang tid, eller bare et lite øyeblikk ekstra?",
+      "Du trenger ikke telle hvert eneste steg. Finn det som gjentas mest: løkkene og kallene. Tell hvor mange ganger det skjer, og hva hver gang koster. Kurset regner i verste tilfelle hvis ikke annet står.",
+      "Kurset definerer kjøretid som antall primitive steg som funksjon av n, i verste tilfelle hvis ikke annet sies, og forenkler med O. Gjennomsnittlig tilfelle krever en sannsynlighetsfordeling over input og regnes ikke ut i kurset. Forventet og amortisert kjøretid (hashing, dynamiske arrayer) skal du kjenne begrepene for, men ikke utlede."
+    ), { label: "Nivå:" });
+
+    (function arketyper() {
+      var INFO = {
+        stConstant: "Et fast antall steg, uansett n. Eksempler: arrayoppslag A[i], Push og Pop på en stakk, se på toppen av en heap.",
+        stLog: "Halvering hver runde. Eksempler: binærsøk, BubbleUp og BubbleDown i en heap, en sti ned i et balansert søketre.",
+        stLinear: "Hvert element én gang. Eksempler: rett-frem søk, finn minste, traversering av et tre, BFS og DFS (O(|V| + |E|)).",
+        stLinLog: "n ganger log n. Eksempler: Merge sort, Heapsort, n innsettinger i en heap, sorter én gang og binærsøk n ganger.",
+        stQuadratic: "Alle par. Eksempler: Selection, Bubble og Insertion sort, en dobbel løkke over alle par, Quicksort i verste tilfelle.",
+        stExp: "Alle delmengder eller to kall per nivå. Eksempler: prøv alle muligheter, H2020 Strategi 2 (2ˢ oppslag). Bare brukbart for små n."
+      };
+      var items = [["stConstant", "O(1)"], ["stLog", "O(log n)"], ["stLinear", "O(n)"], ["stLinLog", "O(n log n)"], ["stQuadratic", "O(n²)"], ["stExp", "O(2ⁿ)"]]
+        .map(function (p) { return { key: p[0], label: p[1] }; });
+      switchRow(qs("#arketype-btns"), items, function (it) {
+        pcBlock("#arketype-pc", "#arketype-bigo", it.key);
+        var info = qs("#arketype-info"); IN.clear(info);
+        info.appendChild(el("h4", { style: "margin:.1rem 0 .3rem", text: A[it.key].title + " · " + it.label }));
+        info.appendChild(el("p", { class: "small", text: INFO[it.key] }));
+        info.appendChild(el("p", { class: "muted small", html: 'Se hvor ulikt klassene vokser i <a href="00-begreper.html#fane=bigo">Begreper → Kjøretid &amp; Big-O</a>.' }));
+      });
+    })();
+
+    (function dobling() {
+      var NS = [8, 16, 32, 64];
+      function lg(n) { return Math.floor(Math.log(n) / Math.LN2 + 1e-9); }
+      var SUP = { "0": "⁰", "1": "¹", "2": "²", "3": "³", "4": "⁴", "5": "⁵", "6": "⁶", "7": "⁷", "8": "⁸", "9": "⁹" };
+      function fmt(v) {
+        if (v < 1e7) return Math.round(v).toLocaleString("nb-NO");
+        var e = Math.floor(Math.log(v) / Math.LN10), m = v / Math.pow(10, e);
+        return "≈ " + m.toFixed(1).replace(".", ",") + " · 10" + String(e).replace(/\d/g, function (d) { return SUP[d]; });
+      }
+      var ROWS = [
+        { id: "en-lokke", label: "Én løkke", f: function (n) { return n; }, what: "runder", txt: "Antallet dobles når n dobles. Det er lineært: <b>O(n)</b>." },
+        { id: "nostet", label: "To nøstede", f: function (n) { return n * n; }, what: "ganger innerst", txt: "Antallet blir fire ganger så stort når n dobles, fordi 2² = 4. Det er kvadratisk: <b>O(n²)</b>." },
+        { id: "trekant", label: "Trekant", f: function (n) { return n * (n - 1) / 2; }, what: "sammenligninger", txt: "Omtrent halvparten av den fulle doble løkka, men faktoren nærmer seg likevel 4. Konstanten ½ forsvinner: <b>O(n²)</b>." },
+        { id: "halvering", label: "Halvering", f: function (n) { return lg(n); }, what: "runder", log: true, txt: "Én runde ekstra hver gang n dobles. Det er logaritmisk: <b>O(log n)</b>." },
+        { id: "lokke-halvering", label: "Løkke + halvering", f: function (n) { return n * lg(n); }, what: "runder innerst", txt: "Litt mer enn dobbelt hver gang. Det er n log n: <b>O(n log n)</b>." },
+        { id: "rek-to", label: "To kall på n − 1", f: function (n) { return Math.pow(2, n + 1) - 1; }, what: "kall", txt: "Antallet kvadreres når n dobles (2⁶⁴ = 2³² · 2³²). Det er eksponentielt: <b>O(2ⁿ)</b>. Allerede for n = 64 er det mer enn noen datamaskin rekker." }
+      ];
+      var byId = {}; ST.DRILL.forEach(function (d) { byId[d.id] = d; });
+      switchRow(qs("#dobling-btns"), ROWS, function (r) {
+        var d = byId[r.id];
+        IN.pseudo.render(qs("#dobling-pc"), { name: d.name, params: d.params, input: d.input, lines: d.lines }, { tooltips: false });
+        var h = '<thead><tr><th class="num">n</th><th class="num">Antall ' + r.what + '</th><th class="num">Endring når n dobles</th></tr></thead><tbody>';
+        NS.forEach(function (n, i) {
+          var v = r.f(n), ch = "–";
+          if (i > 0) { var p = r.f(NS[i - 1]); ch = r.log ? "+" + (v - p) : "× " + (v / p >= 1000 ? fmt(v / p).replace("≈ ", "") : (v / p).toFixed(2).replace(".", ",")); }
+          h += '<tr><td class="num">' + n + '</td><td class="num">' + fmt(v) + '</td><td class="num">' + ch + "</td></tr>";
+        });
+        qs("#dobling-tab").innerHTML = h + "</tbody>";
+        qs("#dobling-txt").innerHTML = r.txt;
+      });
+    })();
+
+    pcBlock("#pc-sumto1", "#bo-sumto1", "stSumTo1");
+    pcBlock("#pc-sumto2", "#bo-sumto2", "stSumTo2");
+    pcBlock("#pc-sumto3", "#bo-sumto3", "stSumTo3");
+
+    /* ---------- Drill ---------- */
+    (function drill() {
+      var host = qs("#drill"), items = ST.DRILL, idx = 0, svar = {};
+      try { svar = JSON.parse(IN.store.get("in-st-drill", "{}")) || {}; } catch (e) { svar = {}; }
+      var wrap = el("div", { class: "card st-drill" });
+      var head = el("div", { class: "st-drill-head" });
+      var dots = el("div", { class: "st-dots", role: "group", "aria-label": "Velg drilloppgave" });
+      var code = el("div", { class: "st-drill-code" });
+      var q = el("p", { class: "st-drill-q" });
+      var opts = el("div", { class: "st-opts" });
+      var fb = el("div", { class: "st-drill-fb", "aria-live": "polite" });
+      var prev = el("button", { class: "btn sm", type: "button", text: "← Forrige", onclick: function () { go(idx - 1); } });
+      var next = el("button", { class: "btn sm primary", type: "button", text: "Neste →", onclick: function () { go(idx + 1); } });
+      var reset = el("button", { class: "btn sm ghost", type: "button", text: "↺ Nullstill", onclick: function () { svar = {}; save(); go(0); } });
+      var nav = el("div", { class: "btn-row" }, [prev, next, reset]);
+      [head, dots, code, q, opts, fb, nav].forEach(function (x) { wrap.appendChild(x); });
+      host.appendChild(wrap);
+      function save() { IN.store.set("in-st-drill", JSON.stringify(svar)); }
+      function score() { var r = 0, n = 0; items.forEach(function (d) { if (svar[d.id] != null) { n++; if (svar[d.id] === d.answer) r++; } }); return { r: r, n: n }; }
+      function go(i) { idx = (i + items.length) % items.length; render(); }
+      function render() {
+        var d = items[idx], s = score();
+        head.innerHTML = '<span><b>Oppgave ' + (idx + 1) + "</b> av " + items.length + ' <span class="tag">' + d.tag + '</span></span><span class="small">' + s.r + " riktig av " + s.n + " besvart</span>";
+        IN.clear(dots);
+        items.forEach(function (x, j) {
+          var st = svar[x.id] == null ? "" : svar[x.id] === x.answer ? " ok" : " no";
+          dots.appendChild(el("button", { class: "st-dot" + st + (j === idx ? " cur" : ""), type: "button", "aria-label": "Oppgave " + (j + 1) + (st === " ok" ? ", riktig" : st === " no" ? ", feil" : ""),
+            "aria-current": j === idx ? "true" : null, onclick: function () { go(j); } }));
+        });
+        IN.pseudo.render(code, { name: d.name, params: d.params, input: d.input, lines: d.lines }, { tooltips: false });
+        q.textContent = d.q || "Hva er kjøretiden, uttrykt i n?";
+        IN.clear(opts); IN.clear(fb);
+        var chosen = svar[d.id];
+        (d.options || ST.OPTIONS).forEach(function (o) {
+          var cls = "quiz-opt";
+          if (chosen != null) { if (o === d.answer) cls += " correct"; else if (o === chosen) cls += " wrong"; }
+          opts.appendChild(el("button", { class: cls, type: "button", text: o, disabled: chosen != null,
+            onclick: function () { svar[d.id] = o; save(); render(); } }));
+        });
+        if (chosen != null) {
+          fb.appendChild(el("p", { class: "small st-verdict-line " + (chosen === d.answer ? "ok" : "no"),
+            html: chosen === d.answer ? "<b>Riktig.</b>" : "<b>Ikke helt.</b> Riktig svar er <b>" + d.answer + "</b>." }));
+          var ex = el("div"); fb.appendChild(ex);
+          IN.explain(ex, d.why, { label: "Forklaring:" });
+        }
+      }
+      render();
+    })();
+
+    IN.quiz("#quiz-kjoretid", [
+      { q: "Hva er 4n² + 5n + 3 i O-notasjon?", options: ["O(4n²)", "O(n²)", "O(n² + n)", "O(n³)"], answer: 1,
+        explain: "Konstanter blir borte, og bare det største leddet blir igjen. O(4n²) og O(n² + n) er ikke feil matematikk, men de er ikke forenklet, og det er O(n²) sensor vil se." },
+      { q: "Du dobler n, og kjøretiden blir omtrent fire ganger så lang. Hvilken klasse er det trolig?", options: ["O(log n)", "O(n)", "O(n log n)", "O(n²)"], answer: 3,
+        explain: "(2n)² = 4n². Lineær gir dobbelt, n log n litt mer enn dobbelt, og log n bare et lite tillegg." },
+      { q: "A har n elementer og B har k. For hver x i B kaller vi rett-frem søk i A. Hva er kjøretiden?", options: ["O(n + k)", "O(k log n)", "O(k · n)", "O(n²)"], answer: 2,
+        explain: "k kall, hvert O(n). O(n²) stemmer bare hvis k = n, og da skal du si det." },
+      { q: "Hvilken påstand er riktig?", options: ["O(n) er alltid verste tilfelle", "En algoritme som er O(n), er også O(n²)", "O(n²) er alltid tregere enn O(n)", "To løkker gir alltid O(n²)"], answer: 1,
+        explain: "O er en øvre grense, så O(n) ⊆ O(n²). Men oppgi alltid den laveste klassen du kan begrunne. For små n kan en O(n²)-algoritme godt være raskest, fordi konstantene teller." }
+    ]);
+
+    /* ===================== STRATEGIER ===================== */
+    IN.explain("#intro-strategier", t(
+      "Når du skal løse et nytt problem, kan du spørre: Kan jeg bare prøve alt? Kan jeg alltid ta det som ser best ut? Kan jeg dele det opp? Kan jeg rydde litt først, så resten går fort?",
+      "Start med den rett-frem-løsningen du vet er riktig, og finn kjøretiden. Spør så hva som gjør den treg: en løkke som leter, en sortering som gjentas, et par som sjekkes to ganger. Strategiene under er verktøyene for å fjerne flaskehalsen.",
+      "Kurset legger vekt på dramaturgien naiv → forbedret: en løsning som følger definisjonen, så en analyse av hvor tiden går, så en bedre algoritme. Grådig er den eneste strategien kurset navngir aktivt (Prim, Kruskal, Dijkstra). Korrektheten til en grådig algoritme må begrunnes, for den holder ikke alltid."
+    ), { label: "Nivå:" });
+
+    qs("#greedy-graf").innerHTML = gsvg({ directed: true, nodes: { s: [40, 115], a: [175, 45], b: [175, 185], t: [300, 45] },
+      edges: [["s", "a", 2], ["s", "b", 5], ["b", "a", -4], ["a", "t", 1]] }, { w: 340, h: 225, label: "Graf: s til a vekt 2, s til b vekt 5, b til a vekt minus 4, a til t vekt 1" });
+
+    IN.quiz("#quiz-strategier", [
+      { q: "Prim legger hele tiden til den billigste kanten ut av treet den har bygget. Hva slags strategi er det?", options: ["Prøv alle muligheter", "Grådig", "Gjør jobben én gang", "Rett fram"], answer: 1,
+        explain: "Prim tar det beste valget akkurat nå og angrer aldri. Kurset kaller Prim, Kruskal og Dijkstra grådige." },
+      { q: "Du skal svare på k spørsmål av typen «finnes x i A?». Hva lønner seg når k er stor?", options: ["Rett-frem søk for hvert spørsmål", "Sortere A én gang og binærsøke", "Sortere A på nytt før hvert søk", "Sjekke alle par"], answer: 1,
+        explain: "O(n log n + k log n) mot O(k · n). Å sortere på nytt hver gang (Intersection4 i H2020) er aldri best." },
+      { q: "En løsning fjerner hver node etter tur og kjører DFS for å se om grafen faller fra hverandre. Hva er kjøretiden?", options: ["O(|V| + |E|)", "O(|V| · (|V| + |E|))", "O(|E| log |V|)", "O(2^|V|)"], answer: 1,
+        explain: "|V| kjøringer av DFS à O(|V| + |E|). Det er brute force: riktig, men på eksamen gir slike løsninger oftest bare delvis uttelling når det finnes noe raskere." },
+      { q: "Når er det grådige valget i Dijkstra trygt?", options: ["Alltid", "Når grafen er urettet", "Når ingen kanter har negativ vekt", "Når grafen er en DAG"], answer: 2,
+        explain: "Uten negative kanter kan ingen senere vei bli kortere enn den vi låste. Med negative kanter bruker vi Bellman-Ford." }
+    ]);
+
+    /* ===================== P OG NP ===================== */
+    IN.explain("#intro-pnp", t(
+      "Noen gåter er lette å løse. Andre er vanskelige å løse, men lette å sjekke: Har noen fylt ut en Sudoku, ser du fort om den er riktig. P er gåtene vi kan løse raskt. NP er gåtene der vi kan sjekke et svar raskt.",
+      "P: problemer vi kan løse i polynomiell tid. NP: problemer der et JA-svar kan sjekkes i polynomiell tid hvis vi får et løsningsforslag (et sertifikat). Alt i P er i NP. Om P = NP, vet ingen.",
+      "Vi klassifiserer avgjørelsesproblemer etter hvor raskt den beste mulige algoritmen kan være. P ⊆ NP er enkelt å vise. Reduksjoner i polynomiell tid gir en ordning «minst like vanskelig som», og NP-komplette problemer er de vanskeligste i NP under denne ordningen. P vs NP er åpent."
+    ), { label: "Nivå:" });
+
+    (function verifikator() {
+      var C = [], i = 0, edgeSt = {}, done = false, verdict = null;
+      var pc = IN.pseudo.render(qs("#ham-pc"), A.stType2Verifier, {});
+      var b = qs("#ham-bigo"); b.appendChild(IN.pseudo.bigO(A.stType2Verifier, { compact: true }));
+      var EX = [{ label: "Gyldig sykel", c: ["a", "b", "c", "d", "e", "f"] }, { label: "Mangler en kant", c: ["a", "b", "e", "d", "c", "f"] },
+                { label: "Bare en sti (siste → første mangler)", c: ["a", "c", "b", "e", "f", "d"] }];
+      EX.forEach(function (x) { qs("#ham-ex").appendChild(el("button", { class: "btn sm ghost", type: "button", text: x.label, onclick: function () { C = x.c.slice(); restart(); } })); });
+      function restart() { i = 0; edgeSt = {}; done = false; verdict = null; pc.clear(); paint("Klar. Trykk «Ett steg» eller «Sjekk alt»."); }
+      function paint(msg) {
+        var ord = {}; C.forEach(function (id, k) { ord[id] = k; });
+        var g = qs("#ham-graf");
+        g.innerHTML = gsvg(HAMG, { w: 320, h: 235, edge: edgeSt, order: ord, click: true, label: "Graf med nodene a til f. Klikk nodene for å bygge sertifikatet." });
+        qsa(".st-gnode", g).forEach(function (n) {
+          function pick() {
+            var id = n.getAttribute("data-id"), k = C.indexOf(id);
+            if (k === C.length - 1) C.pop(); else if (k < 0) C.push(id); else return;
+            restart(); var f = g.querySelector('[data-id="' + id + '"]'); if (f) f.focus();
+          }
+          n.addEventListener("click", pick);
+          n.addEventListener("keydown", function (e) { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); pick(); } });
+        });
+        qs("#ham-cert").innerHTML = "<b>C =</b> [" + (C.length ? C.map(function (x, k) { return '<span class="st-ci">' + x + "<sub>" + k + "</sub></span>"; }).join(", ") : '<span class="muted">tom – klikk nodene</span>') + "]" +
+          (verdict ? ' <span class="st-verdict-pill ' + (verdict === "JA" ? "ok" : "no") + '">' + verdict + "</span>" : "");
+        qs("#ham-msg").innerHTML = msg || "";
+      }
+      function step() {
+        if (done) return;
+        var N = C.length;
+        if (N !== 6) { paint("Sertifikatet skal inneholde alle 6 nodene nøyaktig én gang (det lover oppgaven). Du har valgt " + N + "."); return; }
+        if (i >= N) { done = true; verdict = "JA"; pc.highlight(6); paint("Alle " + N + " kantene finnes. <b>return JA</b>: C er en hamiltonsk sykel."); return; }
+        var u = C[i], v = C[(i + 1) % N], ok = hasEdge(HAMG, u, v);
+        edgeSt[ekey(u, v)] = ok ? "ok" : "bad";
+        var txt = "i = " + i + ": sjekker {" + u + ", " + v + "}" + (i === N - 1 ? " (fra den siste tilbake til den første, fordi (i + 1) mod N = 0)" : "") + ". ";
+        if (!ok) { done = true; verdict = "NEI"; pc.highlight(5); paint(txt + "Kanten finnes ikke. <b>return NEI</b>."); return; }
+        pc.highlight(4); i++; paint(txt + "Kanten finnes.");
+      }
+      qs("#ham-step").addEventListener("click", step);
+      qs("#ham-run").addEventListener("click", function () { var guard = 0; if (C.length !== 6) { step(); return; } while (!done && guard++ < 20) step(); });
+      qs("#ham-reset").addEventListener("click", function () { C = []; restart(); });
+      C = EX[0].c.slice(); restart();
+    })();
+
+    pcBlock("#pc-evenodd", null, "stEvenViaOdd");
+    (function evenOdd() {
+      var inp = qs("#eo-n"), out = qs("#eo-out");
+      function upd() {
+        var n = parseInt(inp.value, 10);
+        if (isNaN(n)) { out.textContent = "Skriv inn et heltall."; return; }
+        var m = n + 1, odd = Math.abs(m % 2) === 1;
+        out.innerHTML = "<p>Instans av EVEN: <b>n = " + n + "</b>. Er n et partall?</p>" +
+          "<p>Oversatt instans av ODD: <b>m = n + 1 = " + m + "</b>. Er m et oddetall? Løseren for ODD svarer <b>" + (odd ? "JA" : "NEI") + "</b>.</p>" +
+          "<p>Vi bruker svaret direkte: EVEN(" + n + ") = <b>" + (odd ? "JA" : "NEI") + "</b>. JA ble JA, og NEI ble NEI.</p>";
+      }
+      inp.addEventListener("input", upd); upd();
+    })();
+
+    IN.quiz("#quiz-pnp", [
+      { q: "Hva er et sertifikat?", options: ["Et bevis for at problemet er i P", "Et løsningsforslag som lar oss sjekke et JA-svar", "En algoritme som finner løsningen", "Et bevis for at P ≠ NP"], answer: 1,
+        explain: "For Hamiltonsykel er sertifikatet en rekkefølge av nodene. Verifikatoren sjekker at rekkefølgen faktisk er en sykel i grafen." },
+      { q: "Vi vil vise at et nytt problem X er NP-hardt. Hvilken reduksjon trenger vi?", options: ["Fra X til SAT", "Fra SAT til X", "Fra X til et problem i P", "Ingen, det holder med en verifikator"], answer: 1,
+        explain: "Fra det kjente vanskelige til det nye. Da er X minst like vanskelig som SAT. En verifikator viser at X er i NP, ikke at X er vanskelig." },
+      { q: "Hvilket problem er NP-komplett?", options: ["PATH", "SORT", "HAMILTONSYKEL", "HALT"], answer: 2,
+        explain: "HAMILTONSYKEL er i NP (verifikatoren over) og NP-hardt. PATH og SORT er i P, og HALT er uavgjørbart." },
+      { q: "Hva vet vi om P og NP?", options: ["P = NP", "P ≠ NP", "P ⊆ NP, men om de er like, er ukjent", "NP er problemene som ikke kan løses i polynomiell tid"], answer: 2,
+        explain: "Alt som kan løses raskt, kan også sjekkes raskt. Om det motsatte gjelder, er et åpent problem." }
+    ]);
+
+    /* ===================== EKSAMENSTEKNIKK ===================== */
+    IN.explain("#intro-teknikk", t(
+      "Sensor kan ikke lese tankene dine, bare det du skriver. Si hva du tenker å gjøre, gjør det ryddig, og si hvor lang tid det tar.",
+      "Poengene kommer fra tre ting: at løsningen er riktig, hvor rask den er, og at sensor forstår den. En rask løsning som ikke virker, gir lite. En riktig, men treg løsning gir delvis uttelling.",
+      "Sensorveiledningene gir ofte poeng i trinn etter kjøretid, et eget poeng for riktig kjøretidsanalyse, og delvis uttelling for riktig idé med feil i detaljene. Presis naturlig tekst sidestilles med pseudokode. Uklarhet koster mer enn syntaksfeil."
+    ), { label: "Nivå:" });
+
+    (function trapp() {
+      var TASKS = [
+        { label: "H2021 InRange", total: 10, link: "04-traer.html#fane=bst&oppg=exam-h2021-8", what: "(a), skrive ut verdiene i [a, b] fra et søketre",
+          steps: [["O(log n) når a = b (inorder med beskjæring)", 10], ["O(n)", 8], ["O(n log n)", 5], ["O(n²)", 2]] },
+        { label: "H2022 CheckBST", total: 6, link: "04-traer.html#fane=bst&oppg=exam-h2022-10", what: "(b), sjekke om et binærtre er et søketre",
+          steps: [["O(n) (grenser eller inorder)", 6], ["O(n²) (FindMin/FindMax i hver node)", 4]] },
+        { label: "H2023 Diameter", total: 8, link: "04-traer.html#fane=diameter&oppg=exam-h2023-5", what: "(c), diameteren til et binærtre",
+          steps: [["O(n) (høyde og diameter samtidig)", 8], ["O(n²) (nytt Height-kall i hver node)", 5], ["Godt forsøk som ikke virker", 3]] },
+        { label: "H2023 Finn duplikat", total: 5, link: "02-sok.html#fane=duplikat", what: "(c), finne et duplikat i et usortert array",
+          steps: [["Forventet O(n) (hashset)", 5], ["O(n log n) (sorter og sammenlign naboer)", 4], ["O(n²)", 1]] },
+        { label: "H2024 LCA", total: 5, link: "04-traer.html#fane=lca&oppg=exam-h2024-6", what: "(b), laveste felles forfeder med parent og depth",
+          steps: [["O(h) (løft den dypeste)", 5], ["O(n) (gå gjennom hele treet)", 3]] }
+      ];
+      var host = qs("#trapp");
+      switchRow(qs("#trapp-btns"), TASKS, function (tk) {
+        var h = '<p class="small">Deloppgave ' + tk.what + ", inntil " + tk.total + ' poeng.</p><div class="st-ladder">';
+        tk.steps.forEach(function (s, i) {
+          var pct = Math.round(100 * s[1] / tk.total);
+          h += '<div class="st-step' + (i === 0 ? " top" : "") + '"><span class="st-step-lbl">' + s[0] + '</span><span class="st-bar"><span style="width:' + pct + '%"></span></span><span class="st-step-p">' + s[1] + " / " + tk.total + "</span></div>";
+        });
+        h += '</div><p class="muted small">Hele oppgaven: <a href="' + tk.link + '">' + tk.label + "</a>.</p>";
+        host.innerHTML = h;
+      });
+    })();
+
+    (function sikring() {
+      var S = [
+        ["Variabler", "La n være antall elementer i A, og k antall elementer i B."],
+        ["Søketre", "Treet er ikke nødvendigvis balansert, så høyden h kan være n − 1. Kjøretiden er O(h), altså O(log n) for et balansert tre og O(n) i verste fall."],
+        ["Hashing", "Jeg antar at innsetting og oppslag i hashsettet er forventet O(1). I verste fall er de O(n), og da blir løsningen O(n²)."],
+        ["Pensumkall", "Jeg bruker BFS fra pensum. Den besøker hver node og kant én gang og er O(|V| + |E|)."],
+        ["Løkke", "Løkka går n ganger, og hver runde gjør O(1) arbeid, så den er O(n) totalt."],
+        ["Rekursjon", "Hver node gir ett kall med O(1) arbeid, så rekursjonen er O(n)."],
+        ["Antagelse", "Oppgaven sier ikke om tallene er unike. Jeg antar at de kan gjenta seg, og håndterer det slik: …"],
+        ["Verifikator", "Verifikatoren sjekker bare sertifikatet. Den går gjennom C én gang og slår opp hver kant, så den er polynomiell."]
+      ];
+      var host = qs("#sikring");
+      function copy(txt, btn) {
+        function ok() { btn.textContent = "Kopiert ✓"; setTimeout(function () { btn.textContent = "Kopier"; }, 1400); }
+        function fallback() {
+          var ta = el("textarea", { style: "position:fixed;left:-9999px;top:0" }); ta.value = txt; document.body.appendChild(ta); ta.select();
+          try { document.execCommand("copy"); ok(); } catch (e) { btn.textContent = "Marker og kopier selv"; }
+          document.body.removeChild(ta);
+        }
+        try { if (navigator.clipboard && window.isSecureContext) navigator.clipboard.writeText(txt).then(ok, fallback); else fallback(); } catch (e) { fallback(); }
+      }
+      S.forEach(function (s) {
+        var btn = el("button", { class: "btn sm ghost", type: "button", text: "Kopier", "aria-label": "Kopier setningen om " + s[0].toLowerCase() });
+        btn.addEventListener("click", function () { copy(s[1], btn); });
+        host.appendChild(el("div", { class: "st-sik" }, [el("span", { class: "tag", text: s[0] }), el("q", { class: "small", text: s[1] }), btn]));
+      });
+    })();
+
+    (function sjekk() {
+      var L = ["Har jeg svart på alle deloppgavene, også sant/usant?", "Har jeg oppgitt kjøretiden for hver algoritme jeg har skrevet?",
+        "Er variablene i kjøretiden definert (n, k, |V|, |E|, h)?", "Stemmer kjøretiden med min egen løsning, også hjelpekallene?",
+        "Håndterer løsningen tomt input, null og like verdier?", "Returnerer jeg det oppgaven ber om (returnere eller skrive ut, indeks eller verdi)?",
+        "Bruker jeg ← for tilordning og 0-indeksering konsekvent?", "Kan en medstudent forstå idéen fra første setning?"];
+      var host = qs("#sjekk"), st = {};
+      try { st = JSON.parse(IN.store.get("in-st-sjekk", "{}")) || {}; } catch (e) { st = {}; }
+      var ul = el("ul", { class: "st-check" });
+      L.forEach(function (txt, i) {
+        var cb = el("input", { type: "checkbox", id: "sj-" + i, checked: !!st[i] });
+        cb.addEventListener("change", function () { st[i] = cb.checked; IN.store.set("in-st-sjekk", JSON.stringify(st)); });
+        ul.appendChild(el("li", {}, [cb, el("label", { for: "sj-" + i, class: "small", text: txt })]));
+      });
+      host.appendChild(ul);
+      host.appendChild(el("button", { class: "btn sm ghost", type: "button", text: "↺ Fjern alle haker", onclick: function () {
+        st = {}; IN.store.set("in-st-sjekk", "{}"); qsa("input", ul).forEach(function (c) { c.checked = false; }); } }));
+    })();
+
+    /* ===================== EKSAMEN (gjengitt med egne ord) ===================== */
+    // Løsning som DOM-node: (a), (b), … som deloppgavene + pseudokode via IN.pseudo (BYGGEGUIDE 5.4)
+    function sol(items, algos, o) {
+      o = o || {};
+      var d = el("div");
+      if (o.intro) d.appendChild(el("p", { html: o.intro }));
+      var ol = el(o.plain ? "ul" : "ol", o.plain ? {} : { class: "et-parts" }); items.forEach(function (x) { ol.appendChild(el("li", { html: x })); }); d.appendChild(ol);
+      (algos || []).forEach(function (key) {
+        d.appendChild(el("h5", { style: "margin:.8rem 0 .3rem", text: "Pseudokode: " + A[key].name }));
+        var h = el("div"); d.appendChild(h); IN.pseudo.render(h, A[key], {});
+        d.appendChild(IN.pseudo.bigO(A[key], { compact: true }));
+      });
+      return d;
+    }
+    function pcFig(algo, cap) { return { cls: "code", cap: cap, draw: function (h) { IN.pseudo.render(h, algo, { head: false, tooltips: false }); } }; }
+    function tfParts(list) { return list.map(function (s) { return { t: s, p: 1 }; }); }
+    function tfSol(list) { return list.map(function (x) { return "<b>" + (x[0] ? "Sant" : "Usant") + ".</b> " + x[1]; }); }
+    function demoLink(fane, demo, txt) { return '<p class="small muted">Prøv selv: <a href="#fane=' + fane + "&amp;oppg=" + demo + '">' + txt + "</a>.</p>"; }
+
+    var EXAM = {
+      "h2021-6": { year: "H2021", title: "Beregnbarhet og kompleksitet (P og NP)", oppgave_nr: "Oppgave 6", points: 8,
+        oppgave: IN.oppg({
+          intro: "<p>Svar <b>Sant</b> eller <b>Usant</b> på hver påstand. Riktig svar gir 1 poeng. Feil svar <b>eller blankt</b> gir −1. Summen for oppgaven blir aldri lavere enn 0 eller høyere enn 8.</p>",
+          parts: tfParts(["Det er bevist at P = NP.", "Det er bevist at P ≠ NP.",
+            "Alle NP-komplette problemer kan reduseres til hverandre i polynomiell tid.", "Alle problemer i P er også i NP.",
+            "Ethvert avgjørelsesproblem er enten i P eller i NP.", "Alle problemer der JA-instanser kan verifiseres i polynomiell tid, er i NP.",
+            "Den som finner en polynomiell algoritme for avgjørelsesproblemet Hamiltonsykel, Knapsack eller Sudoku, har bevist at P = NP.",
+            "Ethvert avgjørelsesproblem kan løses hvis datamaskinen er rask nok."])
+        }),
+        losning: sol(tfSol([
+          [false, "P vs NP er et åpent problem. Ingen har bevist noen av retningene."],
+          [false, "Heller ikke det er bevist. De fleste tror det, men tro er ikke bevis."],
+          [true, "Hvert NP-komplett problem er i NP, og hvert NP-komplett problem er NP-hardt. Da kan alt i NP, også de andre NP-komplette, reduseres til det."],
+          [true, "Kan du løse et problem i polynomiell tid, kan du verifisere et JA-svar ved å løse det selv. P ⊆ NP."],
+          [false, "Siden P ⊆ NP, sier påstanden at alt er i NP. Men det finnes problemer utenfor NP, for eksempel uavgjørbare problemer som stoppeproblemet."],
+          [true, "Det er selve definisjonen av NP."],
+          [true, "Alle tre er NP-komplette (Knapsack som avgjørelsesproblem, Sudoku på generelle n × n-brett). En polynomiell algoritme for ett NP-komplett problem gir polynomielle algoritmer for alt i NP, og da er P = NP."],
+          [false, "Stoppeproblemet er uavgjørbart: ingen algoritme løser det, uansett hvor rask maskinen er."]
+        ])),
+        kjerne: "<p>Fire fakta dekker hele oppgaven: P ⊆ NP. P vs NP er åpent. NP-komplett = i NP og NP-hardt, så alle NP-komplette reduseres til hverandre. Uavgjørbare problemer ligger utenfor både P og NP.</p>",
+        tips: ["Blankt koster like mye som galt. Svar på alle åtte.", "Se etter ordet «bevist». Om P og NP er nesten alt som er «bevist», usant."] },
+
+      "h2020-8": { year: "H2020", title: "Type 2-grafer: verifikator og NP", oppgave_nr: "Oppgave 8 (a–b)", points: 10,
+        oppgave: IN.oppg({
+          intro: "<p>En urettet graf G = (V, E) er av <b>type 2</b> hvis den har en <b>hamiltonsk sykel</b>: en sykel som er innom hver node nøyaktig én gang. Avgjørelsesproblemet <b>Type2</b> spør: er G av type 2?</p>" +
+            "<p>Et <b>sertifikat</b> C er et array med nodene i G, der hver node står nøyaktig én gang. Figuren er et eget eksempel: der er C = [a, b, c, d, e, f] en hamiltonsk sykel.</p>",
+          figs: [{ cap: "Eksempelgraf (egen figur)", draw: function (h) { h.innerHTML = gsvg(HAMG, { w: 320, h: 235, order: { a: 0, b: 1, c: 2, d: 3, e: 4, f: 5 }, edge: { "a|b": "on", "b|c": "on", "c|d": "on", "d|e": "on", "e|f": "on", "a|f": "on" }, label: "Eksempelgraf med en hamiltonsk sykel a, b, c, d, e, f" }); } }],
+          parts: [{ t: "Skriv en verifikator <code>Type2Verifier(G, C)</code> som returnerer JA hvis sertifikatet C viser at G er av type 2, og NEI ellers. Den skal gå i polynomiell tid.", p: 7 },
+            { t: "Forklar med høyst fire setninger hvorfor (a) viser at Type2 er i NP. Du trenger ikke en detaljert kjøretidsanalyse.", p: 3 }],
+          outro: demoLink("pnp", "ham-graf", "Vær verifikatoren")
+        }),
+        losning: sol(["Gå gjennom C med i fra 0 til N − 1, og sjekk at {C[i], C[(i + 1) mod N]} er en kant i G. Mangler én kant, returner NEI. Finnes alle, returner JA. mod N tar med kanten fra den siste noden tilbake til den første.",
+          "Type2Verifier går i polynomiell tid (O(|V| + |E|) med naboliste). Altså kan en JA-instans av Type2 verifiseres i polynomiell tid når vi får et sertifikat, og det er nettopp definisjonen av at Type2 er i NP."], ["stType2Verifier"]),
+        kjerne: "<p>En verifikator <b>sjekker</b> et forslag. Den skal ikke selv lete etter en sykel. Polynomiell verifikator ⇒ problemet er i NP.</p>",
+        tips: ["(a): 5 poeng for å sjekke sykelens kanter i G (−1 hvis kanten tilbake til start mangler), og 2 poeng for signatur og klarhet.", "BFS eller DFS som prøver å finne en sykel, ga 0 poeng.", "(b): koble verifikatorens polynomielle kjøretid direkte til definisjonen av NP."] },
+
+      "h2020-7a": { year: "H2020", title: "Subanagram: hva er kjøretiden?", oppgave_nr: "Oppgave 7a", points: 4,
+        oppgave: IN.oppg({
+          intro: "<p>W er et <b>subanagram</b> av S hvis W kan skrives med bokstaver fra S, uten å bruke noen bokstav i S mer enn én gang. «hole» er et subanagram av «ehlo», men «hello» er det ikke (S har bare én l).</p>" +
+            "<p>Prosedyren under sjekker det. Anta at Copy, Contains og Remove på en streng er lineære i lengden, og at lengden |r| er O(1). La w = |W| og s = |S|.</p>",
+          figs: [pcFig(A.stSubanagram1, "IsSubanagramOf1")],
+          parts: [{ t: "Hva er kjøretidskompleksiteten? Velg ett: O(w + s), O(s²), O(w log s), O(s · w), O(w²).", p: 4 }]
+        }),
+        losning: sol(["<b>O(s · w).</b> Løkka går s ganger, én gang per bokstav i S. Hver runde kaller Contains og kanskje Remove på r, som har opptil w tegn, så hver runde er O(w). Kopien i starten er O(w). Totalt O(w + s · w) = O(s · w)."], ["stSubanagram1"]),
+        kjerne: "<p>Runder × kostnad per runde. Her ligger den lineære kostnaden gjemt i hjelpeprosedyrene, ikke i en synlig indre løkke.</p>",
+        tips: ["Se etter kall på lister og strenger inni løkker: Contains, Remove og Copy er lineære.", "Med en frekvenstabell (hashmap fra bokstav til antall) blir det O(w + s). Det var neste deloppgave."] },
+
+      "h2020-7c": { year: "H2020", title: "Subanagrammer: to strategier", oppgave_nr: "Oppgave 7c", points: 6,
+        oppgave: IN.oppg({
+          intro: "<p>Vi vil finne alle ord i en ordbok D som er subanagrammer av en streng S. Fra før har vi <code>IsSubanagramOf2(W, S)</code>, som svarer på om W er et subanagram av S i O(w + s) med frekvenstabeller. La d være antall ord i D, w lengden på det lengste ordet og s = |S|.</p>" +
+            "<ul><li><b>Strategi 1:</b> gå gjennom alle ord W i D, og kall IsSubanagramOf2(W, S) for hvert. Kjøretid O(d · (w + s)).</li>" +
+            "<li><b>Strategi 2:</b> bygg én gang på forhånd et hashmap der nøkkelen er bokstavene i et ord sortert alfabetisk, og verdien er lista med ord som har akkurat de bokstavene. For å svare slår vi opp alle de sorterte delmengdene av bokstavene i S. Kjøretid O(2ˢ) per spørring.</li></ul>",
+          parts: [{ t: "Drøft fordeler og ulemper ved de to strategiene med tanke på kjøretid.", p: 6 }]
+        }),
+        losning: sol(["Strategi 1 avhenger av d, w og s. Strategi 2 avhenger bare av s, men eksponentielt.",
+          "Ordene i en ordbok er korte, mens ordboka er stor. Derfor er det d som dominerer i Strategi 1: hele ordboka må gjennomgås for hver spørring.",
+          "Strategi 2 slipper å gå gjennom ordboka per spørring, men 2ˢ vokser raskt. Den lønner seg når S er kort og D er stor. For en stor engelsk ordbok lå grensen rundt s ≈ 17 i forsøk.",
+          "Hashmapet i Strategi 2 koster noe å bygge, men det gjøres bare én gang og fordeles på alle spørringene.",
+          "Konklusjon: velg Strategi 2 for korte S, og Strategi 1 for lange."], null, { plain: true }),
+        kjerne: "<p>Forarbeid én gang mot eksponentiell avhengighet av s. Eksponentiell tid er sjelden bra, men den kan være grei når eksponenten holdes liten.</p>",
+        tips: ["Det viktigste poenget (3 p) var å se at Strategi 2 lønner seg når S er liten og D er stor.", "Bruk O-notasjon (−1 hvis ikke) og definer variablene (−3 for å bruke n uten å si hva det er)."] },
+
+      "h2022-2": { year: "H2022", title: "Litt av hvert (sant/usant)", oppgave_nr: "Oppgave 2", points: 10,
+        oppgave: IN.oppg({
+          intro: "<p>Svar <b>Sant</b> eller <b>Usant</b> på hver påstand (1 poeng hver).</p>",
+          parts: tfParts(["I et binærtre har hver node høyst to barn.", "Bruker en algoritme O(n) steg, har den lineær kjøretid.", "Merge sort har kjøretid O(n log n).",
+            "Det går ikke an å avgjøre om et array er sortert i O(n).", "Binærsøk i et array er vesentlig raskere enn binærsøk i en lenket liste.",
+            "Kjøretidskompleksitet beskriver antall steg i forhold til størrelsen på input.", "Har algoritme A bedre kjøretidskompleksitet enn B, bruker A færre steg enn B for alle input-størrelser.",
+            "Huffman-koding brukes til å komprimere data.", "I et tre er roten den eneste noden uten forelder.", "En graf med n noder kan ha høyst n kanter."])
+        }),
+        losning: sol(tfSol([
+          [true, "Det er definisjonen av et binærtre."],
+          [true, "O(n) er den lineære klassen. (Strengt tatt er O en øvre grense, men på eksamen leses «O(n) steg» som «lineær».)"],
+          [true, "I alle tilfeller: log n nivåer med O(n) fletting per nivå."],
+          [false, "Gå gjennom arrayet én gang og sjekk at A[i] ≤ A[i + 1] for alle naboer. Det er O(n)."],
+          [true, "Binærsøk hopper til midten. Det er O(1) i et array, men krever at vi går dit steg for steg i en lenket liste."],
+          [true, "Det er det kjøretidskompleksitet måler: veksten i antall steg når input vokser."],
+          [false, "O sier noe om veksten for store n. For små input kan konstantene gjøre at den «dårligere» algoritmen bruker færre steg."],
+          [true, "Vanlige symboler får korte koder, så teksten blir kortere."],
+          [true, "Alle andre noder har nøyaktig én forelder."],
+          [false, "En urettet graf kan ha opptil n(n − 1)/2 kanter, langt flere enn n."]
+        ])),
+        kjerne: "<p>Skill mellom veksttakt (O) og faktisk antall steg. O sier hva som skjer når n blir stor, ikke hva som er raskest for hvert input.</p>",
+        tips: ["Påstander med «alltid» og «for alle» er ofte usanne. Let etter et moteksempel.", "Spør deg selv: finnes det en enkel løkke som klarer det? Da er «umulig i O(n)» usant."] }
+    };
+    Object.keys(EXAM).forEach(function (id) { if (qs("#exam-" + id)) IN.examTasks("#exam-" + id, [EXAM[id]]); });
+
+    /* ===================== SANT/USANT ===================== */
+    IN.tfTest("#tf-strategi", [
+      { s: "To løkker etter hverandre, som hver går n ganger, gir O(n²).", answer: false, blokk: "7",
+        explain: "Løkker etter hverandre legges sammen: n + n = 2n, som er O(n). Bare nøstede løkker ganges." },
+      { s: "En løkke som halverer i hver runde til i blir 0, går O(log n) ganger.", answer: true, blokk: "7",
+        explain: "Etter r runder er i ≤ n / 2ʳ, så det tar omtrent log n runder." },
+      { s: "<code>for i ← 0 to n − 1</code> med en indre løkke <code>for j ← i + 1 to n − 1</code> er O(n²).", answer: true, blokk: "7",
+        explain: "Den indre løkka går (n − 1) + (n − 2) + … + 0 = n(n − 1)/2 ganger totalt. Konstanten ½ forsvinner." },
+      { s: "En algoritme som er O(n), er også O(n²).", answer: true, blokk: "7",
+        explain: "O er en øvre grense. Men på eksamen skal du oppgi den laveste klassen du kan begrunne." },
+      { s: "En O(n²)-algoritme er alltid tregere enn en O(n)-algoritme.", answer: false, blokk: "7",
+        explain: "For små n kan konstantene gjøre O(n²)-algoritmen raskest. O sier bare noe om veksten når n blir stor." },
+      { s: "Big-O beskriver alltid verste tilfelle.", answer: false, blokk: "7",
+        explain: "Tilfelle og veksttakt er to akser. Rett-frem søk er O(1) i beste og O(n) i verste tilfelle." },
+      { s: "Prim og Kruskal er grådige algoritmer.", answer: true, blokk: "7",
+        explain: "Begge tar den billigste kanten som er lov akkurat nå, og angrer aldri." },
+      { s: "En grådig algoritme gir alltid et optimalt svar.", answer: false, blokk: "7",
+        explain: "Dijkstra er grådig, og kan gi feil svar når grafen har negative kanter. Korrektheten må begrunnes for hvert problem." },
+      { s: "NP står for «ikke polynomiell».", answer: false, blokk: "7",
+        explain: "NP står for nondeterministic polynomial time. Alt i P er også i NP." },
+      { s: "Det er bevist at P ≠ NP.", answer: false, blokk: "7",
+        explain: "P vs NP er et åpent problem (H2021). De fleste tror P ≠ NP, men ingen har bevist det." },
+      { s: "Et problem er i NP hvis JA-instanser kan verifiseres i polynomiell tid.", answer: true, blokk: "7",
+        explain: "Det er definisjonen kurset bruker: med et sertifikat kan en verifikator sjekke JA-svaret i polynomiell tid." },
+      { s: "Et NP-komplett problem er både i NP og NP-hardt.", answer: true, blokk: "7", explain: "Det er definisjonen av NP-komplett." },
+      { s: "Alle NP-harde problemer ligger i NP.", answer: false, blokk: "7",
+        explain: "NP-hardt betyr bare at alt i NP kan reduseres til problemet. Problemet selv kan ligge utenfor NP, og da er det ikke NP-komplett." },
+      { s: "For å vise at et nytt problem X er NP-hardt, reduserer vi X til SAT.", answer: false, blokk: "7",
+        explain: "Retningen er motsatt: reduser SAT (eller et annet kjent NP-hardt problem) til X. Da er X minst like vanskelig som SAT." },
+      { s: "En reduksjon fra A til B i polynomiell tid viser at B er minst like vanskelig som A.", answer: true, blokk: "7",
+        explain: "Kan vi løse B, kan vi løse A: oversett instansen og bruk svaret til B." },
+      { s: "En verifikator for Hamiltonsykel kan bruke DFS til å lete etter sykelen.", answer: false, blokk: "7",
+        explain: "En verifikator sjekker sertifikatet den får. H2020 ga 0 poeng for løsninger som lette etter sykelen." },
+      { s: "Stoppeproblemet kan løses med en rask nok datamaskin.", answer: false, blokk: "7",
+        explain: "Stoppeproblemet er uavgjørbart: ingen algoritme løser det, uansett fart." },
+      { s: "Polynomiell tid betyr O(nᵏ) for en konstant k.", answer: true, blokk: "7",
+        explain: "Ja. O(2ⁿ) er ikke polynomiell, fordi n står i eksponenten." }
+    ], { id: "strategi-tf" });
+
+    // Badge-klikk: gå til fanen og åpne eksamenskortet
+    qsa(".badge[data-go]").forEach(function (b) {
+      b.setAttribute("role", "button"); b.setAttribute("tabindex", "0");
+      function go() {
+        // core.js åpner kortet og ruller dit når hashen endres (#fane=…&oppg=…)
+        var h = "#fane=" + b.getAttribute("data-go") + "&oppg=exam-" + b.getAttribute("data-card");
+        if (location.hash !== h) { location.hash = h; return; }
+        var card = qs("#exam-" + b.getAttribute("data-card") + " .examtask");
+        if (card) { card.open = true; window.scrollTo({ top: Math.max(0, card.getBoundingClientRect().top + window.pageYOffset - 90), behavior: "smooth" }); }
+      }
+      b.addEventListener("click", go);
+      b.addEventListener("keydown", function (e) { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); go(); } });
+    });
+  })();
+  </script>
+</body>
+</html>

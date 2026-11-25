@@ -1380,3 +1380,123 @@ a.a4-block:hover { border-color: var(--color-primary); color: var(--color-primar
 .gv-sep-out { font-size: var(--text-sm); margin-top: .4rem; }
 /* Lange graf-kjøretider (O((|V| + |E|) · log(|V|))) må kunne brytes i de smale cellene */
 [data-page="grafer"] .bigo-compact .bigo-val { white-space: normal; overflow-wrap: anywhere; }
+
+/* === Blokk 7 · Strategi === */
+.st-switch { display: flex; flex-wrap: wrap; gap: .35rem; margin: .4rem 0 .7rem; }
+.st-switch .btn[aria-pressed="true"] { background: var(--color-primary); color: var(--color-on-primary); border-color: var(--color-primary); }
+.st-rules { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: .7rem; margin: .5rem 0 1rem; }
+.st-rule { position: relative; padding-left: 2.6rem; margin: 0; }
+.st-rule h4 { margin: .1rem 0 .3rem; }
+.st-rule p { margin: 0; }
+.st-rule-n { position: absolute; left: .7rem; top: .75rem; width: 1.5rem; height: 1.5rem; border-radius: 50%;
+  display: grid; place-items: center; font-weight: 700; font-size: .85rem;
+  background: var(--color-primary-container); color: var(--color-on-primary-container); }
+.st-arch, .st-sumto { align-items: start; }
+.st-arch > *, .st-sumto > * { min-width: 0; }
+.st-dtab { width: 100%; }
+/* Lange grenser som O(|V| + |E|) skal brytes i kompakte Big-O-bokser på denne siden */
+body[data-page="strategi"] .bigo-compact .bigo-val { white-space: normal; overflow-wrap: anywhere; }
+
+/* Drill */
+.st-drill-head { display: flex; justify-content: space-between; flex-wrap: wrap; gap: .3rem .8rem; align-items: baseline; }
+.st-dots { display: flex; flex-wrap: wrap; gap: .3rem; margin: .5rem 0 .6rem; }
+.st-dot { width: 1.05rem; height: 1.05rem; border-radius: 50%; padding: 0; cursor: pointer;
+  border: 2px solid var(--color-outline); background: var(--color-surface-container-lowest); }
+.st-dot.ok { background: var(--color-on-tone-ok); border-color: var(--color-on-tone-ok); }
+.st-dot.no { background: var(--color-on-tone-danger); border-color: var(--color-on-tone-danger); }
+.st-dot.cur { outline: 2px solid var(--color-primary); outline-offset: 2px; }
+.st-drill-code { min-width: 0; }
+.st-drill-q { font-weight: 600; margin: .7rem 0 .4rem; }
+.st-opts { display: flex; flex-wrap: wrap; gap: .4rem; }
+.st-opts .quiz-opt { width: auto; flex: 0 1 auto; margin: 0; font-family: var(--font-mono); }
+.st-drill-fb { margin-top: .6rem; }
+.st-verdict-line.ok { color: var(--color-on-tone-ok); }
+.st-verdict-line.no { color: var(--color-on-tone-danger); }
+
+/* Strategikort */
+.st-strats { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: .8rem; margin: .6rem 0 1rem; }
+.st-strat { margin: 0; display: flex; flex-direction: column; }
+.st-strat h4 { margin: .1rem 0 .4rem; }
+.st-strat p { margin: 0 0 .45rem; }
+.st-strat .st-verdict { margin-top: auto; padding-top: .45rem; border-top: 1px solid var(--color-outline-variant); }
+
+/* Grafer (SVG) */
+.st-graph { width: 100%; max-width: 360px; height: auto; display: block; margin: 0 auto; }
+.st-gedge { stroke: var(--color-outline); stroke-width: 2; }
+.st-gedge.is-ok, .st-gedge.is-on { stroke: var(--c-sorted); stroke-width: 3.5; }
+.st-gedge.is-bad { stroke: var(--c-swap); stroke-width: 3.5; stroke-dasharray: 6 4; }
+.st-arrow { fill: var(--color-outline); }
+.st-gw { font-size: 13px; font-weight: 700; fill: var(--color-on-surface); font-family: var(--font-mono); }
+.st-gw.neg { fill: var(--c-swap); }
+.st-gnode circle { fill: var(--color-surface-container-lowest); stroke: var(--color-primary); stroke-width: 2; }
+.st-gnode text { font-size: 14px; font-weight: 700; fill: var(--color-on-surface); pointer-events: none; }
+.st-gnode.is-sel circle { fill: var(--color-primary-container); }
+.st-gnode.click { cursor: pointer; }
+.st-gnode.click:focus { outline: none; }
+.st-gnode.click:focus-visible circle { stroke-width: 4; stroke: var(--color-tertiary); }
+.st-gnode .st-gord { font-size: 11px; fill: var(--color-tertiary); }
+.st-cert { font-family: var(--font-mono); font-size: .92rem; margin: .5rem 0; overflow-wrap: anywhere; }
+.st-ci sub { font-size: .7em; color: var(--color-on-surface-variant); }
+.st-verdict-pill { display: inline-block; padding: 0 .45rem; border-radius: var(--radius); font-weight: 700; margin-left: .3rem; }
+.st-verdict-pill.ok { background: var(--color-tone-ok); color: var(--color-on-tone-ok); }
+.st-verdict-pill.no { background: var(--color-tone-danger); color: var(--color-on-tone-danger); }
+
+/* Problemkort */
+.st-probs { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: .7rem; margin: .5rem 0 .8rem; }
+.st-prob { margin: 0; display: flex; flex-direction: column; }
+.st-prob h4 { margin: .1rem 0 .35rem; font-family: var(--font-mono); letter-spacing: .02em; }
+.st-prob p { margin: 0 0 .5rem; }
+.st-prob .tag { margin-top: auto; align-self: flex-start; }
+.st-tag-p { background: var(--color-tone-ok); color: var(--color-on-tone-ok); }
+.st-tag-npc { background: var(--color-tone-warn); color: var(--color-on-tone-warn); }
+.st-tag-u { background: var(--color-tone-danger); color: var(--color-on-tone-danger); }
+
+/* Venn */
+.st-venn-card { text-align: center; }
+.st-venn { width: 100%; max-width: 440px; height: auto; }
+.st-v-np { fill: var(--color-tone-info); stroke: var(--color-on-tone-info); stroke-width: 2; fill-opacity: .85; }
+.st-v-p { fill: var(--color-tone-ok); stroke: var(--color-on-tone-ok); stroke-width: 2; }
+.st-v-nph { fill: var(--color-tone-warn); stroke: var(--color-on-tone-warn); stroke-width: 2; }
+.st-v-lbl { font-size: 17px; font-weight: 700; fill: var(--color-on-surface); }
+.st-v-sm { font-size: 12px; fill: var(--color-on-surface); }
+
+/* Reduksjon */
+.st-reduce { display: flex; flex-wrap: wrap; align-items: center; gap: .4rem; margin: .6rem 0 .9rem; }
+.st-r-box { padding: .35rem .65rem; border-radius: var(--radius-md); border: 1px solid var(--color-outline);
+  background: var(--color-surface-container-lowest); font-weight: 600; font-size: .9rem; }
+.st-r-arrow { color: var(--color-on-surface-variant); font-size: .85rem; }
+.st-fld { display: inline-flex; align-items: center; gap: .4rem; font-weight: 600; }
+.st-fld input { font: inherit; padding: .2rem .4rem; border: 1px solid var(--color-outline); border-radius: var(--radius);
+  background: var(--color-surface-container-lowest); color: var(--color-on-surface); }
+
+/* Eksamensteknikk */
+.st-types { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: .7rem; align-items: start; margin: .5rem 0 1rem; }
+.st-type { margin: 0; }
+.st-type summary { cursor: pointer; }
+.st-type ul { margin: .5rem 0 0; padding-left: 1.2rem; }
+.st-ladder { display: grid; gap: .45rem; margin: .4rem 0 .5rem; }
+.st-step { display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(80px, 1fr) auto; gap: .6rem; align-items: center; font-size: .9rem; }
+.st-step.top .st-step-lbl { font-weight: 700; }
+.st-bar { height: .7rem; border-radius: var(--radius); background: var(--color-surface-container-high); overflow: hidden; }
+.st-bar > span { display: block; height: 100%; background: var(--color-primary); }
+.st-step.top .st-bar > span { background: var(--c-sorted); }
+.st-step-p { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+.st-mal li { margin-bottom: .35rem; }
+.st-sik { display: grid; grid-template-columns: 7.5rem minmax(0, 1fr) auto; gap: .6rem; align-items: center;
+  padding: .45rem 0; border-bottom: 1px solid var(--color-outline-variant); }
+.st-sik .tag { justify-self: start; }
+.st-sik q { quotes: "«" "»"; }
+.st-check { list-style: none; padding: 0; margin: 0 0 .6rem; }
+.st-check li { display: flex; gap: .5rem; align-items: flex-start; padding: .25rem 0; }
+.st-check input { margin-top: .25rem; flex: none; }
+
+@media (max-width: 760px) {
+  .st-step { grid-template-columns: minmax(0, 1fr) auto; }
+  .st-step .st-bar { grid-column: 1 / -1; grid-row: 2; }
+}
+@media (max-width: 560px) {
+  .st-sik { grid-template-columns: minmax(0, 1fr) auto; }
+  .st-sik q { grid-column: 1 / -1; grid-row: 2; }
+  .st-rules, .st-strats, .st-probs, .st-types { grid-template-columns: minmax(0, 1fr); }
+  .st-reduce { flex-direction: column; align-items: flex-start; }
+}
