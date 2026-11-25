@@ -6,7 +6,7 @@
   <title>Crash course · IN2010</title>
   <meta name="description" content="Crash course i IN2010: en løype i eksamensrekkefølge, vektet etter forventede eksamenspoeng. Velg Ekspress, Standard eller Grundig, og følg stegene med kjerne, oppskrift, eksempel, eksamenskort og sjekk.">
   <script>(function(){try{var d=document.documentElement;var t=localStorage.getItem('in-theme');if(t!=='dark'&&t!=='system')t='light';if(t!=='system')d.setAttribute('data-theme',t);var l=localStorage.getItem('in-level');if(l!=='eli5'&&l!=='teknisk')l='normal';d.setAttribute('data-level',l);}catch(e){document.documentElement.setAttribute('data-theme','light');document.documentElement.setAttribute('data-level','normal');}})();</script>
-  <link rel="stylesheet" href="assets/css/styles.css?v=20261125g">
+  <link rel="stylesheet" href="assets/css/styles.css?v=20261125h">
 </head>
 <body data-page="crash">
   <a class="skip-link" href="#main">Hopp til innhold</a>
@@ -91,29 +91,29 @@
 
   <footer class="footer">IN2010-guide · Crash course</footer>
 
-  <script src="assets/js/core.js?v=20261125g"></script>
-  <script src="assets/js/symboler.js?v=20261125g"></script>
-  <script src="assets/js/data-tf.js?v=20261125g"></script>
-  <script src="assets/js/pseudocode.js?v=20261125g"></script>
+  <script src="assets/js/core.js?v=20261125h"></script>
+  <script src="assets/js/symboler.js?v=20261125h"></script>
+  <script src="assets/js/data-tf.js?v=20261125h"></script>
+  <script src="assets/js/pseudocode.js?v=20261125h"></script>
   <!-- Steg-demoer i mock-kortene (IN.mountExamDemo): spiller, alle visualiseringer og generatorene -->
-  <script src="assets/js/stepplayer.js?v=20261125g"></script>
-  <script src="assets/js/viz-bars.js?v=20261125g"></script>
-  <script src="assets/js/viz-buckets.js?v=20261125g"></script>
-  <script src="assets/js/viz-tree.js?v=20261125g"></script>
-  <script src="assets/js/viz-hash.js?v=20261125g"></script>
-  <script src="assets/js/viz-graph.js?v=20261125g"></script>
-  <script src="assets/js/viz-list.js?v=20261125g"></script>
-  <script src="assets/js/data-algos.js?v=20261125g"></script>
-  <script src="assets/js/data-heap.js?v=20261125g"></script>
-  <script src="assets/js/data-sok.js?v=20261125g"></script>
-  <script src="assets/js/data-traer.js?v=20261125g"></script>
-  <script src="assets/js/data-hashing.js?v=20261125g"></script>
-  <script src="assets/js/data-grafer.js?v=20261125g"></script>
-  <script src="assets/js/data-lister.js?v=20261125g"></script>
-  <script src="assets/js/data-strategi.js?v=20261125g"></script>
-  <script src="assets/js/perfekt/mock.js?v=20261125g"></script>
-  <script src="assets/js/data-mock.js?v=20261125g"></script>
-  <script src="assets/js/data-crash.js?v=20261125g"></script>
+  <script src="assets/js/stepplayer.js?v=20261125h"></script>
+  <script src="assets/js/viz-bars.js?v=20261125h"></script>
+  <script src="assets/js/viz-buckets.js?v=20261125h"></script>
+  <script src="assets/js/viz-tree.js?v=20261125h"></script>
+  <script src="assets/js/viz-hash.js?v=20261125h"></script>
+  <script src="assets/js/viz-graph.js?v=20261125h"></script>
+  <script src="assets/js/viz-list.js?v=20261125h"></script>
+  <script src="assets/js/data-algos.js?v=20261125h"></script>
+  <script src="assets/js/data-heap.js?v=20261125h"></script>
+  <script src="assets/js/data-sok.js?v=20261125h"></script>
+  <script src="assets/js/data-traer.js?v=20261125h"></script>
+  <script src="assets/js/data-hashing.js?v=20261125h"></script>
+  <script src="assets/js/data-grafer.js?v=20261125h"></script>
+  <script src="assets/js/data-lister.js?v=20261125h"></script>
+  <script src="assets/js/data-strategi.js?v=20261125h"></script>
+  <script src="assets/js/perfekt/mock.js?v=20261125h"></script>
+  <script src="assets/js/data-mock.js?v=20261125h"></script>
+  <script src="assets/js/data-crash.js?v=20261125h"></script>
   <script>
   (function () {
     "use strict";
@@ -584,7 +584,7 @@
         if (m.begrunnelse) into.appendChild(el("p", { class: "small muted cr-mock-why", html: m.begrunnelse }));
         if (m.eli5) into.appendChild(el("div", { class: "callout eli5 small lvl", "data-eli5": true, html: m.eli5 }));
         var d = {}; for (var k in m) if (Object.prototype.hasOwnProperty.call(m, k)) d[k] = m[k];
-        IN.examTask(into, d);
+        IN.examTask(into, d, { variant: "flat" });   // flatt kort: ingen egen kant inne i steget
       }
       inside.forEach(function (m) { one(m, host); });
       if (outside.length) {
