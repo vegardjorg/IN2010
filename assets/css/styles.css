@@ -1180,3 +1180,130 @@ a.a4-block:hover { border-color: var(--color-primary); color: var(--color-primar
   .a4-seg { font-size: 10.5px; padding: 0 .15rem; }
   .a4-rare { padding-left: .6rem; }
 }
+
+/* === Blokk 5 · Hashing === */
+/* Hashtabeller (IN.vizHash, viz-hash.js) og sidens egne widgeter. Prefiks hs-. */
+:root { --hs-on: #ffffff; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --hs-on: #10131a; } }
+:root[data-theme="dark"] { --hs-on: #10131a; }
+
+.hs-host .sp-stage { height: auto; min-height: 220px; display: block; padding: var(--d-sm); }
+.hs-viz { display: flex; flex-direction: column; gap: .7rem; min-width: 0; }
+.hs-part { min-width: 0; }
+.hs-part.dim { opacity: .62; }
+.hs-cap { font-size: var(--text-xs); color: var(--color-on-surface-variant); margin: 0 0 .2rem; font-weight: 600; }
+.hs-note { color: var(--color-on-surface-variant); }
+
+/* Array-celler (Linear probing, indices) */
+.hs-row { display: flex; gap: 3px; overflow-x: auto; padding: 12px 2px 1.3rem; }
+.hs-cell {
+  position: relative; flex: 0 0 auto; min-width: 2.35rem; height: 3.1rem; padding: 0 .2rem;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  border: 2px solid var(--color-outline); border-radius: var(--radius);
+  background: var(--color-surface-container-lowest); color: var(--color-on-surface);
+  font-family: var(--font-mono);
+}
+.hs-row.dense .hs-cell { min-width: 2rem; }
+.hs-cell .hs-k { font-weight: 700; font-size: 14px; line-height: 1.1; }
+.hs-cell .hs-k.sm { font-size: 11px; }
+.hs-cell .hs-v { font-size: 10px; color: var(--color-on-surface-variant); line-height: 1.1; }
+.hs-cell .hs-i { position: absolute; bottom: -1.15rem; left: 0; right: 0; text-align: center; font-size: 10px; font-weight: 400; color: var(--color-on-surface-variant); }
+.hs-cell.empty { border-style: dashed; border-color: var(--color-outline); background: transparent; }
+.hs-cell.empty .hs-k { color: var(--color-on-surface-variant); font-weight: 400; }
+.hs-cell.tomb { background: repeating-linear-gradient(135deg, var(--color-surface-container) 0 5px, var(--color-surface-container-high) 5px 10px); border-style: dashed; }
+.hs-cell.tomb .hs-k { color: var(--c-swap); }
+.hs-cell.is-occ   { border-color: var(--c-sorted); background: color-mix(in srgb, var(--c-sorted) 14%, var(--color-surface-container-lowest)); }
+.hs-cell.is-cur   { border-color: var(--c-compare); background: var(--c-compare); }
+.hs-cell.is-fresh,
+.hs-cell.is-moved { border-color: var(--c-min); background: var(--c-min); }
+.hs-cell.is-found { border-color: var(--c-target); background: var(--c-target); }
+.hs-cell.is-hole,
+.hs-cell.is-miss  { border-color: var(--c-swap); border-style: solid; box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--c-swap) 35%, transparent); }
+.hs-cell.is-cur .hs-k, .hs-cell.is-fresh .hs-k, .hs-cell.is-moved .hs-k, .hs-cell.is-found .hs-k,
+.hs-cell.is-cur .hs-v, .hs-cell.is-fresh .hs-v, .hs-cell.is-moved .hs-v, .hs-cell.is-found .hs-v { color: var(--hs-on); }
+.hs-cell.is-home { outline: 2px dotted var(--color-primary); outline-offset: 2px; }
+.hs-homemark {
+  position: absolute; top: -12px; left: 50%; transform: translateX(-50%);
+  font: 700 9px/1 system-ui, sans-serif; padding: 1px 4px; border-radius: 999px;
+  background: var(--color-primary); color: var(--color-on-primary);
+}
+/* Segmenter uten hull (clustering): sammenhengende opptatte plasser understrekes */
+.hs-cell[class*="run-"]::after { content: ""; position: absolute; left: -3px; right: -3px; bottom: -6px; height: 3px; background: var(--color-tertiary); opacity: .6; }
+.hs-cell.run-start::after { left: 0; border-radius: 3px 0 0 3px; }
+.hs-cell.run-end::after { right: 0; border-radius: 0 3px 3px 0; }
+.hs-cell.run-solo::after { left: 0; right: 0; border-radius: 3px; }
+
+/* Bøtter (Separate chaining) */
+.hs-chains { display: flex; flex-direction: column; gap: 3px; font-family: var(--font-mono); font-size: 13px; }
+.hs-crow { display: flex; align-items: center; gap: .3rem; flex-wrap: wrap; padding: 2px 4px; border-radius: var(--radius); min-height: 1.8rem; }
+.hs-crow.is-row { background: color-mix(in srgb, var(--c-compare) 14%, transparent); }
+.hs-crow.is-miss { background: color-mix(in srgb, var(--c-swap) 12%, transparent); }
+.hs-ci { display: inline-flex; justify-content: center; align-items: center; width: 1.9rem; height: 1.6rem; border: 2px solid var(--color-outline); border-radius: var(--radius); font-weight: 700; background: var(--color-surface-container-lowest); }
+.hs-crow.is-row .hs-ci { border-color: var(--c-compare); }
+.hs-arrow, .hs-link { color: var(--color-on-surface-variant); }
+.hs-null { color: var(--color-on-surface-variant); font-style: italic; }
+.hs-node { border: 2px solid var(--c-default); border-radius: var(--radius); padding: 1px 6px; background: var(--color-surface-container-lowest); white-space: nowrap; }
+.hs-node.is-occ   { border-color: var(--c-sorted); background: color-mix(in srgb, var(--c-sorted) 14%, var(--color-surface-container-lowest)); }
+.hs-node.is-cur   { border-color: var(--c-compare); background: var(--c-compare); color: var(--hs-on); }
+.hs-node.is-fresh { border-color: var(--c-min); background: var(--c-min); color: var(--hs-on); }
+.hs-node.is-repl  { border-color: var(--c-min); background: var(--c-min); color: var(--hs-on); box-shadow: 0 0 0 3px color-mix(in srgb, var(--c-min) 30%, transparent); }
+.hs-node.is-found { border-color: var(--c-target); background: var(--c-target); color: var(--hs-on); }
+
+/* entries (Python 3.6) og små arrays */
+.hs-entries, .hs-arr { display: flex; flex-wrap: wrap; gap: 4px 4px; padding-bottom: 1.2rem; }
+.hs-arr { gap: 1.25rem 4px; }
+.hs-entries { gap: 1.25rem 4px; }
+.hs-entry, .hs-acell { position: relative; border: 2px solid var(--c-default); border-radius: var(--radius); padding: 3px 7px; font-family: var(--font-mono); font-size: 13px; background: var(--color-surface-container-lowest); }
+.hs-acell { min-width: 2rem; text-align: center; font-weight: 700; }
+.hs-entry .hs-i, .hs-acell .hs-i { position: absolute; bottom: -1.15rem; left: 0; right: 0; text-align: center; font-size: 10px; font-weight: 400; color: var(--color-on-surface-variant); }
+.hs-entry.is-cur, .hs-acell.is-cur { border-color: var(--c-compare); background: var(--c-compare); color: var(--hs-on); }
+.hs-acell.is-occ { border-color: var(--c-sorted); background: color-mix(in srgb, var(--c-sorted) 14%, var(--color-surface-container-lowest)); }
+.hs-entry.is-fresh, .hs-entry.is-repl { border-color: var(--c-min); background: var(--c-min); color: var(--hs-on); }
+.hs-entry.is-found { border-color: var(--c-target); background: var(--c-target); color: var(--hs-on); }
+.hs-map { display: flex; flex-wrap: wrap; gap: 4px; }
+.hs-chip { font-family: var(--font-mono); font-size: 13px; border: 1px solid var(--color-outline-variant); border-radius: 999px; padding: 1px 9px; background: var(--color-surface-container); }
+.hs-chip.is-cur { border-color: var(--c-compare); box-shadow: inset 0 -2px 0 var(--c-compare); }
+.hs-chip.is-found { border-color: var(--c-target); background: color-mix(in srgb, var(--c-target) 18%, var(--color-surface-container)); font-weight: 700; }
+
+.hs-info { display: flex; flex-wrap: wrap; gap: .35rem; }
+.hs-pill { display: inline-flex; gap: .35rem; align-items: baseline; font-size: var(--text-sm); border: 1px solid var(--color-outline-variant); border-radius: 999px; padding: 1px 10px; background: var(--color-surface-container-low); }
+.hs-pill .lbl { color: var(--color-on-surface-variant); font-size: var(--text-xs); }
+.hs-pill .val { font-family: var(--font-mono); }
+
+/* Pseudokode som følger en demo med flere operasjoner */
+.hs-pc { border-left: 3px solid transparent; padding-left: .4rem; margin-bottom: .6rem; transition: opacity .15s; }
+.hs-pcs.has-on .hs-pc:not(.on) { opacity: .55; }
+.hs-pc.on { border-left-color: var(--color-primary); }
+.hs-pc-title { margin: .2rem 0 .3rem; font-size: var(--text-sm); }
+.hs-syntax { margin: .3rem 0 .5rem; }
+.hs-pcs .bigo-compact .bigo-val { white-space: normal; font-size: .82rem; line-height: 1.2; }
+
+/* Statiske figurer i eksamenskort */
+.exam-fig .hs-viz { gap: .4rem; }
+
+/* Hashfunksjon-widget og amortisert kostnad */
+.hs-form { display: flex; flex-wrap: wrap; gap: .5rem .8rem; align-items: end; margin: .4rem 0 .6rem; }
+.hs-form label { display: flex; flex-direction: column; gap: .15rem; font-size: var(--text-sm); color: var(--color-on-surface-variant); }
+.hs-form input { font-family: var(--font-mono); width: 12rem; max-width: 100%; }
+.hs-form input.n { width: 5rem; }
+.hs-out { font-family: var(--font-mono); font-size: var(--text-sm); display: grid; gap: .3rem; }
+.hs-out .row { display: flex; flex-wrap: wrap; gap: .1rem .6rem; align-items: baseline; }
+.hs-out .row .lbl { font-family: system-ui, sans-serif; color: var(--color-on-surface-variant); min-width: 11rem; }
+.hs-out .bad { color: var(--c-swap); font-weight: 700; }
+.hs-out .ok { color: var(--c-sorted); font-weight: 700; }
+.hs-bars { display: flex; align-items: flex-end; gap: 2px; height: 140px; padding: 4px 2px 0; border-bottom: 1px solid var(--color-outline); position: relative; }
+.hs-bar { flex: 1 1 0; min-width: 3px; background: var(--c-default); border-radius: 2px 2px 0 0; }
+.hs-bar.re { background: var(--c-swap); }
+.hs-avg { position: absolute; left: 0; right: 0; border-top: 2px dashed var(--c-sorted); pointer-events: none; }
+.hs-barlbl { display: flex; justify-content: space-between; font-size: var(--text-xs); color: var(--color-on-surface-variant); }
+
+@media (max-width: 760px) {
+  .hs-cell { min-width: 2rem; height: 2.8rem; }
+  .hs-cell .hs-k { font-size: 13px; }
+  .hs-out .row .lbl { min-width: 0; width: 100%; }
+}
+@media (max-width: 420px) {
+  .hs-row { gap: 2px; }
+  .hs-cell { min-width: 1.75rem; border-width: 1.5px; }
+  .hs-host .sp-stage { padding: 6px; }
+}

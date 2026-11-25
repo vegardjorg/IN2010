@@ -1,0 +1,844 @@
+<!doctype html>
+<html lang="nb">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Blokk 5 · Hashing · IN2010</title>
+  <meta name="description" content="Hashing i IN2010: hashfunksjoner, Separate chaining, Linear probing med sletting, Load factor og rehash, Python 3.6-ordbøker og hashing som verktøy – med stegvise demoer, pseudokode og eksamensoppgaver.">
+  <script>(function(){try{var d=document.documentElement;var t=localStorage.getItem('in-theme');if(t&&t!=='system')d.setAttribute('data-theme',t);var l=localStorage.getItem('in-level')||'normal';d.setAttribute('data-level',l);}catch(e){document.documentElement.setAttribute('data-level','normal');}})();</script>
+  <link rel="stylesheet" href="assets/css/styles.css">
+</head>
+<body data-page="hashing">
+  <a class="skip-link" href="#main">Hopp til innhold</a>
+  <header id="topnav"></header>
+
+  <main id="main" class="wrap">
+    <div class="pagehead">
+      <h1>Blokk 5 · Hashing</h1>
+      <p class="lead">Et hashmap finner en nøkkel uten å lete gjennom alt: en hashfunksjon regner ut hvor nøkkelen skal ligge.
+        Her lærer du de to kollisjonsmetodene i kurset, Separate chaining og Linear probing, hvorfor sletting er vanskelig,
+        hva Load factor og rehash betyr for kjøretiden, og hvordan Python-ordbøker bygger på det samme.</p>
+      <div class="badges">
+        <span class="badge" data-go="probing" data-card="h2020-4"><b>H2020</b> · Linear probing · <span class="pts">2p</span></span>
+        <span class="badge" data-go="triks" data-card="h2020-7"><b>H2020</b> · Subanagram · <span class="pts">17p</span></span>
+        <span class="badge" data-go="triks" data-card="h2021-9"><b>H2021</b> · Flest forekomster · <span class="pts">8p</span></span>
+        <span class="badge" data-go="probing" data-card="h2022-7"><b>H2022</b> · Linear probing · <span class="pts">10p</span></span>
+        <span class="badge" data-go="python" data-card="h2024-5"><b>H2024</b> · Python 3.6-ordbøker · <span class="pts">10p</span></span>
+        <span class="badge" data-go="chaining" data-card="h2025-2"><b>H2025</b> · Separate chaining · <span class="pts">10p</span></span>
+      </div>
+    </div>
+
+    <div class="tabs" role="tablist" aria-label="Emner om hashing">
+      <button data-tab="begreper">Begreper</button>
+      <button data-tab="chaining">Separate chaining</button>
+      <button data-tab="probing">Linear probing</button>
+      <button data-tab="kjoretid">Rehash &amp; kjøretid</button>
+      <button data-tab="python">Python-ordbøker</button>
+      <button data-tab="triks">Hashing som verktøy</button>
+      <button data-tab="test">Sant/usant</button>
+    </div>
+
+    <!-- ===================== BEGREPER ===================== -->
+    <section data-panel="begreper">
+      <div class="callout begrep"><span class="lbl">Begrep</span>
+        <p>Et <b>hashmap</b> lagrer par av <b>nøkkel</b> og <b>verdi</b>, og støtter innsetting, oppslag og sletting av nøkler.
+          Hver nøkkel finnes høyst én gang. Et <b>hashset</b> er det samme, bare uten verdier: det lagrer bare nøkler.
+          Begge bygger på et array A med N plasser og en <b>hashfunksjon</b> h(k, N), som gir et tall mellom 0 og N − 1:
+          plassen der nøkkelen k hører hjemme.</p>
+      </div>
+      <div id="intro-begreper"></div>
+
+      <div class="grid cols-2">
+        <div class="callout eli5"><span class="lbl">ELI5</span>
+          <p>Tenk deg en garderobe med nummererte knagger. I stedet for å lete gjennom alle jakkene, har du en regel som gjør navnet ditt om til et knaggnummer.
+            Henter du jakka, bruker du samme regel og går rett til riktig knagg. Av og til gir regelen samme nummer til to personer. Det kalles en <b>kollisjon</b>,
+            og vi trenger en plan for hva som skjer da.</p>
+        </div>
+        <div class="callout eksempel"><span class="lbl">Eksempel</span>
+          <p>Med N = 10 og h(k, N) = k mod N hasher et heltall til sitt siste siffer: 93 → 3, 48 → 8 og 13 → 3.
+            93 og 13 kolliderer: de vil ha samme plass.</p>
+        </div>
+      </div>
+
+      <h3>Hashfunksjonen</h3>
+      <div class="callout begrep"><span class="lbl">Begrep</span>
+        <ul>
+          <li><b>Konsistent:</b> samme nøkkel må alltid gi samme tall. Ellers finner vi aldri nøkkelen igjen.</li>
+          <li><b>Få kollisjoner:</b> ulike nøkler bør spres jevnt utover de N plassene.</li>
+          <li><b>Heltall:</b> kurset lar et heltall hashe til seg selv, og tar så mod N.</li>
+          <li><b>Strenger:</b> summen av tegnkodene er en dårlig hashfunksjon, fordi alle anagrammer («algorithm», «logarithm») får samme sum.
+            En bedre hashfunksjon går gjennom tegnene og regner h ← 31 · h + ord(c), og tar til slutt mod N. Da betyr rekkefølgen noe.</li>
+        </ul>
+      </div>
+      <div class="card" id="hs-hashfn">
+        <h4 style="margin:.2rem 0 .3rem">Prøv hashfunksjonene</h4>
+        <p class="muted small">Skriv inn to nøkler og en N. Tall bruker k mod N. Strenger regnes ut med både summen og 31-hashen, så du ser hvem som kolliderer.</p>
+      </div>
+      <div class="callout felle"><span class="lbl">Felle</span>
+        <p>Kollisjoner kan ikke unngås. Det finnes langt flere mulige nøkler enn plasser, så noen nøkler må dele plass.
+          Et hashmap trenger derfor alltid en metode for å håndtere kollisjoner.</p>
+      </div>
+
+      <h3>To måter å håndtere kollisjoner</h3>
+      <p class="muted small">Samme nøkler (21, 31, 5, 15, 41) med N = 10 og h(k, N) = k mod N:</p>
+      <div class="grid cols-2">
+        <div class="card"><h4 style="margin-top:.2rem">Separate chaining</h4>
+          <div id="mini-chain"></div>
+          <p class="muted small">Hver plass har en <b>bøtte</b> (en liste). Nøkler som kolliderer, ligger i samme bøtte.</p></div>
+        <div class="card"><h4 style="margin-top:.2rem">Linear probing</h4>
+          <div id="mini-probe"></div>
+          <p class="muted small">Alt ligger i selve arrayet. Er plassen opptatt, prøver vi neste plass, og så neste, rundt til 0 etter siste plass.</p></div>
+      </div>
+      <div class="table-wrap" id="tbl-hashing">
+        <table class="cmp-table">
+          <thead><tr><th>Egenskap</th><th>Separate chaining</th><th>Linear probing</th></tr></thead>
+          <tbody>
+            <tr><td>Hvor havner en kolliderende nøkkel?</td><td>I samme bøtte (bakerst)</td><td>På neste ledige plass</td></tr>
+            <tr><td data-tip="Load factor = n/N, der n er antall par og N er størrelsen på arrayet.">Load factor n/N</td><td>Kan bli større enn 1</td><td>Alltid mindre enn 1 (n &lt; N)</td></tr>
+            <tr><td>Oppslag stopper når …</td><td>bøtta er gjennomgått</td><td>vi treffer en ledig plass (null)</td></tr>
+            <tr><td>Sletting</td><td>Fjern paret fra bøtta</td><td>Må tette hullet eller merke plassen som slettet</td></tr>
+            <tr><td>Forventet tid</td><td>O(1)</td><td>O(1)</td></tr>
+            <tr><td>Verste tilfelle</td><td>O(n)</td><td>O(n)</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="callout begrep"><span class="lbl">Begrep</span>
+        <p><b>Load factor</b> er n/N: antall nøkkel-verdi-par delt på antall plasser i arrayet. Lav Load factor gir få kollisjoner, men mye ubrukt plass.
+          Kurset sikter mot omtrent mellom 1/2 og 3/4, og gjør tabellen større (rehash) når n/N når 0,75. Mer om det under <a href="#fane=kjoretid">Rehash &amp; kjøretid</a>.</p>
+      </div>
+
+      <h3>Sjekk deg selv</h3>
+      <div id="quiz-begreper"></div>
+    </section>
+
+    <!-- ===================== SEPARATE CHAINING ===================== -->
+    <section data-panel="chaining" hidden>
+      <div class="callout begrep"><span class="lbl">Begrep</span>
+        <p>Med <b>Separate chaining</b> er hver plass i arrayet enten null eller en <b>bøtte</b>: en liste med nøkkel-verdi-par.
+          Alle nøkler som hasher til plass i, ligger i bøtta A[i]. Bøtta lages først når den første nøkkelen hasher dit.</p>
+      </div>
+      <div id="intro-chaining"></div>
+
+      <h3>Innsetting og oppslag, steg for steg</h3>
+      <p class="muted small hs-syntax">Eget eksempel: skriv par som <code>21=a</code>, og et oppslag som <code>?21</code>. Legg til <code>N=7</code> for en annen størrelse. Tekstnøkler hashes med 31-hashen.</p>
+      <div id="demo-chaining"></div>
+
+      <div class="grid cols-2">
+        <div class="callout sensor"><span class="lbl">Sensortips</span>
+          <ul>
+            <li>Finnes nøkkelen fra før, skal verdien <b>overskrives</b>. Et nytt par bakerst gir duplikat og poengtrekk.</li>
+            <li>Vis hvordan bøtta lages første gang (A[i] = null → ny liste med (k, v)).</li>
+            <li>Si både verste og forventet kjøretid.</li>
+          </ul>
+        </div>
+        <div class="callout felle"><span class="lbl">Felle</span>
+          <p>Det er fristende å bare legge paret bakerst. Men da må vi uansett lete gjennom bøtta for å oppdage en eksisterende nøkkel,
+            så innsetting koster O(1 + |B|), ikke alltid O(1).</p>
+        </div>
+      </div>
+      <div class="callout uni"><span class="lbl">Universitetsnivå</span>
+        <p>Med en hashfunksjon som sprer godt, har en bøtte forventet lengde n/N, altså Load factor. Holdes Load factor under en fast grense (med rehash),
+          blir innsetting, oppslag og sletting forventet O(1). Hasher alle nøklene til samme bøtte, blir hver operasjon O(n).</p>
+      </div>
+
+      <h3>Eksamen</h3>
+      <div id="exam-h2025-2"></div>
+    </section>
+
+    <!-- ===================== LINEAR PROBING ===================== -->
+    <section data-panel="probing" hidden>
+      <div class="callout begrep"><span class="lbl">Begrep</span>
+        <p>Med <b>Linear probing</b> ligger alle parene i selve arrayet, høyst ett par per plass. Vi starter på hjemmeplassen i = h(k, N).
+          Er den opptatt av en annen nøkkel, prøver vi i + 1, i + 2 og så videre, alltid mod N, slik at vi går rundt til 0 etter siste plass.
+          Ledige plasser er null, og alle algoritmene stopper når de treffer en ledig plass.</p>
+      </div>
+      <div id="intro-probing"></div>
+
+      <h3>Innsetting, oppslag og sletting</h3>
+      <p class="muted small hs-syntax">Eget eksempel: tall settes inn, <code>?20</code> er et oppslag og <code>-10</code> sletter 10. Legg til <code>N=7</code> for en annen størrelse.
+        Vi viser bare nøklene. Prikket ramme og «h» viser hjemmeplassen, og den lilla streken under viser segmenter uten hull.</p>
+      <div id="demo-probing"></div>
+
+      <h3>Hvorfor er sletting vanskelig?</h3>
+      <div class="callout felle"><span class="lbl">Felle</span>
+        <p>Setter vi bare plassen til null, kan andre nøkler bli borte. Under er 10 slettet fra tabellen fra H2022 ved å skrive null på plass 0.
+          Et oppslag på 20 starter på hjemmeplassen 0, treffer null med en gang og svarer «finnes ikke», selv om 20 ligger på plass 3.</p>
+      </div>
+      <div class="grid cols-2">
+        <div class="card"><div id="fig-naiv-for"></div></div>
+        <div class="card"><div id="fig-naiv-etter"></div></div>
+      </div>
+      <p>Kurset har to strategier for å unngå dette:</p>
+      <div class="grid cols-2">
+        <div class="card"><h4 style="margin-top:.2rem">1 · Tett hullet</h4>
+          <p class="small">Fjern paret, og gå videre gjennom resten av segmentet. Hver nøkkel som måtte gå forbi hullet for å komme dit den står, flyttes inn i hullet.
+            Da oppstår et nytt hull, som tettes på samme måte, helt til vi treffer en ledig plass. Det er sletting i demoen over.</p></div>
+        <div class="card"><h4 style="margin-top:.2rem">2 · Merk som slettet</h4>
+          <p class="small">Erstatt paret med et <b>slettet-merke</b>. Oppslag stopper ikke ved merker, men innsetting kan bruke dem.
+            Merkene blir liggende til neste rehash, som bare setter inn de ekte parene.</p></div>
+      </div>
+      <div class="callout begrep"><span class="lbl">Begrep</span>
+        <p>Hullet er på plass i, og vi ser på nøkkelen på plass j. La hjem = h(nøkkel, N). Nøkkelen kan bli stående hvis hjem ligger i det
+          <b>sirkulære intervallet (i, j]</b>, altså en av plassene i + 1, …, j (mod N). Da ble j nådd uten å gå forbi i.
+          Ellers gikk proben forbi hullet, og nøkkelen flyttes til i.</p>
+      </div>
+
+      <h3>Strategi 2: slettet-merker</h3>
+      <p class="muted small hs-syntax">Samme syntaks som over. Et merke vises som ×. Innsettingen leter likevel helt til en ledig plass, for nøkkelen kan ligge lenger ut.</p>
+      <div id="demo-marks"></div>
+      <div class="table-wrap">
+        <table class="cmp-table">
+          <thead><tr><th></th><th>Tett hullet</th><th>Merk som slettet</th></tr></thead>
+          <tbody>
+            <tr><td>Arbeid ved sletting</td><td>Gå gjennom resten av segmentet, flytt nøkler</td><td>Bare skriv merket</td></tr>
+            <tr><td>Etterpå</td><td>Tabellen ser ut som om nøkkelen aldri fantes</td><td>Merkene gjør segmentene lengre</td></tr>
+            <tr><td>Oppslag</td><td>Uendret</td><td>Må gå forbi merker</td></tr>
+            <tr><td>Rydding</td><td>Ikke nødvendig</td><td>Neste rehash fjerner merkene</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Clustering</h3>
+      <div class="callout begrep"><span class="lbl">Begrep</span>
+        <p><b>Clustering</b> betyr lange segmenter av opptatte plasser uten hull. En nøkkel som hasher inn i et slikt segment, må probe til enden av det,
+          og blir selv en del av segmentet, så det vokser videre. Lav Load factor holder segmentene korte.</p>
+      </div>
+      <div class="card"><div id="fig-cluster"></div>
+        <p class="muted small">11, 12, 13, 21, 22 og 31 satt inn med N = 10. 31 hører hjemme på plass 1, men må gå forbi seks opptatte plasser før den finner plass 6.</p></div>
+
+      <div class="callout sensor"><span class="lbl">Sensortips</span>
+        <ul>
+          <li>Glem ikke <b>mod N</b>. Å gå utenfor arrayet ga trekk på H2022.</li>
+          <li>Ved samme nøkkel skal paret overskrives.</li>
+          <li>Skriv tabellen med _ for tomme plasser, og sjekk at du har tatt med rundturen fra siste til første plass.</li>
+        </ul>
+      </div>
+
+      <h3>Eksamen</h3>
+      <div id="exam-h2020-4"></div>
+      <div id="exam-h2022-7"></div>
+    </section>
+
+    <!-- ===================== KJØRETID ===================== -->
+    <section data-panel="kjoretid" hidden>
+      <div id="intro-kjoretid"></div>
+      <div class="table-wrap">
+        <table class="cmp-table">
+          <thead><tr><th>Operasjon</th><th>Forventet</th><th>Verste tilfelle</th></tr></thead>
+          <tbody>
+            <tr><td>Innsetting</td><td>O(1) amortisert</td><td>O(n)</td></tr>
+            <tr><td>Oppslag</td><td>O(1)</td><td>O(n)</td></tr>
+            <tr><td>Sletting</td><td>O(1)</td><td>O(n)</td></tr>
+            <tr><td>Rehash</td><td>O(n)</td><td>O(n)</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="callout felle"><span class="lbl">Felle</span>
+        <p>Skriv aldri bare «hashing er O(1)». Si <b>forventet</b> O(1) (for innsetting: forventet amortisert O(1)), og <b>O(n) i verste tilfelle</b>.
+          Verste tilfelle er når mange nøkler hasher til samme plass. H2025 ga ett poeng for hver av de to delene.</p>
+      </div>
+
+      <h3>Rehash</h3>
+      <div class="callout begrep"><span class="lbl">Begrep</span>
+        <p>En <b>rehash</b> lager et nytt, større array (kurset dobler N) og setter inn alle parene på nytt med den nye N-en.
+          Hjemmeplassen h(k, N) avhenger av N, så parene havner ofte på nye plasser. Kurset sjekker før hver innsetting om n/N ≥ 0,75, og starter med N = 1.
+          En rehash koster O(n).</p>
+      </div>
+      <p class="muted small hs-syntax">Eget eksempel: tall som settes inn, f.eks. <code>5, 12, 7, 20</code>. Legg til <code>N=4</code> for å starte med 4 plasser.</p>
+      <div id="demo-rehash"></div>
+
+      <h3>Hvorfor blir det amortisert O(1)?</h3>
+      <div id="intro-amort"></div>
+      <div class="card" id="hs-amort"></div>
+
+      <div class="callout uni"><span class="lbl">Universitetsnivå</span>
+        <p>«Forventet» forutsetter at hashfunksjonen sprer nøklene godt. Da er antall nøkler per plass i snitt Load factor, som rehash holder under en konstant.
+          «Amortisert» betyr at enkelte innsettinger er dyre (de som utløser en rehash, O(n)), men at gjennomsnittet over mange innsettinger er O(1).
+          Dobling er nøkkelen: rehashene skjer ved n ≈ 0,75 · 1, 2, 4, 8, … og summen av arbeidet er en geometrisk rekke, O(n) totalt.</p>
+      </div>
+      <div class="card"><h4 style="margin-top:.2rem">Verste tilfelle: alt i samme bøtte</h4>
+        <div id="fig-verst"></div>
+        <p class="muted small">0, 10, 20, 30 og 40 med N = 10 og k mod N. Et oppslag på 40 må gå gjennom hele bøtta: O(n).</p></div>
+    </section>
+
+    <!-- ===================== PYTHON ===================== -->
+    <section data-panel="python" hidden>
+      <div class="callout begrep"><span class="lbl">Begrep</span>
+        <p>En Python-<b>ordbok</b> (dict) er et hashmap. H2024 lot oss anta, som en forenkling, at ordbøker fram til Python 3.6 brukte Linear probing
+          slik det undervises i IN2010: ett array med N plasser, der hver plass har plass til et helt nøkkel-verdi-par.
+          Fra 3.6 er dataene delt i to: <b>entries</b>, et tettpakket dynamisk array med de n parene i innsettingsrekkefølge, og <b>indices</b>,
+          et array med N plasser som bare inneholder indekser inn i entries (eller er ledig).</p>
+      </div>
+      <div id="intro-python"></div>
+      <div class="grid cols-2">
+        <div class="card"><h4 style="margin-top:.2rem">Før 3.6</h4><div id="fig-py-gammel"></div></div>
+        <div class="card"><h4 style="margin-top:.2rem">Fra 3.6</h4><div id="fig-py-ny"></div></div>
+      </div>
+      <p class="muted small">Eksempelet fra H2024: d["timmy"] = "red", d["barry"] = "green", d["guido"] = "blue", med N = 8.</p>
+
+      <h3>Oppslag og innsetting, steg for steg</h3>
+      <p class="muted small hs-syntax">Eget eksempel: <code>timmy=red, ?timmy, rehash</code>. Navnene fra H2024 har faste hashverdier valgt slik at plasseringene blir som i oppgaven.
+        Andre tekstnøkler bruker 31-hashen. Den nederste, svake tabellen viser hvordan det samme ville sett ut før 3.6.</p>
+      <div id="demo-python"></div>
+
+      <h3>Fordelene med den nye strukturen</h3>
+      <div class="grid cols-2">
+        <div class="callout eksempel"><span class="lbl">Fordeler</span>
+          <ul>
+            <li><b>Innsettingsrekkefølgen bevares</b>, fordi nye par alltid legges bakerst i entries.</li>
+            <li><b>Iterasjon</b> går gjennom n par i entries, ikke gjennom N plasser med mange hull.</li>
+            <li><b>Rehash</b> rører ikke parene: bare indices lages på nytt.</li>
+            <li><b>Mindre minne:</b> de tomme plassene i indices er bare små tall, ikke hele par.</li>
+          </ul>
+        </div>
+        <div class="callout eli5"><span class="lbl">ELI5</span>
+          <p>Før var det som en hylle med mange tomme rom, der hver bok sto på sin faste plass. Nå står bøkene tett i en bokhylle i den rekkefølgen du kjøpte dem,
+            og en liten lapp med mange ruter sier hvilket nummer i hylla boka har.</p>
+        </div>
+      </div>
+
+      <h3>Eksamen</h3>
+      <div id="exam-h2024-5"></div>
+    </section>
+
+    <!-- ===================== TRIKS ===================== -->
+    <section data-panel="triks" hidden>
+      <div id="intro-triks"></div>
+      <div class="table-wrap">
+        <table class="cmp-table">
+          <thead><tr><th>Når du skal …</th><th>Bruk</th><th>Forventet tid</th></tr></thead>
+          <tbody>
+            <tr><td>telle forekomster</td><td>hashmap: element ↦ antall</td><td>O(n)</td></tr>
+            <tr><td>finne det hyppigste elementet</td><td>hashmap + én gjennomgang</td><td>O(n)</td></tr>
+            <tr><td>sjekke om noe finnes fra før (duplikat)</td><td>hashset</td><td>O(n)</td></tr>
+            <tr><td>finne par som summerer til x</td><td>hashset med x − y</td><td>O(n)</td></tr>
+            <tr><td>sammenligne bokstaver i to ord</td><td>to frekvenstabeller</td><td>O(w + s)</td></tr>
+            <tr><td>gruppere anagrammer</td><td>hashmap: sorterte bokstaver ↦ liste med ord</td><td>O(L log L) per ord, der L er ordlengden</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="small">Duplikater og summer fra blokk 2 bruker samme idé: se <a href="02-sok.html#fane=duplikat">Finn duplikat</a> og <a href="02-sok.html#fane=triks">Array-triks</a>.</p>
+
+      <h3>Telling med hashmap</h3>
+      <div id="demo-mostfreq"></div>
+      <div class="callout felle"><span class="lbl">Felle</span>
+        <p>Hashmap-operasjonene er forventet O(1), ikke garantert. Én gjennomgang med n operasjoner er derfor forventet O(n), men O(n²) i verste tilfelle.
+          Er verdiene små heltall (høyst k), gir et vanlig telle-array garantert O(n + k).</p>
+      </div>
+
+      <h3>Frekvenstabeller: subanagram</h3>
+      <div class="callout begrep"><span class="lbl">Begrep</span>
+        <p>En <b>frekvenstabell</b> for en streng er et hashmap fra bokstav til antall forekomster. W kan skrives med bokstavene i S (uten gjenbruk)
+          nøyaktig når W ikke trenger flere av noen bokstav enn S har.</p>
+      </div>
+      <div class="grid cols-2">
+        <div><div id="pc-subanagram"></div></div>
+        <div class="card" id="hs-subw"></div>
+      </div>
+      <details class="card" style="margin-top:.6rem"><summary><b>Koden, linje for linje</b> (IsSubanagramOf2)</summary><div id="exp-subanagram"></div></details>
+
+      <h3>Eksamen</h3>
+      <div id="exam-h2021-9"></div>
+      <div id="exam-h2020-7"></div>
+    </section>
+
+    <!-- ===================== SANT/USANT ===================== -->
+    <section data-panel="test" hidden>
+      <h3>Sant eller usant?</h3>
+      <p class="muted small">Ta stilling til hver påstand, og sjekk svarene. Forklaringen viser hvorfor.</p>
+      <div id="tf-hashing"></div>
+
+      <h3 style="margin-top:2rem">Test deg selv – hashing</h3>
+      <p class="muted small">Disse påstandene har aldri stått på eksamen. De er laget ut fra hva eksamenene og
+        sensorveiledningene H2020–H2025 tester igjen og igjen, så du kan sjekke at du kan det sensor ser etter.
+        De oftest testede står først.</p>
+      <div data-tf-gen="hashing"></div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <p class="muted small">IN2010 · Blokk 5 · Hashing. Egne forklaringer og demoer basert på pensum. Eksamensoppgavene er gjengitt med egne ord.</p>
+  </footer>
+
+  <script src="assets/js/core.js"></script>
+  <script src="assets/js/data-tf.js"></script>
+  <script src="assets/js/pseudocode.js"></script>
+  <script src="assets/js/stepplayer.js"></script>
+  <script src="assets/js/viz-hash.js"></script>
+  <script src="assets/js/data-algos.js"></script>
+  <script src="assets/js/data-hashing.js"></script>
+  <script>
+  (function () {
+    "use strict";
+    var IN = window.IN, qs = IN.qs, qsa = IN.qsa, el = IN.el, A = IN.algos, G = IN.gen, HS = IN.hs;
+    function t(e, n, k) { return { eli5: e, normal: n, teknisk: k }; }
+    function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
+
+    /* ---------- Fellesoppsett for demoer ---------- */
+    var LEGEND = [
+      { cls: "compare", label: "Plassen vi ser på" },
+      { cls: "sorted", label: "Prøvd (kollisjon)" },
+      { cls: "min", label: "Satt inn / flyttet" },
+      { cls: "target", label: "Funnet" },
+      { cls: "swap", label: "Hull / ikke funnet" }
+    ];
+    var PYFIX = { timmy: 13, barry: 9, guido: 7 };   // gir plass 5, 1 og 7 med N = 8, som i H2024
+    function ins(keys) { return keys.map(function (k) { return { op: "ins", k: k }; }); }
+    function insKV(pairs) { return pairs.map(function (p) { return { op: "ins", k: p[0], v: p[1] }; }); }
+
+    /* Demo med én eller flere pseudokoder. Steg med linje 100·a + l lyser opp linje l i pseudokode nr. a. */
+    function mountOps(host, cfg) {
+      if (typeof host === "string") host = qs(host);
+      var player = el("div", { class: "hs-host" });
+      var right = el("div", { class: "hs-pcs" }, [el("h4", { style: "margin:.2rem 0 .4rem", text: "Pseudokode (følger demoen)" })]);
+      var det = el("details", { class: "card" }, [el("summary", { html: "<b>Koden, linje for linje</b> (" + cfg.algos.map(function (k) { return esc(A[k].name); }).join(", ") + ")" })]);
+      var multi = cfg.algos.length > 1;
+      var hs = cfg.algos.map(function (key) {
+        var box = el("div", { class: "hs-pc" }), pc = el("div");
+        if (multi) box.appendChild(el("h5", { class: "hs-pc-title", text: A[key].title }));
+        box.appendChild(pc); right.appendChild(box);
+        var hd = IN.pseudo.render(pc, A[key], { head: !multi });
+        var bo = IN.pseudo.bigO(A[key], { compact: true }); if (bo) box.appendChild(bo);
+        var ex = el("div"); if (multi) det.appendChild(el("h5", { style: "margin:.8rem 0 .3rem", text: A[key].title })); det.appendChild(ex);
+        IN.pseudo.explainer(ex, A[key], {});
+        return { box: box, hd: hd };
+      });
+      host.appendChild(el("div", { class: "grid cols-2" }, [el("div", {}, [player]), right]));
+      host.appendChild(det);
+      var handle = {
+        highlight: function (n) {
+          var a = multi ? Math.floor(n / 100) - 1 : 0, l = multi ? n % 100 : n;
+          right.classList.add("has-on");
+          hs.forEach(function (h, i) { if (i === a) { h.hd.highlight(l); h.box.classList.add("on"); } else { h.hd.clear(); h.box.classList.remove("on"); } });
+        },
+        clear: function () { right.classList.remove("has-on"); hs.forEach(function (h) { h.hd.clear(); h.box.classList.remove("on"); }); }
+      };
+      return IN.stepPlayer(player, {
+        generate: G[cfg.gen], presets: cfg.presets,
+        render: function (s, ctx) { IN.vizHash(ctx.stage, s); },
+        pseudo: handle, legend: cfg.legend || LEGEND,
+        parseInput: cfg.parseInput, inputLabel: cfg.inputLabel
+      });
+    }
+    function pcBlock(pcSel, expSel, key) {
+      IN.pseudo.render(pcSel, A[key], {});
+      var bo = IN.pseudo.bigO(A[key], { compact: true }); if (bo) qs(pcSel).appendChild(bo);
+      if (expSel) IN.pseudo.explainer(expSel, A[key], {});
+    }
+    // Siste tilstand fra en generator, som statisk figur
+    function lastStep(gen, input) { var s = G[gen](input); return s[s.length - 1]; }
+    function probeState(N, keys, fixed) { return lastStep("hsProbeOps", [{ N: N, ops: ins(keys), fixed: fixed }]).parts[0].cells; }
+    function chainState(N, pairs) { return lastStep("hsChainOps", [{ N: N, ops: insKV(pairs) }]).parts[0].rows; }
+    function probeFig(label, cells, marks, clusters) { return { parts: [{ type: "probe", label: label, N: cells.length, cells: cells, marks: marks || {}, clusters: !!clusters }] }; }
+    function draw(sel, step) { var h = typeof sel === "string" ? qs(sel) : sel; IN.vizHash(h, step, { compact: true }); return h; }
+    function hashFig(step, cap, cls) { return { cap: cap, cls: cls || "wide", draw: function (h) { IN.vizHash(h, step, { compact: true }); } }; }
+
+    /* ===================== BEGREPER ===================== */
+    IN.explain("#intro-begreper", t(
+      "Et hashmap er som en magisk skuff-kommode: du sier navnet på tingen, og den forteller deg med en gang hvilken skuff den ligger i.",
+      "Hashing gir forventet O(1) for innsetting, oppslag og sletting, fordi vi regner ut plassen i stedet for å lete. Prisen er at vi må håndtere kollisjoner, og at verste tilfelle er O(n).",
+      "Et hashmap implementerer et map (nøkkel ↦ verdi) med et array A av størrelse N og en hashfunksjon h(k, N) ∈ {0, …, N − 1}. Ytelsen avhenger av hvor godt h sprer nøklene, og av Load factor n/N."
+    ), { label: "Nivå:" });
+
+    (function hashWidget() {
+      var host = qs("#hs-hashfn");
+      var k1 = el("input", { type: "text", value: "algorithm", "aria-label": "Nøkkel 1" });
+      var k2 = el("input", { type: "text", value: "logarithm", "aria-label": "Nøkkel 2" });
+      var nN = el("input", { type: "number", min: "1", max: "1000", value: "7", class: "n", "aria-label": "N" });
+      var out = el("div", { class: "hs-out", "aria-live": "polite" });
+      host.appendChild(el("div", { class: "hs-form" }, [
+        el("label", {}, [el("span", { text: "Nøkkel 1" }), k1]), el("label", {}, [el("span", { text: "Nøkkel 2" }), k2]), el("label", {}, [el("span", { text: "N" }), nN])]));
+      host.appendChild(out);
+      function row(lbl, html) { return '<div class="row"><span class="lbl">' + lbl + "</span><span>" + html + "</span></div>"; }
+      function one(s, N) {
+        if (/^-?\d+$/.test(s)) { var k = parseInt(s, 10); return { int: true, v: HS.mod(k, N), txt: k + " mod " + N + " = " + HS.mod(k, N) }; }
+        var sum = 0; for (var i = 0; i < s.length; i++) sum += s.charCodeAt(i);
+        return { int: false, sum: HS.hSum(s, N), sumTxt: sum + " mod " + N + " = " + HS.hSum(s, N), g: HS.h31(s, N), gTxt: HS.h31Full(s).toString() + " mod " + N + " = " + HS.h31(s, N) };
+      }
+      function paint() {
+        var N = Math.max(1, Math.min(1000, parseInt(nN.value, 10) || 1)), a = k1.value.trim(), b = k2.value.trim(), html = "";
+        if (!a) { out.innerHTML = '<span class="muted small">Skriv en nøkkel.</span>'; return; }
+        var x = one(a, N), y = b ? one(b, N) : null;
+        function cmp(p, q) { return q == null ? "" : p === q ? ' <span class="bad">kolliderer</span>' : ' <span class="ok">ulike plasser</span>'; }
+        if (x.int) {
+          html += row("h(" + esc(a) + ")", esc(x.txt));
+          if (y) html += row("h(" + esc(b) + ")", esc(y.int ? y.txt : "(tekst, bruker 31-hashen) " + y.gTxt) + cmp(x.v, y.int ? y.v : y.g));
+        } else {
+          html += row("Sum av tegnkoder, «" + esc(a) + "»", esc(x.sumTxt));
+          if (y && !y.int) html += row("Sum av tegnkoder, «" + esc(b) + "»", esc(y.sumTxt) + cmp(x.sum, y.sum));
+          html += row("31-hash, «" + esc(a) + "»", esc(x.gTxt));
+          if (y && !y.int) html += row("31-hash, «" + esc(b) + "»", esc(y.gTxt) + cmp(x.g, y.g));
+          if (y && y.int) html += row("h(" + esc(b) + ")", esc(y.txt));
+        }
+        out.innerHTML = html;
+      }
+      [k1, k2, nN].forEach(function (i) { i.addEventListener("input", paint); });
+      paint();
+    })();
+
+    (function minis() {
+      var keys = [21, 31, 5, 15, 41];
+      draw("#mini-chain", { parts: [{ type: "chain", N: 10, rows: chainState(10, keys.map(function (k) { return [k, null]; })) }] });
+      draw("#mini-probe", probeFig("", probeState(10, keys), {}, true));
+    })();
+    IN.tips(qs("#tbl-hashing"));
+
+    IN.quiz("#quiz-begreper", [
+      { q: "N = 10 og h(k, N) = k mod N. På hvilken plass hører 47 hjemme?", options: ["4", "7", "47", "0"], answer: 1,
+        explain: "47 mod 10 = 7: tallet hasher til sitt siste siffer." },
+      { q: "Hva er Load factor?", options: ["N/n", "n/N", "Antall kollisjoner", "Lengden på den lengste bøtta"], answer: 1,
+        explain: "Antall par n delt på antall plasser N. Med Linear probing er den alltid under 1." },
+      { q: "Hvorfor er summen av tegnkodene en dårlig hashfunksjon for strenger?", options: ["Den er treg", "Den kan gi negative tall", "Alle anagrammer får samme hashverdi", "Den er ikke konsistent"], answer: 2,
+        explain: "Summen bryr seg ikke om rekkefølgen, så «algorithm» og «logarithm» kolliderer alltid. 31-hashen vekter tegnene etter posisjon." },
+      { q: "Hva skal skje når vi setter inn en nøkkel som allerede finnes i et hashmap?", options: ["Paret legges inn en gang til", "Den gamle verdien overskrives", "Innsettingen gir feil", "Tabellen rehashes"], answer: 1,
+        explain: "Hver nøkkel finnes høyst én gang, så den gamle verdien byttes ut. Eksamen trekker for duplikater." }
+    ]);
+
+    /* ===================== SEPARATE CHAINING ===================== */
+    IN.explain("#intro-chaining", t(
+      "Hver plass har en bøtte. Hører flere ting til samme plass, legger vi dem bare i samme bøtte.",
+      "Innsetting: finn bøtta med h(k, N), let gjennom den, overskriv hvis nøkkelen finnes, og legg ellers paret bakerst. Oppslag leter i samme bøtte.",
+      "Kostnaden for alle operasjonene er O(1 + |B|) for bøtta B = A[h(k, N)]. Load factor n/N kan bli større enn 1, men holdes lav med rehash."
+    ), { label: "Nivå:" });
+    var CH25 = [[21, "a"], [54, "b"], [82, "c"], [10, "d"], [20, "e"], [44, "f"], [10, "g"]];
+    mountOps("#demo-chaining", {
+      algos: ["hsChainInsert", "hsChainGet"], gen: "hsChainOps",
+      presets: {
+        "H2025 (N = 10)": [{ N: 10, ops: insKV(CH25).concat([{ op: "get", k: 44 }, { op: "get", k: 33 }]) }],
+        "Mange kollisjoner": [{ N: 10, ops: insKV([[3, "a"], [13, "b"], [23, "c"], [33, "d"]]).concat([{ op: "get", k: 33 }]) }],
+        "Tekstnøkler (N = 7)": [{ N: 7, ops: insKV([["ola", 1], ["kari", 2], ["per", 3], ["kari", 4]]).concat([{ op: "get", k: "per" }]) }]
+      },
+      parseInput: function (s) { return HS.parseOps(s, {}); }, inputLabel: "f.eks. 21=a, 31=b, ?21"
+    });
+
+    /* ===================== LINEAR PROBING ===================== */
+    IN.explain("#intro-probing", t(
+      "Er plassen din opptatt, setter du deg på neste ledige stol. Leter du etter noen, går du bortover fra stolen deres til du finner dem, eller til en tom stol.",
+      "Innsetting og oppslag går fra hjemmeplassen og videre med (i + 1) mod N til de treffer nøkkelen eller en ledig plass. Sletting må passe på at ingen nøkkel blir «usynlig» bak et nytt hull.",
+      "Invariant: for hver nøkkel er alle plassene fra hjemmeplassen fram til nøkkelen opptatt. Oppslag stopper derfor trygt ved null. Sletting må gjenopprette invarianten, enten ved å tette hullet eller ved å la et merke stå igjen."
+    ), { label: "Nivå:" });
+    mountOps("#demo-probing", {
+      algos: ["hsProbeInsert", "hsProbeGet", "hsProbeRemove"], gen: "hsProbeOps",
+      presets: {
+        "H2020": [{ N: 10, ops: ins([93, 48, 74, 99, 29, 13, 45]) }],
+        "H2022": [{ N: 10, ops: ins([21, 54, 82, 10, 20, 44]).concat([{ op: "get", k: 20 }]) }],
+        "Sletting (tett hullet)": [{ N: 10, ops: ins([21, 54, 82, 10, 20, 44]).concat([{ op: "del", k: 10 }, { op: "get", k: 20 }]) }],
+        "Rundt enden": [{ N: 10, ops: ins([9, 19, 29, 8]).concat([{ op: "del", k: 9 }, { op: "get", k: 29 }]) }]
+      },
+      parseInput: function (s) { return HS.parseOps(s, { numbers: true, del: true }); }, inputLabel: "f.eks. 21, 31, 41, -21, ?41"
+    });
+
+    (function naiv() {
+      var cells = probeState(10, [21, 54, 82, 10, 20, 44]);
+      draw("#fig-naiv-for", probeFig("Før: 10 på plass 0, 20 på plass 3 (hjemmeplass 0)", cells, { home: 0 }, true));
+      var etter = cells.slice(); etter[0] = null;
+      draw("#fig-naiv-etter", probeFig("Etter A[0] ← null: oppslag på 20 stopper på plass 0", etter, { miss: 0, cur: 3, home: 0 }));
+    })();
+
+    mountOps("#demo-marks", {
+      algos: ["hsMarkInsert", "hsMarkGet", "hsMarkRemove"], gen: "hsProbeOps",
+      presets: {
+        "Slett, søk, sett inn": [{ N: 10, mode: "mark", ops: ins([21, 54, 82, 10, 20, 44]).concat([{ op: "del", k: 10 }, { op: "get", k: 20 }, { op: "ins", k: 30 }]) }],
+        "Ikke duplikat": [{ N: 10, mode: "mark", ops: ins([10, 20, 30]).concat([{ op: "del", k: 10 }, { op: "ins", k: 30 }]) }]
+      },
+      parseInput: function (s) { var r = HS.parseOps(s, { numbers: true, del: true }); if (r.length) r[0].mode = "mark"; return r; },
+      inputLabel: "f.eks. 10, 20, 30, -10, 30"
+    });
+    draw("#fig-cluster", probeFig("Ett langt segment uten hull: plass 1–6", probeState(10, [11, 12, 13, 21, 22, 31]), { home: 1, fresh: 6 }, true));
+
+    /* ===================== KJØRETID ===================== */
+    IN.explain("#intro-kjoretid", t(
+      "Som regel går det lynraskt. Men har vi uflaks og alle havner på samme sted, må vi lete gjennom alle.",
+      "Forventet tid er O(1) når hashfunksjonen sprer godt og Load factor er lav. Verste tilfelle er O(n) for alle operasjonene. Rehash holder Load factor lav, og koster O(n) når den skjer.",
+      "Forventet O(1) for oppslag og sletting, forventet amortisert O(1) for innsetting (rehash), og O(n) i verste tilfelle. Iterasjon over hele tabellen er O(n + N)."
+    ), { label: "Nivå:" });
+    mountOps("#demo-rehash", {
+      algos: ["hsInsertRehash", "hsRehash"], gen: "hsRehashOps",
+      presets: { "Fra N = 1": [{ N: 1, keys: [5, 12, 7, 20, 3, 9] }], "Fra N = 4": [{ N: 4, keys: [4, 8, 15, 16, 23, 42, 7] }] },
+      parseInput: function (s) { return HS.parseOps(s, { numbers: true, N: 1, maxN: 16 }); }, inputLabel: "f.eks. 5, 12, 7, 20, N=4"
+    });
+    IN.explain("#intro-amort", t(
+      "Å flytte alt er tungt, men vi gjør det så sjelden at det blir lite per gang i snitt.",
+      "Søylene viser arbeidet for hver innsetting: 1 for selve innsettingen, pluss n ekstra når en rehash flytter n par. Den stiplede linja er gjennomsnittet.",
+      "Med dobling er totalarbeidet for m innsettinger m + Σ(flytt) ≤ m + c · m for en konstant c, altså O(1) amortisert. Med N ← N + 1 rehasher vi nesten hver gang, og totalarbeidet blir O(m²), altså O(m) per innsetting."
+    ), { label: "Nivå:" });
+
+    (function amort() {
+      var host = qs("#hs-amort"), mode = "dobbel", M = 48;
+      var sw = el("div", { class: "tv-switch", role: "group", "aria-label": "Vekststrategi" });
+      var b1 = el("button", { class: "btn sm", type: "button", "aria-pressed": "true", text: "Doble N" });
+      var b2 = el("button", { class: "btn sm", type: "button", "aria-pressed": "false", text: "N ← N + 1" });
+      sw.appendChild(b1); sw.appendChild(b2);
+      var bars = el("div", { class: "hs-bars", role: "img" }), lbl = el("div", { class: "hs-barlbl" }), txt = el("p", { class: "small", "aria-live": "polite" });
+      host.appendChild(el("h4", { style: "margin:.2rem 0 .3rem", text: "Arbeid per innsetting (" + M + " innsettinger, start N = 1, grense 0,75)" }));
+      host.appendChild(sw); host.appendChild(bars); host.appendChild(lbl); host.appendChild(txt);
+      function paint() {
+        var N = 1, n = 0, cost = [], re = [];
+        for (var i = 0; i < M; i++) {
+          var c = 1, r = false;
+          if (n / N >= 0.75) { c += n; r = true; N = mode === "dobbel" ? 2 * N : N + 1; }
+          n++; cost.push(c); re.push(r);
+        }
+        var total = cost.reduce(function (a, b) { return a + b; }, 0), max = Math.max.apply(null, cost), avg = total / M;
+        IN.clear(bars);
+        cost.forEach(function (c, i) {
+          bars.appendChild(el("div", { class: "hs-bar" + (re[i] ? " re" : ""), style: "height:" + Math.max(2, Math.round(c / max * 130)) + "px", title: "Innsetting " + (i + 1) + ": arbeid " + c }));
+        });
+        bars.appendChild(el("div", { class: "hs-avg", style: "bottom:" + Math.round(avg / max * 130) + "px" }));
+        bars.setAttribute("aria-label", "Søylediagram: arbeid per innsetting. Snitt " + HS.fmt(avg) + ".");
+        lbl.innerHTML = "<span>innsetting 1</span><span>innsetting " + M + "</span>";
+        txt.innerHTML = "Totalt arbeid: <b>" + total + "</b> for " + M + " innsettinger, snitt <b>" + HS.fmt(avg) + "</b> per innsetting. Røde søyler er innsettinger som utløste rehash. " +
+          (mode === "dobbel" ? "Rehashene blir sjeldnere jo større tabellen er, så snittet holder seg lavt (O(1) amortisert)."
+            : "Nesten hver innsetting utløser en rehash som flytter alt, så snittet vokser med n (O(n) amortisert).");
+      }
+      [b1, b2].forEach(function (b) { b.addEventListener("click", function () {
+        mode = b === b1 ? "dobbel" : "pluss"; b1.setAttribute("aria-pressed", b === b1 ? "true" : "false"); b2.setAttribute("aria-pressed", b === b2 ? "true" : "false"); paint(); }); });
+      paint();
+    })();
+    draw("#fig-verst", { parts: [{ type: "chain", N: 10, rows: chainState(10, [[0, null], [10, null], [20, null], [30, null], [40, null]]), marks: { row: 0 } }] });
+
+    /* ===================== PYTHON ===================== */
+    IN.explain("#intro-python", t(
+      "I stedet for én stor tabell med masse tomrom, har vi en tett liste med alle parene, og en liten oversikt som sier hvor i lista hvert par ligger.",
+      "Probingen skjer nå i indices. Hver opptatt plass der er et tall j som peker på entries[j]. Nye par legges bakerst i entries, og plassen i indices får indeksen deres.",
+      "indices har N plasser og Load factor n/N som før. entries er et dynamisk array med n par. Oppslag koster ett ekstra arrayoppslag per probe, og rehash bygger bare indices på nytt."
+    ), { label: "Nivå:" });
+    var PY3 = [{ op: "ins", k: "timmy", v: "red" }, { op: "ins", k: "barry", v: "green" }, { op: "ins", k: "guido", v: "blue" }];
+    function pyLast(ops, N) { return lastStep("hsPyOps", [{ N: N || 8, fixed: PYFIX, ops: ops }]); }
+    (function pyFigs() {
+      var L = pyLast(PY3);
+      draw("#fig-py-gammel", { parts: [{ type: "probe", label: "entries med N = 8 plasser", N: 8, cells: L.parts[2].cells }] });
+      draw("#fig-py-ny", { parts: [L.parts[0], L.parts[1]].map(function (p) { var c = {}; for (var k in p) c[k] = p[k]; c.marks = {}; return c; }) });
+    })();
+    mountOps("#demo-python", {
+      algos: ["hsPyGet", "hsPyInsert"], gen: "hsPyOps",
+      presets: {
+        "H2024": [{ N: 8, fixed: PYFIX, ops: PY3.concat([{ op: "get", k: "barry" }]) }],
+        "Med rehash": [{ N: 8, fixed: PYFIX, ops: PY3.concat([{ op: "rehash" }, { op: "get", k: "guido" }]) }],
+        "Overskriving": [{ N: 8, fixed: PYFIX, ops: PY3.concat([{ op: "ins", k: "timmy", v: "pink" }]) }]
+      },
+      parseInput: function (s) { var r = HS.parseOps(s, { rehash: true, N: 8, maxN: 16 }); if (r.length) r[0].fixed = PYFIX; return r; },
+      inputLabel: "f.eks. timmy=red, ola=gul, ?ola, rehash"
+    });
+
+    /* ===================== TRIKS ===================== */
+    IN.explain("#intro-triks", t(
+      "Et hashmap er en superrask huskeliste: «har jeg sett dette før?» og «hvor mange har jeg sett?» kan besvares nesten med en gang.",
+      "Mange eksamensoppgaver løses med én gjennomgang og et hashmap eller hashset. Da blir løsningen forventet O(n) i stedet for O(n²) med doble løkker, eller O(n log n) med sortering.",
+      "Hashing gir forventet O(1) per operasjon, så én gjennomgang er forventet O(n). Oppgi også verste tilfelle, O(n²), og vurder om et telle-array eller sortering gir en garanti."
+    ), { label: "Nivå:" });
+    mountOps("#demo-mostfreq", {
+      algos: ["hsMostFrequent"], gen: "hsMostFrequent",
+      presets: { "Eksempel": [3, 1, 3, 2, 1, 3], "Uavgjort": [2, 5, 2, 5], "Alle ulike": [4, 8, 1, 6] },
+      legend: [{ cls: "compare", label: "Elementet vi teller" }, { cls: "sorted", label: "Ferdig telt" }, { cls: "target", label: "Foreløpig flest (m)" }],
+      inputLabel: "f.eks. 3,1,3,2,1,3"
+    });
+    pcBlock("#pc-subanagram", "#exp-subanagram", "hsSubanagram");
+
+    (function subWidget() {
+      var host = qs("#hs-subw");
+      var w = el("input", { type: "text", value: "hello", "aria-label": "W" });
+      var s = el("input", { type: "text", value: "ehlo", "aria-label": "S" });
+      var out = el("div", { class: "hs-out", "aria-live": "polite" });
+      host.appendChild(el("h4", { style: "margin:.2rem 0 .3rem", text: "Prøv selv" }));
+      host.appendChild(el("div", { class: "hs-form" }, [el("label", {}, [el("span", { text: "Ord W" }), w]), el("label", {}, [el("span", { text: "Bokstaver S" }), s])]));
+      host.appendChild(out);
+      function freq(x) { var f = {}; for (var i = 0; i < x.length; i++) f[x[i]] = (f[x[i]] || 0) + 1; return f; }
+      function paint() {
+        var W = w.value.trim().toLowerCase(), S = s.value.trim().toLowerCase(), F = freq(W), Gs = freq(S), bad = null, html = "";
+        Object.keys(F).forEach(function (c) {
+          var need = F[c], have = Gs[c] || 0, ok = need <= have;
+          if (!ok && bad == null) bad = c;
+          html += '<div class="row"><span class="lbl">«' + esc(c) + "»</span><span>W trenger " + need + ", S har " + have + " " + (ok ? '<span class="ok">ok</span>' : '<span class="bad">for få</span>') + "</span></div>";
+        });
+        html += '<div class="row"><span class="lbl">Svar</span><span><b>' + (W ? (bad == null ? "true" : "false") : "–") + "</b>" + (bad != null ? " (for få «" + esc(bad) + "»)" : "") + "</span></div>";
+        out.innerHTML = html;
+      }
+      [w, s].forEach(function (i) { i.addEventListener("input", paint); });
+      paint();
+    })();
+
+    /* ===================== EKSAMEN (gjengitt med egne ord) ===================== */
+    function sol(items, algos, o) {
+      o = o || {};
+      var d = el("div");
+      if (o.intro) d.appendChild(el("p", { html: o.intro }));
+      var ol = el(o.plain ? "ul" : "ol", o.plain ? {} : { class: "et-parts" }); items.forEach(function (x) { ol.appendChild(el("li", { html: x })); }); d.appendChild(ol);
+      if (o.figs) d.appendChild(IN.oppg({ figs: o.figs }));
+      (algos || []).forEach(function (key) {
+        d.appendChild(el("h5", { style: "margin:.8rem 0 .3rem", text: "Pseudokode: " + A[key].name }));
+        var h = el("div"); d.appendChild(h); IN.pseudo.render(h, A[key], {});
+      });
+      return d;
+    }
+    function pcFig(algo, cap) { return { cls: "code", cap: cap, draw: function (h) { IN.pseudo.render(h, algo, { head: false, tooltips: false }); } }; }
+    function demoLink(fane, demo, txt) { return '<p class="small muted">Prøv selv: <a href="#fane=' + fane + "&amp;oppg=" + demo + '">' + txt + "</a>.</p>"; }
+    function L(code, indent) { return { code: code, indent: indent }; }
+
+    var EMPTY10 = probeFig("", [null, null, null, null, null, null, null, null, null, null]);
+    var MF1 = { name: "MostFrequent1", params: "A", lines: [
+      L("H ← new HashMap()", 1), L("for x in A do", 1), L("H.put(x, 0)", 2), L("m ← A[0]", 1), L("for x in A do", 1),
+      L("f ← H.get(x)", 2), L("H.put(x, f + 1)", 2), L("if H.get(x) > H.get(m) then", 2), L("m ← x", 3), L("return m", 1)] };
+    var MF2 = { name: "MostFrequent2", params: "A", lines: [
+      L("k ← maximum element in A", 1), L("B ← array of size k + 1", 1), L("for i ← 0 to k do", 1), L("B[i] ← 0", 2), L("m ← A[0]", 1),
+      L("for x in A do", 1), L("B[x] ← B[x] + 1", 2), L("if B[x] > B[m] then", 2), L("m ← x", 3), L("return m", 1)] };
+    var SUB1 = { name: "IsSubanagramOf1", params: "W, S", lines: [
+      L("r ← copy of W", 1), L("for c in S do", 1), L("if c is in r then", 2), L("remove one occurrence of c from r", 3), L("return r.length = 0", 1)] };
+    var SUBS1 = { name: "SubanagramsOf1", params: "D, S", lines: [
+      L("r ← empty list", 1), L("for i ← 0 to d − 1 do", 1), L("W ← D[i]", 2), L("if IsSubanagramOf2(W, S) then", 2), L("add W to r", 3), L("return r", 1)] };
+    var BUILD = { name: "Build", params: "D", lines: [
+      L("M ← empty hashmap", 1), L("for i ← 0 to d − 1 do", 1), L("key ← Sort(D[i])", 2), L("if M.get(key) = null then", 2),
+      L("M.put(key, empty list)", 3), L("add D[i] to M.get(key)", 2), L("return M", 1)] };
+    var SUBS2 = { name: "SubanagramsOf2", params: "M, S", lines: [
+      L("r ← empty list", 1), L("for x in sorted substrings of S do", 1), L("if M.get(x) ≠ null then", 2), L("append all words in M.get(x) to r", 3), L("return r", 1)] };
+
+    var EXAM = {
+      "h2025-2": { year: "H2025", title: "Separate chaining", oppgave_nr: "Oppgave 2", points: 10,
+        oppgave: IN.oppg({
+          intro: "<p>Du har et tomt array med N = 10 plasser og hashfunksjonen h(k, N) = k mod N, som her betyr at et tall hasher til sitt siste siffer. Sett inn disse nøkkel-verdi-parene i denne rekkefølgen med Separate chaining:</p><p style=\"text-align:center\"><code>(21, a), (54, b), (82, c), (10, d), (20, e), (44, f), (10, g)</code></p>",
+          figs: [hashFig({ parts: [{ type: "chain", N: 10, rows: [null, null, null, null, null, null, null, null, null, null] }] }, "Tomt array, N = 10")],
+          parts: [{ t: "Skriv tabellen etter siste innsetting, med én linje per indeks på formen <code>i: (k₁, v₁), (k₂, v₂), …</code>", p: 3 },
+            { t: "Forklar kort hvordan innsetting med Separate chaining virker, og skisser <code>SeparateChainingInsert(A, k, v)</code> i pseudokode. Input er et array A av størrelse N, en nøkkel k og en verdi v. Output er A med (k, v) satt inn. Du kan anta at h(k, N) gir et tall mellom 0 og N − 1, og du trenger ikke tenke på rehash.", p: 5 },
+            { t: "Gjør kort rede for kjøretiden til innsetting med Separate chaining.", p: 2 }],
+          outro: demoLink("chaining", "demo-chaining", "Separate chaining-demoen (eksempelet «H2025»)")
+        }),
+        losning: sol(["<code>0: (10, g), (20, e)</code> · <code>1: (21, a)</code> · <code>2: (82, c)</code> · <code>4: (54, b), (44, f)</code>. De andre plassene er tomme. (10, g) <b>erstatter</b> (10, d) der den står i bøtta, i stedet for å legges bakerst.",
+          "Regn ut i = h(k, N) og se på bøtta A[i]. Er den null, lag en ny liste som bare inneholder (k, v). Ellers: let gjennom bøtta. Finnes nøkkelen k, overskriv paret. Finnes den ikke, legg (k, v) bakerst i bøtta.",
+          "Verste tilfelle <b>O(n)</b>: alle nøklene kan hashe til samme bøtte, og vi må lete gjennom hele for å se om k finnes. Forventet <b>O(1)</b> med en god hashfunksjon og lav Load factor (med rehash: forventet amortisert O(1))."],
+          ["hsChainInsert"], { figs: [hashFig({ parts: [{ type: "chain", N: 10, rows: chainState(10, CH25) }] }, "Etter siste innsetting")] }),
+        kjerne: "<p>Bøtta letes gjennom for å unngå duplikater, og det søket er det som koster O(|B|). Lik nøkkel betyr overskriving.</p>",
+        tips: ["Glemmer du å overskrive like nøkler, mister du poeng både i (a) og (b).", "Vis tydelig hvordan bøtta lages første gang (null → ny liste).",
+          "Uten pseudokode ga (b) høyst 3 av 5 poeng.", "(c) ga ett poeng for verste tilfelle og ett for forventet tilfelle."] },
+
+      "h2020-4": { year: "H2020", title: "Linear probing", oppgave_nr: "Oppgave 4", points: 2,
+        oppgave: IN.oppg({
+          intro: "<p>Du har et tomt array med N = 10 plasser og hashfunksjonen h(k, N) = k mod N, altså det siste sifferet. Sett inn tallene under i denne rekkefølgen med Linear probing:</p><p style=\"text-align:center\"><code>93, 48, 74, 99, 29, 13, 45</code></p>",
+          figs: [hashFig(EMPTY10, "Tomt array, N = 10")],
+          parts: [{ t: "Fyll ut tabellen slik den ser ut når alle tallene er satt inn.", p: 2 }],
+          outro: demoLink("probing", "demo-probing", "Linear probing-demoen (eksempelet «H2020»)")
+        }),
+        losning: sol(["<code>29, _, _, 93, 74, 13, 45, _, 48, 99</code>. 93, 48, 74 og 99 havner rett på hjemmeplassen. 29 hører hjemme på 9, som er opptatt av 99, så den går rundt til plass 0. 13 hører hjemme på 3, men 3 og 4 er opptatt, så den havner på 5. 45 hører hjemme på 5 (nå opptatt av 13) og havner på 6."],
+          null, { figs: [hashFig(probeFig("Ferdig tabell", probeState(10, [93, 48, 74, 99, 29, 13, 45]), {}, true), "Etter alle innsettingene")] }),
+        kjerne: "<p>Etter siste plass går proben rundt til plass 0. Det er nøyaktig det 29 tester.</p>",
+        tips: ["Skriv kort hvor hver kolliderende nøkkel probet. Da ser sensor tankegangen, også om du skriver feil et sted."] },
+
+      "h2022-7": { year: "H2022", title: "Linear probing", oppgave_nr: "Oppgave 7", points: 10,
+        oppgave: IN.oppg({
+          intro: "<p>Du har et tomt array med N = 10 plasser og hashfunksjonen h(k, N) = k mod N. Sett inn tallene under i denne rekkefølgen med Linear probing:</p><p style=\"text-align:center\"><code>21, 54, 82, 10, 20, 44</code></p>",
+          figs: [hashFig(EMPTY10, "Tomt array, N = 10")],
+          parts: [{ t: "Fyll ut tabellen etter alle innsettingene. Skriv svaret som en kommaseparert liste, med _ for tomme plasser.", p: 2 },
+            { t: "Forklar kort hvordan innsetting med Linear probing virker, og skisser <code>LinearProbingInsert(A, k, v)</code> i pseudokode. Input er et array A av størrelse N, en nøkkel k og en verdi v, og output er et array som inneholder (k, v). Du kan anta at A ikke er fullt, at h(k, N) gir et tall mellom 0 og N − 1, og at ledige plasser er null.", p: 8 }],
+          outro: demoLink("probing", "demo-probing", "Linear probing-demoen (eksempelet «H2022»)")
+        }),
+        losning: sol(["<code>10, 21, 82, 20, 54, 44, _, _, _, _</code>. 20 hører hjemme på 0, men 0, 1 og 2 er opptatt, så den havner på 3. 44 hører hjemme på 4 og havner på 5.",
+          "Start på i = h(k, N). Så lenge A[i] ikke er null: ligger nøkkelen k der, stopp (paret skal overskrives); ellers gå videre med i ← (i + 1) mod N. Sett til slutt (k, v) inn på A[i]. Løkka stopper fordi arrayet ikke er fullt."],
+          ["hsProbeInsert"], { figs: [hashFig(probeFig("Ferdig tabell", probeState(10, [21, 54, 82, 10, 20, 44]), {}, true), "Svar på (a)")] }),
+        kjerne: "<p>Tre ting må være med: start på h(k, N), gå videre med mod N, og overskriv ved lik nøkkel.</p>",
+        tips: ["(a) var alt eller ingenting.", "Trekk på (b) for å ikke overskrive lik nøkkel, for å gå utenfor arrayet (glemt mod N) og for å bruke h feil.",
+          "En god forklaring alene ga høyst 5 av 8 på (b). Full uttelling krevde pseudokode."] },
+
+      "h2024-5": { year: "H2024", title: "Python 3.6-ordbøker", oppgave_nr: "Oppgave 5", points: 10,
+        oppgave: IN.oppg({
+          intro: "<p>Anta, som en forenkling, at Python-ordbøker (dict) fram til versjon 3.6 var implementert med Linear probing slik det undervises i IN2010. Dataene lå i ett array <code>entries</code> med N plasser, der hver plass har plass til en nøkkel og en verdi, og mange plasser står tomme.</p>" +
+            "<p>I 2012 foreslo Raymond Hettinger å lagre nøkkel-verdi-parene tettpakket i et dynamisk array <code>entries</code> med bare n elementer, der n er antall par. Et eget array <code>indices</code> med N plasser (fortsatt med mye ledig plass) peker inn i entries. Forslaget ble tatt i bruk fra Python 3.6.</p>" +
+            "<p>Etter <code>d[\"timmy\"] = \"red\"</code>, <code>d[\"barry\"] = \"green\"</code> og <code>d[\"guido\"] = \"blue\"</code> ser de to representasjonene slik ut (_ er ledig plass):</p>",
+          figs: [{ cls: "wide", cap: "Før: entries med N = 8 plasser", draw: function (h) { draw(h, { parts: [{ type: "probe", N: 8, cells: pyLast(PY3).parts[2].cells }] }); } },
+                 { cls: "wide", cap: "Forslaget: indices = [_, 1, _, _, _, 0, _, 2] og entries med 3 par", draw: function (h) { var Lp = pyLast(PY3); draw(h, { parts: [{ type: "probe", label: "indices", N: 8, cells: Lp.parts[0].cells }, { type: "entries", label: "entries", items: Lp.parts[1].items }] }); } }],
+          parts: [{ t: "Forklar kort, med vanlig språk, hvordan algoritmene for oppslag og innsetting med Linear probing må endres for den nye strukturen.", p: 4 },
+            { t: "Hva er en rehash, og hva utløser en rehash?", p: 2 },
+            { t: "Hvordan vil en rehash foregå i den nye strukturen?", p: 2 },
+            { t: "Hva er fordelene med den nye strukturen?", p: 2 }],
+          outro: demoLink("python", "demo-python", "Python-demoen (eksemplene «H2024» og «Med rehash»)")
+        }),
+        losning: sol(["Probingen skjer nå i indices, så N = |indices|. <b>Oppslag:</b> start på i = h(k, N). Er indices[i] ledig, finnes ikke k. Ellers hent paret entries[indices[i]] og sammenlign nøkkelen: ved treff returneres verdien, ellers i ← (i + 1) mod N. <b>Innsetting:</b> let på samme måte. Finnes k, overskriv paret i entries. Ellers: sett indices[i] ← |entries| på den ledige plassen vi fant, og legg (k, v) bakerst i entries.",
+          "En rehash lager et større array (kurset dobler N) og setter inn alle elementene på nytt med den nye N-en. Den utløses når Load factor n/N blir for høy (kurset bruker 0,75), fordi kollisjonene og probingen da blir for mange.",
+          "entries endres ikke. Bare indices lages på nytt med større N, og for hver j i entries settes j inn i indices med h(entries[j].key, N) og Linear probing.",
+          "To av disse: innsettingsrekkefølgen bevares; iterasjon går gjennom n par i stedet for N plasser; rehash rører ikke parene i entries; mindre minne, fordi de ledige plassene bare er små tall i indices, ikke hele par."],
+          ["hsPyGet", "hsPyInsert"]),
+        kjerne: "<p>Én tabell med hull for probing (indices), og én tett tabell for dataene (entries). Alt annet følger av det.</p>",
+        tips: ["Si eksplisitt at N nå er størrelsen på indices, ikke på entries.", "(d) krevde to fordeler for full uttelling.", "På (a) holder naturlig språk. Pseudokoden i løsningen er bare til hjelp."] },
+
+      "h2021-9": { year: "H2021", title: "Flest forekomster", oppgave_nr: "Oppgave 9", points: 8,
+        oppgave: IN.oppg({
+          intro: "<p>Begge algoritmene under er korrekte. De tar et array A med n positive heltall og returnerer tallet som forekommer flest ganger. La k være det største tallet i A.</p>",
+          figs: [pcFig(MF1, "Strategi 1: hashmap"), pcFig(MF2, "Strategi 2: telle-array")],
+          parts: [{ t: "Drøft fordeler og ulemper ved de to strategiene. Oppgi kjøretiden i verste tilfelle og den forventede kjøretiden, uttrykt med n og k, med kort begrunnelse. Si også i hvilke situasjoner Strategi 1 bør velges framfor Strategi 2, og omvendt, med tanke på faktisk kjøretid. Gjør rede for antagelsene du gjør.", p: 8 }],
+          outro: demoLink("triks", "demo-mostfreq", "Telle-demoen (samme idé som Strategi 1)")
+        }),
+        losning: sol(["<b>Strategi 1 (hashmap):</b> to løkker med n runder, og hver runde gjør et par hashmap-operasjoner. De er forventet O(1), så forventet <b>O(n)</b>. I verste tilfelle kan hver operasjon ta O(n) (alt havner på samme plass), altså <b>O(n²)</b>.",
+          "<b>Strategi 2 (telle-array):</b> å finne k og gå gjennom A er O(n), og å lage og nullstille B er O(k). Totalt <b>O(n + k)</b>, både i verste og forventet tilfelle.",
+          "<b>Når hvilken?</b> Er k liten (for eksempel k ≤ n), er Strategi 2 best: den er O(n) uten hashing-kostnader som hashberegning, kollisjoner og rehash. Er k mye større enn n (for eksempel k = n²), bruker Strategi 2 mye tid og minne på et stort B, og Strategi 1 er bedre.",
+          "<b>Antagelser:</b> hashfunksjonen sprer godt (det gir forventet O(1)), og tallene er positive heltall, så de kan brukes direkte som indekser i B."], null, { plain: true }),
+        kjerne: "<p>Hashing gir forventet O(n) uansett hvor store tallene er. Telle-arrayet gir O(n + k) garantert, men bare så lenge k er liten nok.</p>",
+        tips: ["Oppgi både verste og forventet tid for Strategi 1. Det er der mange mister poeng.", "Gi en konkret situasjon for hver strategi (liten k og stor k)."] },
+
+      "h2020-7": { year: "H2020", title: "Subanagram (a–c)", oppgave_nr: "Oppgave 7", points: 17,
+        oppgave: IN.oppg({
+          intro: "<p>W er et <b>subanagram</b> av S hvis W kan skrives med bokstaver fra S, der hver bokstav i S bare kan brukes én gang. «hole» er et subanagram av «ehlo», men «hello» er det ikke, for «ehlo» har bare én l. Både «hole» og «hello» er subanagrammer av «hheelloo». Subanagrammer av «aghilmort» er blant annet algorithm, logarithm, alright, right, math og git. La w = |W| og s = |S|.</p>",
+          figs: [pcFig(SUB1, "Til (a)")],
+          parts: [{ t: "Anta at en streng oppfører seg som et array av bokstaver. Å kopiere, å sjekke om c finnes, og å fjerne én forekomst er lineært, mens lengden er O(1). Hva er kjøretiden til <code>IsSubanagramOf1</code>? Velg blant O(w + s), O(s²), O(w · log s), O(s · w) og O(w²).", p: 4 },
+            { t: "Lag <code>IsSubanagramOf2(W, S)</code> med kjøretid O(w + s). Du har <code>FreqTable</code>, som i lineær tid bygger et map fra bokstav til antall forekomster. For «abbcccdddd» gir F.get(\"a\") = 1 og F.get(\"d\") = 4. F.get(x) gir 0 for bokstaver som ikke er med, F.put oppdaterer en verdi, og begge er O(1). Første linje er gitt: <code>F ← FreqTable(W)</code>.", p: 7 },
+            { t: "Ordboka D er et array med d strenger. <b>Strategi 1</b> sjekker hvert ord i D med IsSubanagramOf2 og bruker O(d · (w + s)), der w nå er lengden av det lengste ordet i D. <b>Strategi 2</b> bygger først et hashmap M fra «bokstavene sortert» til lista av ord i D med akkurat de bokstavene, og slår så opp alle sorterte delstrenger av S (alle utvalg av bokstavene). Det bruker O(2<sup>s</sup>). Drøft fordeler og ulemper ved de to strategiene med tanke på kjøretid.", p: 6 }],
+          figsAfter: [pcFig(SUBS1, "Til (c), Strategi 1"), pcFig(BUILD, "Til (c), Strategi 2: bygg M"), pcFig(SUBS2, "Til (c), Strategi 2: oppslag")],
+          outro: "<p class=\"small muted\">Del (d) i samme oppgave handler om sortering og hører til sorteringsblokken.</p>"
+        }),
+        losning: sol(["<b>O(s · w)</b>. Kopien tar O(w). Løkka går s ganger, og hver runde gjør et lineært søk og kanskje en lineær fjerning i r, som har lengde høyst w.",
+          "Bygg også G ← FreqTable(S). For hver bokstav c i W: trenger W flere c-er enn S har (F.get(c) > G.get(c)), returner false. Ellers returner true. To tellinger, O(w) + O(s), og én løkke med O(1)-oppslag, O(w): totalt O(w + s).",
+          "Strategi 1 er lineær i d, w og s. Strategi 2 avhenger bare av s, men eksponentielt. I praksis er ordboka stor (d er mye større enn w og s) og bokstavene få, og da lønner Strategi 2 seg: 2<sup>s</sup> er lite for liten s, og vi slipper å gå gjennom hele D. Blir S lang, vokser 2<sup>s</sup> fort, og Strategi 1 blir bedre. Build(D) koster tid, men gjøres én gang og gjenbrukes for alle spørringer."],
+          ["hsSubanagram"]),
+        kjerne: "<p>Frekvenstabeller gjør «har S nok av hver bokstav?» til O(1) per bokstav. I (c) er poenget avveiningen mellom stor d og eksponentiell s.</p>",
+        tips: ["(b): Å bytte om &lt; og &gt;, eller W og S, ga 2 poengs trekk hver. Å sjekke likhet (anagram i stedet for subanagram) ga bare 2 poeng totalt.",
+          "(c): Hovedpoenget (3p) er at Strategi 2 lønner seg når S er liten og D stor. Resten av poengene gikk til god argumentasjon og klar tekst.",
+          "Sensor nevnte at skillet i et eksperiment med en stor engelsk ordliste lå rundt s ≈ 17."] }
+    };
+    Object.keys(EXAM).forEach(function (id) { if (qs("#exam-" + id)) IN.examTasks("#exam-" + id, [EXAM[id]]); });
+
+    /* ===================== SANT/USANT ===================== */
+    IN.tfTest("#tf-hashing", [
+      { s: "To ulike nøkler kan få samme hashverdi.", answer: true, blokk: "5", tema: "hashfunksjon", kilde: false,
+        explain: "Det er en kollisjon. Det finnes langt flere mulige nøkler enn plasser, så kollisjoner kan ikke unngås." },
+      { s: "Samme nøkkel kan gi ulike hashverdier ved to kall, så lenge N er den samme.", answer: false, blokk: "5", tema: "hashfunksjon", kilde: false,
+        explain: "En hashfunksjon må være konsistent. Ellers finner vi aldri nøkkelen igjen." },
+      { s: "Summen av tegnkodene er en god hashfunksjon for strenger.", answer: false, blokk: "5", tema: "hashfunksjon", kilde: false,
+        explain: "Alle anagrammer får samme sum og kolliderer. Kurset bruker h ← 31 · h + ord(c), der rekkefølgen betyr noe." },
+      { s: "Med Separate chaining kan Load factor bli større enn 1.", answer: true, blokk: "5", tema: "Separate chaining", kilde: false,
+        explain: "Bøttene kan inneholde mange par, så n kan være større enn N." },
+      { s: "Med Linear probing kan Load factor bli større enn 1.", answer: false, blokk: "5", tema: "Linear probing", kilde: false,
+        explain: "Hver plass har høyst ett par, så n ≤ N. I praksis rehasher vi lenge før tabellen er full." },
+      { s: "Et oppslag med Linear probing kan stoppe ved første ledige plass.", answer: true, blokk: "5", tema: "Linear probing", kilde: false,
+        explain: "Lå nøkkelen lenger ut, måtte innsettingen ha passert akkurat denne plassen, og den var ledig da. (Forutsatt at slettinger er gjort riktig.)" },
+      { s: "Med Linear probing kan vi slette ved å sette plassen til null, uten å gjøre noe mer.", answer: false, blokk: "5", tema: "Linear probing", kilde: false,
+        explain: "Da kan nøkler lenger ut i segmentet bli usynlige for oppslag. Vi må tette hullet eller merke plassen som slettet." },
+      { s: "Et slettet-merke stopper et oppslag på samme måte som en ledig plass.", answer: false, blokk: "5", tema: "Linear probing", kilde: false,
+        explain: "Oppslag går forbi merker. Det er hele poenget med dem. Bare null stopper oppslaget." },
+      { s: "Clustering betyr lange segmenter av opptatte plasser uten hull, som gjør probingen lengre.", answer: true, blokk: "5", tema: "Linear probing", kilde: false,
+        explain: "En nøkkel som hasher inn i et slikt segment, må probe til enden av det, og gjør segmentet enda lengre." },
+      { s: "Etter en rehash ligger hver nøkkel på samme indeks som før.", answer: false, blokk: "5", tema: "rehash", kilde: false,
+        explain: "Hjemmeplassen h(k, N) avhenger av N. Når N dobles, må alle nøklene hashes på nytt." },
+      { s: "Fordi en rehash tar O(n), er innsetting i et hashmap O(n) amortisert.", answer: false, blokk: "5", tema: "kjøretid", kilde: false,
+        explain: "Med dobling skjer rehash så sjelden at totalarbeidet for n innsettinger er O(n). Innsetting er forventet amortisert O(1)." },
+      { s: "Oppslag i et hashmap er O(1) i verste tilfelle.", answer: false, blokk: "5", tema: "kjøretid", kilde: false,
+        explain: "Forventet O(1), men O(n) i verste tilfelle, når mange nøkler hasher til samme plass." },
+      { s: "En Python-ordbok fra versjon 3.6 husker rekkefølgen nøklene ble satt inn i.", answer: true, blokk: "5", tema: "Python", kilde: false,
+        explain: "Nye par legges alltid bakerst i det tettpakkede entries-arrayet." },
+      { s: "Ved rehash i Python 3.6-strukturen må entries bygges på nytt.", answer: false, blokk: "5", tema: "Python", kilde: false,
+        explain: "Bare indices blir større og fylles på nytt. Parene i entries står der de står." },
+      { s: "Å telle forekomster med et hashmap er forventet O(n) for n elementer.", answer: true, blokk: "5", tema: "triks", kilde: false,
+        explain: "n operasjoner som hver er forventet O(1). I verste tilfelle O(n²)." }
+    ], { id: "hashing-tf" });
+
+    // Badge-klikk: gå til fanen og åpne eksamenskortet
+    qsa(".badge[data-go]").forEach(function (b) {
+      b.setAttribute("role", "button"); b.setAttribute("tabindex", "0");
+      function go() {
+        location.hash = "fane=" + b.getAttribute("data-go");
+        var card = qs("#exam-" + b.getAttribute("data-card") + " .examtask");
+        if (card) { card.setAttribute("open", ""); setTimeout(function () { card.scrollIntoView({ behavior: "smooth", block: "center" }); }, 60); }
+      }
+      b.addEventListener("click", go);
+      b.addEventListener("keydown", function (e) { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); go(); } });
+    });
+  })();
+  </script>
+</body>
+</html>
