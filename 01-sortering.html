@@ -7,8 +7,8 @@
   <title>Blokk 1 · Sortering · IN2010</title>
   <meta name="description" content="Sorteringsalgoritmer i IN2010: selection, bubble, insertion, gnome, merge, quick, bøtte, radix og heapsort – med stegvise demoer og kjøretid i stor O.">
   <script>(function(){try{var d=document.documentElement;var t=localStorage.getItem('in-theme');if(t!=='dark'&&t!=='system')t='light';if(t!=='system')d.setAttribute('data-theme',t);var l=localStorage.getItem('in-level');if(l!=='eli5'&&l!=='teknisk')l='normal';d.setAttribute('data-level',l);}catch(e){document.documentElement.setAttribute('data-theme','light');document.documentElement.setAttribute('data-level','normal');}})();</script>
-  <link rel="stylesheet" href="assets/css/styles.css?v=20261125k">
-  <link rel="stylesheet" href="assets/css/begrep-tips.css?v=20261125k">
+  <link rel="stylesheet" href="assets/css/styles.css?v=20261125l">
+  <link rel="stylesheet" href="assets/css/begrep-tips.css?v=20261125l">
 </head>
 <body data-page="sortering">
   <a class="skip-link" href="#main">Hopp til innhold</a>
@@ -79,7 +79,7 @@
               <td data-tip="Bytter elementer inne i arrayet; ingen kopi.">Ja</td></tr>
             <tr><td><a href="#fane=bubble">Bubble</a></td>
               <td class="mono" data-tip="Kursets versjon går alltid alle n − 1 rundene, også på sortert input: n(n − 1)/2 sammenligninger. Legger du til et valgfritt flagg som stopper når en runde ikke bytter noe, blir beste tilfelle O(n).">n²</td>
-              <td class="mono" data-tip="Tilfeldig input har rundt n²/4 inversjoner (par i feil rekkefølge), og hvert nabobytte fjerner bare én.">n²</td>
+              <td class="mono" data-tip="De to løkkene gir alltid n(n − 1)/2 sammenligninger, uansett input. (Inversjonene forklarer antall bytter: tilfeldig input har rundt n²/4 par i feil rekkefølge, og hvert nabobytte fjerner bare ett.)">n²</td>
               <td class="mono" data-tip="Omvendt sortert input har n(n−1)/2 inversjoner – og like mange nabobytter.">n²</td>
               <td data-tip="Bytter bare når venstre nabo er strengt større (>), så like naboer byttes aldri.">Ja</td>
               <td data-tip="Nabobytter inne i arrayet; ingen kopi.">Ja</td></tr>
@@ -515,21 +515,21 @@
 
   <footer class="footer">IN2010-guide · Blokk 1 · Sortering</footer>
 
-  <script src="assets/js/core.js?v=20261125k"></script>
-  <script src="assets/js/symboler.js?v=20261125k"></script>
-  <script src="assets/js/begreper-data.js?v=20261125k"></script>
-  <script src="assets/js/begrep-tips.js?v=20261125k"></script>
-  <script src="assets/js/data-tf.js?v=20261125k"></script>
-  <script src="assets/js/pseudocode.js?v=20261125k"></script>
-  <script src="assets/js/stepplayer.js?v=20261125k"></script>
-  <script src="assets/js/varline.js?v=20261125k"></script>
-  <script src="assets/js/viz-bars.js?v=20261125k"></script>
-  <script src="assets/js/viz-buckets.js?v=20261125k"></script>
-  <script src="assets/js/data-algos.js?v=20261125k"></script>
-  <script src="assets/js/data-heap.js?v=20261125k"></script>
-  <script src="assets/js/perfekt/sortering.js?v=20261125k"></script>
-  <script src="assets/js/perfekt/delt.js?v=20261125k"></script>
-  <script src="assets/js/kort/sortering.js?v=20261125k"></script>
+  <script src="assets/js/core.js?v=20261125l"></script>
+  <script src="assets/js/symboler.js?v=20261125l"></script>
+  <script src="assets/js/begreper-data.js?v=20261125l"></script>
+  <script src="assets/js/begrep-tips.js?v=20261125l"></script>
+  <script src="assets/js/data-tf.js?v=20261125l"></script>
+  <script src="assets/js/pseudocode.js?v=20261125l"></script>
+  <script src="assets/js/stepplayer.js?v=20261125l"></script>
+  <script src="assets/js/varline.js?v=20261125l"></script>
+  <script src="assets/js/viz-bars.js?v=20261125l"></script>
+  <script src="assets/js/viz-buckets.js?v=20261125l"></script>
+  <script src="assets/js/data-algos.js?v=20261125l"></script>
+  <script src="assets/js/data-heap.js?v=20261125l"></script>
+  <script src="assets/js/perfekt/sortering.js?v=20261125l"></script>
+  <script src="assets/js/perfekt/delt.js?v=20261125l"></script>
+  <script src="assets/js/kort/sortering.js?v=20261125l"></script>
   <script>
   (function () {
     var IN = window.IN, qs = IN.qs;

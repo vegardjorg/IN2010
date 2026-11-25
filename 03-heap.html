@@ -7,8 +7,8 @@
   <title>Blokk 3 · Heap · IN2010</title>
   <meta name="description" content="Binære heaper i IN2010: array-representasjon, insert (boble opp), removeMin (boble ned), BuildMinHeap på O(n), level-order, mediankø, Heapsort og prioritetskøer – med stegvise demoer og eksamensoppgaver.">
   <script>(function(){try{var d=document.documentElement;var t=localStorage.getItem('in-theme');if(t!=='dark'&&t!=='system')t='light';if(t!=='system')d.setAttribute('data-theme',t);var l=localStorage.getItem('in-level');if(l!=='eli5'&&l!=='teknisk')l='normal';d.setAttribute('data-level',l);}catch(e){document.documentElement.setAttribute('data-theme','light');document.documentElement.setAttribute('data-level','normal');}})();</script>
-  <link rel="stylesheet" href="assets/css/styles.css?v=20261125k">
-  <link rel="stylesheet" href="assets/css/begrep-tips.css?v=20261125k">
+  <link rel="stylesheet" href="assets/css/styles.css?v=20261125l">
+  <link rel="stylesheet" href="assets/css/begrep-tips.css?v=20261125l">
 </head>
 <body data-page="heap">
   <a class="skip-link" href="#main">Hopp til innhold</a>
@@ -243,7 +243,7 @@
 
       <div class="callout felle"><span class="lbl">Vanlig felle: feil retning</span>
         Å gå <b>oppover</b> fra 0. BubbleDown krever at begge subtrærne allerede er heaper, og det har vi bare når vi
-        går nedenfra og opp (downto). Den andre fellen: å svare O(n log n). Det er kjøretiden for n innsettinger, ikke
+        går nedenfra og opp (down to). Den andre fellen: å svare O(n log n). Det er kjøretiden for n innsettinger, ikke
         for BuildMinHeap.</div>
 
       <div class="callout snarvei"><span class="lbl">Når bruker du hva?</span>
@@ -314,7 +314,7 @@
       <h4>(e) Hvordan ser BST-et av medianene ut?</h4>
       <p>Med eksempelet 8, 3, 1, 5, 7 kommer medianene ut som 5, 3, 7, 1, 8. Settes de inn i et binært søketre i den
         rekkefølgen, blir første median roten, og resten blir vekselvis mindre og større enn alt som har kommet før:</p>
-      <svg class="fig-svg" viewBox="0 0 320 190" role="img" aria-label="Skjevt V-formet binært søketre: rot 5, venstre kjede 3 og 1, høyre kjede 7 og 8">
+      <svg class="fig-svg" viewBox="0 0 320 190" role="img" aria-label="Skjevt Λ-formet binært søketre: rot 5, venstre kjede 3 og 1, høyre kjede 7 og 8">
         <line x1="160" y1="28" x2="105" y2="88"/><line x1="105" y1="88" x2="50" y2="150"/>
         <line x1="160" y1="28" x2="215" y2="88"/><line x1="215" y1="88" x2="270" y2="150"/>
         <circle class="root" cx="160" cy="28" r="17"/><text x="160" y="33" text-anchor="middle">5</text>
@@ -323,7 +323,7 @@
         <circle cx="215" cy="88" r="17"/><text x="215" y="93" text-anchor="middle">7</text>
         <circle cx="270" cy="150" r="17"/><text x="270" y="155" text-anchor="middle">8</text>
       </svg>
-      <p class="muted small">Treet blir V-formet og helt skjevt: til venstre for roten har alle noder bare venstre barn,
+      <p class="muted small">Treet blir Λ-formet og helt skjevt: til venstre for roten har alle noder bare venstre barn,
         og til høyre bare høyre barn. Høyden blir omtrent n/2, så søk i treet blir lineært.</p>
 
       <div class="callout sensor"><span class="lbl">Sensortips (H2024)</span>
@@ -488,21 +488,21 @@
 
   <footer class="footer">IN2010-guide · Blokk 3 · Heap</footer>
 
-  <script src="assets/js/core.js?v=20261125k"></script>
-  <script src="assets/js/varline.js?v=20261125k"></script>
-  <script src="assets/js/viz-tree.js?v=20261125k"></script>
-  <script src="assets/js/symboler.js?v=20261125k"></script>
-  <script src="assets/js/begreper-data.js?v=20261125k"></script>
-  <script src="assets/js/begrep-tips.js?v=20261125k"></script>
-  <script src="assets/js/data-tf.js?v=20261125k"></script>
-  <script src="assets/js/pseudocode.js?v=20261125k"></script>
-  <script src="assets/js/stepplayer.js?v=20261125k"></script>
-  <script src="assets/js/viz-bars.js?v=20261125k"></script>
-  <script src="assets/js/data-algos.js?v=20261125k"></script>
-  <script src="assets/js/data-heap.js?v=20261125k"></script>
-  <script src="assets/js/perfekt/heap.js?v=20261125k"></script>
-  <script src="assets/js/perfekt/delt.js?v=20261125k"></script>
-  <script src="assets/js/kort/heap.js?v=20261125k"></script>
+  <script src="assets/js/core.js?v=20261125l"></script>
+  <script src="assets/js/varline.js?v=20261125l"></script>
+  <script src="assets/js/viz-tree.js?v=20261125l"></script>
+  <script src="assets/js/symboler.js?v=20261125l"></script>
+  <script src="assets/js/begreper-data.js?v=20261125l"></script>
+  <script src="assets/js/begrep-tips.js?v=20261125l"></script>
+  <script src="assets/js/data-tf.js?v=20261125l"></script>
+  <script src="assets/js/pseudocode.js?v=20261125l"></script>
+  <script src="assets/js/stepplayer.js?v=20261125l"></script>
+  <script src="assets/js/viz-bars.js?v=20261125l"></script>
+  <script src="assets/js/data-algos.js?v=20261125l"></script>
+  <script src="assets/js/data-heap.js?v=20261125l"></script>
+  <script src="assets/js/perfekt/heap.js?v=20261125l"></script>
+  <script src="assets/js/perfekt/delt.js?v=20261125l"></script>
+  <script src="assets/js/kort/heap.js?v=20261125l"></script>
   <script>
   (function () {
     var IN = window.IN, qs = IN.qs, el = IN.el;
@@ -776,16 +776,16 @@
 
     /* ================= SANT/USANT ================= */
     var TF = [
-      { s: "Et array med n elementer kan gjøres om til en heap i O(n).", answer: true, explain: "Sant. BuildMinHeap bobler ned nedenfra og opp, og summen av høydene er O(n). (H2022 a)" },
-      { s: "Reverserer vi arrayet til en heap (minste i roten), får vi en max-heap.", answer: false, explain: "Usant. Moteksempel: [1, 2, 5, 3, 4] reversert er [4, 3, 5, 2, 1], og der er 5 barn av 4. (H2022 b)" },
-      { s: "Alle elementer på dybde d er mindre enn alle elementer på dybde d + 1.", answer: false, explain: "Usant. Heap-egenskapen gjelder bare forelder mot barn. I [1, 2, 9, 3] er 9 på dybde 1 større enn 3 på dybde 2. (H2022 c)" },
-      { s: "Innsetting i en heap med n elementer er O(log n) i verste tilfelle.", answer: true, explain: "Sant. Boble opp går høyst fra den nye løvnoden til roten, altså høyden til treet: ⌊log(n + 1)⌋ nivåer, O(log n). (H2022 d)" },
-      { s: "Et AVL-tre kan brukes som prioritetskø med samme kjøretid som en heap.", answer: true, explain: "Sant. Innsetting og å fjerne minste (lengst til venstre) er begge O(log n) i et AVL-tre. (H2022 e)" },
-      { s: "Langs en sti fra roten til en løvnode er nodene ordnet fra minst til størst.", answer: true, explain: "Sant. Hver node er større enn eller lik foreldernoden, så verdiene vokser (eller står stille) nedover. (H2022 f)" },
-      { s: "Bytter to søskennoder plass, er det fremdeles en heap.", answer: false, explain: "Usant (sensor kalte den litt tvetydig). Søsknene har samme forelder, men barna under dem følger ikke med, og da kan heap-egenskapen brytes lenger ned. Eksempel: [1, 2, 5, 3] → [1, 5, 2, 3] gir 3 under 5. (H2022 g)" },
-      { s: "Med en prioritetskø der alle operasjoner er O(1), ville Dijkstra blitt O(|V| + |E|).", answer: true, explain: "Sant. Utenom køen gjør Dijkstra bare lineært arbeid over noder og kanter. Køen er flaskehalsen. (H2022 h)" },
-      { s: "Det største elementet i en heap (minste i roten) kan finnes i O(log n).", answer: false, explain: "Usant. Det kan ligge i en hvilken som helst løvnode, og omtrent halvparten av nodene er løvnoder, så det er O(n). (H2022 i)" },
-      { s: "Over halvparten av elementene i en heap ligger på de to dypeste nivåene.", answer: true, explain: "Sant. Det nest nederste nivået er fullt, og et fullt nivå har én node mer enn alle nivåene over til sammen (2<sup>d</sup> mot 2<sup>d</sup> − 1). Legger vi til nodene på det nederste nivået, er de to nederste nivåene over halvparten. (H2022 j)" },
+      { s: "Et array med n elementer kan gjøres om til en heap i O(n).", answer: true, explain: "Sant. BuildMinHeap bobler ned nedenfra og opp, og summen av høydene er O(n). (H2022 a)", kilde: "H2022" },
+      { s: "Reverserer vi arrayet til en heap (minste i roten), får vi en max-heap.", answer: false, explain: "Usant. Moteksempel: [1, 2, 5, 3, 4] reversert er [4, 3, 5, 2, 1], og der er 5 barn av 4. (H2022 b)", kilde: "H2022" },
+      { s: "Alle elementer på dybde d er mindre enn alle elementer på dybde d + 1.", answer: false, explain: "Usant. Heap-egenskapen gjelder bare forelder mot barn. I [1, 2, 9, 3] er 9 på dybde 1 større enn 3 på dybde 2. (H2022 c)", kilde: "H2022" },
+      { s: "Innsetting i en heap med n elementer er O(log n) i verste tilfelle.", answer: true, explain: "Sant. Boble opp går høyst fra den nye løvnoden til roten, altså høyden til treet: ⌊log(n + 1)⌋ nivåer, O(log n). (H2022 d)", kilde: "H2022" },
+      { s: "Et AVL-tre kan brukes som prioritetskø med samme kjøretid som en heap.", answer: true, explain: "Sant. Innsetting og å fjerne minste (lengst til venstre) er begge O(log n) i et AVL-tre. (H2022 e)", kilde: "H2022" },
+      { s: "Langs en sti fra roten til en løvnode er nodene ordnet fra minst til størst.", answer: true, explain: "Sant. Hver node er større enn eller lik foreldernoden, så verdiene vokser (eller står stille) nedover. (H2022 f)", kilde: "H2022" },
+      { s: "Bytter to søskennoder plass, er det fremdeles en heap.", answer: false, explain: "Usant (sensor kalte den litt tvetydig). Søsknene har samme forelder, men barna under dem følger ikke med, og da kan heap-egenskapen brytes lenger ned. Eksempel: [1, 2, 5, 3] → [1, 5, 2, 3] gir 3 under 5. (H2022 g)", kilde: "H2022" },
+      { s: "Med en prioritetskø der alle operasjoner er O(1), ville Dijkstra blitt O(|V| + |E|).", answer: true, explain: "Sant. Utenom køen gjør Dijkstra bare lineært arbeid over noder og kanter. Køen er flaskehalsen. (H2022 h)", kilde: "H2022" },
+      { s: "Det største elementet i en heap (minste i roten) kan finnes i O(log n).", answer: false, explain: "Usant. Det kan ligge i en hvilken som helst løvnode, og omtrent halvparten av nodene er løvnoder, så det er O(n). (H2022 i)", kilde: "H2022" },
+      { s: "Over halvparten av elementene i en heap ligger på de to dypeste nivåene.", answer: true, explain: "Sant. Det nest nederste nivået er fullt, og et fullt nivå har én node mer enn alle nivåene over til sammen (2<sup>d</sup> mot 2<sup>d</sup> − 1). Legger vi til nodene på det nederste nivået, er de to nederste nivåene over halvparten. (H2022 j)", kilde: "H2022" },
       { s: "Et sortert array (stigende) er alltid en heap.", answer: true, explain: "Sant. For hver i er A[i] ≤ A[2i + 1] og A[i] ≤ A[2i + 2], fordi barna står lenger bak. Det motsatte gjelder ikke." },
       { s: "Foreldernoden til plass i i en 0-indeksert heap er ⌊i/2⌋.", answer: false, explain: "Usant. Det er ⌊(i − 1)/2⌋. ⌊i/2⌋ er formelen når roten står på plass 1. Sjekk med i = 2: forelderen skal være 0, men ⌊2/2⌋ = 1." },
       { s: "removeMin bytter alltid med det venstre barnet.", answer: false, explain: "Usant. Den bytter med det <i>minste</i> barnet. Ellers kan en større verdi havne over sin mindre søsken." },

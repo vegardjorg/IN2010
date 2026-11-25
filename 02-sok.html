@@ -7,8 +7,8 @@
   <title>Blokk 2 · Søk · IN2010</title>
   <meta name="description" content="Søk i IN2010: rett-frem søk, binærsøk med varianter, sorter-én-gang-avveiningen, finn duplikat, finn k minste og array-triks med hashing – med stegvise demoer og kjøretid.">
   <script>(function(){try{var d=document.documentElement;var t=localStorage.getItem('in-theme');if(t!=='dark'&&t!=='system')t='light';if(t!=='system')d.setAttribute('data-theme',t);var l=localStorage.getItem('in-level');if(l!=='eli5'&&l!=='teknisk')l='normal';d.setAttribute('data-level',l);}catch(e){document.documentElement.setAttribute('data-theme','light');document.documentElement.setAttribute('data-level','normal');}})();</script>
-  <link rel="stylesheet" href="assets/css/styles.css?v=20261125k">
-  <link rel="stylesheet" href="assets/css/begrep-tips.css?v=20261125k">
+  <link rel="stylesheet" href="assets/css/styles.css?v=20261125l">
+  <link rel="stylesheet" href="assets/css/begrep-tips.css?v=20261125l">
 </head>
 <body data-page="sok">
   <a class="skip-link" href="#main">Hopp til innhold</a>
@@ -64,7 +64,7 @@
       <div class="table-wrap">
         <table class="cmp-table" id="cmp-sok">
           <thead><tr><th>Metode</th>
-            <th data-tip="Det metoden må kunne anta om dataene for å gi riktig svar.">Krever</th>
+            <th data-tip="Det metoden må kunne anta om dataene for å gi riktig svar og den oppgitte kjøretiden.">Krever</th>
             <th data-tip="Kjøretiden for den gunstigste inputen – typisk at x ligger akkurat der vi ser først.">Best</th>
             <th data-tip="Typisk kjøretid. For hashing er dette forventet tid, under antakelsen om en god hashfunksjon.">Snitt</th>
             <th data-tip="Kjøretiden for den verst tenkelige inputen, for eksempel at x ikke finnes.">Verst</th>
@@ -77,7 +77,7 @@
               <td class="mono" data-tip="x ligger sist eller finnes ikke: alle n må sjekkes.">n</td>
               <td class="mono" data-tip="Bare en teller.">1</td></tr>
             <tr><td><a href="#fane=binaersok">Binærsøk</a></td>
-              <td data-tip="Sortert, og vi må kunne slå opp A[mid] i konstant tid. I en lenket liste koster hvert oppslag O(n), så gevinsten forsvinner.">sortert array</td>
+              <td data-tip="Sortert (ellers blir svaret feil). For kjøretiden må vi også kunne slå opp A[mid] i konstant tid. I en lenket liste koster hvert oppslag O(n), så gevinsten forsvinner.">sortert array</td>
               <td class="mono" data-tip="x ligger på den første midten vi ser på.">1</td>
               <td class="mono" data-tip="Intervallet halveres hver runde, så det blir omtrent log n runder.">log n</td>
               <td class="mono" data-tip="Høyst ⌊log n⌋ + 1 runder før intervallet er tomt.">log n</td>
@@ -326,7 +326,7 @@
       </div>
       <div class="callout uni"><span class="lbl">Universitetsnivå: den andre (c)-løsningen, O(n log k)</span>
         Gå gjennom A og hold på de k minste du har sett så langt i en heap av størrelse k der det <b>største</b> av dem ligger øverst
-        (eksamensløsningen kaller den en max-heap – kursets heap er en min-heap, og dette er samme struktur med motsatt ordning).
+        (en max-heap, som i heapsort; eksamensløsningen kaller den det samme).
         For hvert nytt element: er det mindre enn toppen, bytter vi ut toppen og reparerer heapen. Heapen har aldri mer enn k elementer,
         så hver operasjon koster O(log k), og totalt blir det O(n log k). I telleren over er det linjen «heap av størrelse k».</div>
       <div class="callout sensor"><span class="lbl">Sensor ser etter</span>
@@ -401,19 +401,19 @@
   </main>
   <footer class="footer">IN2010-guide · Blokk 2 · Søk</footer>
 
-  <script src="assets/js/core.js?v=20261125k"></script>
-  <script src="assets/js/symboler.js?v=20261125k"></script>
-  <script src="assets/js/begreper-data.js?v=20261125k"></script>
-  <script src="assets/js/begrep-tips.js?v=20261125k"></script>
-  <script src="assets/js/data-tf.js?v=20261125k"></script>
-  <script src="assets/js/pseudocode.js?v=20261125k"></script>
-  <script src="assets/js/stepplayer.js?v=20261125k"></script>
-  <script src="assets/js/varline.js?v=20261125k"></script>
-  <script src="assets/js/viz-bars.js?v=20261125k"></script>
-  <script src="assets/js/data-algos.js?v=20261125k"></script>
-  <script src="assets/js/data-sok.js?v=20261125k"></script>
-  <script src="assets/js/perfekt/sok.js?v=20261125k"></script>
-  <script src="assets/js/kort/sok.js?v=20261125k"></script>
+  <script src="assets/js/core.js?v=20261125l"></script>
+  <script src="assets/js/symboler.js?v=20261125l"></script>
+  <script src="assets/js/begreper-data.js?v=20261125l"></script>
+  <script src="assets/js/begrep-tips.js?v=20261125l"></script>
+  <script src="assets/js/data-tf.js?v=20261125l"></script>
+  <script src="assets/js/pseudocode.js?v=20261125l"></script>
+  <script src="assets/js/stepplayer.js?v=20261125l"></script>
+  <script src="assets/js/varline.js?v=20261125l"></script>
+  <script src="assets/js/viz-bars.js?v=20261125l"></script>
+  <script src="assets/js/data-algos.js?v=20261125l"></script>
+  <script src="assets/js/data-sok.js?v=20261125l"></script>
+  <script src="assets/js/perfekt/sok.js?v=20261125l"></script>
+  <script src="assets/js/kort/sok.js?v=20261125l"></script>
   <script>
   (function () {
     "use strict";
@@ -729,7 +729,7 @@
       { s: "Rett-frem søk krever at arrayet er sortert.", answer: false, explain: "Rett-frem søk ser på alle elementene ett og ett og antar ingenting om rekkefølgen.", blokk: "2" },
       { s: "Skal du søke etter mange elementer i et stort usortert array, kan det lønne seg å sortere først.", answer: true, explain: "Sorter én gang (O(n log n)) og binærsøk hver gang (O(log n)). Når antall søk k vokser raskere enn log n, slår det k rett-frem søk (O(k·n)). (H2020)", blokk: "2" },
       { s: "Oppslag i et hashset er garantert O(1).", answer: false, explain: "Det er <b>forventet</b> O(1). I verste fall havner alt i samme bøtte, og oppslaget blir O(n).", blokk: "2" },
-      { s: "I Finn duplikat (a) holder det å skrive «bruk BinarySearch» uten å si noe om hva den returnerer.", answer: false, explain: "Kursets BinarySearch svarer true/false. Du må si at du endrer den til å returnere indeksen, ellers trekkes 1p. (H2023)", blokk: "2" },
+      { s: "I Finn duplikat (a) holder det å skrive «bruk BinarySearch» uten å si noe om hva den returnerer.", answer: false, explain: "Kursets BinarySearch svarer true/false. Du må si at du endrer den til å returnere indeksen, ellers kan det trekkes opptil 1 p. (H2023)", blokk: "2" },
       { s: "I Finn k minste (b) er Quicksort et like godt svar som Merge sort.", answer: false, explain: "Quicksort er O(n²) i verste tilfelle, så den oppfyller ikke kravet O(n log n) i verste tilfelle. Den ga lavere uttelling. (H2025)", blokk: "2" },
       { s: "BuildMinHeap etterfulgt av k removeMin gir O(n + k log n).", answer: true, explain: "BuildMinHeap er O(n), og hver removeMin er O(log n).", blokk: "2" },
       { s: "To-peker-teknikken for «par med sum x» virker også på et usortert array.", answer: false, explain: "Teknikken bruker sorteringen til å vite hvilken peker som skal flyttes. Usortert input må sorteres først, eller løses med hashset.", blokk: "2" },

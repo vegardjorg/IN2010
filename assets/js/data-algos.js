@@ -430,8 +430,8 @@
       best: "O(1)", avg: "O(log n)", worst: "O(log n)", space: "O(1)",
       why: t(
         "Hver gang halverer vi bunken vi leter i. Å halvere 1000 sider ned til 1 tar bare ca. 10 steg – derfor er det lynraskt.",
-        "Intervallet halveres hver runde, så det blir høyst ⌊log n⌋ + 1 runder, altså O(log n). Krever at arrayet er sortert på forhånd.",
-        "Hver runde gjør konstant arbeid og halverer intervallet, så O(log n) runder. Best O(1) hvis x ligger på første mid. Kursets versjon svarer true/false; returnerer du indeksen, si at du har endret den."
+        "Intervallet halveres hver runde, så det blir høyst ⌊log n⌋ + 1 runder, altså O(log n). Krever at arrayet er sortert på forhånd. Kursets versjon svarer true/false; her returnerer vi indeksen.",
+        "Hver runde gjør konstant arbeid og halverer intervallet, så O(log n) runder. Best O(1) hvis x ligger på første mid. Avvik fra kursets BinarySearch (forelesningen om introduksjon): kurset kaller midtindeksen i, starter med high ← |A| − 1, skriver den siste grenen som «else if A[i] > x» og svarer true/false. Her heter den mid, vi skriver n − 1, bruker else og returnerer indeksen eller −1. Returnerer du indeksen på eksamen, si at du har endret den."
       )
     }
   };
@@ -508,7 +508,7 @@
       why: t(
         "Treet er lavt – bare noen få «etasjer». Tallet kan maks boble opp én etasje om gangen helt til toppen, og det er få etasjer.",
         "Boble opp går høyst fra løvnoden til roten, altså høyden – omtrent log n. Best O(1) hvis x allerede er ≥ forelderen.",
-        "Et komplett tre har høyde ⌊log n⌋, så det blir O(log n) bytter i verste tilfelle, og O(1) ekstra minne."
+        "Etter innsettingen har heapen n + 1 noder og høyde ⌊log(n + 1)⌋. Det er det største mulige antallet bytter, altså O(log n) i verste tilfelle, og O(1) ekstra minne."
       )
     }
   };
@@ -554,6 +554,9 @@
       )
     }
   };
+  /* Tom linje i pseudokoden. Merge har tomme linjer på 4, 12, 16 og 20 i forelesningen (02 · sortering),
+     så linjenumrene her er de samme som på lysarket. */
+  var BLANK_M = { code: "", indent: 1, eli5: "Tom linje, som på lysarket.", normal: "Tom linje (står slik på lysarket).", teknisk: "Tom linje. Den er med så linjenumrene blir de samme som på lysarket." };
   IN.algos.merge = {
     title: "Merge (fletting av to sorterte arrayer)",
     name: "Merge", params: "A1, A2, A",
@@ -568,6 +571,7 @@
         eli5: "… og på det første kortet i høyre bunke (A2).",
         normal: "j leser i A2.",
         teknisk: "j er antall elementer vi har tatt fra A2. Da er i + j antall skrevne, og neste ledige plass i A." },
+      BLANK_M,
       { code: "while i < |A1| and j < |A2| do", indent: 1,
         eli5: "Så lenge begge bunkene har kort igjen …",
         normal: "Flett til én av bunkene er tom.",
@@ -596,6 +600,7 @@
         eli5: "Vi går videre i høyre bunke.",
         normal: "Neste element i A2.",
         teknisk: "i + j øker med én." },
+      BLANK_M,
       { code: "while i < |A1| do", indent: 1,
         eli5: "Er det kort igjen i venstre bunke, legger vi dem ned etter tur.",
         normal: "Kopier resten av A1.",
@@ -608,6 +613,7 @@
         eli5: "Videre i venstre bunke.",
         normal: "Neste i A1.",
         teknisk: "Øk i." },
+      BLANK_M,
       { code: "while j < |A2| do", indent: 1,
         eli5: "Er det kort igjen i høyre bunke, legger vi dem ned etter tur.",
         normal: "Kopier resten av A2.",
@@ -620,6 +626,7 @@
         eli5: "Videre i høyre bunke.",
         normal: "Neste i A2.",
         teknisk: "Øk j." },
+      BLANK_M,
       { code: "return A", indent: 1,
         eli5: "Nå er alle kortene lagt ned i rekkefølge.",
         normal: "A er sortert.",
@@ -690,31 +697,31 @@
         ex(false, null));
       while (i < A1.length && j < A2.length) {
         var fromL = A1[i] <= A2[j];
-        snap(M(5), aMarks({}),
+        snap(M(6), aMarks({}),
           t("Begge bunkene har kort igjen. Vi ser på de to forreste: " + A1[i] + " fra A1 og " + A2[j] + " fra A2. " +
               (fromL ? A1[i] + " er minst" + (A1[i] === A2[j] ? " (like store – da tar vi fra venstre)" : "") + ", så det tas fra A1." : A2[j] + " er minst, så det tas fra A2."),
-            "i &lt; |A1| og j &lt; |A2| (linje 4). A1[" + i + "] = " + A1[i] + " ≤ A2[" + j + "] = " + A2[j] + "? " + (fromL ? "Ja: ta fra A1." : "Nei: ta fra A2 (else)."),
+            "i &lt; |A1| og j &lt; |A2| (linje 5). A1[" + i + "] = " + A1[i] + " ≤ A2[" + j + "] = " + A2[j] + "? " + (fromL ? "Ja: ta fra A1." : "Nei: ta fra A2 (else)."),
             "Testen A1[i] ≤ A2[j] er " + (fromL ? "sann" : "usann") + " (" + A1[i] + (fromL ? " ≤ " : " &gt; ") + A2[j] + ")." + (A1[i] === A2[j] ? " Ved likhet tar ≤ fra A1, og det bevarer stabiliteten." : "")),
           "Sammenlign", ex(true, null));
         var k = i + j, v = fromL ? A1[i] : A2[j], took = fromL ? { side: "A1", idx: i } : { side: "A2", idx: j };
         A[off + k] = v;
         if (fromL) i++; else j++;
-        snap(M(fromL ? 6 : 9), aMarks({ target: off + k, stale: range(off + k + 1, off + n - 1) }),
+        snap(M(fromL ? 7 : 10), aMarks({ target: off + k, stale: range(off + k + 1, off + n - 1) }),
           t(v + " legges på neste ledige plass. Så går vi videre i " + (fromL ? "A1." : "A2."),
-            "A[" + k + "] ← " + (fromL ? "A1[" + (i - 1) + "]" : "A2[" + (j - 1) + "]") + " = " + v + "; så " + (fromL ? "i ← " + i + " (linje 7)." : "j ← " + j + " (linje 10)."),
+            "A[" + k + "] ← " + (fromL ? "A1[" + (i - 1) + "]" : "A2[" + (j - 1) + "]") + " = " + v + "; så " + (fromL ? "i ← " + i + " (linje 8)." : "j ← " + j + " (linje 11)."),
             "A[i + j] = A[" + k + "] ← " + v + ", og " + (fromL ? "i" : "j") + " øker med 1. Nå er A[0.." + k + "] de " + (k + 1) + " minste av A1 og A2, i sortert rekkefølge."),
           "Skriv minste", ex(false, took));
       }
       var lEmpty = i >= A1.length;
-      snap(M(4), aMarks({}),
+      snap(M(5), aMarks({}),
         t((lEmpty ? "A1" : "A2") + " er tom. Da kan vi ikke sammenligne mer, så resten av " + (lEmpty ? "A2" : "A1") + " legges rett inn. Tallene der er alt sortert og større enn alt vi har skrevet.",
-          "while-testen er usann: " + (lEmpty ? "i = |A1| = " + A1.length : "j = |A2| = " + A2.length) + ". Resten av " + (lEmpty ? "A2" : "A1") + " kopieres inn (linje " + (lEmpty ? "14–16" : "11–13") + ").",
+          "while-testen er usann: " + (lEmpty ? "i = |A1| = " + A1.length : "j = |A2| = " + A2.length) + ". Resten av " + (lEmpty ? "A2" : "A1") + " kopieres inn (linje " + (lEmpty ? "17–19" : "13–15") + ").",
           "Løkka terminerer fordi " + (lEmpty ? "i = |A1|" : "j = |A2|") + ". Elementene igjen i " + (lEmpty ? "A2" : "A1") + " er ≥ alt som er skrevet."), "Én bunke tom",
         ex(false, null));
       while (i < A1.length || j < A2.length) {
         var restL = i < A1.length, k2 = i + j, val = restL ? A1[i] : A2[j], tk = restL ? { side: "A1", idx: i } : { side: "A2", idx: j };
         A[off + k2] = val; if (restL) i++; else j++;
-        snap(M(restL ? 12 : 15), aMarks({ target: off + k2, stale: range(off + k2 + 1, off + n - 1) }),
+        snap(M(restL ? 14 : 18), aMarks({ target: off + k2, stale: range(off + k2 + 1, off + n - 1) }),
           t("Resten av " + (restL ? "A1" : "A2") + ": " + val + " legges på neste ledige plass.",
             "A[" + k2 + "] ← " + (restL ? "A1[" + (i - 1) + "]" : "A2[" + (j - 1) + "]") + " = " + val + " (rest).",
             "Rest-kopiering: A[i + j] = A[" + k2 + "] ← " + val + "."), "Kopier rest", ex(false, tk));
@@ -798,11 +805,11 @@
         teknisk: "A[low..high] er sortert." }
     ],
     bigO: {
-      best: "O(n log n)", avg: "O(n log n)", worst: "O(n²)", space: "O(log n)", stable: false, inplace: true,
+      best: "O(n log n)", avg: "O(n log n)", worst: "O(n²)", space: "O(n) verst, O(log n) i snitt", stable: false, inplace: true,
       why: t(
         "Går det bra, deler pivoten stykket omtrent i to hver gang – få etasjer. Men hvis pivoten alltid er minst eller størst (f.eks. når vi tar siste tall og alt er sortert fra før), deler den dårlig, og det blir n etasjer.",
         "Snitt O(n log n) med balanserte partisjoner. Verst O(n²) når pivoten stadig er minst eller størst – derfor velger ChoosePivot tilfeldig eller median-av-tre. In-place. Ikke stabil.",
-        "Partition deler i to biter av størrelse k og n − 1 − k, og hvert nivå koster O(n). Treffer pivoten noenlunde midt på, får vi omtrent like halvdeler og O(n log n). Blir pivoten stadig minste eller største element (f.eks. siste element som pivot på sortert input), krymper biten bare med 1 hver gang, summen blir (n − 1) + (n − 2) + … = O(n²), og rekursjonen blir n dyp. Tilfeldig pivot eller median-av-tre gjør det svært usannsynlig. Quicksort er ikke stabil, fordi Partition bytter elementer over lange avstander."
+        "Partition deler i to biter av størrelse k og n − 1 − k, og hvert nivå koster O(n). Treffer pivoten noenlunde midt på, får vi omtrent like halvdeler og O(n log n). Blir pivoten stadig minste eller største element (f.eks. siste element som pivot på sortert input), krymper biten bare med 1 hver gang, summen blir (n − 1) + (n − 2) + … = O(n²), og rekursjonen blir n dyp. Da ligger også n kall på kallstakken samtidig, så ekstra minne er O(n) i verste tilfelle og O(log n) med balanserte partisjoner. (Lysarkene oppgir ikke minnebruk; dette er vår egen analyse.) Tilfeldig pivot eller median-av-tre gjør det svært usannsynlig. Quicksort er ikke stabil, fordi Partition bytter elementer over lange avstander."
       )
     }
   };
@@ -999,13 +1006,14 @@
   };
 
   /* ===================== BØTTESORTERING + RADIX =====================
-     Kursets versjon (09 · litt mer sortering): nøkler 0..N − 1, legg hvert
-     element bakerst i sin bøtte, samle bøttene i rekkefølge. Ingen
+     Kursets versjon (09 · litt mer sortering, 11 linjer): BucketSort(A), nøkler
+     0..N − 1, egen linje for nøkkelen k, legg hvert element bakerst i bøtte k,
+     samle bøttene i rekkefølge. Ingen
      sammenligninger, ingen sortering inne i bøttene. Radix = stabil
      bøttesortering per siffer, minst betydningsfulle siffer først. */
   IN.algos.bucketSort = {
     title: "BucketSort",
-    name: "BucketSort", params: "A, N",
+    name: "BucketSort", params: "A",
     input: "Et array A med n elementer, der hver nøkkel er et heltall fra 0 til N − 1",
     output: "A er sortert (stabilt)",
     lines: [
@@ -1017,10 +1025,14 @@
         eli5: "Så går vi gjennom tallene ett for ett.",
         normal: "Fordelingsfasen: gå gjennom A fra venstre.",
         teknisk: "n iterasjoner, O(1) hver." },
-      { code: "append A[i] to B[A[i]]", indent: 2,
-        eli5: "Hvert tall legges bakerst i bøtta med sitt eget nummer.",
-        normal: "Legg elementet bakerst i bøtta til nøkkelen sin. (Er elementene objekter, bruker vi nøkkelen deres som indeks.)",
-        teknisk: "Nøkkelen brukes direkte som indeks – ingen sammenligninger. Å legge bakerst er det som gjør algoritmen stabil." },
+      { code: "k ← key of A[i]", indent: 2,
+        eli5: "Vi ser hvilket nummer tallet har. Det er nummeret på bøtta det skal i.",
+        normal: "k er nøkkelen til elementet, et heltall fra 0 til N − 1. (For tall er nøkkelen tallet selv.)",
+        teknisk: "O(1). Nøkkelen brukes direkte som indeks, uten sammenligninger." },
+      { code: "append A[i] to B[k]", indent: 2,
+        eli5: "Tallet legges bakerst i bøtta med det nummeret.",
+        normal: "Legg elementet bakerst i bøtta til nøkkelen sin.",
+        teknisk: "O(1). Å legge bakerst er det som gjør algoritmen stabil." },
       { code: "j ← 0", indent: 1,
         eli5: "Nå skal vi helle tallene tilbake. j er plassen vi fyller neste gang.",
         normal: "Samlefasen: j er neste ledige plass i A.",
@@ -1029,7 +1041,7 @@
         eli5: "Vi tar bøttene i rekkefølge, fra bøtte 0 og oppover.",
         normal: "Gå gjennom bøttene i stigende rekkefølge.",
         teknisk: "N iterasjoner – også de tomme bøttene koster. Derfor O(N)-leddet." },
-      { code: "for x in B[k] do", indent: 2,
+      { code: "for each x in B[k] do", indent: 2,
         eli5: "I hver bøtte tar vi tallene ut forfra, i samme rekkefølge som de kom inn.",
         normal: "Ta ut elementene i bøtta forfra.",
         teknisk: "Til sammen n elementer over alle bøttene." },
@@ -1057,17 +1069,21 @@
   };
   IN.algos.radixSort = {
     title: "RadixSort",
-    name: "RadixSort", params: "A, d",
-    input: "Et array A med n tall som alle har d siffer (fyll ut med 0 foran ved behov)",
+    name: "RadixSort", params: "A",
+    input: "Et array A med n ikke-negative heltall",
     output: "A er sortert",
     lines: [
-      { code: "for i ← d − 1 downto 0 do", indent: 1,
+      { code: "d ← number of digits in the largest number", indent: 1,
+        eli5: "Først teller vi hvor mange siffer det største tallet har. Så mange runder trenger vi.",
+        normal: "d er antall siffer i det største tallet. Kortere tall tenker vi oss fylt ut med 0 foran.",
+        teknisk: "O(n) for å finne det største tallet. Sifrene nummereres fra venstre, 0 til d − 1." },
+      { code: "for i ← d − 1 down to 0 do", indent: 1,
         eli5: "Vi tar ett siffer om gangen – og vi starter bakerst, med enerplassen.",
         normal: "Sifrene er nummerert fra venstre (0 til d − 1), så vi starter med det bakerste sifferet og jobber oss mot det første.",
         teknisk: "d runder. Minst betydningsfulle siffer først." },
-      { code: "A ← BucketSort(A, i)", indent: 2,
+      { code: "A ← BucketSort(A) by digit i", indent: 2,
         eli5: "Vi bøttesorterer tallene på dette ene sifferet. Tallene som har samme siffer, beholder rekkefølgen de hadde.",
-        normal: "Bøttesorter på siffer nummer i, med 10 bøtter (sifrene 0–9). Bøttesorteringen må være stabil. (Her betyr andre argument hvilket siffer som er nøkkel, ikke antall bøtter.)",
+        normal: "Bøttesorter med siffer nummer i som nøkkel, med 10 bøtter (sifrene 0–9). Bøttesorteringen må være stabil.",
         teknisk: "Én stabil BucketSort per siffer: O(N + n), der N er antall mulige sifferverdier (10 i titallsystemet)." },
       { code: "return A", indent: 1,
         eli5: "Etter siste siffer er alt sortert.",
@@ -1117,15 +1133,15 @@
     for (var i = 0; i < n; i++) {
       var it = A[i];
       B[it.key].push(it);
-      done.push(i); st.i = i;
-      snap(4, { active: { where: "B", k: it.key, i: B[it.key].length - 1 }, bucket: it.key, src: i },
+      done.push(i); st.i = i; st.k = it.key;
+      snap(5, { active: { where: "B", k: it.key, i: B[it.key].length - 1 }, bucket: it.key, src: i },
         t("Tallet " + it.v + " legges bakerst i bøtte " + it.key + "." + (it.tag ? " Bokstaven viser hvilken " + it.v + "-er det var først i input." : ""),
           "A[" + i + "] = " + itemTxt(it) + " → bakerst i B[" + it.key + "].",
-          "append A[" + i + "] to B[" + it.key + "]."), "Fordel");
+          "k ← " + it.key + "; append A[" + i + "] to B[" + it.key + "]."), "Fordel");
     }
     var j = 0, written = [];
     st = { j: 0 };
-    snap(5, { hideUnwritten: true, done: [] },
+    snap(6, { hideUnwritten: true, done: [] },
       t("Alle tallene ligger i bøttene. Nå heller vi dem tilbake, bøtte for bøtte.",
         "Fordelingen er ferdig. Samlefasen: j ← 0.",
         "Fordeling O(n) ferdig; samling starter."), "Samle");
@@ -1133,7 +1149,7 @@
       done = range(j, n - 1);
       st.k = k; st.j = j; st.x = undefined;
       if (!B[k].length) {
-        snap(6, { bucket: k, written: written.slice(), hideUnwritten: true, done: [] },
+        snap(7, { bucket: k, written: written.slice(), hideUnwritten: true, done: [] },
           t("Bøtte " + k + " er tom – ingenting å hente, men vi må likevel sjekke den.",
             "B[" + k + "] er tom. (Tomme bøtter koster også – det er N-leddet.)",
             "k = " + k + ": tom bøtte, O(1)."), "Tom bøtte");
@@ -1142,7 +1158,7 @@
       while (B[k].length) {
         var x = B[k].shift();
         A[j] = x; written.push(j); done = range(j + 1, n - 1); st.j = j; st.x = itemTxt(x);
-        snap(8, { active: { where: "A", i: j }, bucket: k, written: written.slice(), hideUnwritten: true, done: [] },
+        snap(9, { active: { where: "A", i: j }, bucket: k, written: written.slice(), hideUnwritten: true, done: [] },
           t("Vi tar " + x.v + " ut forfra i bøtte " + k + " og legger det på plass " + j + ".",
             "A[" + j + "] ← " + itemTxt(x) + " (forrest i B[" + k + "]).",
             "A[" + j + "] ← " + itemTxt(x) + "; j ← " + (j + 1) + "."), "Samle");
@@ -1150,7 +1166,7 @@
       }
     }
     st = { j: j };
-    snap(10, { written: range(0, n - 1), done: [] },
+    snap(11, { written: range(0, n - 1), done: [] },
       t("Ferdig! Tallene er sortert – og like tall står i samme rekkefølge som før (a før b).",
         "Sortert. Like nøkler har beholdt rekkefølgen sin: stabil.",
         "Terminert. O(N + n), stabil."), "Ferdig");
@@ -1165,21 +1181,21 @@
     function empty() { var B = []; for (var q = 0; q < 10; q++) B.push([]); return B; }
     function digitOf(v, p) { return Math.floor(v / Math.pow(10, p)) % 10; }
     var names = ["enerplassen", "tierplassen", "hundrerplassen", "tusenplassen"];
-    steps.push({ line: null, A: A.slice(), B: empty(), labels: labels, vars: [vv("i"), vv("d", d)], text:
-      t("Tallene har opptil " + d + " siffer. Vi sorterer på ett siffer om gangen, bakerst først.",
-        "d = " + d + ". Kortere tall fylles ut med 0 foran. Ti bøtter: sifrene 0–9.",
-        "d = " + d + ", N = 10."), tag: "Start" });
+    steps.push({ line: 2, A: A.slice(), B: empty(), labels: labels, vars: [vv("i"), vv("d", d)], text:
+      t("Det største tallet har " + d + " siffer, så d = " + d + ". Vi sorterer på ett siffer om gangen, bakerst først.",
+        "d ← " + d + " (sifre i det største tallet). Kortere tall fylles ut med 0 foran. Ti bøtter: sifrene 0–9.",
+        "d ← " + d + ", N = 10."), tag: "Start" });
     for (var i = d - 1; i >= 0; i--) {
       var p = d - 1 - i, B = empty(), done = [];
       var pname = names[p] || ("siffer " + i);
-      steps.push({ line: 2, A: A.slice(), B: copyB(B), labels: labels, digit: p, vars: [vv("i", i), vv("d", d)], text:
+      steps.push({ line: 3, A: A.slice(), B: copyB(B), labels: labels, digit: p, vars: [vv("i", i), vv("d", d)], text:
         t("Nå ser vi bare på " + pname + " (det understrekte sifferet).",
           "i = " + i + ": sorter på " + pname + " (siffer " + i + " fra venstre).",
           "i = " + i + " → siffer " + i + " (" + pname + ")."), tag: "Siffer " + i + " · " + pname });
       for (var a = 0; a < n; a++) {
         var it = A[a], dg = digitOf(it.v, p);
         B[dg].push(it); done.push(a);
-        steps.push({ line: 3, A: A.slice(), B: copyB(B), labels: labels, digit: p, done: done.slice(), vars: [vv("i", i), vv("d", d)],
+        steps.push({ line: 4, A: A.slice(), B: copyB(B), labels: labels, digit: p, done: done.slice(), vars: [vv("i", i), vv("d", d)],
           active: { where: "B", k: dg, i: B[dg].length - 1 }, bucket: dg, src: a, text:
           t(it.v + " har sifferet " + dg + " her, så det legges bakerst i bøtte " + dg + ".",
             itemTxt(it) + ": siffer " + dg + " → bakerst i B[" + dg + "].",
@@ -1187,12 +1203,12 @@
       }
       var next = []; B.forEach(function (b) { next = next.concat(b); });
       A = next;
-      steps.push({ line: 3, A: A.slice(), B: empty(), labels: labels, digit: p, written: range(0, n - 1), vars: [vv("i", i), vv("d", d)], text:
+      steps.push({ line: 4, A: A.slice(), B: empty(), labels: labels, digit: p, written: range(0, n - 1), vars: [vv("i", i), vv("d", d)], text:
         t("Vi heller bøttene tilbake, fra 0 til 9. Nå er tallene sortert på " + pname + (p > 0 ? " – og tall med likt siffer her står fortsatt i rekkefølgen fra forrige runde." : "."),
           "Samlet: sortert på siffer " + i + " og bakover. Stabilitet holder på rekkefølgen fra forrige runde der sifferet er likt.",
           "Etter runden: sortert på sifrene " + i + " … " + (d - 1) + "."), tag: "Samle" });
     }
-    steps.push({ line: 4, A: A.slice(), B: empty(), labels: labels, written: range(0, n - 1), vars: [vv("i"), vv("d", d)], text:
+    steps.push({ line: 5, A: A.slice(), B: empty(), labels: labels, written: range(0, n - 1), vars: [vv("i"), vv("d", d)], text:
       t("Ferdig! Etter siste runde, med det første (mest betydningsfulle) sifferet, er alle tallene sortert.",
         "Sortert etter alle " + d + " siffer.",
         "Terminert etter d = " + d + " runder: O(d·(N + n))."), tag: "Ferdig" });
@@ -1473,13 +1489,13 @@
         "Tallet som byttes inn på pivotens gamle plass (helt bakerst) havner på høyre side, så det må være ≥ pivot. A[left] er det første tallet som er større enn pivoten (eller pivoten selv, hvis left kom helt fram til high). A[right] er derimot et tall som er mindre – det hører ikke til bakerst.")
     },
     bucketSort: {
-      "append A[i] to B[A[i]]": g("Hvorfor bakerst i bøtta, og ikke forrest?",
+      "append A[i] to B[k]": g("Hvorfor bakerst i bøtta, og ikke forrest?",
         "Elementer med samme nøkkel havner i samme bøtte. Legger vi bakerst og tar ut forfra, kommer de ut i samme rekkefølge som de kom inn – algoritmen er stabil. Legger vi forrest, snus rekkefølgen innen hver bøtte, og stabiliteten ryker. (Det er nettopp stabiliteten radix sort trenger.)"),
       "for k ← 0 to N − 1 do": g("Hvorfor N − 1 og ikke N?",
         "Nøklene er 0, 1, …, N − 1 – det er N bøtter, og den siste heter B[N − 1]. «to» tar med sluttverdien, så «to N» ville spurt etter en bøtte som ikke finnes. (Teller du feil her når du lager bøttene, f.eks. for ordlengder 0 … N, trenger du N + 1 bøtter.)")
     },
     radixSort: {
-      "for i ← d − 1 downto 0 do": g("Hvorfor baklengs, fra d − 1 ned til 0?",
+      "for i ← d − 1 down to 0 do": g("Hvorfor baklengs, fra d − 1 ned til 0?",
         "Sifrene nummereres fra venstre, så siffer d − 1 er enerplassen – det minst betydningsfulle. Vi må starte der: den siste runden (det første sifferet) bestemmer rekkefølgen til slutt, og stabiliteten sørger for at like førstesiffer beholder rekkefølgen fra rundene før. Starter vi med det første sifferet, ødelegger de senere rundene den rekkefølgen.")
     }
   };
@@ -1542,15 +1558,15 @@
       return s.line != null && s.line >= 3 && val(s, "i") != null ? [W("i", 0, n - 1)] : [];
     },
     // MergeSort(A) og Merge(A1, A2, A): kallets array, tegnet på plassene callLo..callHi i input.
-    // Merge linje 4–10: while i < |A1| and j < |A2|; linje 11–13: bare i; linje 14–16: bare j.
+    // Merge linje 5–11: while i < |A1| and j < |A2|; linje 13–15: bare i; linje 17–19: bare j (tomme linjer 4, 12, 16, 20).
     mergeSort: function (s) {
       var r = [];
       if (!s.frame || s.callLo == null || s.callHi == null) return r;
       var c = C("kall", s.callLo, s.callHi); c.label = "kallets A"; r.push(c);
       if (s.frame === "Merge" && s.rows) {
         var l = s.line % 1000 - 100;
-        if (l >= 4 && l <= 13) r.push(W("i", 0, s.rows[0].cells.length - 1, "A1"));
-        if ((l >= 4 && l <= 10) || (l >= 14 && l <= 16)) r.push(W("j", 0, s.rows[1].cells.length - 1, "A2"));
+        if (l >= 5 && l <= 15) r.push(W("i", 0, s.rows[0].cells.length - 1, "A1"));
+        if ((l >= 5 && l <= 11) || (l >= 17 && l <= 19)) r.push(W("j", 0, s.rows[1].cells.length - 1, "A2"));
       }
       return r;
     },

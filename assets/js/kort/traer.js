@@ -166,7 +166,7 @@
       tips: ["Sensorveiledningen viser inorder + sjekk av sortert rekkefølge som en av tre naturlige løsninger. Den er lineær og kan gi opp til 6 poeng på (b).", "En kvadratisk løsning med FindMin/FindMax i hver node kan gi opp til 4 poeng på (b).", "Å bare sjekke direkte barn er feil. I false-treet er 9 et gyldig høyre barn av 2, men ligger i venstre subtre til 5."]
     }; });
 
-    def("H2023-5", { host: "#exam-h2023-5" }, function () { return { key: "H2023-5", year: "H2023", title: "Diameteren til et binærtre", oppgave_nr: "Oppgave 5", points: 12,
+    def("H2023-5", { host: "#exam-h2023-5" }, function () { return { key: "H2023-5", year: "H2023", title: "Diameteren til et tre", oppgave_nr: "Oppgave 5", points: 12,
       kilde: "Oppgavetekst: UiO, IN2010, H2023, oppgave 5", ark: "Diameteren til et tre", ordrett: true, poengkilde: "sv",
       oppgave: skel(IN.oppg({
         intro: "<p>Vi definerer diameteren til et tre som lengden til den lengste stien mellom to noder.</p>",

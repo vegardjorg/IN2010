@@ -177,7 +177,7 @@
   var mHeap = {
     id: "mock-heap-removemin", tema: "heap", operasjon: "RemoveMin i min-heap (array)",
     sannsynlighet: "høy",
-    begrunnelse: "RemoveMin står i forelesning 04_prioritetskoer, ukesoppgaver 04_prioritetskoeer (bubbleDown), og foreleseren gjennomgår boblingen nedover i detalj. Den ble spurt i Del 1 H2021 (6p), men aldri som standardoppgave. Heap-innsetting var standardoppgaven H2023, så speilbildet er et naturlig neste valg. Innlevering 3 bruker en ferdig prioritetskø fra biblioteket, så der skriver du ikke RemoveMin selv.",
+    begrunnelse: "RemoveMin står i forelesning 04_prioritetskoer, ukesoppgaver 04_prioritetskoeer (bubbleDown), og foreleseren gjennomgår boblingen nedover i detalj. Den ble spurt i Del 1 H2021 (oppg. 4 «Binære heaper», 6p, der RemoveMin-delen (a) gir 2p), men aldri som standardoppgave. Heap-innsetting var standardoppgaven H2023, så speilbildet er et naturlig neste valg. Innlevering 3 bruker en ferdig prioritetskø fra biblioteket, så der skriver du ikke RemoveMin selv.",
     year: "Mock", title: "RemoveMin i en min-heap", points: 10, oppgave_nr: "Oppgave 1 (mock)",
     oppgave:
       "<p>En min-heap med n = 10 elementer er lagret i et array (0-indeksert):</p>" +
@@ -321,7 +321,7 @@
   var mAvl = {
     id: "mock-avl", tema: "traer", operasjon: "AVL-tre: innsetting og sletting med rotasjoner",
     sannsynlighet: "høy",
-    begrunnelse: "AVL er hovedtemaet i forelesning 03_balanserte_soketraer, og innlevering 3 bruker det. (Ukesoppgavene om balanserte søketrær har ingen AVL-oppgave.) Det har kommet hvert år (H2020 9p innsetting, H2022 Del 1 6p, H2025 Anti-AVL), men aldri som standardoppgaven. Sletting med rebalansering er ikke spurt.",
+    begrunnelse: "AVL er hovedtemaet i forelesning 03_balanserte_soketraer, og innlevering 3 bruker det. (Ukesoppgavene om balanserte søketrær har ingen AVL-oppgave.) Det har kommet flere år (H2020 9p innsetting, H2022 Del 1 6p, H2025 Anti-AVL), men aldri som standardoppgaven. Sletting med rebalansering er ikke spurt.",
     year: "Mock", title: "AVL-tre: innsetting og sletting", points: 10, oppgave_nr: "Oppgave 1 (mock)",
     oppgave:
       "<p>Sett inn 5, 9, 14, 3, 7, 6, 4 i denne rekkefølgen i et tomt AVL-tre. Bruk kursets definisjoner: høyden til en løvnode er 0, høyden til null er −1, og balansefaktoren er høyden til venstre subtre minus høyden til høyre subtre.</p>" +
@@ -727,19 +727,19 @@
       "<b>(c)</b> Med (G, B) har B inngrad 1, så bare A legges på stakken. A tas av, og C får inngrad 1. Stakken er tom, og output er bare [A]. Siden 1 &lt; |V| = 7, melder algoritmen feil: grafen har en sykel (for eksempel B → D → E → G → B), og da finnes ingen topologisk ordning.",
       "<b>(d)</b> Pseudokode:" +
         pc("TopSort(G)", "En rettet graf G = (V, E)", "En topologisk ordning av V, eller feil hvis G har en sykel", [
-          "S ← new Stack",
+          "stack ← new Stack",
           "output ← new List",
           "for each v ∈ V do",
           "  inDeg[v] ← InDegree(G, v)",
           "  if inDeg[v] = 0 then",
-          "    Push(S, v)",
-          "while S is not empty do",
-          "  u ← Pop(S)",
+          "    stack.push(v)",
+          "while stack is not empty do",
+          "  u ← stack.pop()",
           "  append u to output",
           "  for each (u, v) ∈ E do",
           "    inDeg[v] ← inDeg[v] − 1",
           "    if inDeg[v] = 0 then",
-          "      Push(S, v)",
+          "      stack.push(v)",
           "if |output| < |V| then",
           "  error \"G har en sykel\"",
           "return output"
@@ -773,7 +773,7 @@
   var mMst = {
     id: "mock-mst", tema: "grafer", operasjon: "Minimalt spenntre: Kruskal og Prim for hånd",
     sannsynlighet: "middels",
-    begrunnelse: "Prim (med pseudokode) og Kruskal (idé) står i forelesning 06_vektede_grafer og ukesoppgaver 06_vektede_grafer. H2020 spurte om Kruskal (vekten til siste kant, 4p), og «minste terskel = største kant i spenntreet» har kommet i grafoppgavene. Det er sjelden standardoppgave, men en sterk kandidat i grafdelen.",
+    begrunnelse: "Prim (med pseudokode) og Kruskal (idé) står i forelesning 06_vektede_grafer og ukesoppgaver 06_vektede_grafer. H2020 spurte om Kruskal (oppg. 8 (f), 4p for fire spørsmål, blant dem vekten til siste kant), og «minste terskel = største kant i spenntreet» har kommet i grafoppgavene. Det er sjelden standardoppgave, men en sterk kandidat i grafdelen.",
     year: "Mock", title: "Minimalt spenntre: Kruskal og Prim", points: 10, oppgave_nr: "Oppgave 1 (mock)",
     oppgave:
       "<p>Gitt den urettede, vektede grafen under.</p>" +
@@ -957,7 +957,8 @@
         states([["etter runde 3", [85, 87, 98, 147, 230, 302, 415, 512]]]),
       "<b>(b)</b> Hver runde skal bevare rekkefølgen fra forrige runde for tall med samme siffer. Det er det som gjør at de lavere sifrene «huskes». Er Bucket sort ikke stabil, kan 87 havne foran 85 i siste runde. Starter du med det mest signifikante sifferet og gjør det samme, avgjør siste runde (enersifferet) alt, og du får [230, 302, 512, 415, 85, 147, 87, 98], som ikke er sortert.",
       "<b>(c)</b> Pseudokode (siffer 0 er det mest signifikante, siffer d − 1 enersifferet):" +
-        pc("RadixSort(A, d)", "Et array A med ikke-negative heltall med høyst d sifre", "A sortert stigende", [
+        pc("RadixSort(A)", "Et array A med ikke-negative heltall", "A sortert stigende", [
+          "d ← number of digits in the largest number",
           "for i ← d − 1 down to 0 do",
           "  A ← BucketSort(A, i)   // stabil, på siffer nr. i",
           "return A"
@@ -999,7 +1000,7 @@
   var mSep = {
     id: "mock-separasjonsnoder", tema: "grafer", operasjon: "Separasjonsnoder med depth og low (DFS)",
     sannsynlighet: "lav",
-    begrunnelse: "SeparationVertices med depth og low står i forelesning 07_sammenhengende_grafer og notatet Utvalgte_grafalgoritmer, Ukesoppgaver 07_sammenhengende_grafer tar separasjonsnoder bare som begrep, uten depth og low. H2025 spurte om separasjonsnoder som bruk i grafoppgaven, ikke som håndkjøring. Den er krevende å rette, så den er lite sannsynlig som standardoppgave, men nyttig øving for grafdelen.",
+    begrunnelse: "SeparationVertices med depth og low står i forelesning 07_sammenhengende_grafer og notatet Utvalgte_grafalgoritmer. Ukesoppgaver 07_sammenhengende_grafer tar separasjonsnoder bare som begrep, uten depth og low. H2025 spurte om separasjonsnoder som bruk i grafoppgaven, ikke som håndkjøring. Den er krevende å rette, så den er lite sannsynlig som standardoppgave, men nyttig øving for grafdelen.",
     year: "Mock", title: "Separasjonsnoder", points: 10, oppgave_nr: "Oppgave 1 (mock)",
     oppgave:
       "<p>Gitt den urettede grafen under. Naboene behandles i alfabetisk rekkefølge.</p>" +
@@ -1034,12 +1035,13 @@
         fig(graph({ w: 420, h: 190, nodes: SN, edges: SE, hn: ["C", "D", "F"], label: "Separasjonsnodene C, D og F er uthevet" }), "Uthevet: separasjonsnodene."),
       "<b>(c)</b> Med {E, G} blir low[G] = depth[E] = 4, så 5 ≤ 4 er usant og F er ikke lenger en separasjonsnode. D og C er fortsatt separasjonsnoder (low[E] = 3, low[D] = 2). Svaret er {C, D}.",
       "<b>Pseudokode</b> (kursets variant, til referanse; depth og low er ordbøker, seps er felles for begge prosedyrene):" +
-        pc("SeparationVertices(G, s)", "En sammenhengende, urettet graf G = (V, E) og en startnode s", "Mengden av separasjonsnoder", [
-          "seps ← new Set",
-          "depth[s] ← 0",
-          "Visit(G, s)",
-          "if s har mer enn ett barn i DFS-treet then",
-          "  add s to seps",
+        pc("SeparationVertices(G)", "En sammenhengende, urettet graf G = (V, E)", "Mengden av separasjonsnoder", [
+          "depth, low, seps ← empty map, empty map, empty set",
+          "r ← an arbitrary node in V   // her r = A",
+          "depth[r] ← 0",
+          "Visit(G, r)",
+          "if r has more than one child in the DFS tree then",
+          "  add r to seps",
           "return seps"
         ]) +
         pc("Visit(G, u)", "", "", [

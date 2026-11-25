@@ -4,7 +4,7 @@
    en skanner som finner symbolene i ren tekst (IN.SYMBOLER.scan).
    Lastes rett etter core.js. Selve verktøytipset (IN.symbolTips) ligger i core.js,
    og pseudocode.js bruker skanneren i tokenizeren.
-   Skrivemåten følger kurset (plan/symbolbank.md, plan/gjennomgang/symboler.md).
+   Skrivemåten følger kurset (plan/symbolbank.md, plan/gjennomgang/symboler.md). Unntak: ↦ er guidens egen.
    ============================================================ */
 (function () {
   "use strict";
@@ -70,7 +70,7 @@
               txt: "∑ betyr «legg sammen». Grensene sier hvor tellingen starter og slutter.",
               eks: "Summen av i for i fra 1 til n er 1 + 2 + … + n = n(n + 1)/2." },
     maps:   { vis: "↦", navn: "«kobles til»",
-              txt: "k ↦ v betyr at nøkkelen k er koblet til verdien v (et par i et hashmap).",
+              txt: "k ↦ v betyr at nøkkelen k er koblet til verdien v (et par i et hashmap). Det er guidens skrivemåte; kurset sier det med ord.",
               eks: "«ola» ↦ 42: slår vi opp «ola», får vi 42." }
   };
 

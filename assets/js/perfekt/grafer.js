@@ -429,7 +429,7 @@
     hvorfor: {
       eli5: "<p>(a): Kommer du til et sted du har vært, uten å snu, har du gått i ring. (b): Hvis noen venter på hverandre i ring, blir de aldri ferdige.</p>",
       normal: "<p>Sensorveiledningen trekker 2 poeng i (a) hvis forelderen ikke hoppes over. Løsninger i O(|V| · (|V| + |E|)) gir opp til 3 poeng i begge deloppgavene.</p>",
-      teknisk: "<p>(a): i et DFS-tre for en urettet graf er hver kant enten en trekant eller en tilbakekant. En tilbakekant (til en besøkt node som ikke er forelderen) lukker en sykel. (b): G er en DAG hvis og bare hvis topologisk sortering behandler alle |V| nodene.</p>"
+      teknisk: "<p>(a): i et DFS-tre for en urettet graf er hver kant enten en kant i DFS-treet eller en tilbakekant. En tilbakekant (til en besøkt node som ikke er forelderen) lukker en sykel. (b): G er en DAG hvis og bare hvis topologisk sortering behandler alle |V| nodene.</p>"
     },
     sensor: {
       kilde: "Kilde: sensorveiledning IN2010 H2025, oppgave 3",

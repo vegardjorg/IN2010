@@ -85,7 +85,7 @@
     tre: { directed: false,
       nodes: [N("A", 40, 40), N("B", 150, 40), N("C", 260, 40), N("D", 95, 140), N("E", 205, 140), N("F", 315, 140)],
       edges: [["A", "B"], ["A", "D"], ["B", "C"], ["B", "E"], ["E", "F"]] },
-    // Skog: to trær, men sykel i det andre
+    // To komponenter: et tre og en komponent med sykel
     skog: { directed: false,
       nodes: [N("A", 40, 40), N("B", 150, 40), N("C", 95, 140), N("D", 260, 40), N("E", 370, 40), N("F", 315, 140)],
       edges: [["A", "B"], ["A", "C"], ["D", "E"], ["D", "F"], ["E", "F"]] }
@@ -417,7 +417,8 @@
   function topGen(inp, mode) {
     var g = inp[0], A = adj(g), V = ids(g), steps = [];
     var deg = {}, stack = [], out = [], removed = {}, cur = null, hot = null, U = null;
-    // Linjenumrene er like i TopSort og HasCycleDirected (bare linje 3, 9, 13 og 14 skiller seg)
+    // Linjenumrene er like i TopSort (14 linjer) og HasCycleDirected (13 linjer). Linje 3 og 9 skiller seg,
+    // linje 13 er feilsjekken i TopSort og return i HasCycleDirected, og linje 14 (return output) finnes bare i TopSort.
     var LN = { init: 5, push0: 6, pop: 8, out: 9, dec: 11, pushv: 12, check: 13, ret: 14 };
     V.forEach(function (v) { deg[v] = 0; });
     g.edges.forEach(function (e) { deg[e[1]]++; });

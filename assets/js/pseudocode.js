@@ -1,6 +1,6 @@
 /* ============================================================
    IN2010 guide · pseudocode.js
-   Pseudokode i eksamensformat (algorithm2e-stil):
+   Pseudokode i eksamensformat (samme form som lysarkene):
    tokenizer, renderer med linjemarkering, nivåstyrt linjeforklarer,
    Big-O-boks og Parsons-øving ("sorter linjene"). Klassisk script.
    ============================================================ */
@@ -13,7 +13,7 @@
 
   /* ---------- Tokenizer ---------- */
   var KEYWORDS = {
-    Procedure:1, Function:1, "for":1, to:1, downto:1, "do":1, "while":1, "if":1, then:1,
+    Procedure:1, Function:1, "for":1, to:1, down:1, downto:1, "do":1, "while":1, "if":1, then:1,
     "else":1, elseif:1, "return":1, and:1, or:1, not:1, "new":1, swap:1, "true":1, "false":1,
     "null":1, "break":1, "continue":1, append:1, "in":1, is:1, mod:1, repeat:1, until:1,
     each:1, of:1, "then":1, error:1, yield:1

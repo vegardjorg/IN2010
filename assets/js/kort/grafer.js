@@ -240,7 +240,7 @@
       losning: sol(["Nodene er personer og kantene vennskap. Vennskap går begge veier, så grafen er urettet (en rettet graf ga like mye uttelling).",
         "Bredde-først søk fra s som lagrer avstanden (antall ledd) til hver node, og som ikke går videre fra noder på avstand k. Tell jazz og klassisk for alle nodene søket når. O(|V| + |E|).",
         "<b>Bredde-først søk (BFS)</b>: det besøker nodene lag for lag, altså venner før venners venner."], ["jazzOrClassical"],
-        { outro: "<p class=\"small\">Linja <code>if dist[u] &lt; k</code> gjør at noder på avstand k blir talt med, men at vi ikke går videre fra dem. Om du teller deg selv (s) med, spiller liten rolle. Si hva du velger.</p>" }),
+        { outro: "<p class=\"small\">Linja <code>if dist[u] &lt; k</code> gjør at noder på avstand k blir talt med, men at vi ikke går videre fra dem. Sensors kode teller også s, fordi s ligger i visited. Arket tyder heller på at bare vennene skal telles, og valget kan avgjøre svaret: i presetet med k = 3 blir det uavgjort hvis s telles med. Si hva du velger.</p>" }),
       kjerne: "<p>«Innen k ledd» = korteste avstand i antall kanter ≤ k. Det er nøyaktig det BFS beregner.</p>",
       tips: ["Tips: velg BFS i (b). Sensorveiledningens forslag er et dybdebegrenset DFS med felles visited. I noen grafer kan det nå en venn via en lang omvei først, merke den som besøkt og så ikke gå videre fra den, selv om den egentlig er nærmere. BFS når hver node via en korteste sti først.",
         "Sensorveiledningen trekker 3 poeng i (b) hvis k ikke tas høyde for i det hele tatt."]

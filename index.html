@@ -7,8 +7,8 @@
   <title>IN2010 · interaktiv eksamensguide</title>
   <meta name="description" content="Interaktiv eksamensguide for IN2010 – Algoritmer og datastrukturer. Slik ser eksamen ut, og alle eksamensoppgavene fra H2020 til H2025.">
   <script>(function(){try{var d=document.documentElement;var t=localStorage.getItem('in-theme');if(t!=='dark'&&t!=='system')t='light';if(t!=='system')d.setAttribute('data-theme',t);var l=localStorage.getItem('in-level');if(l!=='eli5'&&l!=='teknisk')l='normal';d.setAttribute('data-level',l);}catch(e){document.documentElement.setAttribute('data-theme','light');document.documentElement.setAttribute('data-level','normal');}})();</script>
-  <link rel="stylesheet" href="assets/css/styles.css?v=20261125k">
-  <link rel="stylesheet" href="assets/css/begrep-tips.css?v=20261125k">
+  <link rel="stylesheet" href="assets/css/styles.css?v=20261125l">
+  <link rel="stylesheet" href="assets/css/begrep-tips.css?v=20261125l">
 </head>
 <body data-page="index">
   <a class="skip-link" href="#main">Hopp til innhold</a>
@@ -57,11 +57,12 @@
           <p>Øv på å skrive svaret i <a href="pseudokode.html#fane=skriveguide">Pseudokode → Skriveguide</a>.</p>
         </div>
         <ul>
-          <li><b>Pseudokode</b> – eller en presis forklaring på vanlig norsk. Riktig idé uten pseudokode gir
-            som regel høyst halv pott.</li>
-          <li><b>Oppgi alltid kjøretid.</b> Mangler den eller er den feil, trekkes det typisk 1 poeng.</li>
-          <li><b>Poengene trappes etter kjøretid:</b> beste løsning gir full pott, ett trinn dårligere omtrent
-            halvparten.</li>
+          <li><b>Pseudokode</b> – eller en presis forklaring på vanlig norsk. En klar forklaring kan gi mer enn uklar
+            pseudokode. Bare en riktig idé uten presis beskrivelse gir færre poeng, og hvor mange varierer.</li>
+          <li><b>Oppgi alltid kjøretid.</b> Mangler den eller er den feil, mister du poengene for
+            kjøretidsdelen (ofte 1–2 p), eller det trekkes (H2023: 1 p).</li>
+          <li><b>Poengene trappes etter kjøretid:</b> beste løsning gir full pott. Ett trinn dårligere gir ofte mer
+            enn halvparten, men det varierer fra oppgave til oppgave.</li>
           <li><b>Bruk pensum fritt</b> uten å skrive det selv – si hva kallet gjør og hva det koster. Skriv ned
             antagelsene dine.</li>
         </ul>
@@ -71,7 +72,7 @@
         <div class="a4-sechead">
           <h2 id="a4-kart-h">Oppgavekart H2020–H2025</h2>
           <p>Oppgavene i den rekkefølgen de kom, med nummer og poeng. Lenkene går rett til oppgaven.
-            Fra 2023 har settet en egen sant/usant-del; før det lå sant/usant inne i oppgavene.</p>
+            Fra 2023 er del 1 én samlet sant/usant-blokk. Før det var del 1 flere små nummererte oppgaver, og noen av dem var sant/usant.</p>
         </div>
         <div id="task-map" class="a4-map"></div>
       </section>
@@ -100,12 +101,12 @@
     IN2010-guide · laget for eksamensøving · fungerer frakoblet (file://) og på GitHub Pages.
   </footer>
 
-  <script src="assets/js/core.js?v=20261125k"></script>
-  <script src="assets/js/symboler.js?v=20261125k"></script>
-  <script src="assets/js/begreper-data.js?v=20261125k"></script>
-  <script src="assets/js/begrep-tips.js?v=20261125k"></script>
-  <script src="assets/js/data-mock.js?v=20261125k"></script>
-  <script src="assets/js/data-crash.js?v=20261125k"></script>
+  <script src="assets/js/core.js?v=20261125l"></script>
+  <script src="assets/js/symboler.js?v=20261125l"></script>
+  <script src="assets/js/begreper-data.js?v=20261125l"></script>
+  <script src="assets/js/begrep-tips.js?v=20261125l"></script>
+  <script src="assets/js/data-mock.js?v=20261125l"></script>
+  <script src="assets/js/data-crash.js?v=20261125l"></script>
   <script>
   /* Crash course-boksen øverst: samme utregning som løypesiden (IN.crashProgress) */
   (function () {
@@ -287,7 +288,7 @@
     var TOPICS = [
       { name: "Grafer", n: 6, pts: "22–46 p", often: "Alltid",
         items: "Gjør en historie om til en graf. BFS/DFS, sykler, topologisk sortering, komponenter. Dijkstra, Bellman-Ford, minimalt spenntre.",
-        tip: "O(|V| + |E|) gir full pott. Én traversering per node gir omtrent halvparten.",
+        tip: "O(|V| + |E|) gir full pott. Én traversering per node ga omtrent halvparten i H2024 og H2025, men andelen varierer.",
         links: [["grafer", "begreper", "Begreper"], ["grafer", "bfs", "BFS"], ["grafer", "dfs", "DFS"], ["grafer", "sykler", "Sykler"], ["grafer", "topologisk", "Topologisk"],
                 ["grafer", "sammenheng", "Sammenheng"], ["grafer", "scc", "Sterke komponenter"], ["grafer", "dijkstra", "Dijkstra"], ["grafer", "mst", "MST"]] },
       { name: "Trær", n: 6, pts: "12–24 p", often: "Alltid",
@@ -297,16 +298,16 @@
                 ["traer", "avl", "AVL"], ["traer", "antiavl", "Anti-AVL"], ["traer", "huffman", "Huffman"]] },
       { name: "Heap og prioritetskø", n: 5, pts: "6–20 p", often: "Nesten alltid",
         items: "Insert og RemoveMin for hånd. Bygg noe nytt oppå en heap: mediankø, bøttekø.",
-        tip: "Mediankø: to heaper gir full pott; å lete etter medianen ved behov gir lite.",
+        tip: "Mediankø: to heaper gir full pott; å sortere når medianen trengs ga høyst 2 av 6 (H2024).",
         links: [["heap", "innsetting", "Insert"], ["heap", "removemin", "RemoveMin"], ["heap", "levelorder", "Level-order"],
                 ["heap", "median", "Mediankø"], ["heap", "pk", "Prioritetskø"]] },
-      { name: "Hashing", n: 5, pts: "8–10 p", often: "Nesten alltid",
+      { name: "Hashing", n: 5, pts: "8–19 p", often: "Nesten alltid",
         items: "Linear probing eller separate chaining for hånd, pseudokode for innsetting. Hashset som verktøy for lineære løsninger.",
         tip: "Oppgi både forventet O(1) og verste tilfelle O(n).",
         links: [["hashing", "chaining", "Chaining"], ["hashing", "probing", "Linear probing"], ["hashing", "python", "Python-dict"], ["hashing", "triks", "Hashing som verktøy"], ["sok", "triks", "Array-triks"]] },
-      { name: "Søk i array", n: 5, pts: "10–12 p", often: "Nesten alltid",
+      { name: "Søk i array", n: 4, pts: "10–12 p", often: "Nesten alltid",
         items: "Finn duplikat, par eller de k minste. Sorter én gang, søk mange ganger. Modifisert binærsøk.",
-        tip: "Kjøretidstrapp: jo raskere, jo flere poeng – og 0 for en treg løsning når en bedre finnes.",
+        tip: "Kjøretidstrapp: jo raskere, jo flere poeng – og lite (ofte høyst 1 p) for en treg løsning når en bedre finnes.",
         links: [["sok", "binaersok", "Binærsøk"], ["sok", "duplikat", "Finn duplikat"], ["sok", "kminste", "Finn k minste"], ["sok", "sortersok", "Sorter én gang"]] },
       { name: "Sortering", n: 4, pts: "6–13 p", often: "Ofte",
         items: "Stabil bøttesortering når nøklene er få. Stabilitet. Drøft en ukjent algoritme mot pensum (gnome sort).",
@@ -416,17 +417,19 @@
 
     // ===== Blokkene =====
     var BLOCKS = [
-      { page:"begreper",  n:"0", title:"Begreper",  desc:"Algoritme, datastruktur, stor O, stabil/in-place, ADT, rekursjon.", tasks:3 },
+      { page:"begreper",  n:"0", title:"Begreper",  desc:"Algoritme, datastruktur, stor O, stabil/in-place, ADT, rekursjon.", tasks:6 },
       { page:"lister",    n:"0b", title:"Lister, stakk & kø", desc:"Array vs. lenket liste, dynamisk array (dobling), stakk og kø, nylige søk (LRU).", tasks:1 },
       { page:"sortering", n:"1", title:"Sortering", desc:"Selection, bubble, insertion, gnome, merge, quick, bøtte, radix og heapsort.", tasks:5 },
       { page:"sok",       n:"2", title:"Søk & array-triks", desc:"Rett-frem søk og binærsøk, sorter én gang, finn duplikat, finn k minste, hashtriks.", tasks:4 },
       { page:"heap",      n:"3", title:"Heap / prioritetskø", desc:"Insert, removeMin, BuildHeap, level-order, mediankø, heapsort, bøttekø.", tasks:6 },
-      { page:"traer",     n:"4", title:"Trær & søketrær", desc:"Traversering, binære søketrær (BST: CheckBST, InRange), diameter, LCA, AVL/Anti-AVL, Huffman og prefikstre.", tasks:12 },
+      { page:"traer",     n:"4", title:"Trær & søketrær", desc:"Traversering, binære søketrær (BST: CheckBST, InRange), diameter, LCA, AVL/Anti-AVL, Huffman og prefikstre.", tasks:11 },
       { page:"hashing",   n:"5", title:"Hashing", desc:"Hashfunksjon, chaining, linear probing, rehash, Python 3.6-dict, hashing som verktøy.", tasks:6 },
       { page:"grafer",    n:"6", title:"Grafer", desc:"BFS, DFS, sykler, topsort, sterkt sammenhengende komponenter (SCC), Dijkstra, Bellman-Ford, MST.", tasks:16 },
-      { page:"strategi",  n:"7", title:"Strategi & kompleksitet", desc:"Kjøretidsanalyse, algoritmestrategier, P og NP, eksamensteknikk.", tasks:5 }
+      { page:"strategi",  n:"7", title:"Strategi & kompleksitet", desc:"Kjøretidsanalyse, algoritmestrategier, P og NP, eksamensteknikk.", tasks:2 }
     ];
     var blockHost = IN.qs("#block-cards");
+    // tasks skal stemme med oppgavekartet over: tell oppgavene i TASKS som hører til siden.
+    BLOCKS.forEach(function (b) { b.tasks = TASKS.filter(function (r) { return r[4] === b.page; }).length; });
     BLOCKS.forEach(function (b) {
       var kids = [el("span", { class: "a4-bn", text: b.n }), el("span", { text: b.title })];
       if (b.tasks > 0) kids.push(el("span", { class: "a4-bt", text: b.tasks + " oppg." }));

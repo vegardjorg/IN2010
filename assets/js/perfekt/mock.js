@@ -328,7 +328,7 @@
       { del: "(c)",
         tekst: "<p>Kursets Dijkstra med prioritetskø og visited:</p>",
         kode: "dijkstra",
-        etter: "<p class=\"small muted\">For å kunne svare på (b) lagrer vi i tillegg forelderen til v hver gang dist[v] blir bedre (parents[v] ← u sammen med linje 12).</p>",
+        etter: "<p class=\"small muted\">For å kunne svare på (b) lagrer vi i tillegg forelderen til v hver gang dist[v] blir bedre (parents[v] ← u sammen med linje 13, dist[v] ← c).</p>",
         poeng: ["prioritetskø og oppdatering av dist (2p)"] },
       { del: "(d)",
         tekst: "<p><b>O((|V| + |E|) · log(|V|)).</b> Hver node tas ut og behandles én gang, og hver kant kan gi én innsetting i køen. Køen har høyst O(|E|) innslag, og hver Insert og RemoveMin koster O(log(|E|)) = O(log(|V|)).</p>",

@@ -88,7 +88,7 @@
         kjerne: t(
           "Eksamen er som et brettspill med faste regler. Først et lett spørsmål. Så mange små «sant eller usant», der det lønner seg å svare på alt. Til slutt større oppgaver der du forklarer, skriver pseudokode og sier hvor lang tid løsningen tar. Den som kan reglene, taper færre poeng på dumme ting.",
           "<p>Eksamen er 100 poeng: oppvarming (2 p), del 1 med sant/usant (32, 22 og 26 p i 2023–2025) og del 2 med 6–7 langsvarsoppgaver. I del 1 teller blankt og galt likt, så svar på alle. I del 2 gir lavere kjøretid flere poeng, og du kan bruke pensumalgoritmer uten å skrive dem selv (står i oppgavesettene fra 2023). Gjør rede for antagelsene dine.</p>",
-          "<p>Del 1 (2023–2025): N påstander, n riktige, poeng = 2 · max(n − N/2, 0). Ren gjetting gir i snitt 0. Del 2: sensorveiledningene gir poeng i trinn etter kjøretid (optimal løsning full pott). Hvor mye en tregere, riktig løsning gir, varierer: 4 av 5 for O(n log n) på H2023 Finn duplikat, inntil 5 av 8 for O(n²) på H2023 diameter og 4 av 6 for kvadratisk CheckBST på H2022, men høyst 1 p for verre enn O(n log n) på Finn duplikat. Feil eller manglende kjøretid koster typisk 1 p. Riktig idé uten pseudokode gir opptil halv pott, og presis tekst kan gi mer enn uklar pseudokode.</p>"),
+          "<p>Del 1 (2023–2025): N påstander, n riktige, poeng = 2 · max(n − N/2, 0). Ren gjetting gir i snitt 0. Del 2: sensorveiledningene gir poeng i trinn etter kjøretid (optimal løsning full pott). Hvor mye en tregere, riktig løsning gir, varierer: 4 av 5 for O(n log n) på H2023 Finn duplikat, inntil 5 av 8 for O(n²) på H2023 diameter og 4 av 6 for kvadratisk CheckBST på H2022, men høyst 1 p for verre enn O(n log n) på Finn duplikat. Mangler kjøretiden eller er den feil, mister du poengene for kjøretidsdelen (ofte 1–2 p), eller det trekkes (H2023: 1 p). Hva en riktig idé uten pseudokode gir, varierer: H2021 oppg. 12 ga opptil 5 av 10 for en setning med riktig idé, og H2024 oppg. 2 (c) sa at en god beskrivelse på naturlig språk gir like god uttelling. Presis tekst kan gi mer enn uklar pseudokode.</p>"),
         les: [["strategi", "eksamensteknikk", "tek-typer", "Strategi → Oppgavetypene"], ["strategi", "eksamensteknikk", "tek-bygg", "Pensum som byggeklosser"]],
         oppskrift: [
           "<b>Del 1:</b> svar på alle påstandene. Blankt teller som galt.",
@@ -111,7 +111,7 @@
         ] }],
         feller: [
           "Å la påstander i del 1 stå blanke. De teller som gale.",
-          "Å glemme kjøretiden. Det koster typisk 1 poeng per deloppgave.",
+          "Å glemme kjøretiden. Da mister du poengene for kjøretidsdelen (ofte 1–2 p), eller det trekkes (H2023: 1 p per deloppgave).",
           "Å kalle en pensumalgoritme når oppgaven ber deg skrive nettopp den, for eksempel HeapInsert."
         ] }
     ] },
@@ -268,8 +268,8 @@
           "<p>Innsettingen bevarer formen (komplett binærtre) ved å bruke første ledige plass, og reparerer heap-egenskapen langs én sti fra løvnoden mot roten. Antall bytter er høyst høyden etter innsettingen, ⌊log(n + 1)⌋, med O(1) arbeid per bytte: O(log n) i verste tilfelle.</p>"),
         les: [["heap", "innsetting", null, "Heap → Innsetting"]],
         oppskrift: [
-          "<b>(a) Sluttilstand, 2–3 p:</b> regn én innsetting om gangen på kladd og skriv sluttilstanden tydelig. Sensor gir poeng for riktig svar og ingen for feil (H2022), så ett feil steg underveis koster hele deloppgaven.",
-          "<b>(b) Forklaring og pseudokode, 5–7 p:</b> forklar idéen i én–to setninger og skriv pseudokoden. Uten pseudokode får du omtrent 3.",
+          "<b>(a) Sluttilstand, 2–3 p:</b> regn én innsetting om gangen på kladd og skriv sluttilstanden tydelig. I H2022 (Linear probing) ga sensor poeng for riktig sluttilstand og ingen for feil. I H2023 (heap) ga et nesten riktig svar, en gyldig min-heap som ikke var den riktige, 1 av 2 p. Ett feil steg underveis kan altså koste det meste av deloppgaven.",
+          "<b>(b) Forklaring og pseudokode, 6–8 p:</b> forklar idéen i én–to setninger og skriv pseudokoden. Uten pseudokode får du omtrent halvparten: 3 av 6 for en skissert algoritme i H2023 (heap), opptil 5 av 8 for en god forklaring i H2022 (Linear probing).",
           "<b>(c) Kjøretid:</b> til slutt, med begrunnelse. For hashing: både forventet og verste tilfelle.",
           "Skriv hvilken regel du bruker (bobler opp mot forelder ⌊(i − 1)/2⌋, overskriver lik nøkkel, slår sammen de to minste)."
         ],
@@ -288,7 +288,7 @@
         ],
         feller: [
           "1-indekserte foreldreformler. Med 0-indeksering er forelderen ⌊(i − 1)/2⌋.",
-          "Å regne i hodet. Ett feil steg gir feil sluttsvar, og feil svar gir 0 p, så ta det én innsetting om gangen på kladd.",
+          "Å regne i hodet. Ett feil steg gir feil sluttsvar, og feil svar gir lite eller ingenting, så ta det én innsetting om gangen på kladd.",
           "Å kalle Insert når oppgaven ber deg forklare og skrive selve innsettingen."
         ] },
 
@@ -320,7 +320,7 @@
         kjerne: t(
           "Hver knagg i garderoben har en pose. Får flere jakker samme knaggnummer, havner de i samme pose.",
           "<p>Hver plass A[i] er null eller en <b>bøtte</b> (en liste med nøkkel-verdi-par). Innsetting: i ← h(k, N). Er A[i] null, lag en ny bøtte med (k, v). Ellers let gjennom bøtta: finnes k, overskriv verdien, ellers legg paret bakerst. Forventet O(1), O(n) i verste tilfelle.</p>",
-          "<p>Med en hashfunksjon som sprer godt, er forventet bøttelengde Load factor n/N. Holdes den under en fast grense med rehash, er operasjonene forventet O(1). Hasher alle nøklene til samme bøtte, blir det O(n).</p>"),
+          "<p>Under antakelsen om uniform hashing er forventet bøttelengde Load factor n/N (vår egen utregning; lysarkene sier bare at det gir forventet O(1)). Holdes den under en fast grense med rehash, er operasjonene forventet O(1). Hasher alle nøklene til samme bøtte, blir det O(n).</p>"),
         les: [["hashing", "chaining", null, "Hashing → Separate chaining"]],
         oppskrift: [
           "Skriv svaret som i: (k, v), (k, v) for hver ikke-tom plass.",
@@ -354,7 +354,7 @@
         oppskrift: [
           "Skriv køen etter hver sammenslåing: hvilke to som tas ut, og hvilken sum som settes inn.",
           "Tegn det ferdige treet og les av kodelengdene som dybder.",
-          "Byggealgoritmen: prioritetskø på frekvens, ta ut to, sett inn summen, til ett tre er igjen. Kjøretid O(n log n): n − 1 runder med to removeMin og én insert."
+          "Byggealgoritmen: prioritetskø på frekvens, ta ut to, sett inn summen, til ett tre er igjen. Kjøretid O(n log n), der n er antall ulike symboler: n − 1 runder med to removeMin og én insert. (Kjøretiden står ikke i kildene; det er vår egen analyse med heap.)"
         ],
         eksempel: [["traer", "huffman", "demo-huffman", "Huffman steg for steg"]],
         oppgaver: ["t24huf"],
@@ -363,7 +363,7 @@
           { q: "Frekvenser: A = 5, B = 1, C = 1, D = 2. Hvilke kodelengder gir Huffman?", options: ["A: 1, D: 2, B: 3, C: 3", "A: 2, B: 2, C: 2, D: 2", "A: 1, B: 2, C: 3, D: 3", "A: 3, D: 2, B: 1, C: 1"], answer: 0,
             explain: "B + C = 2. Så D (2) + BC (2) = 4. Så 4 + A (5) = 9. A ligger på dybde 1, D på dybde 2, B og C på dybde 3." },
           { q: "Hvilken datastruktur gjør byggingen O(n log n)?", options: ["Et sortert array som sorteres på nytt etter hver sammenslåing", "En prioritetskø (min-heap) på frekvens", "Et hashmap", "En stakk"], answer: 1,
-            explain: "Hver av de n − 1 sammenslåingene gjør to removeMin og én insert, hver O(log n)." },
+            explain: "Med n ulike symboler gjør hver av de n − 1 sammenslåingene to removeMin og én insert, hver O(log n)." },
           { q: "Hva ligger i løvnodene?", options: ["Summene", "Symbolene med frekvensene sine", "Kodene", "Ingenting"], answer: 1,
             explain: "Bare løvnodene har symboler. Det er derfor ingen kode er prefiks av en annen." }
         ] }],
@@ -497,7 +497,7 @@
           "Representasjon: to heaper og regelen for størrelsene. Si det i én setning.",
           "Pseudokode for insert og removeMedian, med rebalansering.",
           "Kjøretid O(log n) for begge.",
-          "To heaper gir full pott (6 p). Å lete etter medianen ved behov gir maks 2."
+          "To heaper gir full pott (6 p). En sortert liste der du holder styr på midten gir maks 4, og en usortert struktur som sorteres når medianen trengs, gir maks 2."
         ],
         eksempel: [["heap", "median", "tracer-med", "Mediankøen steg for steg"]],
         oppgaver: ["h24med"],
@@ -510,7 +510,7 @@
             explain: "Høyst noen få heap-operasjoner, hver O(log n)." }
         ] }],
         feller: [
-          "Å lete etter medianen ved hvert kall: maks 2 av 6.",
+          "Å sortere på nytt hver gang medianen trengs: maks 2 av 6.",
           "Å glemme å rebalansere etter removeMedian."
         ] },
 
@@ -613,7 +613,7 @@
         hvorfor: "Python 3.6-ordbøker (2024, 10 p) handlet om oppslag, rehash og fordelene med ny struktur. Rehash og amortisert tid passer også godt som sant/usant-påstander (vår vurdering, siden del 1-påstandene 2023–2025 ikke er offentlige).",
         kjerne: t(
           "Blir garderoben for full, flytter du til en dobbelt så stor og henger opp alle jakkene på nytt. Det tar tid, men skjer så sjelden at det i snitt nesten ikke merkes.",
-          "<p><b>Load factor</b> er n/N. Kurset rehasher når n/N når 0,75: lag et array med dobbel størrelse og sett inn alle parene på nytt med ny N, O(n). Fordi N dobles, blir innsetting <b>amortisert</b> O(1) (forventet). Python fra 3.6: et tett <b>entries</b>-array i innsettingsrekkefølge og et glissent <b>indices</b>-array med indekser inn i entries.</p>",
+          "<p><b>Load factor</b> er n/N. Kursnotatet om hashing rehasher når n/N når 0,75 (H2024 sier bare «for høy»): lag et array med dobbel størrelse og sett inn alle parene på nytt med ny N, O(n). Fordi N dobles, blir innsetting <b>amortisert</b> O(1) (forventet). Python fra 3.6: et tett <b>entries</b>-array i innsettingsrekkefølge og et glissent <b>indices</b>-array med indekser inn i entries.</p>",
           "<p>Doblingen gjør at rehashene skjer ved n ≈ 0,75 · 1, 2, 4, 8 …, og summen av arbeidet er en geometrisk rekke, O(n) totalt. I Python 3.6-strukturen er det bare indices som må bygges på nytt ved rehash. Entries beholdes.</p>"),
         les: [["hashing", "kjoretid", null, "Hashing → Rehash og kjøretid"], ["hashing", "python", null, "Hashing → Python-ordbøker"]],
         oppskrift: [
@@ -769,7 +769,7 @@
         kjerne: t(
           "Tenk deg at du sender ut løpere fra start. Den løperen som er nærmest, er alltid først framme. Hver gang en løper kommer fram til en node, sjekker hun om veien videre gjør noen andre noder raskere å nå.",
           "<p>Sett avstanden til start til 0 og til alle andre til ∞. Ta hele tiden ut noden med minst avstand fra prioritetskøen. For hver kant (u, v): er d[u] + w(u, v) < d[v], oppdater d[v] og forrige[v], og legg v i køen (edge relaxation). En node som er tatt ut, er ferdig. Krever at ingen kanter har negativ vekt. O((|V| + |E|) · log(|V|)).</p>",
-          "<p>Tabellen: én rad per uttak, én kolonne per node med (avstand, forrige). Kurset viser også en versjon uten DecreasePriority: legg noden inn på nytt med ny prioritet og hopp over noder som allerede er ferdige. Køen kan da ha opptil |E| elementer, men siden |E| ≤ |V|², er log(|E|) ≤ 2 · log(|V|), og derfor er kjøretiden fortsatt O((|V| + |E|) · log(|V|)).</p>"),
+          "<p>Tabellen: én rad per uttak, én kolonne per node med (avstand, forrige). Kurset viser også en versjon uten DecreasePriority: legg noden inn på nytt med ny prioritet og hopp over noder som allerede er ferdige. Køen kan da ha opptil |E| elementer, men i en enkel graf (uten parallelle kanter) er |E| ≤ |V|², så log(|E|) ≤ 2 · log(|V|), og derfor er kjøretiden fortsatt O((|V| + |E|) · log(|V|)).</p>"),
         les: [["grafer", "dijkstra", null, "Grafer → Dijkstra"]],
         oppskrift: [
           "Tegn tabellen før du begynner: kolonner for hver node, rad for hvert uttak.",

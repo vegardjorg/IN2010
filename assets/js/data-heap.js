@@ -541,7 +541,7 @@
       why: t(
         "Tallet synker én etasje om gangen, og treet har få etasjer.",
         "Høyst like mange kall som høyden til noden i, altså høyst O(log n) fra roten.",
-        "Hvert kall flytter i til 2i + 1 eller 2i + 2, så i + 1 minst dobles. Da blir det høyst ⌊log n⌋ kall fra roten, og bare noen få nær bunnen. Det er nettopp derfor BuildMinHeap blir lineær. Rekursjonen bruker O(log n) plass på kallstakken. En løkke-versjon klarer seg med O(1)."
+        "Hvert kall flytter i til 2i + 1 eller 2i + 2, så i + 1 minst dobles. Da blir det høyst ⌊log n⌋ bytter (⌊log n⌋ + 1 kall, medregnet det siste kallet som ikke bytter) fra roten, og bare noen få nær bunnen. Det er nettopp derfor BuildMinHeap blir lineær. Rekursjonen bruker O(log n) plass på kallstakken. En løkke-versjon klarer seg med O(1)."
       )
     }
   });
@@ -549,7 +549,7 @@
   /* ===================== BUILDMINHEAP ===================== */
   var G_BUILD = g("Hvorfor starte på ⌊n/2⌋, og hvorfor baklengs?",
     t("Tallene i den bakerste halvdelen har ingen barn, så de kan ikke synke. Vi starter rundt midten og går baklengs mot toppen. En node kan nemlig bare synke riktig når alt under den allerede er i orden.",
-      "Siste element står på n − 1, og forelderen er ⌊(n − 2)/2⌋ = ⌊n/2⌋ − 1. Det er den siste noden med barn. Forelesningen starter på ⌊n/2⌋, som alltid er en løvnode, så det gir ett ekstra kall som ikke gjør noe. Begge er riktige. Å starte lavere enn ⌊n/2⌋ − 1 er feil, fordi da hopper vi over noder med barn. Vi går nedover (downto) fordi BubbleDown krever at begge subtrærne allerede er heaper.",
+      "Siste element står på n − 1, og forelderen er ⌊(n − 2)/2⌋ = ⌊n/2⌋ − 1. Det er den siste noden med barn. Forelesningen starter på ⌊n/2⌋, som alltid er en løvnode, så det gir ett ekstra kall som ikke gjør noe. Begge er riktige. Å starte lavere enn ⌊n/2⌋ − 1 er feil, fordi da hopper vi over noder med barn. Vi går nedover (down to) fordi BubbleDown krever at begge subtrærne allerede er heaper.",
       "Indeksene ⌊n/2⌋ … n − 1 er løvnoder, og hver løvnode er alene en heap. Den siste interne noden er ⌊n/2⌋ − 1. Å starte på ⌊n/2⌋ (som forelesningen) eller høyere er korrekt, bare litt sløsete. Å starte lavere enn ⌊n/2⌋ − 1 er feil. Retningen er viktig. Går vi oppover fra 0, kaller vi BubbleDown på roten før subtrærne er heaper, og da holder ikke forutsetningen. En liten verdi langt nede kan da bli liggende under en større."));
   def(IN.algos, "buildMinHeap", {
     title: "BuildMinHeap – lag en heap av et array på lineær tid",
@@ -557,7 +557,7 @@
     input: "Et array A med n elementer i vilkårlig rekkefølge",
     output: "A er omorganisert til en heap",
     lines: [
-      { code: "for i ← ⌊n/2⌋ downto 0 do", indent: 1,
+      { code: "for i ← ⌊n/2⌋ down to 0 do", indent: 1,
         eli5: "Vi starter rundt midten og jobber oss baklengs mot toppen. Tallene bakerst har ingen barn, så de er allerede i orden.",
         normal: "Gå baklengs fra midten til roten. Løvnodene bakerst er allerede heaper.",
         teknisk: "Vi går nedenfra og opp. Når vi kommer til i, er begge subtrærne under i allerede heaper. Det er nettopp forutsetningen BubbleDown trenger.",
@@ -623,7 +623,7 @@
       best: "O(1)", avg: "O(log n)", worst: "O(log n)", space: "O(log n)",
       why: t("Tallet synker én etasje om gangen, og treet har få etasjer.",
         "Høyst ett kall per nivå: O(log n).",
-        "i + 1 minst dobles per kall, så det blir høyst ⌊log n⌋ kall. Rekursjonen bruker O(log n) plass på kallstakken.")
+        "i + 1 minst dobles per kall, så det blir høyst ⌊log n⌋ bytter (⌊log n⌋ + 1 kall). Rekursjonen bruker O(log n) plass på kallstakken.")
     }
   });
   def(IN.algos, "buildMaxHeap", {
@@ -632,7 +632,7 @@
     input: "Et array A med n elementer",
     output: "A er en max-heap (største element i A[0])",
     lines: [
-      { code: "for i ← ⌊n/2⌋ downto 0 do", indent: 1,
+      { code: "for i ← ⌊n/2⌋ down to 0 do", indent: 1,
         eli5: "Start rundt midten og jobb baklengs mot toppen.",
         normal: "Bygg nedenfra og opp; løvnodene er allerede max-heaper.",
         teknisk: "Samme idé som BuildMinHeap, bare med motsatt sammenligning i BubbleDown.",
@@ -655,14 +655,14 @@
         eli5: "Først ordner vi tallene slik at det største ligger på toppen.",
         normal: "Gjør arrayet om til en max-heap på O(n).",
         teknisk: "Etter dette er A[0] det største elementet." },
-      { code: "for i ← n − 1 downto 0 do", indent: 1,
+      { code: "for i ← n − 1 down to 0 do", indent: 1,
         eli5: "Så fyller vi arrayet bakfra: den bakerste plassen først.",
         normal: "i er plassen det neste største elementet skal på.",
         teknisk: "Invariant: A[i + 1..n − 1] er sortert og inneholder de største elementene. A[0..i] er en max-heap.",
         grense: g("Hvorfor n − 1, og hvorfor helt ned til 0?",
           t("Den bakerste plassen er n − 1, fordi vi teller fra 0. Det største tallet skal stå der. Den siste runden (i = 0) bytter tallet med seg selv, så den gjør ingenting, men den skader heller ikke.",
-            "Det største elementet hører hjemme på siste plass, A[n − 1]. Forelesningen går ned til 0. Den siste runden bytter A[0] med seg selv og er ufarlig, så «downto 1» er like riktig.",
-            "i er neste plass i den sorterte halen, og den første er A[n − 1]. Ved i = 0 er det ett element igjen, og det er det minste, så runden er en ufarlig «swap med seg selv». «downto 1» sparer den runden. Å starte på n ville vært feil, fordi A[n] ikke finnes.")) },
+            "Det største elementet hører hjemme på siste plass, A[n − 1]. Forelesningen går ned til 0. Den siste runden bytter A[0] med seg selv og er ufarlig, så «down to 1» er like riktig.",
+            "i er neste plass i den sorterte halen, og den første er A[n − 1]. Ved i = 0 er det ett element igjen, og det er det minste, så runden er en ufarlig «swap med seg selv». «down to 1» sparer den runden. Å starte på n ville vært feil, fordi A[n] ikke finnes.")) },
       { code: "swap A[0] and A[i]", indent: 2,
         eli5: "Det største tallet på toppen bytter plass med tallet bakerst. Nå står det største riktig.",
         normal: "Flytt maksimum til plass i.",
@@ -1170,7 +1170,7 @@
           ? t("Det største tallet, " + A[i] + ", bytter plass med det bakerste. Nå står " + A[i] + " på riktig plass for godt.",
               "swap A[0] og A[" + i + "]: " + A[i] + " er på plass.",
               "Maks " + A[i] + " flyttes til A[" + i + "]. Heapen krymper til størrelse " + i + ".")
-          : t("Bare ett tall igjen, og det er det minste. Det bytter plass med seg selv.", "i = 0: swap med seg selv.", "i = 0: swap A[0] med seg selv. Ufarlig, og «downto 1» ville spart den."), "På plass: " + A[i]);
+          : t("Bare ett tall igjen, og det er det minste. Det bytter plass med seg selv.", "i = 0: swap med seg selv.", "i = 0: swap A[0] med seg selv. Ufarlig, og «down to 1» ville spart den."), "På plass: " + A[i]);
       if (i > 0) {
         snap(5, {}, t("Tallet som kom på toppen må synke, men bare innenfor de " + i + " første plassene.", "BubbleDown(A, 0, " + i + ").", "BubbleDown(A, 0, i = " + i + "): størrelsen i stenger halen ute."), null);
         bubbleSteps(A, 0, i, true, 200, 5, snap, null);

@@ -254,7 +254,7 @@
       kilde: "Kilde: sensorveiledning IN2010 H2020, oppgave 7",
       deler: [
         { del: "(a)",
-          fasit: "<ul><li>O(w + s)</li><li>O(s²)</li><li>O(w log(s))</li><li>O(s · w)</li><li>O(w²)</li></ul>" },
+          fasit: "<ul><li>O(w + s)</li><li>O(s²)</li><li>O(w log(s))</li><li><b>O(s · w)</b> <span class=\"small muted\">(vår merking: sensorveiledningen markerer dette alternativet med blå tekst som riktig)</span></li><li>O(w²)</li></ul>" },
         { del: "(b)",
           fasit: "<p>Å bygge en frekvenstabell gjøres på lineær tid. En fin måte å løse denne oppgaven er å lage en frekvenstabell for begge strengene (som kan gjøres i O(w + s)) og sjekke at det for hver bokstav i W er minst like mange av den bokstaven i S:</p>",
           kode: { name: "IsSubanagramOf2", params: "W, S",
@@ -281,7 +281,7 @@
             "<li>Minus 1 poeng for å ikke ha noen referanse til O-notasjonen (men snakker generelt om at «når ordboka er stor» og «ordene korte»).</li>" +
             "<li>Minus 3 poeng for å snakke om n uten definisjon; her er jo det hele poenget</li></ul>" }
       ],
-      merknad: "For (a) gjentar sensorveiledningen bare de fem svaralternativene og sier ikke hvilket som er riktig. Svaret O(s · w) i vårt svar er regnet ut av oss. I (b) kaller vi tabellene F og G (F er gitt i oppgaven), mens sensor kaller dem Fw og Fs. Deloppgave (c) vurderes etter skjønn: det finnes ikke ett fasitsvar, og vårt svar er ett eksempel som dekker kriteriene."
+      merknad: "For (a) gjentar sensorveiledningen de fem svaralternativene og markerer det riktige, O(s · w), med blå tekst. Fargen kommer ikke med her, så vi har merket det selv. I (b) kaller vi tabellene F og G (F er gitt i oppgaven), mens sensor kaller dem Fw og Fs. Deloppgave (c) vurderes etter skjønn: det finnes ikke ett fasitsvar, og vårt svar er ett eksempel som dekker kriteriene."
     }
   };
 

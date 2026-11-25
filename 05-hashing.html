@@ -7,8 +7,8 @@
   <title>Blokk 5 · Hashing · IN2010</title>
   <meta name="description" content="Hashing i IN2010: hashfunksjoner, Separate chaining, Linear probing med sletting, Load factor og rehash, Python 3.6-ordbøker og hashing som verktøy – med stegvise demoer, pseudokode og eksamensoppgaver.">
   <script>(function(){try{var d=document.documentElement;var t=localStorage.getItem('in-theme');if(t!=='dark'&&t!=='system')t='light';if(t!=='system')d.setAttribute('data-theme',t);var l=localStorage.getItem('in-level');if(l!=='eli5'&&l!=='teknisk')l='normal';d.setAttribute('data-level',l);}catch(e){document.documentElement.setAttribute('data-theme','light');document.documentElement.setAttribute('data-level','normal');}})();</script>
-  <link rel="stylesheet" href="assets/css/styles.css?v=20261125k">
-  <link rel="stylesheet" href="assets/css/begrep-tips.css?v=20261125k">
+  <link rel="stylesheet" href="assets/css/styles.css?v=20261125l">
+  <link rel="stylesheet" href="assets/css/begrep-tips.css?v=20261125l">
 </head>
 <body data-page="hashing">
   <a class="skip-link" href="#main">Hopp til innhold</a>
@@ -106,7 +106,7 @@
       </div>
       <div class="callout begrep"><span class="lbl">Begrep: Load factor</span>
         <p><b>Load factor</b> er n/N: antall nøkkel-verdi-par delt på antall plasser i arrayet. Lav Load factor gir få kollisjoner, men mye ubrukt plass.
-          Kurset sikter mot omtrent mellom 1/2 og 3/4, og gjør tabellen større (rehash) når n/N når 0,75. Mer om det under <a href="#fane=kjoretid">Rehash &amp; kjøretid</a>.</p>
+          Forelesningen anslår at en god Load factor trolig ligger mellom 1/2 og 3/4 (det bør avgjøres ved å prøve), og kursnotatets kode gjør tabellen større (rehash) når n/N når 0,75. Mer om det under <a href="#fane=kjoretid">Rehash &amp; kjøretid</a>.</p>
       </div>
 
       <h3>Sjekk deg selv</h3>
@@ -281,7 +281,7 @@
             <tr><td>Innsetting</td><td>O(1) amortisert</td><td>O(n)</td></tr>
             <tr><td>Oppslag</td><td>O(1)</td><td>O(n)</td></tr>
             <tr><td>Sletting</td><td>O(1)</td><td>O(n)</td></tr>
-            <tr><td>Rehash</td><td>O(n)</td><td>O(n)</td></tr>
+            <tr><td>Rehash</td><td>O(n)</td><td data-tip="Havner alle n nøklene på samme hjemmeplass, koster gjeninnsettingene 1 + 2 + … + n. Med god spredning er rehash forventet O(n).">O(n²)</td></tr>
           </tbody>
         </table>
       </div>
@@ -304,8 +304,8 @@
       <div class="card" id="hs-amort"></div>
 
       <div class="callout uni"><span class="lbl">Universitetsnivå: forventet og amortisert</span>
-        <p>«Forventet» forutsetter at hashfunksjonen sprer nøklene godt. Da er antall nøkler per plass i snitt Load factor, som rehash holder under en konstant.
-          «Amortisert» betyr at enkelte innsettinger er dyre (de som utløser en rehash, O(n)), men at gjennomsnittet over mange innsettinger er O(1).
+        <p>«Forventet» forutsetter at hashfunksjonen sprer nøklene godt. Under antakelsen om uniform hashing er antall nøkler per plass i snitt Load factor, som rehash holder under en konstant. (Lysarkene sier bare at dette gir forventet O(1); snittet n/N er vår egen utregning.)
+          «Amortisert» betyr at enkelte innsettinger er dyre (de som utløser en rehash, forventet O(n)), men at gjennomsnittet over mange innsettinger er O(1).
           Dobling er nøkkelen: rehashene skjer ved n ≈ 0,75 · 1, 2, 4, 8, … og summen av arbeidet er en geometrisk rekke, O(n) totalt.</p>
       </div>
       <div class="card"><h4 style="margin-top:.2rem">Verste tilfelle: alt i samme bøtte</h4>
@@ -426,20 +426,20 @@
     <p class="muted small">IN2010 · Blokk 5 · Hashing. Egne forklaringer og demoer basert på pensum. Eksamensoppgavene og sensorveiledningene er gjengitt ordrett med kildelinje, og avvik fra eksamensarket står i hvert kort.</p>
   </footer>
 
-  <script src="assets/js/core.js?v=20261125k"></script>
-  <script src="assets/js/symboler.js?v=20261125k"></script>
-  <script src="assets/js/begreper-data.js?v=20261125k"></script>
-  <script src="assets/js/begrep-tips.js?v=20261125k"></script>
-  <script src="assets/js/data-tf.js?v=20261125k"></script>
-  <script src="assets/js/pseudocode.js?v=20261125k"></script>
-  <script src="assets/js/stepplayer.js?v=20261125k"></script>
-  <script src="assets/js/varline.js?v=20261125k"></script>
-  <script src="assets/js/viz-hash.js?v=20261125k"></script>
-  <script src="assets/js/data-algos.js?v=20261125k"></script>
-  <script src="assets/js/data-hashing.js?v=20261125k"></script>
-  <script src="assets/js/perfekt/hashing.js?v=20261125k"></script>
-  <script src="assets/js/perfekt/delt.js?v=20261125k"></script>
-  <script src="assets/js/kort/hashing.js?v=20261125k"></script>
+  <script src="assets/js/core.js?v=20261125l"></script>
+  <script src="assets/js/symboler.js?v=20261125l"></script>
+  <script src="assets/js/begreper-data.js?v=20261125l"></script>
+  <script src="assets/js/begrep-tips.js?v=20261125l"></script>
+  <script src="assets/js/data-tf.js?v=20261125l"></script>
+  <script src="assets/js/pseudocode.js?v=20261125l"></script>
+  <script src="assets/js/stepplayer.js?v=20261125l"></script>
+  <script src="assets/js/varline.js?v=20261125l"></script>
+  <script src="assets/js/viz-hash.js?v=20261125l"></script>
+  <script src="assets/js/data-algos.js?v=20261125l"></script>
+  <script src="assets/js/data-hashing.js?v=20261125l"></script>
+  <script src="assets/js/perfekt/hashing.js?v=20261125l"></script>
+  <script src="assets/js/perfekt/delt.js?v=20261125l"></script>
+  <script src="assets/js/kort/hashing.js?v=20261125l"></script>
   <script>
   (function () {
     "use strict";

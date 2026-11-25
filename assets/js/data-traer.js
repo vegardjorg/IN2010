@@ -201,7 +201,7 @@
     return { best: "O(n)", avg: "O(n)", worst: "O(n)", space: "O(h)",
       why: t("Vi hilser på hver node nøyaktig én gang. Dobbelt så mange noder tar dobbelt så lang tid.",
              navn + " besøker hver av de n nodene én gang. Rekursjonen husker veien tilbake på kallstakken, som er like dyp som treet.",
-             "Hver node gir ett kall med O(1) arbeid, pluss n + 1 null-kall: O(n) totalt. Kallstakken er høyst h + 1 dyp, altså O(log n) for et balansert tre og O(n) for en kjede.") };
+             "Hver node gir ett kall med O(1) arbeid, pluss n + 1 null-kall: O(n) totalt. Kallstakken er høyst h + 2 dyp (h + 1 noder pluss null-kallet nederst), altså O(log n) for et balansert tre og O(n) for en kjede.") };
   }
 
   reg(IN.algos, "preorder", {
@@ -810,7 +810,7 @@
      DIAMETER (H2023)
      ============================================================ */
   reg(IN.algos, "treDiameter", {
-    title: "Diameteren til et binærtre (H2023)",
+    title: "Diameteren til et binærtre (H2023 c)",
     name: "Diameter", params: "v",
     input: "Roten v til et binærtre (kan være null)",
     output: "Et par (h, d): høyden h og diameteren d til treet med rot v",
@@ -900,7 +900,7 @@
       { code: "if u = v then return u", indent: 1,
         eli5: "Har de to klatrerne møttes i samme node, har vi svaret.",
         normal: "Møttes de? Da er dette den laveste felles forfederen.",
-        teknisk: "En node regnes som etterkommer av seg selv, så LCA(u, u) = u." },
+        teknisk: "Eksamen H2024 regner en node som etterkommer av seg selv, så LCA(u, u) = u." },
       { code: "if u.depth < v.depth then", indent: 1,
         eli5: "Hvem står lengst nede? Den må klatre først.",
         normal: "Sammenlign dybdene. Den dypeste noden skal flyttes opp.",
@@ -937,7 +937,7 @@
         grense: { q: "Hvorfor ≤ og ikke streng ulikhet?",
           a: t("Hvis x selv er forfederen til y, er svaret x. Da må vi godta at tallet er likt x.",
                "Er v.element = x, er v forfeder til y (y ligger i høyre subtre), og v er svaret. Streng ulikhet ville sendt søket forbi v og ned i et subtre som bare inneholder én av dem.",
-               "Kurset definerer en node som etterkommer av seg selv. Derfor er endepunktene med i intervallet [x, y].") } },
+               "Eksamen H2024 regner en node som etterkommer av seg selv, og sensors kode tar med endepunktene i intervallet [x, y].") } },
       { code: "if y < v.element then return LCABST(v.left, x, y)", indent: 1,
         eli5: "Er begge tallene mindre, må svaret ligge til venstre.",
         normal: "Begge er mindre enn v.element (siden x < y): gå til venstre.",
@@ -1081,6 +1081,11 @@
     why: t("Vi flytter bare tre pekere, uansett hvor stort treet er.",
            "Fast antall pekerendringer og to høydeoppdateringer.",
            "Konstant arbeid. Subtrærne T1/T2 flyttes som helhet. Ingen noder inni dem berøres.") };
+  // Arkversjonen (H2025, Anti-AVL) har ingen SetHeight-linjer, så begrunnelsen er bare pekerendringer.
+  var ROTBIGO_ARK = { best: "O(1)", avg: "O(1)", worst: "O(1)", space: "O(1)",
+    why: t("Vi flytter bare noen få pekere, uansett hvor stort treet er.",
+           "Fast antall pekerendringer. Arkversjonen oppdaterer ikke høyden.",
+           "Konstant arbeid: fire tilordninger og en retur. Subtreet T2 flyttes som helhet, og ingen noder inni det berøres.") };
 
   reg(IN.algos, "leftRotate", {
     title: "Venstrerotasjon",
@@ -1126,7 +1131,7 @@
       { code: "return LeftRotate(v)", indent: 2,
         eli5: "Så vrir vi hele greina til venstre.",
         normal: "Venstrerotasjon rundt v løfter høyre barn opp.",
-        teknisk: "Høyden til subtreet går ned med 1 (ved innsetting tilbake til høyden før innsettingen)." },
+        teknisk: "Ved innsetting går høyden til subtreet ned med 1, tilbake til høyden før innsettingen. Ved fjerning kan den også bli uendret (når v.right har balansefaktor 0)." },
       { code: "if BalanceFactor(v) > 1 then", indent: 1,
         eli5: "Er treet for tungt til venstre?",
         normal: "Venstretung: venstre subtre er 2 høyere enn høyre.",
@@ -1142,7 +1147,7 @@
       { code: "return RightRotate(v)", indent: 2,
         eli5: "Så vrir vi hele greina til høyre.",
         normal: "Høyrerotasjon rundt v.",
-        teknisk: "Speilbildet av LeftRotate." },
+        teknisk: "Speilbildet av LeftRotate. Ved innsetting går høyden til subtreet ned med 1; ved fjerning kan den bli uendret (når v.left har balansefaktor 0)." },
       { code: "return v", indent: 1,
         eli5: "Alt var i orden. Ingenting å gjøre.",
         normal: "v var balansert: ingen rotasjon.",
@@ -1302,7 +1307,7 @@
       BLANK,
       { code: "return y", indent: 1, eli5: "Den nye toppen gis tilbake.", normal: "Returner den nye roten i subtreet.", teknisk: "Kalleren kobler den på, derfor return RightRotate(v) i InsertAntiAVL." }
     ],
-    bigO: ROTBIGO
+    bigO: ROTBIGO_ARK
   });
 
   /* ============================================================

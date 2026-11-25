@@ -740,7 +740,9 @@
         return null;
       }
       if (it.kilde !== undefined) return it.kilde || null;   // kilde: false = aldri eksamensmerke
-      var m = /\b([HV]20\d\d)\b/.exec((it.s || "") + " " + (it.explain || ""));
+      // Uten kilde-felt: bare et årstall i parentes til slutt i selve påstanden, f.eks. «… (H2022)», gir eksamensmerke.
+      // Årstall i forklaringen teller ikke, for der står ofte våre egne henvisninger («… (H2023)»).
+      var m = /\(([HV]20\d\d)\b[^)]*\)\s*$/.exec(it.s || "");
       return m ? m[1] : null;
     }
     var norm = items.map(function (it, i) {
@@ -1143,7 +1145,7 @@
     var y = examYear(d), nr = oppgNr(d);
     var src = sv.kilde || ("Kilde: sensorveiledning IN2010" + (y ? " " + y : "") + (nr ? ", oppgave " + nr : ""));
     host.appendChild(el("p", { class: "et-pf-src", text: src }));
-    host.appendChild(el("p", { class: "et-lead", text: "Ordrett fra sensorveiledningen. Vårt eget svar står under «Løsning»." }));
+    host.appendChild(el("p", { class: "et-lead", text: "Ordrett fra sensorveiledningen. Fargemarkeringer (som blå tekst for riktig svar) og figurer kommer ikke med, så dem gjengir vi med vår egen merking. Vårt eget svar står under «Løsning»." }));
     var bq = el("blockquote", { class: "sensor" });
     function sensorPart(p) {
       var w = el("div", { class: "et-sv-del" });
@@ -1821,7 +1823,7 @@
      mellomlager ved oppstart, når fanen blir synlig igjen og hver halvtime. Er den nyere, vises en
      liten melding med «Oppdater». Fremdrift og svar ligger i localStorage og overlever oppdateringen.
      Virker bare over http(s): via file:// finnes det ingen gammel kopi å bekymre seg for. */
-  IN.VERSION = "20261125k";
+  IN.VERSION = "20261125l";
   function initVersionCheck() {
     if (!/^https?:$/.test(location.protocol) || !window.fetch) return;
     var DISMISS = "in2010:ny-versjon-skjult", last = 0, shown = null;

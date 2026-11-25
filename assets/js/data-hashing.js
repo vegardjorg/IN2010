@@ -132,7 +132,7 @@
         teknisk: "Append er O(1). Totalt: O(1 + |B|)." },
       { code: "return A", indent: 1, eli5: "Ferdig! Paret ligger nå bakerst i bøtta.", normal: "Ferdig.", teknisk: "n øker med 1." }
     ],
-    bigO: { best: "O(1)", avg: "O(1) forventet", worst: "O(n)", space: "O(n + N)",
+    bigO: { best: "O(1)", avg: "O(1) forventet", worst: "O(n)", space: "O(1) ekstra",
       why: t("Vanligvis er bøtta nesten tom, så det går fort. Men havner alt i samme bøtte, må vi lete gjennom alt.",
         "Vi må lete gjennom én bøtte. Med en god hashfunksjon og lav Load factor (n/N) er bøttene korte, så forventet tid er O(1). Hasher alle n nøklene til samme bøtte, blir det O(n).",
         "Kostnaden er O(1 + |B|). Med en god hashfunksjon og en tilstrekkelig lav Load factor er lengden på hver liste begrenset av en konstant, så det blir forventet O(1). Verste tilfelle: alle n nøkler i samme bøtte, O(n). Tar vi med rehash for å holde Load factor lav, er innsetting forventet amortisert O(1).") }
@@ -180,7 +180,7 @@
         teknisk: "Én skriving. Kostnaden er antall prøvde plasser." },
       { code: "return A", indent: 1, eli5: "Ferdig! Paret ligger nå i tabellen.", normal: "Ferdig.", teknisk: "Ferdig. Kostnaden var antall prøvde plasser, og det er forventet O(1) når Load factor holdes lav." }
     ],
-    bigO: { best: "O(1)", avg: "O(1) forventet", worst: "O(n)", space: "O(N)",
+    bigO: { best: "O(1)", avg: "O(1) forventet", worst: "O(n)", space: "O(1) ekstra",
       why: t("Som regel er hjemmeplassen ledig eller nesten ledig. Men står mange i kø på rad, må vi gå forbi alle.",
         "Vi går forbi opptatte plasser til vi treffer en ledig. Med lav Load factor er det få av dem. I verste fall ligger alle n i ett langt segment.",
         "Forventet O(1) når Load factor holdes under en fast grense (f.eks. 0,75) og hashfunksjonen sprer godt. Lange segmenter uten hull gjør probingen lengre. Verste tilfelle O(n). Med rehash: forventet amortisert O(1).") }
@@ -254,7 +254,7 @@
       { code: "if p ≠ null then i ← p", indent: 1, eli5: "Fant vi et merke, bruker vi den plassen.", normal: "Gjenbruk det første merket hvis vi fant et.", teknisk: "Kortere probing neste gang." },
       { code: "A[i] ← (k, v)", indent: 1, eli5: "Legg paret her. Nøkkelen fantes ikke fra før.", normal: "Sett inn.", teknisk: "Én skriving, enten i det første merket eller i den ledige plassen. n øker med 1, og et gjenbrukt merke forsvinner." }
     ],
-    bigO: { best: "O(1)", avg: "O(1) forventet", worst: "O(n)", space: "O(N)",
+    bigO: { best: "O(1)", avg: "O(1) forventet", worst: "O(n)", space: "O(1) ekstra",
       why: t("Vi går forbi opptatte plasser og plasser med slettemerke til vi finner en tom. Merkene gjør køene lengre, men vanligvis er det bare noen få steg.", "Merker teller som opptatte når vi leter, så mange merker gjør letingen lengre.",
         "Probelengden avhenger av både ekte elementer og merker. Merkene forsvinner ved neste rehash.") }
   });
@@ -298,12 +298,12 @@
     input: "Nøkkel k og verdi v. Hashmapet har arrayet A, størrelsen N og antall par n", output: "(k, v) er satt inn",
     lines: [
       { code: "if n / N ≥ 0.75 then", indent: 1, eli5: "Er tabellen minst tre fjerdedeler full? Da blir køene lange, og vi må lage mer plass.", normal: "Sjekk Load factor før innsettingen.",
-        teknisk: "Kurset bruker grensen 0,75. Ideelt ligger Load factor omtrent mellom 1/2 og 3/4.",
+        teknisk: "Kursnotatets kode bruker grensen 0,75. Forelesningen anslår at en god Load factor trolig ligger mellom 1/2 og 3/4, og at den bør avgjøres ved å prøve.",
         grense: { q: "Hvorfor sjekke før innsettingen?", a: t(
           "Da er det alltid minst én tom plass når vi skal legge inn noe.",
           "Etter sjekken er n/N < 0,75, altså n < N. Da finnes det en ledig plass, og probe-løkka stopper.",
           "Invarianten n < N gjør at while-løkka terminerer. Med grense 0,75 holdes dessuten forventet probelengde konstant.") } },
-      { code: "Rehash()", indent: 2, eli5: "Lag en større tabell og flytt alt over.", normal: "Doble arrayet og sett inn alt på nytt.", teknisk: "O(n), men sjelden." },
+      { code: "Rehash()", indent: 2, eli5: "Lag en større tabell og flytt alt over.", normal: "Doble arrayet og sett inn alt på nytt.", teknisk: "Forventet O(n), men sjelden." },
       { code: "i ← h(k, N)", indent: 1, eli5: "Finn hjemmeplassen. Har tabellen nettopp blitt større, kan den være en annen enn før.", normal: "Hjemmeplassen med den (kanskje nye) N-en.", teknisk: "Hjemmeplassen avhenger av N. Etter en rehash er N doblet, så vi regner den ut med den nye N-en." },
       { code: "while A[i] ≠ null do", indent: 1, eli5: "Så lenge plassen er opptatt …", normal: "Linear probing som før.", teknisk: "Løkka stopper, fordi sjekken på linje 2 sørger for at n < N, så det finnes en ledig plass." },
       { code: "if A[i].key = k then", indent: 2, eli5: "Bor nøkkelen allerede her? Da skal vi bare bytte verdien.", normal: "Ligger k her fra før?", teknisk: "Samme nøkkel skal overskrives, ikke legges inn to ganger." },
@@ -313,10 +313,10 @@
       { code: "A[i] ← (k, v)", indent: 1, eli5: "Legg paret på den ledige plassen.", normal: "Sett inn på den ledige plassen.", teknisk: "Én skriving på den ledige plassen." },
       { code: "n ← n + 1", indent: 1, eli5: "Nå er det én til i tabellen. Vi teller, så vi vet når den blir for full.", normal: "Tell opp antall par.", teknisk: "n må holdes oppdatert, ellers blir Load factor-sjekken på linje 2 feil neste gang." }
     ],
-    bigO: { best: "O(1)", avg: "O(1) forventet amortisert", worst: "O(n)", space: "O(N)",
+    bigO: { best: "O(1)", avg: "O(1) forventet amortisert", worst: "O(n)", space: "O(1) ekstra (O(N) ved rehash)",
       why: t("Nesten alltid raskt. Av og til må alt flyttes, men det skjer så sjelden at det jevner seg ut.",
         "En rehash koster O(n), men N dobles hver gang, så det skjer bare etter at vi har satt inn mange nye par siden sist. Fordelt på alle innsettingene blir det O(1) hver.",
-        "Dobling gir rehash ved n ≈ 0,75 · 1, 2, 4, 8, …. Total rehash-kostnad over n innsettinger er en geometrisk rekke, O(n). Altså forventet amortisert O(1) per innsetting. Én enkelt innsetting kan likevel ta O(n).") }
+        "Dobling gir rehash ved n ≈ 0,75 · 1, 2, 4, 8, …. Total rehash-kostnad over n innsettinger er en geometrisk rekke, O(n). Altså forventet amortisert O(1) per innsetting. Én enkelt innsetting kan likevel ta O(n). (Utløser den en rehash der alle nøklene kolliderer, kan den i verste fall koste O(n²); se Rehash.)") }
   });
 
   reg(IN.algos, "hsRehash", {
@@ -336,10 +336,10 @@
       { code: "Insert(B[j].key, B[j].value)", indent: 3, eli5: "Flytt det over. Det kan havne et nytt sted!", normal: "Sett inn på nytt med h(k, N) for den nye N-en.",
         teknisk: "Nøklene må hashes på nytt, fordi hjemmeplassen avhenger av N. Insert utløser ikke ny rehash: n/N ≤ 1/2 etter doblingen." }
     ],
-    bigO: { best: "O(n + N)", avg: "O(n + N)", worst: "O(n + N)", space: "O(N)",
+    bigO: { best: "O(n + N)", avg: "O(n + N) forventet", worst: "O(N + n²)", space: "O(N) ekstra (ny tabell)",
       why: t("Når garderoben blir for full, bygger vi en dobbelt så stor og henger hver jakke opp på nytt. Det tar tid akkurat da, men det skjer sjelden.",
-        "Hvert par settes inn på nytt. Rehash skjer først når n/N ≥ 0,75, så rett etter doblingen er N høyst en konstant ganger n (omtrent 8/3 · n). Altså er N = O(n), og hele rehashen er O(n).",
-        "O(N) for å gå gjennom B, pluss n forventet O(1)-innsettinger. Med Load factor over en fast nedre grense er det O(n).") }
+        "Hvert par settes inn på nytt. Rehash skjer først når n/N ≥ 0,75, så rett etter doblingen er N høyst en konstant ganger n (omtrent 8/3 · n). Altså er N = O(n), og med god spredning er hele rehashen forventet O(n).",
+        "O(N) for å gå gjennom B, pluss n innsettinger som hver er forventet O(1) når hashfunksjonen sprer godt. Med Load factor over en fast nedre grense er det forventet O(n). I verste tilfelle havner alle nøklene på samme hjemmeplass. Da koster gjeninnsettingene 1 + 2 + … + n = O(n²), og hele rehashen O(N + n²).") }
   });
 
   /* ---------- Python 3.6-ordbok ---------- */
@@ -380,7 +380,7 @@
       { code: "append (k, v) to entries", indent: 1, eli5: "Legg paret bakerst i lista.", normal: "Legg paret bakerst i entries.",
         teknisk: "Derfor husker ordboka innsettingsrekkefølgen, og entries er tettpakket." }
     ],
-    bigO: { best: "O(1)", avg: "O(1) forventet amortisert", worst: "O(n)", space: "O(N + n)",
+    bigO: { best: "O(1)", avg: "O(1) forventet amortisert", worst: "O(n)", space: "O(1) ekstra amortisert (O(N) ved rehash)",
       why: t("Som regel er plassen ledig eller nesten ledig. Står mange på rad, må vi gå forbi alle. Til slutt legger vi paret bakerst i lista.", "Probing i indices pluss en append. Med rehash: forventet amortisert O(1).",
         "Append i et dynamisk array er amortisert O(1). Probingen er forventet O(1). Rehash bygger bare indices på nytt.") }
   });

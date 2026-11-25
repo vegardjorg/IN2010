@@ -65,8 +65,8 @@
       best: "O(1)", avg: "O(n)", worst: "O(n)", space: "O(1)",
       why: t(
         "Er vi heldige, ligger tallet helt først. Er vi uheldige, må vi se på alle tallene. Dobbelt så mange tall betyr dobbelt så mye leting.",
-        "I verste fall (x ligger sist eller finnes ikke) sammenligner vi med alle n elementene, så tiden vokser lineært med n. Fordelen er at arrayet ikke trenger å være sortert.",
-        "Hver runde gjør konstant arbeid, og i verste tilfelle kjører løkka n runder, altså O(n). Ligger x på første plass, stopper vi etter én runde: O(1). Algoritmen bruker bare telleren i, så ekstra minne er O(1)."
+        "I verste fall (x ligger sist eller finnes ikke) sammenligner vi med alle n elementene, så tiden vokser lineært med n. Fordelen er at arrayet ikke trenger å være sortert. Kursets versjon svarer true/false; her returnerer vi indeksen.",
+        "Hver runde gjør konstant arbeid, og i verste tilfelle kjører løkka n runder, altså O(n). Ligger x på første plass, stopper vi etter én runde: O(1). Algoritmen bruker bare telleren i, så ekstra minne er O(1). Avvik fra kursets Search (forelesningen om introduksjon): kurset skriver «for i ← 0 to |A| − 1» og svarer true/false. Her skriver vi n − 1 og returnerer indeksen eller −1, fordi demoen viser hvor x ble funnet. Returnerer du indeksen på eksamen, si at du har endret den."
       )
     }
   });
@@ -267,7 +267,7 @@
       why: t(
         "Akkurat som vanlig binærsøk halverer vi bunken hver gang. Men hvert nytt «hjelper-kall» må huskes til svaret kommer tilbake, og det tar litt plass.",
         "Hvert kall halverer intervallet, så det blir ca. log n kall. Kallene ligger på kallstakken samtidig, derfor O(log n) ekstra minne (den iterative versjonen bruker O(1)).",
-        "Hvert kall gjør konstant arbeid og sender et intervall som er høyst halvparten så stort videre. Fra n ned til ett element med halvering tar omtrent log n kall, så kjøretiden er O(log n). (Kortversjonen er T(n) = T(n/2) + O(1). Den trenger du ikke regne på; det er argumentet om antall halveringer som teller på eksamen.) Kallstakken blir like dyp som antall halveringer, så minnebruken er O(log n). Kaller du med low og high fra et kjent delintervall, er n her lengden av intervallet."
+        "Hvert kall gjør konstant arbeid og sender et intervall som er høyst halvparten så stort videre. Fra n ned til ett element med halvering tar omtrent log n kall, så kjøretiden er O(log n). (Kortversjonen er T(n) = T(n/2) + O(1). Den trenger du ikke regne på; det er argumentet om antall halveringer som teller på eksamen.) Kallstakken blir like dyp som antall halveringer, så minnebruken er O(log n). Kaller du med low og high fra et kjent delintervall, er n her lengden av intervallet. Avvik fra løsningsforslaget til ukesoppgaven om introduksjon: der svarer den rekursive versjonen true/false, kaller midtindeksen i og sender i med som femte parameter. Her har vi fire parametre, kaller den mid og returnerer indeksen eller −1."
       )
     }
   });
@@ -336,7 +336,7 @@
       { code: "i ← BinarySearch(A, x)", indent: 1,
         eli5: "Vi bruker binærsøk for å finne én av de to kopiene av x.",
         normal: "Binærsøk som returnerer en indeks (ikke bare true/false). Gir én av de to plassene.",
-        teknisk: "Kursets BinarySearch returnerer true/false. Her må den være litt endret så den returnerer indeksen – si det eksplisitt på eksamen, ellers trekkes 1p. O(log n)." },
+        teknisk: "Kursets BinarySearch returnerer true/false. Her må den være litt endret så den returnerer indeksen – si det eksplisitt på eksamen, ellers kan det trekkes opptil 1 p. O(log n)." },
       { code: "if i > 0 and A[i − 1] = x then", indent: 1,
         eli5: "Fordi arrayet er sortert, står den andre kopien rett ved siden av. Står den til venstre?",
         normal: "Sjekk naboen til venstre (pass på at i − 1 er en gyldig indeks).",
@@ -487,7 +487,7 @@
       why: t(
         "Vi går gjennom tallene bare én gang, og notatboka svarer nesten med en gang. Til gjengjeld må vi ha plass til notatboka.",
         "n runder med forventet O(1) oppslag og innsetting gir forventet O(n). Prisen er O(n) ekstra minne til hashmapet.",
-        "Med n operasjoner som hver er forventet O(1), blir totalen forventet O(n). Hvis alt havner i samme bøtte, kan én operasjon koste O(n), og totalen O(n²), men det regner vi ikke med i praksis. På eksamen: skriv «jeg antar forventet konstant tid for innsetting og oppslag i hashbaserte datastrukturer»."
+        "Med n operasjoner som hver er forventet O(1), blir totalen forventet O(n). Hvis alt havner i samme bøtte, kan én operasjon koste O(n), og totalen O(n²), men det regner vi ikke med i praksis. Sensor (H2023) sier at du kan anta konstant tid for hashmap og hashset uten noen bemerkning. Det kreves ikke, men du kan gjerne skrive «jeg antar forventet konstant tid for innsetting og oppslag i hashbaserte datastrukturer»."
       )
     }
   });
@@ -774,7 +774,7 @@
       { code: "i ← i + 1", indent: 3, eli5: "Da flytter vi venstre finger til et større tall.", normal: "Øk summen: flytt i til høyre.", teknisk: "Neste A[i] er større (sortert), så summen øker." },
       { code: "else if y > x then", indent: 2, eli5: "Er summen for stor?", normal: "For stor sum?", teknisk: "Da kan A[j] ikke inngå i noe par med en A[i′] ≥ A[i]." },
       { code: "j ← j − 1", indent: 3, eli5: "Da flytter vi høyre finger til et mindre tall.", normal: "Minsk summen: flytt j til venstre.", teknisk: "Neste A[j] er mindre, så summen synker." },
-      { code: "else", indent: 2, eli5: "Ellers er summen akkurat riktig!", normal: "y = x: treff.", teknisk: "Summen er akkurat x, så A[i] og A[j] er et par. Begge kan nå flyttes innover." },
+      { code: "else", indent: 2, eli5: "Ellers er summen akkurat riktig!", normal: "y = x: treff.", teknisk: "Summen er akkurat x, så A[i] og A[j] er et par. Vi flytter bare i; da blir neste sum for stor, og j flyttes i neste runde." },
       { code: "print(A[i], A[j])", indent: 3, eli5: "Vi roper ut paret.", normal: "Skriv ut paret.", teknisk: "Hvert tall brukes i høyst ett par fordi tallene er unike." },
       { code: "i ← i + 1", indent: 3, eli5: "Og flytter videre for å se etter flere par.", normal: "Gå videre.", teknisk: "Vi må flytte en peker for å komme videre. Neste runde vil da senke j." }
     ],

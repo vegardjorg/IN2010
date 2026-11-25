@@ -128,10 +128,10 @@
     lines: [
       { code: "EnsureCapacity(D)", indent: 1,
         eli5: "Sørg for at det er plass til én til.", normal: "Samme som i PushBack: det må finnes en ledig plass.", teknisk: "O(1) eller O(D.n)." },
-      { code: "for j ← D.n − 1 downto i do", indent: 1,
+      { code: "for j ← D.n − 1 down to i do", indent: 1,
         eli5: "Begynn bakerst og flytt hver ting ett hakk til høyre, helt til vi kommer til plass i.",
         normal: "Gå baklengs fra det siste elementet ned til plass i.",
-        teknisk: "D.n − i runder. Verst for i = 0: O(D.n). Kurset skriver «down to»; her står det downto.",
+        teknisk: "D.n − i runder. Verst for i = 0: O(D.n).",
         grense: { q: "Hvorfor baklengs, og hvorfor fra D.n − 1?", a: t(
           "Hvis vi flytter forfra, skubber vi en ting oppå naboen før naboen er flyttet. Da blir den borte. Derfor begynner vi bakerst.",
           "D.n − 1 er det siste elementet. Går vi forlengs, overskriver D.A[j + 1] ← D.A[j] et element vi ikke har flyttet ennå. Baklengs flyttes hvert element før plassen det står på, blir skrevet over.",

@@ -41,8 +41,9 @@
     sensor: {
       kilde: "Kilde: sensorveiledning IN2010 H2020, oppgave 5",
       fasit: "<p>Intersection2 gir ikke nødvendigvis riktig svar, fordi man kan ikke uten videre anta at input er sortert. Intersection4 gir aldri best kjøretid, fordi å sortere for hver iterasjon er overflødig.</p>" +
-        "<p>Det mest interessante tilfellet er der k = log(n). Da er Intersection1 i O(n · k) = O(n log(n)) og Intersection3 er i O(n log(n) + log(n) · k) = O(n log(n) + log(n) · log(n)) = O(n log(n)). Altså er begge svar korrekte, og gir full uttelling.</p>",
-      merknad: "Etter analysen lister sensorveiledningen bare de fire svaralternativene fra Inspera for hver deloppgave, uten å markere hvilket som er riktig. Svarene i (a), (c) og (d) er derfor våre egne, regnet ut fra analysen. Poengene per deloppgave står ikke i sensorveiledningen."
+        "<p>Det mest interessante tilfellet er der k = log(n). Da er Intersection1 i O(n · k) = O(n log(n)) og Intersection3 er i O(n log(n) + log(n) · k) = O(n log(n) + log(n) · log(n)) = O(n log(n)). Altså er begge svar korrekte, og gir full uttelling.</p>" +
+        "<p class=\"small muted\">Vår merking av alternativene sensorveiledningen markerer med blå tekst: (a) Intersection1, (b) Intersection1 og Intersection3, (c) Intersection3, (d) Intersection3.</p>",
+      merknad: "Etter analysen lister sensorveiledningen de fire svaralternativene fra Inspera for hver deloppgave og markerer de riktige med blå tekst. Fargen kommer ikke med her, så vi har skrevet de markerte svarene i en egen linje under. Svarene i vårt svar stemmer med markeringen. Poengene per deloppgave står ikke i sensorveiledningen."
     }
   };
 
@@ -203,7 +204,7 @@
     svar: [
       {
         del: "(a)",
-        tekst: "<p><b>O(n) med to pekere.</b> La i starte på 0 og j på n − 1. Så lenge i &lt; j: er A[i] + A[j] for stor, flytt j ett steg mot venstre. Er summen for liten, flytt i ett steg mot høyre. Er den lik x, skriv ut paret og flytt begge. Det virker fordi A er sortert: å flytte j gjør summen mindre, og å flytte i gjør den større.</p>",
+        tekst: "<p><b>O(n) med to pekere.</b> La i starte på 0 og j på n − 1. Så lenge i &lt; j: er A[i] + A[j] for stor, flytt j ett steg mot venstre. Er summen for liten, flytt i ett steg mot høyre. Er den lik x, skriv ut paret og flytt i (da blir neste sum for stor, og j flyttes i neste runde). Det virker fordi A er sortert: å flytte j gjør summen mindre, og å flytte i gjør den større.</p>",
         kode: "findSummandsSorted",
         kjoretid: "O(n)",
         fasitVerdi: "(0, 10), (2, 8), (4, 6)",

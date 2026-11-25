@@ -159,12 +159,12 @@
             L("return checkLeft and checkRight", 1)] } },
         { fasit: "<p>En annen O(n) løsning er å gjøre en in-order traversering av det binære treet, og legge nodene i en liste. Dersom den resulterende listen er sortert, så er treet også et binært søketre.</p>",
           kode: { name: "CheckBST", params: "v", lines: [L("inorder_list ← InOrder(v, empty list)", 1), L("for consecutive pairs (x, y) in inorder_list do", 1),
-            L("if x > y then", 2), L("return false", 2), L("return true", 1), L("", 0), L("Procedure InOrder(v, list)", 0), L("if v = null then", 1), L("return list", 2), L("", 1),
+            L("if x > y then", 2), L("return false", 3), L("return true", 1), L("", 0), L("Procedure InOrder(v, list)", 0), L("if v = null then", 1), L("return list", 2), L("", 1),
             L("InOrder(v.left, list)", 1), L("append v.element to list", 1), L("InOrder(v.right, list)", 1), L("", 1), L("return list", 1)] },
           kriterier: "<p>Det gis opp til 4 poeng for en kvadratisk løsning, og opp til 6 poeng for en lineær løsning.</p>" },
         { del: "(c)", kriterier: "<p>Det gis 2 poeng for riktig kjøretidskompleksitet.</p>" }
       ],
-      merknad: "Linjene 3, 7, 10 og 13 i sensorens andre løsning og linjene 7, 11 og 15 i den tredje er tomme i sensorveiledningen. Innrykket på <span class=\"mono\">return false</span> i den tredje løsningen er gjengitt slik det står."
+      merknad: "Linjene 3, 7, 10 og 13 i sensorens andre løsning og linjene 7, 11 og 15 i den tredje er tomme i sensorveiledningen. I den tredje løsningen står <span class=\"mono\">return false</span> rykket inn under <span class=\"mono\">if x &gt; y then</span>, slik som på arket."
     }
   };
 
