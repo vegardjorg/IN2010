@@ -729,7 +729,7 @@
 
   /* ---------- Eksamensoppgave (utvidbart kort) ----------
      data: {
-       year: "H2023", title: "Gnome sort", points: 10, oppgave_nr: "Oppgave 5",
+       year: "H2023", title: "Gnome sort", points: 10, oppgave_nr: "Oppgave 4",
        oppgave:  html,                      // oppgavetekst (ordrett fra arket når ordrett: true)
        losning:  html | [ "steg", ... ],    // løsningsgjennomgang (sensorveiledning, parafrasert)
        kjerne:   html,                      // kjernepoeng / hvorfor (valgfritt)
@@ -1560,7 +1560,7 @@
      mellomlager ved oppstart, når fanen blir synlig igjen og hver halvtime. Er den nyere, vises en
      liten melding med «Oppdater». Fremdrift og svar ligger i localStorage og overlever oppdateringen.
      Virker bare over http(s): via file:// finnes det ingen gammel kopi å bekymre seg for. */
-  IN.VERSION = "20261125f";
+  IN.VERSION = "20261125g";
   function initVersionCheck() {
     if (!/^https?:$/.test(location.protocol) || !window.fetch) return;
     var DISMISS = "in2010:ny-versjon-skjult", last = 0, shown = null;

@@ -63,10 +63,9 @@
     return "default";
   }
 
-  IN.vizBuckets = function (stage, s, opts) {
-    opts = opts || {};
-    if (s && s.A && s.vars && IN.varLine) {
-      IN.varLine.attach(stage).update(s.vars, s.varsPrev, { frame: s.frame, dot: function (v) { return dotState(s, v); } });
+  function draw(stage, s, opts, lay) {
+    if (s && s.A && (s.vars || (lay && lay.vars)) && IN.varLine) {
+      IN.varLine.attach(stage).update(s.vars || [], s.varsPrev, { frame: s.frame, dot: function (v) { return dotState(s, v); } });
       IN.varLine.clearStage(stage);
     } else {
       if (IN.varLine) IN.varLine.detach(stage);
@@ -125,5 +124,51 @@
     bzone.appendChild(bs);
     root.appendChild(bzone);
     stage.appendChild(root);
+    return root;
+  }
+
+  /* Fast høyde: når stegene er stemplet (IN.vizBars.stamp gir s.lay), tegnes hele tracen én gang
+     og den høyeste bøtteboksen og variabellinja blir min-height. Da hopper ikke demoen når
+     bøttene fylles og tømmes. Mellomlageret ligger på .sp-stage og gjelder én bredde og én
+     tilstand for variabelbryteren. */
+  function vlOn(stage) { var v = stage.__vl && stage.__vl.el; return !v || !v.classList.contains("is-off"); }
+  /* Bryteren «Variabler» gjelder alle demoer på siden: tegn de synlige demoene på nytt med en gang,
+     så den reserverte høyden følger bryteren uten å vente på neste steg. */
+  if (!IN.__vzLive) {
+    IN.__vzLive = [];
+    document.addEventListener("click", function (e) {
+      if (!e.target || !e.target.closest || !e.target.closest(".vl-tog")) return;
+      setTimeout(function () {
+        IN.__vzLive = IN.__vzLive.filter(function (sp) { return sp.isConnected; });
+        IN.__vzLive.forEach(function (sp) { if (sp.offsetParent !== null && sp.__vzLast) sp.__vzLast(); });
+      }, 0);
+    });
+  }
+  function vzLive(sp, fn) { sp.__vzLast = fn; if (IN.__vzLive.indexOf(sp) < 0) IN.__vzLive.push(sp); }
+  IN.vizBuckets = function (stage, s, opts) {
+    opts = opts || {};
+    var lay = s && s.lay && s.lay.steps ? s.lay : null;
+    if (!lay) return draw(stage, s, opts, null);
+    var sp = stage.closest ? (stage.closest(".sp-stage") || stage) : stage;
+    var w = sp.clientWidth, on = vlOn(stage);
+    if (w > 0 && (sp.__bkLay !== lay || sp.__bkW !== w || sp.__bkOn !== on)) {
+      var v0 = stage.__vl && stage.__vl.el; if (v0) v0.style.minHeight = "";
+      var hMax = 0, vMax = 0;
+      for (var z = 0; z < lay.steps.length; z++) {
+        var node = draw(stage, lay.steps[z], opts, lay);
+        if (node) hMax = Math.max(hMax, node.getBoundingClientRect().height);
+        var ve = stage.__vl && stage.__vl.el;
+        if (ve && ve.parentNode) vMax = Math.max(vMax, ve.getBoundingClientRect().height);
+      }
+      sp.__bkLay = lay; sp.__bkW = w; sp.__bkOn = on; sp.__bkH = hMax; sp.__bkV = vMax;
+    }
+    vzLive(sp, function () { IN.vizBuckets(stage, s, opts); });
+    var out = draw(stage, s, opts, lay);
+    if (out && sp.__bkLay === lay) {
+      out.style.minHeight = sp.__bkH ? sp.__bkH + "px" : "";
+      var vle = stage.__vl && stage.__vl.el;
+      if (vle) vle.style.minHeight = sp.__bkV && vlOn(stage) ? sp.__bkV + "px" : "";
+    }
+    return out;
   };
 })();

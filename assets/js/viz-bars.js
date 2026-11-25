@@ -99,12 +99,21 @@
     return null;
   }
 
-  /* list: [{ name, from, to, dashed?, call?, row?, label? }], cols: cellene spennet måles mot */
-  function rangeBox(step, list, cols, ownerEls) {
+  /* list: [{ name, from, to, dashed?, call?, row?, label? }], cols: cellene spennet måles mot.
+     slots (valgfri): faste radnavn for hele tracen. Da får hvert navn alltid samme rad, og en
+     løkke som ikke går akkurat nå, gir en tom rad i stedet for at radene under flytter seg opp. */
+  function rangeBox(step, list, cols, ownerEls, slots) {
     var vr = el("div", { class: "vr", "aria-hidden": "true" });
     vr.__cols = cols; vr.__items = []; vr.__vr = vr;
+    if (slots) {
+      var byName = {}, rest = [];
+      list.forEach(function (r) { if (slots.indexOf(r.name) >= 0 && !byName[r.name]) byName[r.name] = r; else rest.push(r); });
+      var ordered = slots.map(function (nm) { return byName[nm] || null; }).concat(rest);
+      list = ordered;
+    }
     list.forEach(function (r) {
       var row = el("div", { class: "vr-row" });
+      if (!r) { vr.appendChild(row); return; }
       var br = el("span", { class: "vr-br" + (r.dashed ? " is-dashed" : "") + (r.call ? " is-call" : "") });
       var lbl = el("span", { class: "vr-lbl" });
       var v = findVar(step, r.name, r.row);
@@ -178,8 +187,8 @@
             ranges:[{ name, from, to, dashed?, call?, row?, label? }] – løkkespenn under søylene
               (eller under raden row = "L"/"R"); ytterste først, nærmest søylene }
      opts.varHost: elementet linja skal ligge øverst i (standard: stage). */
-  IN.vizBars = function (stage, step, opts) {
-    opts = opts || {};
+  function draw(stage, step, opts) {
+    var lay = opts.lay || null;
     var arr = step.array || [];
     var marks = step.marks || {};
     var ptrs = step.ptrs || {};
@@ -188,9 +197,10 @@
     var minH = 22, span = 120;
     var vhost = opts.varHost || stage;
     var vl = null;
-    if (step.vars && IN.varLine) {
+    // Har noen steg i tracen variabler, beholdes linja også i steg uten (tom), så den ikke kommer og går
+    if ((step.vars || (lay && lay.vars)) && IN.varLine) {
       vl = IN.varLine.attach(vhost);
-      vl.update(step.vars, step.varsPrev, { frame: step.frame, dot: function (v) { return dotState(step, v); } });
+      vl.update(step.vars || [], step.vars ? step.varsPrev : null, { frame: step.frame, dot: function (v) { return dotState(step, v); } });
     } else if (IN.varLine && vhost === stage) IN.varLine.detach(stage);
 
     var bars = el("div", { class: "bars" });
@@ -214,38 +224,124 @@
 
     if (vl && vhost === stage) IN.varLine.clearStage(stage); else clear(stage);
     var ranges = step.ranges || [];
-    var extra = step.hold || (step.rows && step.rows.length) || ranges.length;
-    if (!extra) { stage.appendChild(bars); fitBars(bars); watchFit(bars); return; }
+    var extra = step.hold || (step.rows && step.rows.length) || ranges.length || (lay && lay.extra);
+    if (!extra) { stage.appendChild(bars); fitBars(bars); watchFit(bars); return bars; }
     function rangesFor(row) { return ranges.filter(function (r) { return (r.row || null) === row; }); }
+    function slotsFor(row) { return lay && lay.ranges[row == null ? "" : row] || null; }
     var toLayout = [];
 
     var wrap = el("div", { class: "vb" });
-    if (step.hold) {
+    if (step.hold || (lay && lay.hold)) {
       var top = el("div", { class: "vb-top" });
-      top.appendChild(el("span", { class: "vb-hold" }, [
-        el("span", { class: "vb-lbl mono", text: step.hold.label }),
-        el("span", { class: "vb-cell" + (step.hold.cls ? " is-" + step.hold.cls : ""), text: String(step.hold.v) })
-      ]));
+      var hold = step.hold || { label: "·", v: "·" };
+      var hs = el("span", { class: "vb-hold" }, [
+        el("span", { class: "vb-lbl mono", text: hold.label }),
+        el("span", { class: "vb-cell" + (hold.cls ? " is-" + hold.cls : ""), text: String(hold.v) })
+      ]);
+      if (!step.hold) hs.style.visibility = "hidden"; // fast plass: raden er der også når ingenting holdes til side
+      top.appendChild(hs);
       wrap.appendChild(top);
     }
     wrap.appendChild(bars);
-    var aR = rangesFor(null);
-    if (aR.length) {
-      var vrA = rangeBox(step, aR, Array.prototype.slice.call(bars.children), [bars]);
+    var aR = rangesFor(null), aS = slotsFor(null);
+    if (aR.length || aS) {
+      var vrA = rangeBox(step, aR, Array.prototype.slice.call(bars.children), [bars], aS);
       wrap.appendChild(vrA); toLayout.push(vrA);
     }
     (step.rows || []).forEach(function (r) {
       var rowEl = cellRow(r.label, r.cells || [], r.note);
       wrap.appendChild(rowEl);
-      var rR = rangesFor(r.label);
-      if (rR.length) {
-        var vrR = rangeBox(step, rR, Array.prototype.slice.call(rowEl.querySelectorAll(".vb-ccol")), [rowEl]);
+      var rR = rangesFor(r.label), rS = slotsFor(r.label);
+      if (rR.length || rS) {
+        var vrR = rangeBox(step, rR, Array.prototype.slice.call(rowEl.querySelectorAll(".vb-ccol")), [rowEl], rS);
         wrap.appendChild(vrR); toLayout.push(vrR);
       }
     });
     stage.appendChild(wrap);
     fitBars(bars); watchFit(bars);
     toLayout.forEach(layoutRanges);
+    return wrap;
+  }
+
+  /* Fast høyde for hele tracen. Når stegene er stemplet med IN.vizBars.stamp(steps), tegnes alle
+     stegene én gang (synkront, uten at noe males) når demoen vises første gang eller bredden endres.
+     Den største høyden blir min-height for området under variabellinja og for variabellinja selv,
+     så demoen ikke hopper opp og ned når man blar. Variabellinja kan fortsatt skjules med bryteren. */
+  function vlOn(vhost) { var v = vhost.__vl && vhost.__vl.el; return !v || !v.classList.contains("is-off"); }
+  /* Bryteren «Variabler» gjelder alle demoer på siden: tegn de synlige demoene på nytt med en gang,
+     så den reserverte høyden følger bryteren uten å vente på neste steg. */
+  if (!IN.__vzLive) {
+    IN.__vzLive = [];
+    document.addEventListener("click", function (e) {
+      if (!e.target || !e.target.closest || !e.target.closest(".vl-tog")) return;
+      setTimeout(function () {
+        IN.__vzLive = IN.__vzLive.filter(function (sp) { return sp.isConnected; });
+        IN.__vzLive.forEach(function (sp) { if (sp.offsetParent !== null && sp.__vzLast) sp.__vzLast(); });
+      }, 0);
+    });
+  }
+  function vzLive(sp, fn) { sp.__vzLast = fn; if (IN.__vzLive.indexOf(sp) < 0) IN.__vzLive.push(sp); }
+  IN.vizBars = function (stage, step, opts) {
+    opts = opts || {};
+    var lay = step && step.lay && step.lay.steps ? step.lay : null;
+    if (!lay) return draw(stage, step, opts);
+    var vhost = opts.varHost || stage;
+    var sp = stage.closest ? (stage.closest(".sp-stage") || stage) : stage;
+    var w = sp.clientWidth, on = vlOn(vhost);
+    var o = {}; for (var k in opts) o[k] = opts[k]; o.lay = lay;
+    if (w > 0 && (sp.__lay !== lay || sp.__layW !== w || sp.__layOn !== on)) {
+      var vlEl = vhost.__vl && vhost.__vl.el;
+      if (vlEl) vlEl.style.minHeight = "";
+      var hMax = 0, vMax = 0;
+      for (var z = 0; z < lay.steps.length; z++) {
+        var node = draw(stage, lay.steps[z], o);
+        if (node) hMax = Math.max(hMax, node.getBoundingClientRect().height);
+        var ve = vhost.__vl && vhost.__vl.el;
+        if (ve && ve.parentNode) vMax = Math.max(vMax, ve.getBoundingClientRect().height);
+      }
+      sp.__lay = lay; sp.__layW = w; sp.__layOn = on; sp.__layH = hMax; sp.__layV = vMax;
+    }
+    vzLive(sp, function () { IN.vizBars(stage, step, opts); });
+    var out = draw(stage, step, o);
+    if (out && sp.__lay === lay) {
+      out.style.minHeight = sp.__layH ? sp.__layH + "px" : "";
+      var vle = vhost.__vl && vhost.__vl.el;
+      if (vle) vle.style.minHeight = sp.__layV && vlOn(vhost) ? sp.__layV + "px" : "";
+    }
+    return out;
   };
   IN.vizBars.dotState = dotState;
+
+  /* Stempel en trace (kalles av generatorene etter at ranges er satt): alle stegene får samme
+     lay-objekt med navnene på spennradene per eier (A eller en hjelperad), om noen steg holder en
+     verdi til side, og om noen steg har variabler. Spennradene får faste plasser: navnene står i
+     den rekkefølgen de først dukker opp, så i alltid er rad 1 og j rad 2. */
+  IN.vizBars.stamp = function (steps) {
+    if (!steps || !steps.length) return steps;
+    var lay = { steps: steps, ranges: {}, hold: false, vars: false, extra: false };
+    steps.forEach(function (s) {
+      if (s.hold) lay.hold = true;
+      if (s.vars) lay.vars = true;
+      if (s.hold || (s.rows && s.rows.length) || (s.ranges && s.ranges.length)) lay.extra = true;
+      var prevByOwner = {};
+      (s.ranges || []).forEach(function (r) {
+        var own = r.row || "", list = lay.ranges[own] || (lay.ranges[own] = []);
+        var at = list.indexOf(r.name);
+        if (at < 0) {
+          var after = prevByOwner[own];
+          var pos = after != null ? list.indexOf(after) + 1 : 0;
+          // Uten forgjenger i steget: foran det første navnet som kommer etter i steget, ellers bakerst
+          if (after == null) pos = list.length ? 0 : 0;
+          if (after == null && list.length) {
+            var later = (s.ranges || []).filter(function (q) { return (q.row || "") === own && list.indexOf(q.name) >= 0; })[0];
+            pos = later ? list.indexOf(later.name) : list.length;
+          }
+          list.splice(pos, 0, r.name);
+        }
+        prevByOwner[own] = r.name;
+      });
+    });
+    steps.forEach(function (s) { s.lay = lay; });
+    return steps;
+  };
 })();

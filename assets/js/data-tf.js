@@ -213,7 +213,7 @@
     {
       "s": "Velger vi pivot tilfeldig, er Quicksort garantert O(n log n).",
       "answer": false,
-      "explain": "Tilfeldig pivot gjør dårlige delinger usannsynlige, men verste tilfelle er fortsatt O(n²). Sensor vil se at du nevner dette (H2023, H2025).",
+      "explain": "Tilfeldig pivot gjør dårlige delinger usannsynlige, men verste tilfelle er fortsatt O(n²). Sensor vil se at du nevner dette (H2023).",
       "tema": "Quicksort",
       "kilde": false
     },

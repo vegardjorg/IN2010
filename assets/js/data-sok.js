@@ -749,6 +749,8 @@
         steps[z].varsPrev = z ? (steps[z - 1].vars || null) : null;
         if (R) steps[z].ranges = R(steps[z], (steps[z].array || []).length);
       }
+      // Fast plass til spenn og variabellinja i hele tracen (viz-bars.js)
+      if (IN.vizBars && IN.vizBars.stamp) IN.vizBars.stamp(steps);
       return steps;
     };
     w.__vlLinked = true;

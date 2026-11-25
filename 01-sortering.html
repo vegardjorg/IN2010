@@ -5,8 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Blokk 1 · Sortering · IN2010</title>
   <meta name="description" content="Sorteringsalgoritmer i IN2010: selection, bubble, insertion, gnome, merge, quick, bøtte, radix og heapsort – med stegvise demoer og Big-O.">
-  <script>(function(){try{var d=document.documentElement;var t=localStorage.getItem('in-theme')||'light';if(t!=='system')d.setAttribute('data-theme',t);var l=localStorage.getItem('in-level')||'normal';d.setAttribute('data-level',l);}catch(e){document.documentElement.setAttribute('data-theme','light');document.documentElement.setAttribute('data-level','normal');}})();</script>
-  <link rel="stylesheet" href="assets/css/styles.css?v=20261125a">
+  <script>(function(){try{var d=document.documentElement;var t=localStorage.getItem('in-theme');if(t!=='dark'&&t!=='system')t='light';if(t!=='system')d.setAttribute('data-theme',t);var l=localStorage.getItem('in-level');if(l!=='eli5'&&l!=='teknisk')l='normal';d.setAttribute('data-level',l);}catch(e){document.documentElement.setAttribute('data-theme','light');document.documentElement.setAttribute('data-level','normal');}})();</script>
+  <link rel="stylesheet" href="assets/css/styles.css?v=20261125g">
 </head>
 <body data-page="sortering">
   <a class="skip-link" href="#main">Hopp til innhold</a>
@@ -76,20 +76,20 @@
               <td data-tip="Langdistanse-byttet kan hoppe et element forbi en lik verdi. Eks: [2a, 2b, 1] → 1 byttes med 2a → [1, 2b, 2a].">Nei</td>
               <td data-tip="Bytter elementer inne i arrayet; ingen kopi.">Ja</td></tr>
             <tr><td><a href="#fane=bubble">Bubble</a></td>
-              <td class="mono" data-tip="Med swapped-flagget: én runde uten bytter på sortert input, og så stopper den – O(n).">n</td>
+              <td class="mono" data-tip="Kursets versjon går alltid alle n − 1 rundene, også på sortert input: n(n − 1)/2 sammenligninger. Legger du til et valgfritt flagg som stopper når en runde ikke bytter noe, blir beste tilfelle O(n).">n²</td>
               <td class="mono" data-tip="Tilfeldig input har rundt n²/4 inversjoner (par i feil rekkefølge), og hvert nabobytte fjerner bare én.">n²</td>
               <td class="mono" data-tip="Omvendt sortert input har n(n−1)/2 inversjoner – og like mange nabobytter.">n²</td>
               <td data-tip="Bytter bare når venstre nabo er strengt større (>), så like naboer byttes aldri.">Ja</td>
               <td data-tip="Nabobytter inne i arrayet; ingen kopi.">Ja</td></tr>
             <tr><td><a href="#fane=insertion">Insertion</a></td>
               <td class="mono" data-tip="Sortert input: hvert nytt element står allerede rett, så det blir én sammenligning per element – O(n).">n</td>
-              <td class="mono" data-tip="I snitt må hvert element skyves forbi omtrent halvparten av den sorterte delen.">n²</td>
-              <td class="mono" data-tip="Omvendt sortert: hvert element skyves helt til start – 1 + 2 + … + (n−1) forskyvninger.">n²</td>
-              <td data-tip="Skyver bare forbi elementer som er strengt større (>), så like elementer beholder rekkefølgen.">Ja</td>
-              <td data-tip="Forskyver elementer inne i arrayet; ingen kopi.">Ja</td></tr>
+              <td class="mono" data-tip="I snitt må hvert element byttes forbi omtrent halvparten av den sorterte delen.">n²</td>
+              <td class="mono" data-tip="Omvendt sortert: hvert element byttes helt til start – 1 + 2 + … + (n−1) bytter.">n²</td>
+              <td data-tip="Bytter bare forbi elementer som er strengt større (>), så like elementer beholder rekkefølgen.">Ja</td>
+              <td data-tip="Nabobytter inne i arrayet; ingen kopi.">Ja</td></tr>
             <tr><td><a href="#fane=gnome">Gnome</a></td>
               <td class="mono" data-tip="Sortert input: nissen går rett fram uten et eneste bytte – n−1 sammenligninger.">n</td>
-              <td class="mono" data-tip="Som insertion, men hvert skritt tilbake er et bytte – omtrent dobbelt så mange sammenligninger.">n²</td>
+              <td class="mono" data-tip="Like mange bytter som insertion, men gnome har bare én indeks og må gå hele veien fram igjen etter hvert bytte bakover – omtrent dobbelt så mange sammenligninger. Fortsatt O(n²).">n²</td>
               <td class="mono" data-tip="Omvendt sortert: hvert element må byttes helt tilbake til start.">n²</td>
               <td data-tip="Bytter bare naboer når venstre er strengt større (>), så like elementer bytter aldri plass.">Ja</td>
               <td data-tip="Nabobytter inne i arrayet; ingen kopi.">Ja</td></tr>
@@ -98,11 +98,11 @@
               <td class="mono" data-tip="Samme struktur hver gang – inputen endrer ikke antall nivåer.">n log n</td>
               <td class="mono" data-tip="Flettingen er alltid O(n) per nivå, så også verste input gir O(n log n). Garantert!">n log n</td>
               <td data-tip="Ved like verdier tas elementet fra venstre halvdel først (≤), så rekkefølgen bevares.">Ja</td>
-              <td data-tip="Flettingen bruker hjelpearrayer (L og R) – en ekstra datastruktur.">Nei</td></tr>
+              <td data-tip="Halvdelene lages som nye arrayer (A1 og A2) – en ekstra datastruktur.">Nei</td></tr>
             <tr><td><a href="#fane=quick">Quick</a></td>
               <td class="mono" data-tip="Pivot havner midt i hver gang: to like halvdeler gir log n nivåer à O(n).">n log n</td>
               <td class="mono" data-tip="Med tilfeldig input blir partisjonene i snitt balanserte nok til O(n log n).">n log n</td>
-              <td class="mono" data-tip="Pivot blir stadig minst eller størst (f.eks. sortert input når siste element er pivot): biten krymper bare med 1, så det blir n nivåer.">n²</td>
+              <td class="mono" data-tip="Pivot blir stadig minst eller størst (f.eks. sortert input når siste element er pivot): biten krymper bare med 1, så rekursjonstreet får høyde n − 1.">n²</td>
               <td data-tip="Partisjoneringen bytter elementer over lange avstander, så like verdier kan bytte rekkefølge.">Nei</td>
               <td data-tip="Partisjonerer inne i selve arrayet, uten noen ekstra datastruktur.">Ja</td></tr>
             <tr><td><a href="#fane=bucket">Bøtte</a></td>
@@ -142,7 +142,7 @@
         <ul>
           <li><b>H2020 · Søk (Intersection)</b>, 12p: lønner det seg å sortere én gang før mange søk? –
             <a href="02-sok.html#fane=sortersok">Søk → Sorter én gang</a></li>
-          <li><b>H2021 · Par med sum x</b>, 10p: radix sort gir O(n) og full pott; merge sort gir O(n log n) og
+          <li><b>H2021 · Finn par som summerer til x</b>, 10p: radix sort gir O(n) og full pott; merge sort gir O(n log n) og
             noe trekk. – <a href="02-sok.html#fane=triks">Søk → Array-triks</a></li>
           <li><b>H2023 · Finn duplikat</b>: elementene kan bare sammenlignes, så bøtte og radix er utelukket –
             merge sort eller heapsort. – <a href="02-sok.html#fane=duplikat">Søk → Finn duplikat</a></li>
@@ -193,10 +193,12 @@
         <div><div id="tracer-bubble"></div></div>
         <div><h4 style="margin:.2rem 0 .4rem">Pseudokode (følger demoen)</h4><div id="pc-bubble"></div></div>
       </div>
-      <div class="callout eksempel"><span class="lbl">Tidlig stopp – bare bubble</span>
-        <code>swapped</code>-flagget gir O(n) i beste tilfelle: går en hel runde uten bytte, er alt sortert.
-        Dette trikset virker <b>ikke</b> for selection eller insertion – deres indre løkke sammenligner
-        ikke alle nabopar, så «ingen bytte i runden» betyr ikke «ferdig».</div>
+      <div class="callout eksempel"><span class="lbl">Tidlig stopp er valgfritt</span>
+        Kursets versjon går alltid alle n − 1 rundene, så den er O(n²) også på sortert input.
+        Forelesningen nevner at man <i>kunne</i> stoppet når en hel runde går uten bytte. Gjør du det
+        (for eksempel med et flagg), blir beste tilfelle O(n). Det trikset passer for bubble fordi én runde
+        sammenligner alle nabopar: ingen bytter betyr da at alt er sortert. Selection sammenligner ikke
+        nabopar, så der betyr «ingen bytte» ikke «ferdig».</div>
       <h4>Sjekk deg selv</h4>
       <div id="quiz-bubble"></div>
       <h4>Koden, linje for linje</h4>
@@ -208,14 +210,14 @@
       <h3>Insertion sort</h3>
       <div id="intro-insertion"></div>
       <div class="callout eli5"><span class="lbl">5-åring: kort på hånda</span>
-        Slik sorterer de fleste kort på hånda. Du tar opp ett nytt kort og skyver det til venstre forbi alle kort
-        som er større, til det står riktig. Kortene du allerede holder, er hele tiden sortert.</div>
+        Slik sorterer de fleste kort på hånda. Du tar opp ett nytt kort og bytter det med kortet til venstre så
+        lenge det kortet er større, til det står riktig. Kortene du allerede holder, er hele tiden sortert.</div>
       <div class="grid cols-2">
         <div><div id="tracer-insertion"></div></div>
         <div><h4 style="margin:.2rem 0 .4rem">Pseudokode (følger demoen)</h4><div id="pc-insertion"></div></div>
       </div>
       <div class="callout eksempel"><span class="lbl">Best på nesten-sorterte data</span>
-        Antall forskyvninger = antall <b>inversjoner</b> i arrayet. Er data nesten sortert, er det nesten
+        Antall bytter = antall <b>inversjoner</b> i arrayet. Er data nesten sortert, er det nesten
         ingen inversjoner → nesten O(n). Insertion er derfor et godt valg når data allerede er nesten sortert.</div>
       <h4>Sjekk deg selv</h4>
       <div id="quiz-insertion"></div>
@@ -242,14 +244,18 @@
       </div>
 
       <div class="callout sensor"><span class="lbl">Slik drøfter du gnome på eksamen</span>
+        Sensorveiledningen for H2023 oppgave 4 gir poeng for forklaring, kjøretid, plassering blant de andre
+        algoritmene, og stabil/in-place. For full uttelling må du se at gnome er i nær slekt med insertion sort.
+        Punktene under er vår oppsummering:
         <ul>
-          <li><b>Korrekthet:</b> hver gang et par er i feil rekkefølge byttes de og nissen går tilbake –
-            akkurat som insertion skyver et element på plass. Når <code>i</code> når <code>n</code> er alt ordnet.</li>
+          <li><b>Korrekthet:</b> hver gang et par er i feil rekkefølge, byttes de, og nissen går tilbake.
+            Det er akkurat det insertion gjør når den bytter et element bakover på plass. Når <code>i</code>
+            når <code>n</code>, er alt ordnet.</li>
           <li><b>Kjøretid:</b> best O(n) (alt sortert → bare framover), snitt/verst O(n²). Antall bytter =
             antall inversjoner.</li>
-          <li><b>Sammenlign med insertion:</b> samme O(n²), men gnome gjør omtrent <b>dobbelt så mange
-            sammenligninger</b> fordi den re-sjekker paret den nettopp byttet. O-notasjonen skjuler denne
-            konstantfaktoren – si det eksplisitt.</li>
+          <li><b>Sammenlign med insertion:</b> begge bytter naboer, og de gjør like mange bytter. Forskjellen er
+            at gnome bare har én indeks. Etter å ha byttet et element bakover må den gå hele veien fram igjen,
+            så den gjør omtrent <b>dobbelt så mange sammenligninger</b>. O-klassen er den samme.</li>
           <li><b>Egenskaper:</b> stabil (streng <code>&gt;</code>) og in-place (ingen ekstra datastruktur).</li>
         </ul></div>
 
@@ -283,9 +289,13 @@
         </div>
       </div>
       <div class="callout eksempel"><span class="lbl">Flettingen (Merge) er nøkkelen</span>
-        Demoen viser hvordan de to sorterte halvdelene flettes tilbake i arrayet. Tar vi fra venstre ved
-        likhet (<code>≤</code>), blir sorteringen <b>stabil</b>. Flettingen trenger et hjelpearray, en
-        ekstra datastruktur – så merge er ikke in-place.</div>
+        Demoen viser hvordan de to sorterte halvdelene A1 og A2 flettes tilbake i A. Neste ledige plass er
+        alltid <code>A[i + j]</code>, fordi i + j elementer er skrevet. Tar vi fra venstre ved likhet
+        (<code>≤</code>), blir sorteringen <b>stabil</b>. Halvdelene lages som nye arrayer, en ekstra
+        datastruktur, så merge sort er ikke in-place.</div>
+      <div class="callout felle"><span class="lbl">Venstre halvdel er den minste</span>
+        Kurset deler med <code>i ← ⌊n/2⌋</code> og tar <code>A[0..i − 1]</code> til venstre. Med n = 5 får
+        venstre 2 elementer og høyre 3. Skal du tegne delingen på eksamen, del på samme måte.</div>
       <div class="callout uni"><span class="lbl">Fra ukesoppgavene: lenkede lister</span>
         Av merge, quick og heapsort er det merge sort som passer best på <b>lenkede lister</b>: den trenger
         ikke oppslag på indeks, og kan flette ved å flytte pekere.</div>
@@ -324,8 +334,11 @@
         når pivoten er dårlig.</div>
       <div class="callout felle"><span class="lbl">Verste tilfelle</span>
         Prøv «Sortert (verst)»: med siste element som pivot er pivoten alltid størst, partisjonen blir
-        maksimalt skjev, og rekursjonstreet blir n høyt → <b>O(n²)</b>. Derfor fraråder sensor quicksort når oppgaven krever
-        O(n log n) i verste fall.</div>
+        maksimalt skjev, og rekursjonstreet får høyde n − 1 → <b>O(n²)</b>. Quicksort er likevel ofte et
+        greit valg: i H2023 oppgave 3c kaller sensorveiledningen den «også et godt valg», men sier at du bør
+        nevne at den strengt tatt er kvadratisk i verste tilfelle. I H2025 oppgave 6b gir den inntil 3 av 4
+        poeng, mot 4 for en O(n log n)-sortering. Krever oppgaven O(n log n) i verste fall, er merge sort
+        eller heapsort det trygge valget.</div>
       <h4>Sjekk deg selv</h4>
       <div id="quiz-quick"></div>
       <h4>Koden, linje for linje</h4>
@@ -478,8 +491,10 @@
         vil se mer. Svarene huskes i nettleseren din.</p>
       <h3 id="eksamen-test" class="exam-anchor" style="margin-top:1rem">Eksamen H2021 · Oppgave 3 <span class="tag">10p</span></h3>
       <p class="muted small">A er et array med n elementer, og 0 ≤ i &lt; n. «Runde» betyr én iterasjon av den
-        ytre løkka. På eksamen ga hvert riktig svar 1 poeng og hvert feil eller ubesvart −1 (minst 0 totalt).
-        Ubesvart koster like mye som feil, så svar på alle.</p>
+        ytre løkka. Påstandene står ordrett som på eksamen.</p>
+      <p class="et-kilde">Oppgavetekst: UiO, IN2010, H2021, oppgave 3 · ordrett. Fasit og poeng: sensorveiledning IN2010 H2021, oppgave 3.</p>
+      <p class="muted small">Sensorveiledningen: «Maksimalt får man 10 poeng, som vil si at man kan få full uttelling med én feil.»
+        Hvert riktig svar gir 1 poeng, og hvert feil eller ubesvart −1 (minst 0 totalt). Ubesvart koster like mye som feil, så svar på alle.</p>
       <div id="tf-h2021"></div>
 
       <h3 style="margin-top:2rem">Flere påstander</h3>
@@ -487,7 +502,7 @@
       <div id="tf-sortering"></div>
 
       <h3 style="margin-top:2rem">Test deg selv – sortering</h3>
-      <p class="muted small">Disse påstandene har aldri stått på eksamen. De er laget ut fra hva eksamenene og
+      <p class="muted small">Disse påstandene er ikke hentet ordrett fra eksamen. De er laget ut fra hva eksamenene og
         sensorveiledningene H2020–H2025 tester igjen og igjen, så du kan sjekke at du kan det sensor ser etter.
         De oftest testede står først.</p>
       <div data-tf-gen="sortering"></div>
@@ -496,16 +511,17 @@
 
   <footer class="footer">IN2010-guide · Blokk 1 · Sortering</footer>
 
-  <script src="assets/js/core.js?v=20261125a"></script>
-  <script src="assets/js/symboler.js?v=20261125a"></script>
-  <script src="assets/js/data-tf.js?v=20261125a"></script>
-  <script src="assets/js/pseudocode.js?v=20261125a"></script>
-  <script src="assets/js/stepplayer.js?v=20261125a"></script>
-  <script src="assets/js/varline.js?v=20261125a"></script>
-  <script src="assets/js/viz-bars.js?v=20261125a"></script>
-  <script src="assets/js/viz-buckets.js?v=20261125a"></script>
-  <script src="assets/js/data-algos.js?v=20261125a"></script>
-  <script src="assets/js/data-heap.js?v=20261125a"></script>
+  <script src="assets/js/core.js?v=20261125g"></script>
+  <script src="assets/js/symboler.js?v=20261125g"></script>
+  <script src="assets/js/data-tf.js?v=20261125g"></script>
+  <script src="assets/js/pseudocode.js?v=20261125g"></script>
+  <script src="assets/js/stepplayer.js?v=20261125g"></script>
+  <script src="assets/js/varline.js?v=20261125g"></script>
+  <script src="assets/js/viz-bars.js?v=20261125g"></script>
+  <script src="assets/js/viz-buckets.js?v=20261125g"></script>
+  <script src="assets/js/data-algos.js?v=20261125g"></script>
+  <script src="assets/js/data-heap.js?v=20261125g"></script>
+  <script src="assets/js/perfekt/sortering.js?v=20261125g"></script>
   <script>
   (function () {
     var IN = window.IN, qs = IN.qs;
@@ -537,9 +553,8 @@
         { cls: "sorted", label: "ferdig på plass" }
       ],
       insertion: [
-        { cls: "compare", label: "sammenlignes med key" },
-        { cls: "target", label: "skrives hit" },
-        { cls: "stale", label: "ledig plass", color: SW_STALE },
+        { cls: "compare", label: "A[j − 1] og A[j] sammenlignes" },
+        { cls: "swap", label: "byttet" },
         { cls: "part", label: "sortert seg imellom", color: SW_PART },
         { cls: "sorted", label: "ferdig (til slutt)" }
       ],
@@ -550,9 +565,9 @@
         { cls: "sorted", label: "ferdig (til slutt)" }
       ],
       merge: [
-        { cls: "compare", label: "L[i] og R[j] sammenlignes" },
-        { cls: "target", label: "skrives nå (A[k])" },
-        { cls: "stale", label: "ledig: kopiert til L og R", color: SW_STALE },
+        { cls: "compare", label: "A1[i] og A2[j] sammenlignes" },
+        { cls: "target", label: "skrives nå (A[i + j])" },
+        { cls: "stale", label: "ledig: skrives på nytt", color: SW_STALE },
         { cls: "part", label: "delsortert", color: SW_PART },
         { cls: "sorted", label: "ferdig sortert" }
       ],
@@ -576,22 +591,22 @@
       bubble: {
         eli5: "<p>Vi går gjennom tallene og bytter nabopar som står feil. De store «bobler» mot høyre, litt etter litt.</p>",
         normal: "<p>Gjenta gjennomløp der nabopar i feil rekkefølge byttes; etter hver runde ligger det største bakerst.</p>",
-        teknisk: "<p>Snitt og verst O(n²) nabobytter; swapped-flagget gir O(n) i beste tilfelle, når input allerede er sortert. Stabil og in-place.</p>"
+        teknisk: "<p>Kursversjonen går alle n − 1 rundene uansett, så den er O(n²) i alle tilfeller. Legger du til et valgfritt flagg som stopper når en runde ikke bytter noe, blir beste tilfelle (sortert input) O(n). Stabil og in-place.</p>"
       },
       insertion: {
         eli5: "<p>Som å sortere kort i hånda: ta neste kort og skyv det inn på rett plass blant dem du alt har ordnet.</p>",
-        normal: "<p>Ta ett element om gangen og sett det inn på rett plass i den sorterte venstre delen ved å skyve større elementer til høyre.</p>",
-        teknisk: "<p>Antall forskyvninger = antall inversjoner, så beste tilfelle (sortert input) er O(n) og snitt/verst O(n²). Stabil og in-place.</p>"
+        normal: "<p>Ta ett element om gangen og bytt det mot venstre med naboen så lenge naboen er større. Da havner det på rett plass i den sorterte venstre delen.</p>",
+        teknisk: "<p>Hvert bytte fjerner nøyaktig én inversjon, så antall bytter = antall inversjoner. Beste tilfelle (sortert input) er O(n), snitt og verst O(n²). Stabil og in-place.</p>"
       },
       gnome: {
         eli5: "<p>En hagenisse går langs rekka. Står to naboer feil, bytter han og tar ett skritt tilbake. Ellers går han framover.</p>",
         normal: "<p>Én peker i. Er paret (i−1, i) feil: bytt og gå ett tilbake. Ellers: gå ett fram. Ferdig når i = n.</p>",
-        teknisk: "<p>Som insertion, men med bytter i stedet for forskyvninger (omtrent dobbelt så mange sammenligninger). Beste tilfelle O(n), verst O(n²). Stabil og in-place.</p>"
+        teknisk: "<p>Nær slekt med insertion sort: samme nabobytter, men bare én indeks. Etter at et element er flyttet på plass, må nissen gå hele veien fram igjen og sammenligne på nytt, så den gjør omtrent dobbelt så mange sammenligninger. Beste tilfelle O(n), verst O(n²). Stabil og in-place.</p>"
       },
       merge: {
         eli5: "<p>Del bunken i to igjen og igjen til hver bit er ett kort. Så fletter vi bitene sammen to og to, alltid minste først.</p>",
         normal: "<p>Del arrayet i to, sorter hver halvdel rekursivt, og flett de to sorterte halvdelene sammen.</p>",
-        teknisk: "<p>log n nivåer med halvering, og O(n) flettearbeid per nivå, gir O(n log n) uansett input. Stabil, men ikke in-place: flettingen bruker et hjelpearray.</p>"
+        teknisk: "<p>log n nivåer med halvering, og O(n) flettearbeid per nivå, gir O(n log n) uansett input. Stabil, men ikke in-place: hvert kall lager nye arrayer (A1 og A2) for halvdelene. Demoen tegner hvert kall på sin plass i det store arrayet, så du ser hvor bitene havner.</p>"
       },
       quick: {
         eli5: "<p>Vi velger et «måletall» (pivot). Alt mindre legges til venstre, alt større til høyre. Så gjentar vi på hver side.</p>",
@@ -742,14 +757,14 @@
         { q: "Når er insertion sort raskest, og hvor rask er den da?",
           options: ["Når lista allerede er sortert: O(n)", "Når lista er omvendt sortert: O(n)", "Alltid: O(n log n)", "Når lista er sortert: O(1)"], answer: 0,
           explain: "Hvert nytt element sammenlignes én gang med naboen foran og blir stående. Det blir én rask runde gjennom lista: O(n). Vi må fortsatt se på alle n elementene, så O(1) er umulig." },
-        { q: "Hva er antall forskyvninger i insertion sort lik?",
+        { q: "Hva er antall bytter i insertion sort lik?",
           options: ["Antall inversjoner (par som står i feil rekkefølge)", "Alltid n − 1", "log n", "Antall like elementer"], answer: 0,
-          explain: "Hver forskyvning flytter ett element forbi ett større element foran seg, og fjerner dermed nøyaktig én inversjon." }
+          explain: "Hvert bytte flytter ett element forbi ett større element rett foran seg, og fjerner dermed nøyaktig én inversjon." }
       ],
       gnome: [
         { q: "Hvilken pensumalgoritme er gnome sort mest i slekt med?",
           options: ["Insertion sort", "Merge sort", "Bøttesortering", "Quicksort"], answer: 0,
-          explain: "Den flytter et element bakover på plass med nabobytter, akkurat som insertion skyver det på plass. Samme antall bytter, men omtrent dobbelt så mange sammenligninger." },
+          explain: "Den bytter et element bakover på plass med naboen, akkurat som insertion sort. Samme antall bytter, men omtrent dobbelt så mange sammenligninger: gnome har bare én indeks, så den må gå fram igjen og sjekke parene på nytt." },
         { q: "Hva skjer med i rett etter et bytte?",
           options: ["i ← i − 1: nissen går ett steg tilbake", "i ← i + 1: nissen går ett steg fram", "i ← 0: nissen begynner på nytt", "Ingenting"], answer: 0,
           explain: "Etter byttet kan det nye paret bak ham også stå feil, så han går tilbake og sjekker." }
@@ -759,13 +774,13 @@
           options: ["Den deler alltid i to like store deler, og flettingen koster O(n) per nivå", "Den velger en god pivot", "Den stopper tidlig på sortert input", "Den bruker bøtter"], answer: 0,
           explain: "Delingen avhenger ikke av verdiene, så det blir alltid log n nivåer. På hvert nivå ser flettingen på alle n elementene til sammen." },
         { q: "Hvorfor er ikke merge sort in-place?",
-          options: ["Flettingen bruker hjelpearrayer (L og R)", "Den bytter elementer over lange avstander", "Den er rekursiv", "Den er stabil"], answer: 0,
-          explain: "In-place betyr ingen ekstra datastruktur til å mellomlagre elementene. Flettingen kopierer halvdelene ut i L og R. (Rekursjon alene gjør ikke en sortering «ikke in-place» – quicksort er rekursiv og in-place.)" }
+          options: ["Den lager nye arrayer (A1 og A2) for halvdelene", "Den bytter elementer over lange avstander", "Den er rekursiv", "Den er stabil"], answer: 0,
+          explain: "In-place betyr ingen ekstra datastruktur til å mellomlagre elementene. MergeSort lager nye arrayer A1 og A2 for de to sorterte halvdelene, og Merge skriver dem tilbake i A. (Rekursjon alene gjør ikke en sortering «ikke in-place» – quicksort er rekursiv og in-place.)" }
       ],
       quick: [
         { q: "Når blir quicksort O(n²)?",
           options: ["Når pivoten hver gang er det minste eller største elementet", "Når pivoten alltid havner midt i", "Når arrayet har få elementer", "Aldri"], answer: 0,
-          explain: "Da blir den ene siden tom og den andre bare ett element mindre. Rekursjonstreet blir omtrent n høyt i stedet for log n, og hvert nivå koster O(n)." },
+          explain: "Da blir den ene siden tom og den andre bare ett element mindre. Rekursjonstreet får høyde n − 1 i stedet for omtrent log n, og hvert nivå koster O(n)." },
         { q: "Hva vet vi om pivoten rett etter Partition?",
           options: ["Den står på sin endelige plass", "Den står først i arrayet", "Den står sist i arrayet", "Ingenting"], answer: 0,
           explain: "Alt til venstre er mindre enn eller likt pivoten, og alt til høyre er større enn eller likt. Da flytter pivoten seg aldri mer." }
@@ -799,23 +814,23 @@
       { s: "Quicksort er O(n log n) i verste tilfelle.", answer: false,
         explain: "Quicksort er O(n²) i verste fall (f.eks. sortert input med pivot = siste element). Snittet er O(n log n).", blokk: "1" },
       { s: "Gnome sort gjør omtrent dobbelt så mange sammenligninger som insertion sort.", answer: true,
-        explain: "Gnome re-sjekker paret den nettopp byttet (ett skritt tilbake), så den gjør omtrent dobbelt så mange sammenligninger – men er i samme O(n²)-klasse.", blokk: "1" },
+        explain: "Gnome har bare én indeks. Når et element er byttet på plass, må den gå fram igjen og sammenligne de samme parene på nytt, mens insertion sort hopper rett videre med den ytre indeksen. Det gir omtrent dobbelt så mange sammenligninger, men samme antall bytter og samme O(n²).", blokk: "1" },
       { s: "Merge sort er stabil.", answer: true,
         explain: "Ja – ved å ta fra venstre halvdel når elementene er like (≤), bevares opprinnelig rekkefølge.", blokk: "1" },
-      { s: "Tidlig stopp med et «swapped»-flagg gir bubble sort O(n) i beste tilfelle.", answer: true,
-        explain: "Er arrayet alt sortert, går bubble én runde uten bytte og stopper → O(n). Trikset virker ikke for selection/insertion.", blokk: "1" },
+      { s: "Legger du til et flagg som stopper bubble sort når en runde ikke bytter noe, blir beste tilfelle O(n).", answer: true,
+        explain: "Er arrayet alt sortert, går den første runden uten bytte, og algoritmen stopper: O(n). Kursversjonen har ikke dette flagget og er derfor O(n²) også på sortert input.", blokk: "1" },
       { s: "Et stigende sortert array er alltid en gyldig min-heap.", answer: true,
         explain: "I et stigende sortert array er A[i] ≤ begge barna (indeks 2i+1, 2i+2), så min-heap-egenskapen holder. (Det motsatte gjelder ikke.)", blokk: "1" },
       { s: "Heapsort er stabil.", answer: false,
         explain: "Heapsort er ustabil: bytter over lang avstand (rot ↔ siste) kan endre rekkefølgen mellom like elementer.", blokk: "1" },
       { s: "Merge sort har kjøretid O(n log n).", answer: true,
-        explain: "Arrayet halveres til bitene har ett element: log n nivåer. På hvert nivå koster flettingen O(n) til sammen. (H2022, Oppgave 2.)", blokk: "1" },
+        explain: "Arrayet halveres til bitene har ett element: omtrent log n nivåer. På hvert nivå koster flettingen O(n) til sammen.", blokk: "1", kilde: "H2022" },
       { s: "En sortering er stabil når den alltid bruker like mange steg på n elementer.", answer: false,
         explain: "Stabil handler om rekkefølge, ikke tid: elementer med lik nøkkel står i samme innbyrdes rekkefølge etterpå som før.", blokk: "1" },
       { s: "Insertion sort er O(n) når arrayet allerede er sortert.", answer: true,
         explain: "Hvert nytt element sammenlignes én gang med naboen foran og blir stående – én rask runde gjennom arrayet.", blokk: "1" },
       { s: "En stabil sorteringsalgoritme er alltid in-place.", answer: false,
-        explain: "Det er to uavhengige egenskaper. Merge sort er stabil, men bruker et hjelpearray når den fletter.", blokk: "1" },
+        explain: "Det er to uavhengige egenskaper. Merge sort er stabil, men lager nye arrayer (A1 og A2) for halvdelene.", blokk: "1" },
       { s: "Ingen sammenligningsbasert sortering slår O(n log n) i verste tilfelle.", answer: true,
         explain: "Det er den nedre grensen for sortering som bare sammenligner. Bøtte- og radix sort kommer under fordi de aldri sammenligner to elementer.", blokk: "1" },
       { s: "Bøttesortering kan brukes selv om alt vi vet om elementene er at de kan sammenlignes.", answer: false,
@@ -834,50 +849,9 @@
         explain: "Merge sort trenger ikke oppslag på indeks, og den kan flette ved å flytte pekere.", blokk: "1" }
     ], { id: "sortering-tf" });
 
-    /* ---- Faktiske eksamensoppgaver ----
-       Bruker eksamensbanken (window.IN_EXAM_BANK) når den er inkludert; ellers
-       denne innebygde teksten. All tekst er parafrasert fra UiO-settene. */
-    var EXAM_FALLBACK = {
-      gnome: {
-        year: "H2023", oppgave_nr: "Oppgave 4", title: "Gnome sort", points: 10,
-        oppgave: IN.oppg({
-          intro: "<p>Gnome sort presenteres som en enkel sorteringsalgoritme utenfor pensum. Pseudokoden under tar inn et array <code>A</code> med <code>n</code> elementer og sorterer det. Tenk deg en nisse som står på plass <code>i</code>: står de to nabo-elementene riktig (eller han står helt først), går han ett steg fram. Ellers bytter han dem og går ett steg tilbake.</p>",
-          figs: [{ cls: "code", draw: function (h) { IN.pseudo.render(h, IN.algos.gnomeSort, { head: false, tooltips: false }); } }],
-          outro: "<p>Drøft fordeler og ulemper ved Gnome sort opp mot sorteringsalgoritmene i pensum. Svaret skal inneholde:</p><ol><li>en kort forklaring av virkemåten med vanlige ord,</li><li>kjøretidskompleksiteten med kort begrunnelse,</li><li>en sammenligning mot sorteringsalgoritmene i pensum,</li><li>en kort vurdering av om den er stabil og/eller in-place.</li></ol><p class=\"small muted\">Prøv selv: <a href=\"#fane=gnome&amp;oppg=tracer-gnome\">demoen over</a> viser nissen steg for steg.</p>"
-        }),
-        losning: [
-          "<b>Virkemåte:</b> algoritmen vandrer over elementene; møter den et element som er mindre enn det foregående, flytter den det bakover med gjentatte nabobytter. Nesten identisk med insertion sort, men holder styr på bare én indeks.",
-          "<b>Kjøretid:</b> kvadratisk, O(n²) (som bubble og selection). Best O(n) når alt allerede er sortert. Nøyaktig like mange bytter som insertion sort, men omtrent dobbelt så mange sammenligninger.",
-          "<b>Sammenligning:</b> pga. kvadratisk tid langt dårligere for store arrays enn de raskeste i pensum (merge, heap, quick). Sammenligningsbasert, så vanskelig å måle direkte mot bøtte/radix.",
-          "<b>Egenskaper:</b> stabil (bytter bare naboer) og in-place (ingen ekstra datastruktur).",
-          "<b>Poenggiving:</b> opptil 3 for god forklaring, 2 for riktig kompleksitet, 2 for riktig plassering mot de andre, 2 for stabilitet/in-place. Ekstra uttelling for å se slektskapet med insertion sort."
-        ],
-        kjerne: "<p>Oppgaven tester om du kan analysere en ukjent, sammenligningsbasert algoritme: lese kjøretiden ut av løkkestrukturen, kjenne igjen at den i praksis er en insertion-sort-variant, og resonnere om stabilitet og in-place.</p>",
-        tips: [
-          "Knytt den eksplisitt til insertion sort – det premieres mest: «samme antall bytter, flere sammenligninger».",
-          "Ikke bland in-place og stabil: argumentér stabilitet ut fra at bare naboer byttes, in-place ut fra at ingen ekstra struktur brukes.",
-          "Begrunn O(n²) kort (indeksen kan gå like mange skritt bakover som framover i verste fall) – ubegrunnet svar gir mindre uttelling."
-        ]
-      },
-      bucket: {
-        id: "exam-h2024-3", year: "H2024", oppgave_nr: "Oppgave 3", title: "Etymologisk ordliste", points: 10,
-        oppgave: "<p>En etymologisk ordliste slår opp opphavet til et ord. Hvert ordobjekt <code>v</code> har feltene <code>v.string</code> (selve ordet) og <code>v.category</code> (kategorien). Anta at det finnes <code>N</code> kategorier med <code>N &lt; 100</code>.</p><ul><li><b>(a)</b> Arrayet <code>A</code> inneholder hele ordlisten sortert alfabetisk (etter <code>string</code>). Skriv <code>EtymologySort(A)</code> som <b>stabilt</b> sorterer <code>A</code> tematisk (etter <code>category</code>). Prosedyren skal <b>ikke</b> kalle en sorteringsalgoritme.</li><li><b>(b)</b> Du har nå en ordbok <code>K</code> som for hver kategori gir et intervall <code>K[v.category] = [low, high]</code> (indeks til første og siste ordobjekt i kategorien). Beskriv hvordan du kan bruke en pensumalgoritme til å sjekke om et gitt ordobjekt <code>v</code> finnes i <code>A</code>, og oppgi kjøretiden.</li></ul>",
-        losning: [
-          "<b>(a)</b> Tilpasset bøttesortering: lag en ordnet ordbok <code>B</code> med tom liste som standardverdi; løp gjennom <code>A</code> og legg hvert element bakerst i bøtta <code>B[A[i].category]</code>; løp så gjennom kategorinøklene i sortert rekkefølge og skriv elementene tilbake i <code>A</code> i samme rekkefølge de lå. Dette er O(n) fordi antall kategorier er begrenset av konstanten <code>N &lt; 100</code>, og stabilt fordi hver bøtte beholder den opprinnelige alfabetiske rekkefølgen.",
-          "<b>(a) poeng:</b> full uttelling for bøttesortering (opptil 6p). En stabil O(n log n)-sortering gir opptil 4p (−1p hvis ikke stabil); en O(n²)-sortering opptil 2p. Merk kravet om å ikke kalle en sorteringsalgoritme.",
-          "<b>(b)</b> Siden (a) er stabil, er elementene fortsatt alfabetisk ordnet innenfor hver kategori. Dermed kan du binærsøke i O(log n): start binærsøket med <code>low</code> og <code>high</code> hentet fra <code>K[v.category]</code> og søk etter <code>v.string</code> i det intervallet. Lineære løsninger gir 2p."
-        ],
-        kjerne: "<p>Oppgaven tester bøttesortering når nøkkeldomenet er lite og konstant-begrenset (gir lineær tid), og – avgjørende – at <b>stabilitet</b> bevarer en sekundær ordning. Det er nettopp stabiliteten fra (a) som gjør binærsøket innenfor hver kategori i (b) mulig; deloppgavene henger kausalt sammen.</p>",
-        tips: [
-          "Full uttelling i (a): se at <code>N &lt; 100</code> gjør antall bøtter konstant → lineær tid. Kaller du en sammenligningssortering, tar det deg ned til 4p.",
-          "Hold sorteringen stabil (behold input-rekkefølgen i hver bøtte). Mister du stabiliteten, mister du et poeng og ødelegger forutsetningen for (b).",
-          "I (b): utnytt at hvert kategorisegment alt er alfabetisk sortert → binærsøk i <code>[low, high]</code>, O(log n). Ikke løp lineært gjennom segmentet (gir bare 2p)."
-        ]
-      }
-    };
-
-    IN.examTasks("#exam-gnome", [EXAM_FALLBACK.gnome]);
-    // Løsning med pseudokode: punktliste + kodeblokk (BYGGEGUIDE 5.4)
+    /* ---- Faktiske eksamensoppgaver (WP0-format) ----
+       Oppgaveteksten står ordrett fra eksamensarket (plan/gjennomgang/08-eksamenstekst-ordrett.md),
+       perfekt svar og sensorveiledningen ligger i assets/js/perfekt/sortering.js. */
     function losningMedKode(items, algoKey, lead) {
       var box = document.createElement("div");
       box.innerHTML = "<ol>" + items.map(function (x) { return "<li>" + x + "</li>"; }).join("") + "</ol>" +
@@ -887,77 +861,198 @@
       IN.pseudo.render(pc, IN.algos[algoKey], {});
       return box;
     }
-    function demoLink(fane, demo, txt) { return '<p class="small muted">Prøv selv: <a href="#fane=' + fane + "&amp;oppg=" + demo + '">' + txt + "</a>.</p>"; }
-    EXAM_FALLBACK.bucket.oppgave += demoLink("bucket", "tracer-bucket", "bøttedemoen over viser fordel og samle steg for steg");
-    EXAM_FALLBACK.bucket.losning = losningMedKode(EXAM_FALLBACK.bucket.losning, "etymologySort",
-      "Slik kan (a) skrives i pseudokode:");
+    function skel(node, algo) { IN.pseudo.render(node.querySelector(".et-skel"), algo, { tooltips: false }); return node; }
+    function itemTxt(it) { return it.v + (it.tag || ""); }
+    var LEG_BK = [
+      { cls: "compare", label: "elementet vi jobber med" },
+      { cls: "sorted", label: "skrevet tilbake i A" }
+    ];
 
-    var EXAM_EXTRA = {
-      stabilitet: {
-        id: "exam-h2021-2", year: "H2021", oppgave_nr: "Oppgave 2", title: "Stabilitet", points: 3,
-        oppgave: "<p>Et usortert array <code>A</code> inneholder personobjekter med et alder-felt. Personene på <code>A[3]</code> og <code>A[42]</code> er begge 22 år. <code>A</code> sorteres på alder, og etterpå ligger personen fra <code>A[3]</code> på <code>A[9]</code>, og personen fra <code>A[42]</code> på <code>A[7]</code>.</p><ul><li><b>(a)</b> Var sorteringen stabil?</li><li><b>(b)</b> Hvilken alder har personen som nå ligger på <code>A[8]</code>?</li><li><b>(c)</b> Ingen er eldre enn 100 år. Hvilken sorteringsalgoritme bør du velge for best kjøretid?</li></ul>",
-        losning: [
-          "<b>(a) Nei.</b> De to 22-åringene har byttet rekkefølge: den som lå først (indeks 3), ligger nå sist (indeks 9). En stabil sortering ville holdt dem i samme innbyrdes rekkefølge.",
-          "<b>(b) 22.</b> Etter sortering ligger like aldre samlet. Indeks 7 og 9 er begge 22, så indeks 8 må også være 22.",
-          "<b>(c) Bøttesortering.</b> Alderen er et heltall 0–100, så vi kan bruke 101 bøtter. Det gir O(N + n) med N = 101, altså O(n) – uten en eneste sammenligning."
-        ],
-        kjerne: "<p>Stabilitet handler bare om elementer med <b>lik</b> nøkkel: beholder de rekkefølgen sin? Og når nøklene er små heltall, slår bøttesortering de sammenligningsbaserte.</p>",
-        tips: [
-          "Se bare på elementene med samme nøkkel når du skal avgjøre stabilitet.",
-          "Alder 0–100 betyr 101 mulige verdier – tell med 0 når du lager bøttene.",
-          "Like nøkler ligger samlet etter sortering. Det kan du bruke til å si noe om plassene mellom dem."
-        ]
-      },
-      subanagrams: {
-        id: "exam-h2020-7d", year: "H2020", oppgave_nr: "Oppgave 7d", title: "SortSubanagrams", points: 6,
-        oppgave: "<p>Et array <code>A</code> med ord er allerede sortert alfabetisk. Ordene skal i stedet sorteres etter lengde, <b>lengst først</b>, og ord med samme lengde skal fortsatt stå alfabetisk. Eksempel: [«algorithm», «alright», «git», «logarithm», «math», «right»] skal bli [«algorithm», «logarithm», «alright», «right», «math», «git»]. Skriv <code>SortSubanagrams(A)</code> med så lav kjøretid som mulig.</p>",
-        losning: [
-          "Kjenn igjen mønsteret: data som alt er sortert på det sekundære kriteriet (alfabetisk), skal sorteres på et primært kriterium (lengde). Da trenger vi en <b>stabil</b> sortering på lengde – og lengden er et lite heltall, så bøttesortering passer.",
-          "Fordel: legg hvert ord bakerst i bøtta for lengden sin. Løsningsforslaget bruker et hashmap, så bare lengder som faktisk finnes, får en bøtte.",
-          "Samle: gå gjennom lengdene i <b>synkende</b> rekkefølge og skriv ordene tilbake i A. Siden vi la bakerst og tar ut forfra, står ord med lik lengde fortsatt alfabetisk.",
-          "Kjøretid: O(N log N + n), der N er antall ulike lengder (vi sorterer de N nøklene). Siden N ≤ n, er dette aldri verre enn O(n log n), og i praksis mye bedre."
-        ],
-        kjerne: "<p>To sorteringskriterier, der dataene alt er sortert på det minst viktige: sorter <b>stabilt</b> på det viktigste. Det er samme idé som i radix sort.</p>",
-        tips: [
-          "Lengst først: gå gjennom bøttene baklengs – ikke snu hver bøtte, da ryker den alfabetiske rekkefølgen.",
-          "Bruker du et array av bøtter i stedet for hashmap, trenger du én bøtte per lengde fra 0 til maks lengde L – altså L + 1 bøtter. Da blir kjøretiden O(N + n) med N = L + 1.",
-          "En sammenligningsbasert sortering gir O(n log n), og bare hvis du velger en stabil algoritme (f.eks. merge sort), blir den alfabetiske rekkefølgen bevart."
-        ]
-      }
+    // H2023 oppgave 4: pseudokoden står som på arket (arket bruker A[i-1] og en kommentar)
+    var GNOME_ARK = {
+      name: "GnomeSort", params: "A",
+      input: "Et array A med n elementer",
+      output: "Et sortert array med de samme n elementene",
+      lines: [
+        { code: "i ← 0", indent: 1 },
+        { code: "while i < n do", indent: 1 },
+        { code: "if i > 0 and A[i-1] > A[i] then", indent: 2 },
+        { code: "A[i-1], A[i] ← A[i], A[i-1] // swap A[i] and A[i - 1]", indent: 3 },
+        { code: "i ← i − 1", indent: 3 },
+        { code: "else", indent: 2 },
+        { code: "i ← i + 1", indent: 3 }
+      ]
     };
-    EXAM_EXTRA.stabilitet.oppgave += demoLink("bucket", "tracer-bucket", "i bøttedemoen over får like tall bokstaver, så du ser om rekkefølgen holder");
-    EXAM_EXTRA.subanagrams.oppgave += demoLink("bucket", "tracer-bucket", "bøttedemoen over viser hvorfor «legg bakerst, ta ut forfra» holder like nøkler i rekkefølge");
-    EXAM_EXTRA.subanagrams.losning = losningMedKode(EXAM_EXTRA.subanagrams.losning, "sortSubanagrams",
-      "Løsningen i pseudokode:");
-    IN.examTasks("#exam-bucket", [EXAM_FALLBACK.bucket, EXAM_EXTRA.stabilitet, EXAM_EXTRA.subanagrams]);
+    IN.examTasks("#exam-gnome", [{
+      key: "H2023-4", year: "H2023", oppgave_nr: "Oppgave 4", title: "Gnome sort", points: 10,
+      ark: "Gnome sort", ordrett: true,
+      oppgave: IN.oppg({
+        intro: "<p>Gnome sort er en enkel sorteringsalgoritme som ikke er kjent fra pensum. Illustrasjonen ovenfor er generert fra en kjøring av Gnome sort. Pseudokode for algoritmen er gitt nedenfor.</p>",
+        figs: [{ cls: "code", draw: function (h) { IN.pseudo.render(h, GNOME_ARK, { tooltips: false }); } }],
+        outro: "<p>I denne oppgaven skal du drøfte fordeler og ulemper ved Gnome sort sammenlignet med andre sorteringsalgoritmer kjent fra pensum. Teksten din bør inneholde:</p><ul><li>en kort forklaring på hvordan Gnome sort fungerer (med naturlig språk),</li><li>kjøretidskompleksiteten til Gnome sort (sammen med en kort begrunnelse),</li><li>en sammenligning av Gnome sort med sorteringsalgoritmer fra pensum, og</li><li>en kort redegjørelse for hvorvidt Gnome sort er stabil og/eller in-place.</li></ul>"
+      }),
+      avvik: "Illustrasjonen øverst på arket (et linjediagram fra en kjøring av Gnome sort) er utelatt fordi den bare viser én kjøring og ikke trengs for å svare. Steg-demoen i dette kortet viser en kjøring i stedet. Derfor viser «Illustrasjonen ovenfor» ikke til noe her.",
+      demo: {
+        engine: "bars", gen: "gnomeSort", input: [5, 2, 4, 1, 3], inputNavn: "Eksempel",
+        presets: { "Sortert (beste tilfelle)": [1, 2, 3, 4, 5], "Omvendt (verste tilfelle)": [5, 4, 3, 2, 1] },
+        pseudo: "gnomeSort", legend: LEGENDS.gnome, countControl: { min: 3, max: 9 }, inputLabel: "f.eks. 5,2,4,1,3",
+        label: "Se nissen sortere 5, 2, 4, 1, 3", fasit: "1, 2, 3, 4, 5"
+      },
+      losning: [
+        "<b>Virkemåte:</b> algoritmen vandrer over elementene. Møter den et element som er mindre enn det foran, bytter den dem og går ett steg tilbake, og slik flyttes elementet bakover med nabobytter. Nesten identisk med insertion sort, men den holder styr på bare én indeks.",
+        "<b>Kjøretid:</b> kvadratisk, O(n²) (som bubble og selection). Best O(n) når alt allerede er sortert. Nøyaktig like mange bytter som insertion sort, men omtrent dobbelt så mange sammenligninger.",
+        "<b>Sammenligning:</b> på grunn av den kvadratiske tiden langt dårligere for store arrayer enn de raskeste i pensum (merge, heap, quick). Den er sammenligningsbasert, så den er vanskelig å måle direkte mot bøtte og radix.",
+        "<b>Egenskaper:</b> stabil (bytter bare naboer) og in-place (ingen ekstra datastruktur).",
+        "<b>Poenggiving:</b> opptil 3 for god forklaring, 2 for riktig kompleksitet, 2 for riktig plassering mot de andre, 2 for stabilitet og in-place. For full uttelling må du se slektskapet med insertion sort."
+      ],
+      kjerne: "<p>Oppgaven tester om du kan analysere en ukjent, sammenligningsbasert algoritme: lese kjøretiden ut av løkkestrukturen, kjenne igjen at den i praksis er en insertion-sort-variant, og resonnere om stabilitet og in-place.</p>",
+      tips: [
+        "Knytt den eksplisitt til insertion sort. Det kreves for full uttelling: «samme antall bytter, flere sammenligninger».",
+        "Ikke bland in-place og stabil: argumentér for stabilitet ut fra at bare naboer byttes, og for in-place ut fra at ingen ekstra struktur brukes.",
+        "Begrunn O(n²) kort: hvert bytte flytter indeksen ett steg tilbake, og det kan trengs kvadratisk mange bytter."
+      ]
+    }]);
+
+    // H2024 oppgave 3
+    var etyOppg = skel(IN.oppg({
+      intro: "<p>En etymologisk ordliste er et oppslagsverk for et ords opphav. Her er et eksempel fra kategorien Matematikk:</p>" +
+        "<blockquote><p>heksagon: seksvinklet figur. Av gresk hex «seks» + gonía «vinkel».</p><p class=\"small\">(Kilde: Norsk etymologisk ordbok – tematisk ordnet, Yann De Caprona)</p></blockquote>" +
+        "<p>Anta at et ordobjekt <code>v</code> kun har følgende felter:</p><ul><li><code>v.string</code> – Ordet representert som en streng</li><li><code>v.category</code> – En streng som angir kategorien ordet tilhører</li></ul>" +
+        "<p>Du kan anta at kategorien til et ord er en av N kategorier, der N &lt; 100.</p>",
+      parts: [
+        { t: "Arrayet A inneholder hele den etymologiske ordlisten ordnet alfabetisk (altså ordnet etter string). Skriv en prosedyre som stabilt sorterer arrayet A tematisk (altså ordnet etter category). Prosedyren skal ikke inneholde kall på sorteringsalgoritmer. <span class=\"et-p\">(6p)</span><div class=\"et-skel\"></div>" },
+        { t: "Anta nå at du har en ordbok K, som assosierer hver kategori til et intervall som angir hvor kategorien starter og slutter i arrayet. For hvert ordobjekt v vil K[v.category] = [low, high], der low og high gir indeksen til henholdsvis det første, og det siste, ordobjektet som tilhører kategorien til v. Du skal nå søke etter et gitt ordobjekt i arrayet A slik det blir returnert fra EtymologySort.<br>Oppgi hvordan du kan bruke en algoritme, kjent fra pensum, til å sjekke om et ordobjekt v finnes i arrayet A. Oppgi også kjøretidskompleksiteten til algoritmen.", p: 4 }
+      ]
+    }), {
+      name: "EtymologySort", params: "A",
+      input: "Et array A med n ordobjekter",
+      output: "Et array A med de samme n ordobjektene som er ordnet etter category",
+      lines: [{ code: "// · · ·", indent: 1 }]
+    });
+    var ETY_INPUT = [["arm", "Kropp"], ["banan", "Mat"], ["fiolin", "Musikk"], ["hals", "Kropp"], ["kanel", "Mat"], ["sonate", "Musikk"], ["tå", "Kropp"]];
+    var bucketCards = [{
+      id: "exam-h2024-3", key: "H2024-3", year: "H2024", oppgave_nr: "Oppgave 3", title: "Etymologisk ordliste", points: 10,
+      ark: "Etymologisk ordliste", ordrett: true, poengkilde: "sv",
+      oppgave: etyOppg,
+      demo: {
+        engine: "buckets", gen: "etymologySort", input: ETY_INPUT, inputNavn: "Sju ord, tre kategorier",
+        presets: false, customInput: false, pseudo: "etymologySort", legend: LEG_BK,
+        label: "Se EtymologySort på sju ord i tre kategorier", del: "(a)",
+        fasit: "arm, hals, tå, banan, kanel, fiolin, sonate",
+        svar: function (last) { return last && last.A ? last.A.map(function (it) { return it.v; }).join(", ") : null; }
+      },
+      losning: losningMedKode([
+        "<b>(a)</b> Tilpasset bøttesortering: lag en ordnet ordbok <code>B</code> med tom liste som standardverdi. Løp gjennom <code>A</code> og legg hvert element bakerst i bøtta <code>B[A[i].category]</code>. Løp så gjennom kategoriene i fast rekkefølge og skriv elementene tilbake i <code>A</code> i samme rekkefølge som de lå. Det er O(n) fordi antall kategorier er begrenset av konstanten <code>N &lt; 100</code>, og stabilt fordi hver bøtte beholder den alfabetiske rekkefølgen. Steg-demoen i dette kortet viser det på et lite eksempel.",
+        "<b>(a) poeng:</b> full uttelling for bøttesortering (6p). En stabil O(n log n)-sortering gir opptil 4p (−1p hvis den ikke er stabil). En O(n²)-sortering gir opptil 2p. Husk kravet om ikke å kalle en sorteringsalgoritme.",
+        "<b>(b)</b> Siden (a) er stabil, er elementene fortsatt alfabetisk ordnet innenfor hver kategori. Dermed kan du binærsøke i O(log n): start binærsøket med <code>low</code> og <code>high</code> fra <code>K[v.category]</code> og søk etter <code>v.string</code> i det intervallet. Lineære løsninger gir 2p."
+      ], "etymologySort", "Slik kan (a) skrives i pseudokode:"),
+      kjerne: "<p>Oppgaven tester bøttesortering når nøkkeldomenet er lite og begrenset av en konstant (det gir lineær tid), og at <b>stabilitet</b> bevarer en sekundær ordning. Det er nettopp stabiliteten fra (a) som gjør binærsøket innenfor hver kategori i (b) mulig.</p>",
+      tips: [
+        "Full uttelling i (a): se at <code>N &lt; 100</code> gjør antall bøtter konstant, og dermed lineær tid. Kaller du en sammenligningssortering, gir det høyst 4p.",
+        "Hold sorteringen stabil (behold rekkefølgen fra input i hver bøtte). Mister du stabiliteten, mister du et poeng og ødelegger forutsetningen for (b).",
+        "I (b): utnytt at hvert kategorisegment er alfabetisk sortert, og binærsøk i <code>[low, high]</code>: O(log n). Ikke løp lineært gjennom segmentet (det gir bare 2p)."
+      ]
+    }, {
+      id: "exam-h2021-2", key: "H2021-2", year: "H2021", oppgave_nr: "Oppgave 2", title: "Stabilitet", points: 3,
+      ark: "Stabilitet", ordrett: true,
+      oppgave: IN.oppg({
+        intro: "<p>Anta at arrayet A er usortert og inneholder personobjekter som alle har et felt for alder. Anta videre at personobjektene som ligger på A[3] og A[42] begge er 22 år gamle.</p>" +
+          "<p>Arrayet A blir sortert etter alder. Etter sorteringen får du vite at:</p><ul><li>Personobjektet som lå på A[3] før sorterting, ligger nå på A[9]</li><li>Personobjektet som lå på A[42] før sorterting, ligger nå på A[7]</li></ul>",
+        parts: [
+          { t: "Var sorteringen stabil?" },
+          { t: "Hva er alderen til personobjektet som ligger på A[8] etter sortering?" },
+          { t: "Dersom du får vite at ingen personer i A er eldre enn 100 år gammel. Hvilken sorteringsalgoritme bør da benyttes, med hensyn til kjøretidseffektivitet?" }
+        ]
+      }),
+      demo: {
+        engine: "buckets", gen: "bucketSort", input: [4, 2, 4, 1, 3], inputNavn: "Små aldre, to like",
+        presets: { "Tre like": [3, 1, 3, 0, 3], "Mange like": [2, 0, 2, 1, 0, 1] }, countControl: { min: 3, max: 10 },
+        parseInput: function (s) { return s.split(",").map(function (x) { return parseInt(x.trim(), 10); }).filter(function (x) { return !isNaN(x) && x >= 0 && x <= 9; }).slice(0, 10); },
+        inputLabel: "tall 0–9, f.eks. 4,2,4,1,3", pseudo: "bucketSort", legend: LEG_BK,
+        label: "Se at bøttesortering holder like aldre i samme rekkefølge (a før b)", del: "(c)",
+        fasit: "1, 2, 3, 4a, 4b",
+        svar: function (last) { return last && last.A ? last.A.map(itemTxt).join(", ") : null; }
+      },
+      losning: [
+        "<b>(a) Nei.</b> De to 22-åringene har byttet rekkefølge: den som lå først (indeks 3), ligger nå sist (indeks 9). En stabil sortering ville holdt dem i samme innbyrdes rekkefølge.",
+        "<b>(b) 22.</b> Etter sortering ligger like aldre samlet. Indeks 7 og 9 er begge 22, så indeks 8 må også være 22.",
+        "<b>(c) Bøttesortering.</b> Alderen er et heltall 0–100, så vi kan bruke 101 bøtter. Det gir O(N + n) med N = 101, altså O(n), uten en eneste sammenligning. Steg-demoen i dette kortet bruker små tall, og bokstavene a og b viser at like aldre beholder rekkefølgen."
+      ],
+      kjerne: "<p>Stabilitet handler bare om elementer med <b>lik</b> nøkkel: beholder de rekkefølgen sin? Og når nøklene er små heltall, slår bøttesortering de sammenligningsbaserte.</p>",
+      tips: [
+        "Se bare på elementene med samme nøkkel når du skal avgjøre stabilitet.",
+        "Alder 0–100 betyr 101 mulige verdier. Tell med 0 når du lager bøttene.",
+        "Like nøkler ligger samlet etter sortering. Det kan du bruke til å si noe om plassene mellom dem."
+      ]
+    }, {
+      id: "exam-h2020-7d", key: "H2020-7", deler: ["(d)"], year: "H2020", oppgave_nr: "Oppgave 7 (d)", title: "Sortering av subanagrammer", points: 6,
+      ark: "Subanagram", ordrett: true,
+      oppgave: skel(IN.oppg({
+        intro: "<p>Vi ønsker å lage en nettside for å hjelpe sleipe Scrabble-spillere. En Scrabble-spiller har noen bokstaver som de skal prøve å forme ord fra, og disse ordene må stå i en ordbok. I denne oppgaven ignorerer alle andre Scrabble-regler, og fokuserer på det vi skal kalle subanagrammer.</p>" +
+          "<p>La oss anta at bokstavene man har tilgjengelig er gitt som en streng S, og at et ord W også er gitt som en streng. Vi sier at W er et subanagram av S, dersom W kan skrives ved å kun bruke bokstaver fra S. Merk at vi ikke tillater gjenbruk av bokstaver fra S. For eksempel er \"hole\" et subanagram av \"ehlo\". Derimot er \"hello\" ikke et subanagram av \"ehlo\", fordi det ikke er to \"l\"-er i \"ehlo\". Både \"hole\" og \"hello\" er subanagrammer av \"hheelloo\".</p>" +
+          "<p>Her er noen eksempler på subanagramer av \"aghilmort\":</p><ul><li>\"algorithm\"</li><li>\"logarithm\"</li><li>\"alright\"</li><li>\"right\"</li><li>\"math\"</li><li>\"git\"</li></ul>" +
+          "<p>I oppgavene som følger ser vi på ulike måter å finne subanagrammer fra en gitt ordbok.</p>",
+        parts: [
+          { note: "(a)–(c) handler om kjøretid og hashing. De står på Hashing- og Strategi-sidene." },
+          { t: "Nå som nettsiden vår har funksjonalitet for å finne subanagrammer av en streng S, gjenstår det bare å presentere resultatene for brukeren. Anta at subanagrammene som blir returnert av SubanagramsOf2 er gitt som et array, sortert alfabetisk. Vi ønsker at subanagrammene skal vises sortert etter lengde, og at ord av samme lengde sorteres alfabetisk, slik som i følgende eksempel:" +
+              "<p class=\"mono small\">Input: \"algorithm\", \"alright\", \"git\", \"logarithm\", \"math\", \"right\"<br>Output: \"algorithm\", \"logarithm\", \"alright\", \"right\", \"math\", \"git\"</p>" +
+              "Fyll ut pseudokode nedenfor med så lav kjøretidskompleksitet som mulig. <span class=\"et-p\">(6p)</span><p class=\"et-lbl-sm\">ALGORITHM: SORTERING AV SUBANAGRAMMER</p><div class=\"et-skel\"></div>" }
+        ]
+      }), {
+        name: "SortSubanagrams", params: "A",
+        input: "Et array A av størrelse n som inneholder strenger",
+        output: "Et array med de samme n strengene sortert etter lengde der ord av samme lengde er sortert alfabetisk",
+        lines: [{ code: "// Fyll ut", indent: 1 }]
+      }),
+      avvik: "Bare innledningen og deloppgave (d) står her, fordi (a)–(c) handler om kjøretid og hashing og har egne kort på Hashing- og Strategi-sidene.",
+      demo: {
+        engine: "buckets", gen: "sortSubanagrams", input: ["algorithm", "alright", "git", "logarithm", "math", "right"], inputNavn: "Eksempelet fra arket",
+        presets: false, customInput: false, pseudo: "sortSubanagrams", legend: LEG_BK,
+        label: "Kjør SortSubanagrams på eksempelet fra arket", del: "(d)",
+        svar: function (last) { return last && last.A ? last.A.map(function (it) { return it.v; }).join(", ") : null; }
+      },
+      losning: losningMedKode([
+        "Kjenn igjen mønsteret: data som alt er sortert på det sekundære kriteriet (alfabetisk), skal sorteres på et primært kriterium (lengde). Da trenger vi en <b>stabil</b> sortering på lengde, og lengden er et lite heltall, så bøttesortering passer.",
+        "Fordel: legg hvert ord bakerst i bøtta for lengden sin. Løsningsforslaget bruker et hashmap, så bare lengder som faktisk finnes, får en bøtte.",
+        "Samle: gå gjennom lengdene i <b>synkende</b> rekkefølge og skriv ordene tilbake i A. Siden vi la bakerst og tar ut forfra, står ord med lik lengde fortsatt alfabetisk. Steg-demoen i dette kortet kjører eksempelet fra arket.",
+        "Kjøretid: O(N log N + n), der N er antall ulike lengder (vi sorterer de N nøklene). Siden N ≤ n, er dette aldri verre enn O(n log n), og i praksis mye bedre."
+      ], "sortSubanagrams", "Løsningen i pseudokode:"),
+      kjerne: "<p>To sorteringskriterier, der dataene alt er sortert på det minst viktige: sorter <b>stabilt</b> på det viktigste. Det er samme idé som i radix sort.</p>",
+      tips: [
+        "Lengst først: gå gjennom bøttene baklengs. Ikke snu hver bøtte, da ryker den alfabetiske rekkefølgen.",
+        "Bruker du et array av bøtter i stedet for hashmap, trenger du én bøtte per lengde fra 0 til maks lengde L, altså L + 1 bøtter. Da blir kjøretiden O(N + n) med N = L + 1.",
+        "En sammenligningsbasert sortering gir O(n log n), og bare hvis du velger en stabil algoritme (for eksempel merge sort), blir den alfabetiske rekkefølgen bevart."
+      ]
+    }];
+    IN.examTasks("#exam-bucket", bucketCards);
 
     /* ---- H2021 Oppgave 3: invarianter (sant/usant) ---- */
     IN.tfTest("#tf-h2021", [
-      { s: "Bubble sort: etter i runder av den ytre løkka står de i første elementene ferdig sortert.", answer: false,
-        explain: "Bubble flytter det største gjenværende elementet bakerst i hver runde. Det er de i <i>siste</i> som er ferdige – forrest kan et lite element ennå ligge langt bak." },
-      { s: "Bubble sort: etter i runder står de i siste elementene ferdig sortert.", answer: true,
-        explain: "Hver runde bobler det største gjenværende elementet helt bakerst, så etter i runder står de i største på sine endelige plasser." },
-      { s: "Bubble sort bytter bare naboelementer.", answer: true,
-        explain: "Den sammenligner og bytter alltid A[j] og A[j+1]." },
-      { s: "Bubble sort gjør så få bytter som mulig.", answer: false,
-        explain: "Den gjør ett bytte per inversjon – opptil n(n−1)/2. Selection klarer seg med høyst n − 1." },
-      { s: "Selection sort: etter i runder står de i første elementene ferdig sortert.", answer: true,
-        explain: "Runde i finner det minste gjenværende elementet og bytter det inn forrest i den usorterte delen. De i første er da de i minste, på endelig plass." },
-      { s: "Selection sort: etter i runder står de i siste elementene ferdig sortert.", answer: false,
-        explain: "Selection bygger den sorterte delen forfra. Bakerst ligger fortsatt usorterte elementer." },
-      { s: "Selection sort bytter bare naboelementer.", answer: false,
-        explain: "Den bytter A[i] med det minste elementet, som kan ligge hvor som helst lenger bak – et langt hopp." },
-      { s: "Selection sort gjør så få bytter som mulig.", answer: true,
-        explain: "Høyst ett bytte per runde, altså høyst n − 1 bytter. Det er fasiten på denne eksamenen." },
-      { s: "Insertion sort: etter i runder av den ytre løkka er de i første elementene sortert.", answer: true,
-        explain: "Sant (fasiten på H2021). Den ytre løkka starter på i = 1, så etter i runder er faktisk de i + 1 første sortert – og da er de i første det også. Men de er bare sortert <i>seg imellom</i>, ikke på endelig plass: et senere, mindre element kan fortsatt skyves inn foran dem." },
-      { s: "Insertion sort: etter i runder står de i siste elementene ferdig sortert.", answer: false,
-        explain: "Bakerst har insertion ikke rørt noe ennå." },
-      { s: "Insertion sort bytter bare naboelementer.", answer: true,
-        explain: "Elementet flyttes bakover ett steg om gangen, forbi én nabo av gangen – det tilsvarer nabobytter." },
-      { s: "Insertion sort gjør så få bytter som mulig.", answer: false,
-        explain: "Antall forskyvninger er lik antall inversjoner, opptil n(n−1)/2." }
-    ], { id: "h2021-oppg3" });
+      { s: "(a) Etter i iterasjoner av den ytre loopen i Bubble sort, er de i første elementene sortert.", answer: false, kilde: "H2021",
+        explain: "Usant. Bubble sort flytter det største gjenværende elementet bakerst i hver runde. Det er de i <i>siste</i> som er ferdige. Forrest kan et lite element ennå ligge langt bak." },
+      { s: "(b) Etter i iterasjoner av den ytre loopen i Bubble sort, er de i siste elementene sortert.", answer: true, kilde: "H2021",
+        explain: "Sant. Hver runde bobler det største gjenværende elementet helt bakerst, så etter i runder står de i største på sine endelige plasser." },
+      { s: "(c) Bubble sort bytter kun elementer som står direkte ved siden av hverandre.", answer: true, kilde: "H2021",
+        explain: "Sant. Den sammenligner og bytter alltid A[j] og A[j + 1]." },
+      { s: "(d) Bubble sort garanterer et minimalt antall bytter.", answer: false, kilde: "H2021",
+        explain: "Usant. Den gjør ett bytte per inversjon, opptil n(n − 1)/2. Selection sort klarer seg med høyst n − 1." },
+      { s: "(e) Etter i iterasjoner av den ytre loopen i Selection sort, er de i første elementene sortert.", answer: true, kilde: "H2021",
+        explain: "Sant. Runde i finner det minste gjenværende elementet og bytter det inn forrest i den usorterte delen. De i første er da de i minste, på endelig plass." },
+      { s: "(f) Etter i iterasjoner av den ytre loopen i Selection sort, er de i siste elementene sortert.", answer: false, kilde: "H2021",
+        explain: "Usant. Selection sort bygger den sorterte delen forfra. Bakerst ligger fortsatt usorterte elementer." },
+      { s: "(g) Selection sort bytter kun elementer som står direkte ved siden av hverandre.", answer: false, kilde: "H2021",
+        explain: "Usant. Den bytter A[i] med det minste elementet, som kan ligge hvor som helst lenger bak." },
+      { s: "(h) Selection sort garanterer et minimalt antall bytter.", answer: true, kilde: "H2021",
+        explain: "Sant. Høyst ett bytte per runde, altså høyst n − 1 bytter." },
+      { s: "(i) Etter i iterasjoner av den ytre loopen i Insertion sort, er de i første elementene sortert.", answer: true, kilde: "H2021",
+        explain: "Sant. Den ytre løkka starter på i = 1, så etter i runder er faktisk de i + 1 første sortert, og da er de i første det også. Men de er bare sortert <i>seg imellom</i>, ikke på endelig plass: et senere, mindre element kan fortsatt byttes inn foran dem." },
+      { s: "(j) Etter i iterasjoner av den ytre loopen i Insertion sort, er de i siste elementene sortert.", answer: false, kilde: "H2021",
+        explain: "Usant. Bakerst har insertion sort ikke rørt noe ennå." },
+      { s: "(k) Insertion sort bytter kun elementer som står direkte ved siden av hverandre.", answer: true, kilde: "H2021",
+        explain: "Sant. Kursversjonen bytter A[j − 1] og A[j], altså alltid to naboer." },
+      { s: "(l) Insertion sort garanterer et minimalt antall bytter.", answer: false, kilde: "H2021",
+        explain: "Usant. Antall bytter er lik antall inversjoner, opptil n(n − 1)/2." }
+], { id: "h2021-oppg3" });
 
     // «Til oppgaven ↓»: scroll ned til eksamensdelen i samme fane (fanen beholdes i adressen)
     IN.qsa("[data-jump]").forEach(function (a) {
