@@ -22,6 +22,8 @@
              Bare første treff per seksjon/kort markeres.
      ikke  – sider (body[data-page]) der begrepet er selve temaet og ikke skal markeres
      vis   – "treff": overskriften viser teksten som ble truffet (brukes for O(…))
+     forveks – valgfri, én–to setninger: «Må ikke forveksles med …» der to begreper ofte blandes.
+             Vises som egen dempet linje i tipset og i ordlista.
    ============================================================ */
 (function () {
   "use strict";
@@ -29,7 +31,7 @@
 
   var B = {
     /* ---------- Grunnbegreper ---------- */
-    ostor: { ord: "stor O", full: "Big O", navn: "stor O-notasjon", tema: "grunn", vis: "treff",
+    ostor: { ord: "stor O", forveks: "Må ikke forveksles med det nøyaktige antallet steg: O sier hvor fort kjøretiden vokser, og konstanter og mindre ledd tas bort.", full: "Big O", navn: "stor O-notasjon", tema: "grunn", vis: "treff",
       txt: "Stor O sier hvor fort kjøretiden vokser når input n blir stor. Vi stryker konstanter og mindre ledd, så 3n + 5 blir O(n).",
       se: ["00-begreper.html#fane=bigo", "Begreper → Kjøretid & stor O"],
       m: ["O\\((?:[^()\\n]|\\([^()\\n]*\\)){1,30}\\)", "Big[- ]O", "stor O(?:-notasjon(?:en)?)?"] },
@@ -37,10 +39,10 @@
       txt: "Sier hvilke operasjoner som finnes og hva de gjør, men ikke hvordan de er laget. Stakk og kø er ADT-er; array og lenket liste er måter å lage dem på.",
       se: ["00-begreper.html#fane=adt", "Begreper → ADT vs. datastruktur"],
       mc: ["ADT(?:-en|-er|-ene)?"], m: ["abstrakte? datatyper?"] },
-    lifo: { ord: "LIFO", full: "last in, first out", navn: "sist inn, først ut", tema: "lister",
+    lifo: { ord: "LIFO", forveks: "Må ikke forveksles med FIFO (kø), der det som kom inn først, også går ut først.", full: "last in, first out", navn: "sist inn, først ut", tema: "lister",
       txt: "Det som ble lagt inn sist, tas ut først. Slik virker en stakk.",
       se: ["lister.html#fane=stakk", "Lister → Stakk og kø"], mc: ["LIFO"] },
-    fifo: { ord: "FIFO", full: "first in, first out", navn: "først inn, først ut", tema: "lister",
+    fifo: { ord: "FIFO", forveks: "Må ikke forveksles med LIFO (stakk), der det som kom inn sist, går ut først.", full: "first in, first out", navn: "først inn, først ut", tema: "lister",
       txt: "Det som kom først, tas ut først. Slik virker en kø.",
       se: ["lister.html#fane=stakk", "Lister → Stakk og kø"], mc: ["FIFO(?:-kø(?:en)?)?"] },
     amortisert: { ord: "amortisert", tema: "grunn",
@@ -54,10 +56,10 @@
       se: ["00-begreper.html#fane=rekursjon", "Begreper → Rekursjon"], m: ["kallstakk(?:en|er|ene)?"] },
 
     /* ---------- Sortering ---------- */
-    stabil: { ord: "stabil", tema: "sortering",
+    stabil: { ord: "stabil", forveks: "Må ikke forveksles med in-place. Stabil handler om rekkefølgen til like nøkler, in-place om ekstra datastrukturer.", tema: "sortering",
       txt: "En sortering er stabil når like nøkler står i samme innbyrdes rekkefølge etter sorteringen som før.",
       se: ["00-begreper.html#fane=stabil", "Begreper → Stabil & in-place"], m: ["u?stabil(?:e|t)?"] },
-    inplace: { ord: "in-place", tema: "sortering",
+    inplace: { ord: "in-place", forveks: "Må ikke forveksles med stabil. In-place handler om ekstra datastrukturer, stabil om rekkefølgen til like nøkler.", tema: "sortering",
       txt: "Algoritmen sorterer i selve arrayet og mellomlagrer ikke elementene i en ekstra datastruktur. Merge sort (hjelpearray) og Bucket sort (bøtter) er ikke in-place.",
       se: ["00-begreper.html#fane=stabil", "Begreper → Stabil & in-place"], m: ["in-place"] },
     pivot: { ord: "pivot", tema: "sortering",
@@ -79,7 +81,7 @@
       se: ["lister.html#fane=stakk", "Lister → Stakk og kø"], m: ["deque(?:n|r)?"] },
 
     /* ---------- Trær ---------- */
-    bst: { ord: "BST", full: "binary search tree", navn: "binært søketre", tema: "traer",
+    bst: { ord: "BST", forveks: "Må ikke forveksles med en heap. I et BST er venstre subtre mindre og høyre større enn noden. I en min-heap er bare hver forelder mindre enn eller lik barna.", full: "binary search tree", navn: "binært søketre", tema: "traer",
       txt: "Et binærtre der alt i venstre subtre er mindre enn noden og alt i høyre subtre er større. Søk, innsetting og fjerning koster O(h), der h er høyden.",
       se: ["04-traer.html#fane=bst", "Trær → Binære søketrær"], mc: ["BST(?:-en|-er|-ene)?"], m: ["binær(?:t|e) søketr(?:e|eet|ær|ærne)"] },
     avl: { ord: "AVL-tre", tema: "traer",
@@ -94,7 +96,7 @@
     lovnode: { ord: "løvnode", tema: "traer",
       txt: "En node uten barn (også kalt ekstern node). En løvnode har høyde 0.",
       se: ["04-traer.html#fane=begreper", "Trær → Begreper"], m: ["løvnode(?:n|r|ne)?"] },
-    komplett: { ord: "komplett binærtre", tema: "heap",
+    komplett: { ord: "komplett binærtre", forveks: "Må ikke forveksles med AVL-treet. Et komplett tre er fylt nivå for nivå fra venstre. Et AVL-tre er et binært søketre der høydene til venstre og høyre subtre skiller seg med høyst 1 i hver node, men det trenger ikke være komplett.", tema: "heap",
       txt: "Alle nivåer er fulle, unntatt kanskje det nederste, som fylles fra venstre. Det er formen en heap alltid har.",
       se: ["03-heap.html#fane=hva", "Heap → Hva er en heap"], m: ["komplett(?:e)? binærtr(?:e|eet|ær)"] },
     preorder: { ord: "preorder", tema: "traer",
@@ -117,10 +119,10 @@
       se: ["04-traer.html#fane=huffman", "Trær → Huffman"], m: ["prefikstr(?:e|eet|ær)", "trie"] },
 
     /* ---------- Heap ---------- */
-    heap: { ord: "heap", tema: "heap",
+    heap: { ord: "heap", forveks: "Må ikke forveksles med «heapen» i minnet der et program lagrer objekter. Det er noe helt annet enn datastrukturen her.", tema: "heap",
       txt: "Et komplett binærtre der hver node er større enn eller lik forelderen. Da ligger det minste elementet alltid i roten.",
       se: ["03-heap.html#fane=hva", "Heap → Hva er en heap"], m: ["(?:binær |min-|max-)?heap(?:en|er|ene)?"], ikke: ["heap"] },
-    prioritetsko: { ord: "prioritetskø", tema: "heap",
+    prioritetsko: { ord: "prioritetskø", forveks: "Må ikke forveksles med heap. Prioritetskøen er ADT-en (hva man kan gjøre), heapen er en datastruktur som implementerer den.", tema: "heap",
       txt: "En ADT der vi setter inn elementer og alltid tar ut det minste først (removeMin). Den lages vanligvis med en heap.",
       se: ["03-heap.html#fane=pk", "Heap → Prioritetskø"], m: ["prioritetskø(?:en|er|ene)?"], ikke: ["heap"] },
 
@@ -128,10 +130,10 @@
     hashfunksjon: { ord: "hashfunksjon", tema: "hashing",
       txt: "Gjør en nøkkel om til en plass i arrayet, et tall fra 0 til N − 1. Samme nøkkel må alltid gi samme plass.",
       se: ["05-hashing.html#fane=begreper", "Hashing → Begreper"], m: ["hashfunksjon(?:en|er|ene)?"] },
-    hashmap: { ord: "hashmap", tema: "hashing",
+    hashmap: { ord: "hashmap", forveks: "Må ikke forveksles med hashset. Et hashmap lagrer par av nøkkel og verdi, et hashset bare nøkler.", tema: "hashing",
       txt: "Lagrer par av nøkkel og verdi. Innsetting, oppslag og sletting er forventet O(1).",
       se: ["05-hashing.html#fane=begreper", "Hashing → Begreper"], m: ["hashmap(?:et|pet|s|ene)?"], ikke: ["hashing"] },
-    hashset: { ord: "hashset", tema: "hashing",
+    hashset: { ord: "hashset", forveks: "Må ikke forveksles med hashmap. Et hashset lagrer bare nøkler, et hashmap lagrer par av nøkkel og verdi.", tema: "hashing",
       txt: "Som et hashmap, men bare med nøkler. Svarer på om en nøkkel finnes i forventet O(1).",
       se: ["05-hashing.html#fane=begreper", "Hashing → Begreper"], m: ["hashset(?:et|tet|s|ene)?"], ikke: ["hashing"] },
     kollisjon: { ord: "kollisjon", tema: "hashing",
@@ -146,7 +148,7 @@
     chaining: { ord: "Separate chaining", tema: "hashing",
       txt: "Hver plass i arrayet har en bøtte, en liste med alle parene som hasher dit.",
       se: ["05-hashing.html#fane=chaining", "Hashing → Separate chaining"], m: ["separate chaining"] },
-    rehash: { ord: "rehash", tema: "hashing",
+    rehash: { ord: "rehash", forveks: "Må ikke forveksles med å bytte hashfunksjon. Det er arrayet som får ny størrelse (vanligvis større), og plassene regnes ut på nytt.", tema: "hashing",
       txt: "Lag et større array (kurset dobler N) og sett inn alle parene på nytt, siden plassen h(k, N) avhenger av N. Én rehash koster O(n).",
       se: ["05-hashing.html#fane=kjoretid", "Hashing → Rehash & kjøretid"], m: ["rehash(?:en|ing(?:en)?|er|es)?"] },
 
@@ -154,10 +156,10 @@
     dag: { ord: "DAG", full: "directed acyclic graph", navn: "rettet asyklisk graf", tema: "grafer",
       txt: "En rettet graf uten sykler. Bare en DAG kan sorteres topologisk.",
       se: ["06-grafer.html#fane=topologisk", "Grafer → Topologisk sortering"], mc: ["DAG(?:-en|-er|-ene|s)?"], m: ["rett(?:et|ede) asykliske? graf(?:en|er|ene)?"] },
-    bfs: { ord: "BFS", full: "breadth-first search", navn: "bredde-først søk", tema: "grafer",
+    bfs: { ord: "BFS", forveks: "Må ikke forveksles med DFS, som går så dypt som mulig før den snur. BFS går lag for lag ut fra starten, med en kø.", full: "breadth-first search", navn: "bredde-først søk", tema: "grafer",
       txt: "Besøker grafen lag for lag fra startnoden, med en kø. I en uvektet graf gir det korteste vei målt i antall kanter.",
       se: ["06-grafer.html#fane=bfs", "Grafer → Bredde-først søk"], mc: ["BFS(?:-en|-treet)?"], m: ["bredde-først(?:-| )søk(?:et)?"] },
-    dfs: { ord: "DFS", full: "depth-first search", navn: "dybde-først søk", tema: "grafer",
+    dfs: { ord: "DFS", forveks: "Må ikke forveksles med BFS, som går lag for lag med en kø. DFS går så dypt som mulig før den snur, med en stakk eller rekursjon.", full: "depth-first search", navn: "dybde-først søk", tema: "grafer",
       txt: "Går så langt som mulig langs én sti før det går tilbake og prøver neste nabo. Skrives naturlig rekursivt, eller med en stakk.",
       se: ["06-grafer.html#fane=dfs", "Grafer → Dybde-først søk"], mc: ["DFS(?:-en|-treet)?"], m: ["dybde-først(?:-| )søk(?:et)?"] },
     inngrad: { ord: "inngrad", tema: "grafer",
@@ -175,10 +177,10 @@
     asyklisk: { ord: "asyklisk", tema: "grafer",
       txt: "Uten sykler. En rettet asyklisk graf kalles en DAG.",
       se: ["06-grafer.html#fane=begreper", "Grafer → Begreper"], m: ["asykliske?"] },
-    naboliste: { ord: "naboliste", tema: "grafer",
+    naboliste: { ord: "naboliste", forveks: "Må ikke forveksles med nabomatrise, en |V| × |V|-tabell som bruker O(|V|²) plass uansett hvor mange kanter grafen har.", tema: "grafer",
       txt: "For hver node lagrer vi en liste over naboene. Det tar O(|V| + |E|) plass, og kjøretidene i kurset regner med den.",
       se: ["06-grafer.html#fane=begreper", "Grafer → Begreper"], m: ["naboliste(?:n|r|ne)?"] },
-    nabomatrise: { ord: "nabomatrise", tema: "grafer",
+    nabomatrise: { ord: "nabomatrise", forveks: "Må ikke forveksles med naboliste, der hver node bare lagrer naboene sine, så plassen blir O(|V| + |E|).", tema: "grafer",
       txt: "En |V| × |V|-tabell der plass [u][v] sier om det går en kant fra u til v. Det tar O(|V|²) plass.",
       se: ["06-grafer.html#fane=begreper", "Grafer → Begreper"], m: ["nabomatrise(?:n|r|ne)?"] },
     relaksere: { ord: "relaksere en kant", tema: "grafer",
@@ -187,7 +189,7 @@
     spenntre: { ord: "spenntre", tema: "grafer",
       txt: "Et tre med alle nodene i en sammenhengende, urettet graf og bare kanter fra grafen. Det har |V| − 1 kanter.",
       se: ["06-grafer.html#fane=mst", "Grafer → Minimalt spenntre"], m: ["spenntr(?:e|eet|ær|ærne)"] },
-    mst: { ord: "MST", full: "minimum spanning tree", navn: "minimalt spenntre", tema: "grafer",
+    mst: { ord: "MST", forveks: "Må ikke forveksles med korteste vei. Et minimalt spenntre har minst mulig total vekt, men veien mellom to noder i treet er ikke alltid den korteste.", full: "minimum spanning tree", navn: "minimalt spenntre", tema: "grafer",
       txt: "Et spenntre der summen av kantvektene er så liten som mulig. Prim og Kruskal finner det.",
       se: ["06-grafer.html#fane=mst", "Grafer → Minimalt spenntre"], mc: ["MST(?!-k)(?:-et)?"], m: ["minimal(?:t|e) spenntr(?:e|eet|ær|ærne)"] },
     scc: { ord: "SCC", full: "strongly connected component", navn: "sterkt sammenhengende komponent", tema: "grafer",
@@ -216,16 +218,16 @@
     sertifikat: { ord: "sertifikat", tema: "strategi",
       txt: "Et løsningsforslag som viser at svaret er JA, og som kan sjekkes i polynomiell tid.",
       se: ["07-strategi.html#fane=pnp", "Strategi → P og NP"], m: ["sertifikat(?:et|er|ene)?"] },
-    reduksjon: { ord: "reduksjon", tema: "strategi",
+    reduksjon: { ord: "reduksjon", forveks: "Må ikke forveksles med motsatt retning. Reduserer man A til B, er B minst like vanskelig som A.", tema: "strategi",
       txt: "En oversettelse i polynomiell tid fra instanser av A til instanser av B, der JA blir JA og NEI blir NEI. Da er B minst like vanskelig som A.",
       se: ["07-strategi.html#fane=pnp", "Strategi → P og NP"], m: ["reduksjon(?:en|er|ene)?"] },
-    np: { ord: "NP", tema: "strategi",
+    np: { ord: "NP", forveks: "Må ikke forveksles med «ikke polynomiell». NP står for nondeterministic polynomial time, og alle problemer i P er også i NP.", tema: "strategi",
       txt: "Avgjørelsesproblemene der et JA-svar kan sjekkes i polynomiell tid når vi får et sertifikat.",
       se: ["07-strategi.html#fane=pnp", "Strategi → P og NP"], mc: ["NP(?!-)"] },
-    nphardt: { ord: "NP-hardt", tema: "strategi",
+    nphardt: { ord: "NP-hardt", forveks: "Må ikke forveksles med NP-komplett. Et NP-hardt problem trenger ikke selv å være i NP.", tema: "strategi",
       txt: "Minst like vanskelig som alle problemer i NP: alt i NP kan reduseres til det. Problemet trenger ikke selv ligge i NP.",
       se: ["07-strategi.html#fane=pnp", "Strategi → P og NP"], mc: ["NP-hard(?:t|e)"] },
-    npkomplett: { ord: "NP-komplett", tema: "strategi",
+    npkomplett: { ord: "NP-komplett", forveks: "Må ikke forveksles med NP-hardt. Et NP-komplett problem er NP-hardt og i tillegg selv i NP.", tema: "strategi",
       txt: "Både i NP og NP-hardt: de vanskeligste problemene i NP, for eksempel SAT.",
       se: ["07-strategi.html#fane=pnp", "Strategi → P og NP"], mc: ["NP-komplett(?:e)?"] }
   };

@@ -72,3 +72,6 @@
   .bt { text-decoration: none; }
   .bt-tip { display: none; }
 }
+/* «Må ikke forveksles med …» (feltet forveks i begreper-data.js) */
+.bt-tip-fv { margin-top: .3rem; font-size: var(--text-xs, .8rem); color: var(--color-on-surface-variant); font-style: italic; }
+.bt-ol-fv { display: block; margin-top: .15rem; font-size: var(--text-sm, .9rem); color: var(--color-on-surface-variant); font-style: italic; }

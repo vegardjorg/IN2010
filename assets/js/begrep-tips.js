@@ -160,6 +160,7 @@
     var sub = e.navn && !(e.vis === "treff" && shown === e.navn) ? e.navn : null;
     if (sub) t.appendChild(mk("span", "bt-tip-n", sub));
     t.appendChild(mk("span", "bt-tip-t", e.txt));
+    if (e.forveks) t.appendChild(mk("span", "bt-tip-fv", e.forveks));   // «Må ikke forveksles med …»
     var a = mk("a", "bt-tip-a", "Ordlista →");
     a.href = href(id);
     a.tabIndex = -1;                 // tastatur: Enter på begrepet åpner ordlista
@@ -288,6 +289,7 @@
         if (it.navn) dd.appendChild(mk("span", "bt-ol-navn", it.navn + ". "));
         dd.appendChild(document.createTextNode(it.txt));
         if (it.eks) dd.appendChild(mk("span", "bt-ol-eks", "Eksempel: " + it.eks));
+        if (it.forveks) dd.appendChild(mk("span", "bt-ol-fv", it.forveks));
         if (it.se) {
           var p = mk("span", "bt-ol-se", "Les mer: ");
           var a = mk("a", null, it.se[1]);
@@ -297,7 +299,7 @@
           dd.appendChild(p);
         }
         dl.appendChild(dt); dl.appendChild(dd);
-        rows.push({ dt: dt, dd: dd, sec: sec, key: norm([it.ord, it.full, it.navn, it.txt].join(" ")) });
+        rows.push({ dt: dt, dd: dd, sec: sec, key: norm([it.ord, it.full, it.navn, it.txt, it.forveks].join(" ")) });
       });
       sec.appendChild(dl);
       host.appendChild(sec);
@@ -305,7 +307,7 @@
     BG.TEMA.forEach(function (tm) {
       var items = Object.keys(LIST).filter(function (id) { return LIST[id].tema === tm[0]; }).map(function (id) {
         var e = LIST[id];
-        return { anchor: "b-" + id, ord: e.ord, full: e.full, navn: e.navn, txt: e.txt, se: e.se };
+        return { anchor: "b-" + id, ord: e.ord, full: e.full, navn: e.navn, txt: e.txt, se: e.se, forveks: e.forveks };
       }).sort(function (a, b) { return a.ord.localeCompare(b.ord, "nb"); });
       group(tm[1], items);
     });
