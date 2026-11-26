@@ -882,7 +882,7 @@ h2, h3, h4, section[id], .card[id], .panel[id], main { scroll-margin-top: 68px; 
 
 /* ---------- Responsivt ---------- */
 @media (max-width: 760px) {
-  body { font-size: var(--text-sm); }
+  body { font-size: 15px; }
   h1 { font-size: 1.55rem; }
   .grid.cols-2, .grid.cols-3, .grid.cols-2.demo-wide { grid-template-columns: 1fr; }
   .pc-explainer { grid-template-columns: 1fr; }
@@ -2458,3 +2458,77 @@ body[data-page="crash"] .cr-step { scroll-margin-top: 0; }
 .pc-notes p { margin: .3rem 0; }
 .pc-notes-head { display: flex; align-items: center; gap: .5rem; }
 .pc-notes-x { margin-left: auto; }
+
+/* ============================================================
+   UI/UX-runde (mobil og PC): treffflater, tabeller, faner, stegrad, linjelengde
+   ============================================================ */
+/* «Øv: skjul svarene»: søylene skal heller ikke røpe svaret */
+.ls-ops.drill td.v:not(.shown) .otr { visibility: hidden; }
+
+/* Små knapper: litt høyere på PC, tommelvennlige på berøringsskjerm */
+.btn.sm { min-height: 32px; }
+@media (pointer: coarse), (max-width: 760px) {
+  .btn.sm, .seg-btn { min-height: 44px; }
+  .cr-stick .btn.sm { min-height: 36px; }
+  .sp-cbtn { width: 36px; height: 36px; }
+  .vl-tog { min-height: 36px; }
+  .theme-toggle { width: 40px; height: 40px; }
+  .bigo-whybtn { padding: 10px 0; margin: -10px 0; }
+}
+
+/* Sammenligningstabeller: første kolonne (navnet) står fast når tabellen rulles vannrett */
+.table-wrap { background: var(--color-surface-container-lowest); }
+.table-wrap .cmp-table:not(.ls-prose) tr > :first-child {
+  position: sticky; left: 0; z-index: 1;
+  background: var(--color-surface-container-lowest);
+  box-shadow: inset -1px 0 var(--color-outline-variant);
+}
+.table-wrap .cmp-table:not(.ls-prose) thead tr > :first-child { z-index: 2; background: var(--color-surface-container-high); }
+.table-wrap .cmp-table:not(.ls-prose) tr.win > td:first-child {
+  background: linear-gradient(color-mix(in srgb, var(--c-sorted) 16%, transparent), color-mix(in srgb, var(--c-sorted) 16%, transparent)), var(--color-surface-container-lowest);
+}
+
+/* Fanerader som kan dras vannrett: uttoning på siden der det finnes flere faner */
+.tabs.fade-r {
+  -webkit-mask-image: linear-gradient(90deg, #000 0, #000 calc(100% - 24px), transparent 100%);
+          mask-image: linear-gradient(90deg, #000 0, #000 calc(100% - 24px), transparent 100%);
+}
+.tabs.fade-l {
+  -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 24px, #000 100%);
+          mask-image: linear-gradient(90deg, transparent 0, #000 24px, #000 100%);
+}
+.tabs.fade-l.fade-r {
+  -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 24px, #000 calc(100% - 24px), transparent 100%);
+          mask-image: linear-gradient(90deg, transparent 0, #000 24px, #000 calc(100% - 24px), transparent 100%);
+}
+
+/* Fast stegrad nederst på mobil (stepplayer.js viser den når knappene er rullet ut av bildet) */
+.sp-dock { display: none; }
+@media (max-width: 619.98px) {
+  .sp-dock:not([hidden]) {
+    display: block; position: fixed; left: 0; right: 0; bottom: 0; z-index: 60;
+    background: var(--color-surface-container-lowest); border-top: 1px solid var(--color-outline-variant);
+    box-shadow: 0 -4px 14px rgba(0, 0, 0, .12);
+    padding: .4rem .75rem calc(.5rem + env(safe-area-inset-bottom, 0px));
+  }
+  .sp-dock-line {
+    font-family: var(--font-mono, ui-monospace, monospace); font-size: 12px; min-height: 1.2em;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: .35rem;
+    color: var(--color-on-surface-variant);
+  }
+  .sp-dock-row { display: flex; align-items: center; gap: .5rem; }
+  .sp-dock-row .btn { flex: 1; min-height: 44px; }
+  .sp-dock-n { flex: none; font-size: var(--text-xs); font-variant-numeric: tabular-nums; color: var(--color-on-surface-variant); text-align: center; min-width: 5.5rem; }
+  body.has-sp-dock { padding-bottom: 6.5rem; }
+}
+@media print { .sp-dock { display: none !important; } }
+
+/* Crash course på mobil: mindre innrykk i nøstede bokser, så svaralternativene får bredden */
+@media (max-width: 619.98px) {
+  .card.cr-etappe { padding-left: .6rem; padding-right: .6rem; }
+  .cr-sbody { padding: 0 .5rem .6rem; }
+}
+
+/* Linjelengde på brede skjermer: brødtekst holdes rundt 75 tegn, figurer og tabeller bruker hele bredden */
+main :is(p, li, dd, .lead) { max-width: 75ch; }
+main :is(td, th) :is(p, li) { max-width: none; }

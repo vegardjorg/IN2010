@@ -81,7 +81,46 @@
     var bNext = el("button", { class: "btn sm", type: "button", html: "Neste →", onclick: function () { step(1); } });
     var bReset = el("button", { class: "btn sm", type: "button", text: "↺ Nullstill", onclick: function () { goto(0); } });
     var scope = IN.levelScope({ initial: opts.initial_level || null });
-    wrap.appendChild(el("div", { class: "sp-controls" }, [bPrev, bPlay, bNext, bReset, scope.el]));
+    var controlsRow = el("div", { class: "sp-controls" }, [bPrev, bPlay, bNext, bReset, scope.el]);
+    wrap.appendChild(controlsRow);
+
+    /* Mobil: når demoen er i bildet, men knappene er rullet ut (f.eks. mens man leser pseudokoden under),
+       vises en fast rad nederst med aktiv kodelinje og Forrige · Steg x av y · Neste – innen rekkevidde for tommelen. */
+    var dock = null, dockLine = null, dockCount = null, dPrev = null, dNext = null;
+    var MOB = window.matchMedia ? window.matchMedia("(max-width: 619.98px)") : null;
+    // Settes opp etter at siden har lagt spilleren og pseudokoden inn i dokumentet
+    if (MOB && "IntersectionObserver" in window) setTimeout(setupDock, 0);
+    function setupDock() {
+      if (!opts.pseudo || !document.body.contains(wrap)) return;
+      var area = wrap;
+      while (area.parentElement && area.parentElement !== document.body && !area.querySelector(".pseudo")) area = area.parentElement;
+      if (!area.querySelector(".pseudo")) return;
+      dPrev = el("button", { class: "btn sm", type: "button", text: "← Forrige", onclick: function () { step(-1); } });
+      dNext = el("button", { class: "btn sm", type: "button", text: "Neste →", onclick: function () { step(1); } });
+      dockCount = el("span", { class: "sp-dock-n", "aria-live": "polite" });
+      dockLine = el("div", { class: "sp-dock-line", "aria-hidden": "true" });
+      dock = el("div", { class: "sp-dock", hidden: "", role: "group", "aria-label": "Steg for steg" },
+        [dockLine, el("div", { class: "sp-dock-row" }, [dPrev, dockCount, dNext])]);
+      document.body.appendChild(dock);
+      var ctrlIn = true, areaIn = false;
+      var syncDock = function () {
+        var show = MOB.matches && areaIn && !ctrlIn && wrap.offsetParent !== null;
+        if (show) { if (IN._spDock && IN._spDock !== dock) IN._spDock.hidden = true; IN._spDock = dock; }
+        dock.hidden = !show;
+        document.body.classList.toggle("has-sp-dock", !!(IN._spDock && !IN._spDock.hidden));
+      };
+      new IntersectionObserver(function (es) { ctrlIn = es[es.length - 1].isIntersecting; syncDock(); }).observe(controlsRow);
+      new IntersectionObserver(function (es) { areaIn = es[es.length - 1].isIntersecting; syncDock(); }).observe(area);
+      if (MOB.addEventListener) MOB.addEventListener("change", syncDock);
+      paintDock();
+    }
+    function paintDock() {
+      if (!dock) return;
+      dockCount.textContent = counter.textContent;
+      dockLine.innerHTML = (pcLine.hidden || pcLine.style.visibility === "hidden") ? "&nbsp;" : pcLine.innerHTML;
+      dPrev.disabled = bPrev.disabled;
+      dNext.disabled = bNext.disabled;
+    }
 
     var explain = el("div", { class: "sp-explain" });
     wrap.appendChild(explain);
@@ -281,6 +320,7 @@
       if (!measuring && atStart && document.activeElement === bPrev && !atEnd) bNext.focus();
       bPrev.disabled = atStart;
       bNext.disabled = atEnd;
+      paintDock();
     }
     function paintExplain(s, kind) {
       clear(explain);

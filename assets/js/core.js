@@ -284,10 +284,28 @@
 
   /* ---------- Faner (tabs) ---------- */
   // Markup: container med .tabs (knapper med [data-tab=id]) og paneler [data-panel=id].
+  /* Vannrett rullbar rad (fanelinja på mobil): ton ut kanten på den siden der det finnes mer,
+     samme hint som toppmenyen. */
+  IN.scrollFade = function (row) {
+    if (!row || row._fade) return;
+    row._fade = true;
+    function sync() {
+      var over = row.scrollWidth > row.clientWidth + 2;
+      row.classList.toggle("fade-l", over && row.scrollLeft > 2);
+      row.classList.toggle("fade-r", over && row.scrollLeft + row.clientWidth < row.scrollWidth - 2);
+    }
+    row.addEventListener("scroll", sync, { passive: true });
+    window.addEventListener("resize", sync);
+    if (window.ResizeObserver) new ResizeObserver(sync).observe(row);
+    sync();
+    setTimeout(sync, 300);
+  };
+
   IN.tabs = function (root) {
     root = root || document;
     var bar = qs(".tabs", root);
     if (!bar) return;
+    IN.scrollFade(bar);
     var btns = qsa('[data-tab]', bar);
     var panels = qsa('[data-panel]', root);
 
@@ -1838,7 +1856,7 @@
      mellomlager ved oppstart, når fanen blir synlig igjen og hver halvtime. Er den nyere, vises en
      liten melding med «Oppdater». Fremdrift og svar ligger i localStorage og overlever oppdateringen.
      Virker bare over http(s): via file:// finnes det ingen gammel kopi å bekymre seg for. */
-  IN.VERSION = "20261126d";
+  IN.VERSION = "20261126e";
   function initVersionCheck() {
     if (!/^https?:$/.test(location.protocol) || !window.fetch) return;
     var DISMISS = "in2010:ny-versjon-skjult", last = 0, shown = null;
