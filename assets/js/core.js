@@ -801,7 +801,21 @@
     "heap:H2025-5": 1, "heap:H2022-10": 1, "traer:H2021-8": 1, "traer:H2020-6": 1, "traer:H2024-2": 1,
     "hashing:H2025-2": 1, "hashing:H2020-4": 1, "hashing:H2022-7": 1, "grafer:H2024-4": 1,
     "grafer:H2021-11": 1, "grafer:H2021-7": 1, "grafer:H2024-8": 1, "grafer:H2021-12": 1,
-    "strategi:H2021-6": 1, "strategi:H2020-8": 1, "strategi:H2020-7": 1
+    "strategi:H2021-6": 1, "strategi:H2020-8": 1, "strategi:H2020-7": 1,
+    // Gjennomgått 2026-11: det som manglet i fullpoengssvaret, er lagt inn der (perfekt/*.js)
+    "begreper:H2025-1": 1, "sortering:H2023-4": 1, "sortering:H2024-3": 1, "sortering:H2021-2": 1,
+    "sortering:H2020-7": 1, "sok:H2020-5": 1, "sok:H2023-3": 1, "sok:H2025-6": 1, "sok:H2021-10": 1,
+    "strategi:H2022-2": 1, "lister:H2020-9": 1, "hashing:H2024-5": 1, "hashing:H2021-9": 1,
+    "hashing:H2020-7": 1, "heap:H2023-2": 1, "heap:H2021-4": 1, "heap:H2024-7": 1, "heap:H2022-5": 1,
+    "traer:H2020-2": 1, "traer:H2022-11": 1, "traer:H2023-5": 1, "traer:H2024-6": 1, "traer:H2022-4": 1,
+    "traer:H2025-4": 1, "traer:H2025-5": 1, "traer:H2021-5": 1, "traer:H2022-9": 1,
+    "grafer:H2020-3": 1, "grafer:H2022-3": 1, "grafer:H2022-6": 1, "grafer:H2022-8": 1,
+    "grafer:H2021-13": 1, "grafer:H2023-6": 1, "grafer:H2025-7": 1, "grafer:H2020-8": 1,
+    "grafer:H2022-12": 1, "grafer:H2025-3": 1, "grafer:H2023-7": 1,
+    "crash:MOCK-heap-removemin": 1, "crash:MOCK-probing-slett": 1, "crash:MOCK-avl": 1,
+    "crash:MOCK-bst-remove": 1, "crash:MOCK-buildheap-heapsort": 1, "crash:MOCK-rehash": 1,
+    "crash:MOCK-dijkstra": 1, "crash:MOCK-topsort": 1, "crash:MOCK-mst": 1, "crash:MOCK-quicksort": 1,
+    "crash:MOCK-radix": 1, "crash:MOCK-separasjonsnoder": 1
   };
   var TABDEF = {
     oppgave: { long: "Oppgave", short: "Oppgave" },
@@ -1823,7 +1837,7 @@
      mellomlager ved oppstart, når fanen blir synlig igjen og hver halvtime. Er den nyere, vises en
      liten melding med «Oppdater». Fremdrift og svar ligger i localStorage og overlever oppdateringen.
      Virker bare over http(s): via file:// finnes det ingen gammel kopi å bekymre seg for. */
-  IN.VERSION = "20261125l";
+  IN.VERSION = "20261126a";
   function initVersionCheck() {
     if (!/^https?:$/.test(location.protocol) || !window.fetch) return;
     var DISMISS = "in2010:ny-versjon-skjult", last = 0, shown = null;

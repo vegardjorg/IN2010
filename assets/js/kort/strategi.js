@@ -130,53 +130,26 @@
       '<p><b>(b)</b> <span class="et-p">(3p)</span></p>' +
       "<p>Forklar kort (maks 4 setninger) hvorfor svaret på forrige deloppgave viser at avgjørelsesproblemet Type2 er i NP. Ikke gi en detaljert kjøretidsanalyse av pseudokoden din for Type2Verifier.</p>" +
       "<p>Dersom svaret ditt på forrige deloppgave har mangler, kan du gjøre nødvendige antagelser uten å få følgefeil.</p>",
-    figsAfter: [{ cap: "Eksempelgraf (egen figur, ikke fra arket)", draw: function (h) { h.innerHTML = gsvg(HAMG, { w: 320, h: 235, order: { a: 0, b: 1, c: 2, d: 3, e: 4, f: 5 }, edge: { "a|b": "on", "b|c": "on", "c|d": "on", "d|e": "on", "e|f": "on", "a|f": "on" }, label: "Eksempelgraf med en hamiltonsk sykel a, b, c, d, e, f" }); } }],
+    figsAfter: [{ cap: "Eksempelgraf (egen figur, ikke fra arket)", draw: function (h) { h.innerHTML = gsvg(hexG(), { w: 320, h: 285, order: { A: 0, B: 1, C: 2, D: 3, E: 4, F: 5 }, edge: { "A|B": "on", "B|C": "on", "C|D": "on", "D|E": "on", "E|F": "on", "A|F": "on" }, label: "Eksempelgraf med en hamiltonsk sykel A, B, C, D, E, F" }); } }],
     outro: demoLink("pnp", "ham-graf", "Vær verifikatoren")
   });
   sheetPc(qs(".et-skel-8a", o), { name: "Type2Verifier", params: "G, C", input: "En graf G og et array av noder C", output: "Returner JA hvis C viser at G er av type 2, NEI ellers", lines: [{ code: "// Fyll ut", indent: 1 }] });
   return o;
   }
 
-  // Steg-demo: Type2Verifier på eksempelgrafen. Linjekoder som i kursets stType2Verifier (1 = Procedure-linja).
-  var HAM_VG = { directed: false, nodes: Object.keys(HAMG.nodes).map(function (id) { return { id: id, x: HAMG.nodes[id][0], y: HAMG.nodes[id][1] }; }), edges: HAMG.edges };
-  function genHam(inp) {
-    var g = inp[0], C = inp[1].slice(), N = C.length, steps = [], ok = {};
-    function snap(line, text, tag, cur, bad, res) {
-      var nodes = {}, edges = {}, lab = {};
-      C.forEach(function (v, k) { lab[v] = String(k); });
-      Object.keys(ok).forEach(function (k) { edges[k] = "tree"; });
-      if (cur) { edges[cur[0] + ">" + cur[1]] = "hot"; nodes[cur[0]] = "cur"; nodes[cur[1]] = "cur"; }
-      if (bad) { nodes[bad[0]] = "warn"; nodes[bad[1]] = "warn"; }
-      steps.push({ line: line, g: g, nodes: nodes, edges: edges, lab: lab, text: text, tag: tag, result: res || null,
-        panel: [{ label: "C:", items: C.map(function (v, k) { return k + ": " + v; }) }] });
-    }
-    snap(2, t("Forslaget har " + N + " byer. Nå sjekker vi at det går en vei mellom hver by og den neste.",
-      "N ← |C| = " + N + ". Tallet ved hver node er plassen i C.",
-      "N ← " + N + ". Oppgaven lover at C har hver node nøyaktig én gang, så vi sjekker bare kantene."), "N = " + N);
-    for (var i = 0; i < N; i++) {
-      var u = C[i], v = C[(i + 1) % N], last = i === N - 1;
-      var has = g.edges.some(function (e) { return (e[0] === u && e[1] === v) || (e[0] === v && e[1] === u); });
-      snap(4, t("Går det en vei mellom " + u + " og " + v + "?" + (last ? " Det er veien hjem igjen til start." : ""),
-        "i = " + i + ": finnes {" + u + ", " + v + "} i E?" + (last ? " (i + 1) mod N = 0, så dette er kanten tilbake til C[0]." : ""),
-        "i = " + i + ": {C[" + i + "], C[" + ((i + 1) % N) + "]} = {" + u + ", " + v + "}" + (last ? ", den lukkende kanten" : "") + "."), "i = " + i, [u, v]);
-      if (!has) {
-        snap(5, t("Det går ingen vei mellom " + u + " og " + v + ". Da er forslaget feil.",
-          "{" + u + ", " + v + "} er ikke en kant i G. return NEI.",
-          "{" + u + ", " + v + "} ∉ E, så C er ikke en sykel i G. Verifikatoren svarer NEI for dette sertifikatet og leter ikke etter et annet."), "NEI", null, [u, v], "NEI");
-        return steps;
-      }
-      ok[u + ">" + v] = 1;
-    }
-    snap(6, t("Alle veiene fantes, også veien hjem. Forslaget er en tur innom alle byene.",
-      "Alle " + N + " kantene finnes. return JA.",
-      "Alle " + N + " kantene i den foreslåtte sykelen er i E: C er en hamiltonsk sykel. N kantoppslag, altså polynomiell tid."), "JA", null, null, "JA");
-    return steps;
+  /* Steg-demo: samme Type2Verifier-demo som på 06-grafer (grType2 og type2Verifier fra data-grafer.js,
+     eksempelgrafen IN.grafer.G.hex). Lastes data-grafer.js ikke, viser kortet en feilmelding i stedet for demoen. */
+  var GRF = IN.grafer || null, HEX = GRF ? GRF.G.hex : null;
+  // Samme graf i formatet til gsvg (figuren i oppgaveteksten), flyttet litt inn så nodene ikke kuttes i kanten
+  function hexG() {
+    var nodes = {};
+    (HEX ? HEX.nodes : []).forEach(function (n) { nodes[n.id] = [n.x + 10, n.y + 20]; });
+    return { nodes: nodes, edges: HEX ? HEX.edges : [] };
   }
-  var HAM_DEMO = { engine: "graph", gen: genHam, input: [HAM_VG, ["a", "b", "c", "d", "e", "f"]], inputNavn: "Gyldig sykel",
-    presets: { "Mangler en kant": [HAM_VG, ["a", "b", "e", "d", "c", "f"]], "Bare en sti (siste → første mangler)": [HAM_VG, ["a", "c", "b", "e", "f", "d"]] },
-    pseudo: "stType2Verifier", del: "(a)", label: "Kjør Type2Verifier på eksempelgrafen",
-    legend: [{ cls: "compare", label: "Kanten vi sjekker nå" }, { cls: "sorted", label: "Kanten finnes" }, { cls: "swap", label: "Kanten mangler (endene)" }],
-    svar: function (s) { return s ? s.result : null; }, fasit: "JA" };
+  var HAM_DEMO = { engine: "graph", gen: "grType2", input: [HEX, ["A", "B", "C", "D", "E", "F"]], inputNavn: "C = [A, B, C, D, E, F]",
+    presets: { "C = [C, B, A, D, E, F] (siste kant mangler)": [HEX, ["C", "B", "A", "D", "E", "F"]], "C = [A, B, E, D, C, F] (en kant mangler)": [HEX, ["A", "B", "E", "D", "C", "F"]] },
+    pseudo: "type2Verifier", del: "(a)", label: "Kjør Type2Verifier på eksempelgrafen",
+    legend: GRF ? GRF.LEG_T2 : [], fasit: "JA" };   // svaret leses fra s.svar (siste steg) i IN.mountExamDemo
 
   /* ---------- Kortene ---------- */
     def("H2021-6", { host: "#exam-h2021-6" }, function () { return { key: "H2021-6", year: "H2021", title: "Litt om beregnbarhet og kompleksitet", oppgave_nr: "Oppgave 6", points: 8,

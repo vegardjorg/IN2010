@@ -58,7 +58,7 @@
           row([3, 5, 4, 9, 6, 7, 8, 12, 10]) +
           "<p><b>Kall 2</b> returnerer 3. 10 flyttes til roten og bytter med 4 (0 ↔ 2), så med 7 (2 ↔ 5):</p>" +
           row([4, 5, 7, 9, 6, 10, 8, 12]) +
-          "<p><b>Kall 3</b> returnerer 4. 12 flyttes til roten og bytter med 5 (0 ↔ 1), så med 6 (1 ↔ 4). Indeks 4 har ingen barn i heapen:</p>" +
+          "<p><b>Kall 3</b> returnerer 4. 12 flyttes til roten og bytter med 5 (0 ↔ 1), så med 6 (1 ↔ 4). Indeks 4 har ingen barn i heapen (2 · 4 + 1 = 9, men siste indeks er nå 6):</p>" +
           row([5, 6, 7, 9, 12, 10, 8]),
         fig: heapFig([5, 6, 7, 9, 12, 10, 8], "Heapen etter tre kall"),
         fasitVerdi: "5, 6, 7, 9, 12, 10, 8",
@@ -66,7 +66,7 @@
       { del: "(c)",
         tekst: "<p>Ta vare på roten, flytt det siste elementet opp i roten, og la det boble ned mot det <i>minste</i> barnet så lenge det er større enn barnet.</p>",
         kode: "removeMin",
-        etter: "<p class=\"small muted\">Etter at A[n − 1] er flyttet opp i roten, hører plass n − 1 ikke lenger til heapen. Heapen er nå plassene 0 … n − 2, og derfor står grensen n − 1 i løkka.</p>",
+        etter: "<p class=\"small muted\">Etter at A[n − 1] er flyttet opp i roten, hører plass n − 1 ikke lenger til heapen. Heapen er nå plassene 0 … n − 2, og derfor står grensen n − 1 i løkka. Prosedyren endrer ikke n selv; kalleren setter n ← n − 1 etterpå.</p>",
         poeng: ["siste element flyttes til roten (1p)", "valg av minste barn (1p)", "riktig stoppkriterium (1p)"] },
       { del: "(d)",
         tekst: "<p><b>O(log n).</b> En heap er et komplett binærtre, så høyden er ⌊log n⌋. Hver runde i løkka gjør et fast antall sammenligninger og høyst ett bytte, og flytter elementet ett nivå ned. Det blir høyst ⌊log n⌋ runder.</p>",
@@ -98,19 +98,20 @@
         poeng: ["riktig tabell (2p)"] },
       { del: "(b)",
         tekst: "<p>Plass 1 blir et hull. Vi går videre til første tomme plass. En nøkkel på plass j flyttes inn i hullet i bare hvis hjemmeplassen ikke ligger i (i, j], regnet rundt tabellen.</p>" +
-          "<ul><li>42 (hjem 2) blir stående.</li><li>11 (hjem 1) flyttes til 1. Hullet er nå på 3.</li><li>23 (hjem 3) flyttes til 3. Hull på 4.</li>" +
+          "<ul><li>42 (hjem 2) blir stående, fordi 2 ligger i (1, 2].</li><li>11 (hjem 1) flyttes til 1. Hullet er nå på 3.</li><li>23 (hjem 3) flyttes til 3. Hull på 4.</li>" +
           "<li>51 (hjem 1) flyttes til 4. Hull på 5.</li><li>70 (hjem 0) flyttes til 5. Hull på 6.</li><li>Plass 7 er tom: stopp.</li></ul>" +
           row([29, 11, 42, 23, 51, 70, _, _, _, 19]),
         poeng: ["42 blir stående (1p)", "11, 23 og 51 flyttes (1p)", "70 flyttes også, og sluttabellen er riktig (1p)"] },
       { del: "(c)",
         tekst: "<p>Hull på 9. 29 på plass 0 har hjem 9, som ikke ligger i (9, 0], så 29 flyttes til 9, og hullet går til 0. " +
           "11, 42, 23 og 51 har hjemmeplass mellom hullet og der de står, så de blir stående. 70 på plass 5 har hjem 0 og flyttes til 0. Plass 6 er tom: stopp.</p>" +
-          row([70, 11, 42, 23, 51, _, _, _, _, 29]),
+          row([70, 11, 42, 23, 51, _, _, _, _, 29]) +
+          "<p>Kontroll: et søk etter 70 starter på 0 og finner den med én gang. Et søk etter 51 sjekker 1, 2, 3, 4 og finner den på plass 4.</p>",
         fig: hashFig([70, 11, 42, 23, 51, _, _, _, _, 29], "Tabellen etter at 31 og 19 er slettet"),
         fasitVerdi: "70, 11, 42, 23, 51, _, _, _, _, 29",
         poeng: ["29 går rundt kanten til plass 9 (1p)", "70 flyttes til plass 0 (1p)"] },
       { del: "(d)",
-        tekst: "<p>Setter vi bare plass 1 til null, starter et søk etter 11 på hjemmeplassen 1, ser en tom plass og svarer at 11 ikke finnes. Men 11 ligger på plass 3. Søket stopper på første tomme plass, så hullet gjør nøklene bak det usynlige.</p>",
+        tekst: "<p>Setter vi bare plass 1 til null, starter et søk etter 11 på hjemmeplassen 1, ser en tom plass og svarer at 11 ikke finnes. Men 11 ligger på plass 3. Det samme skjer med 51. Søket stopper på første tomme plass, så hullet gjør nøklene bak det usynlige.</p>",
         poeng: ["et konkret søk som feiler (1p)"] },
       { del: "(e)",
         tekst: "<p>Finn nøkkelen, sett plassen til null, og gå videre til neste tomme plass. Hver nøkkel som ellers ville blitt gjemt, flyttes inn i hullet, og hullet flytter seg dit nøkkelen sto.</p>",
@@ -143,7 +144,7 @@
         tekst: "<p><b>14:</b> kjeden 5 → 9 → 14 gir bf(5) = −2 og bf(9) = −1 (samme retning). <span class=\"mono\">LeftRotate(5)</span> gir 9 med barna 5 og 14.</p>" +
           "<p><b>3 og 7:</b> ingen rotasjon.</p>" +
           "<p><b>6:</b> 6 blir venstre barn av 7. Da får 9 bf = +2, og venstre barn 5 har bf = −1 (motsatt retning). Først <span class=\"mono\">LeftRotate(5)</span>, så <span class=\"mono\">RightRotate(9)</span>. Ny rot er 7, med 5(3, 6) til venstre og 9(_, 14) til høyre.</p>" +
-          "<p><b>4:</b> 4 blir høyre barn av 3, og alle balansefaktorer er mellom −1 og 1. Ingen rotasjon.</p>" +
+          "<p><b>4:</b> 4 blir høyre barn av 3, og alle balansefaktorer er mellom −1 og 1. Ingen rotasjon. Totalt ble det tre enkle rotasjoner: én for 14 og to for 6.</p>" +
           "<p>Treet etter alle innsettingene, i preorder: 7, 5, 3, 4, 6, 9, 14.</p>",
         fasitVerdi: "7, 5, 3, 4, 6, 9, 14",
         poeng: ["riktig tre før og etter hver rotasjonssituasjon (1p hver)", "riktige navn på rotasjonene, med noden de gjøres på (1p hver)"] },
@@ -154,9 +155,12 @@
       { del: "(c)",
         tekst: "<p>7 har to barn. Den minste i høyre subtre er 9, så 9 kopieres opp i roten og slettes fra høyre subtre. Der har 9 bare barnet 14, som tar plassen. " +
           "Roten får venstre høyde 2 og høyre høyde 0, altså bf = +2. Venstre barn 5 har bf = +1, så én <span class=\"mono\">RightRotate</span> på roten holder.</p>" +
-          "<p>Resultat: 5 med 3(_, 4) til venstre og 9(6, 14) til høyre. Høyden er 2.</p>",
+          "<p>Resultat: 5 med 3(_, 4) til venstre og 9(6, 14) til høyre. Høyden er 2, og alle balansefaktorer er 0, bortsett fra 3 med −1.</p>",
         fig: treeFig([5, [3, null, [4]], [9, [6], [14]]], "Etter Remove(7) og RightRotate på roten"),
         poeng: ["riktig etterfølger og kopiering (1p)", "riktig rotasjon og sluttre (1p)"] },
+      { tekst: "<p>Kursets Balance, som avgjør om det blir én eller to rotasjoner:</p>",
+        kode: "avlBalance",
+        etter: "<p class=\"small muted\">Insert og Remove gjør først vanlig søketre-arbeid rekursivt. På vei opp kaller hver node SetHeight(v) og returnerer Balance(v).</p>" },
       { del: "(d)",
         tekst: "<p><b>O(log n)</b> for begge. Et AVL-tre har høyde O(log n). Innsetting og sletting går én sti ned og én sti opp, og på hver node gjøres SetHeight og eventuelt en rotasjon, begge O(1).</p>",
         kjoretid: "O(log n) for både Insert og Remove",
@@ -186,10 +190,10 @@
         fig: treeFig([50, [30, [20], [40, [35]]], [80, [60, null, [70, [65]]], [90]]], "Treet etter innsettingene"),
         poeng: ["riktig tre (1p)", "høyden 4, målt i kanter (1p)"] },
       { del: "(b)",
-        tekst: "<ol><li><b>Slett 35</b> (løvnode): fjernes. Preorder: 50, 30, 20, 40, 80, 60, 70, 65, 90.</li>" +
-          "<li><b>Slett 70</b> (ett barn): 65 tar plassen. Preorder: 50, 30, 20, 40, 80, 60, 65, 90.</li>" +
-          "<li><b>Slett 50</b> (to barn): den minste i høyre subtre er 60. 60 kopieres opp, og 60 slettes fra høyre subtre, der barnet 65 tar plassen. Preorder: 60, 30, 20, 40, 80, 65, 90.</li>" +
-          "<li><b>Slett 30</b> (to barn): den minste i høyre subtre er 40, en løvnode. 40 kopieres opp, og løvnoden fjernes. Preorder: 60, 40, 20, 80, 65, 90.</li></ol>",
+        tekst: "<ol><li><b>Slett 35</b> (løvnode): fjernes. Preorder: 50, 30, 20, 40, 80, 60, 70, 65, 90. Høyden er fortsatt 4.</li>" +
+          "<li><b>Slett 70</b> (ett barn): 65 tar plassen. Preorder: 50, 30, 20, 40, 80, 60, 65, 90. Høyden blir 3.</li>" +
+          "<li><b>Slett 50</b> (to barn): den minste i høyre subtre er 60 (én gang til høyre, så til venstre så langt det går). 60 kopieres opp, og 60 slettes fra høyre subtre, der barnet 65 tar plassen. Preorder: 60, 30, 20, 40, 80, 65, 90. Høyden blir 2.</li>" +
+          "<li><b>Slett 30</b> (to barn): den minste i høyre subtre er 40, en løvnode. 40 kopieres opp, og løvnoden fjernes. Preorder: 60, 40, 20, 80, 65, 90. Høyden er fortsatt 2.</li></ol>",
         fig: treeFig([60, [40, [20]], [80, [65], [90]]], "Treet etter de fire slettingene"),
         fasitVerdi: "60, 40, 20, 80, 65, 90",
         poeng: ["1p per sletting, med riktig tilfelle", "to barn: riktig etterfølger, og at barnet til etterfølgeren (65) blir med"] },
@@ -223,7 +227,7 @@
     type: "mock",
     svar: [
       { del: "(a)",
-        tekst: "<p>BuildMaxHeap kaller BubbleDown for i = ⌊8/2⌋ = 4 ned til 0. For i = 4, 3 og 1 endres ingenting.</p>" +
+        tekst: "<p>BuildMaxHeap kaller BubbleDown for i = ⌊8/2⌋ = 4 ned til 0. For i = 4, 3 og 1 endres ingenting: indeks 4 har ingen barn, 5 på indeks 3 er større enn barnet 2, og 10 på indeks 1 er større enn barna 5 og 1.</p>" +
           tab(["etter", "array"], [["start", "4, 10, 3, 5, 1, 8, 9, 2"], ["i = 2: 3 ↔ 9", "4, 10, 9, 5, 1, 8, 3, 2"], ["i = 0: 4 ↔ 10, så 4 ↔ 5", "10, 5, 9, 4, 1, 8, 3, 2"]]),
         fig: heapFig([10, 5, 9, 4, 1, 8, 3, 2], "Max-heapen etter BuildMaxHeap"),
         poeng: ["riktig startindeks og retning (1p)", "riktige mellomtilstander (2p)"] },
@@ -232,7 +236,8 @@
           tab(["runde", "array"], [
             ["i = 7", "9, 5, 8, 4, 1, 2, 3 | 10"], ["i = 6", "8, 5, 3, 4, 1, 2 | 9, 10"], ["i = 5", "5, 4, 3, 2, 1 | 8, 9, 10"],
             ["i = 4", "4, 2, 3, 1 | 5, 8, 9, 10"], ["i = 3", "3, 2, 1 | 4, 5, 8, 9, 10"], ["i = 2", "2, 1 | 3, 4, 5, 8, 9, 10"],
-            ["i = 1", "1 | 2, 3, 4, 5, 8, 9, 10"], ["i = 0", "1, 2, 3, 4, 5, 8, 9, 10"]]),
+            ["i = 1", "1 | 2, 3, 4, 5, 8, 9, 10"], ["i = 0", "1, 2, 3, 4, 5, 8, 9, 10"]]) +
+          "<p>Én runde i detalj, i = 7: bytt 10 og 2, så A = 2, 5, 9, 4, 1, 8, 3 | 10. Bobl 2 ned: det største barnet er 9 (bytt), så 8 (bytt), og vi får 9, 5, 8, 4, 1, 2, 3 | 10.</p>",
         fasitVerdi: "1, 2, 3, 4, 5, 8, 9, 10",
         poeng: ["riktige runder (ca. 1p per to runder). En tidlig feil som følges konsekvent trekkes én gang"] },
       { del: "(c)",
@@ -276,7 +281,8 @@
       { del: "(c)",
         tekst: "<p>Før 14 er n/N = 6/8 = 0,75, så N blir 16. Gammel rekkefølge 30, 9, 17, 13, 6, 21 gir 30 → 14, 9 → 9, 17 → 1, 13 → 13, 6 → 6, 21 → 5, uten kollisjoner.</p>" +
           row([_, 17, _, _, _, 21, 6, _, _, 9, _, _, _, 13, 30, _]) +
-          "<p>14 → 14 er opptatt, 15 er ledig:</p>" + row([_, 17, _, _, _, 21, 6, _, _, 9, _, _, _, 13, 30, 14]),
+          "<p>14 → 14 er opptatt, 15 er ledig:</p>" + row([_, 17, _, _, _, 21, 6, _, _, 9, _, _, _, 13, 30, 14]) +
+          "<p>Til slutt er n = 7 og N = 16.</p>",
         fasitVerdi: "_, 17, _, _, _, 21, 6, _, _, 9, _, _, _, 13, 30, 14",
         poeng: ["rehashing skjer før 14 (1p)", "riktig sluttabell (1p)"] },
       { del: "(d)",
@@ -313,11 +319,13 @@
     type: "mock",
     svar: [
       { del: "(a)",
-        tekst: "<p>Gamle køinnslag for en node som allerede er besøkt, hoppes over. Tabellen viser dist etter hvert uttak:</p>" +
-          tab(["tatt ut", "A", "B", "C", "D", "E", "F"], [
-            ["start", 0, "∞", "∞", "∞", "∞", "∞"], ["A (0)", 0, 4, 1, "∞", "∞", "∞"], ["C (1)", 0, 3, 1, 9, 11, "∞"], ["B (3)", 0, 3, 1, 8, 11, "∞"],
-            ["B (4): hopp over", 0, 3, 1, 8, 11, "∞"], ["D (8)", 0, 3, 1, 8, 10, 14], ["D (9): hopp over", 0, 3, 1, 8, 10, 14], ["E (10)", 0, 3, 1, 8, 10, 13],
-            ["E (11): hopp over", 0, 3, 1, 8, 10, 13], ["F (13)", 0, 3, 1, 8, 10, 13], ["F (14): hopp over", 0, 3, 1, 8, 10, 13]]) +
+        tekst: "<p>I kursets variant legges en node inn i køen på nytt hver gang avstanden blir bedre. Gamle køinnslag for en node som allerede er besøkt, hoppes over når de tas ut. Tabellen viser dist og køen etter hvert uttak:</p>" +
+          tab(["tatt ut", "A", "B", "C", "D", "E", "F", "kø etterpå"], [
+            ["start", 0, "∞", "∞", "∞", "∞", "∞", "(0, A)"], ["A (0)", 0, 4, 1, "∞", "∞", "∞", "(1, C) (4, B)"], ["C (1)", 0, 3, 1, 9, 11, "∞", "(3, B) (4, B) (9, D) (11, E)"],
+            ["B (3)", 0, 3, 1, 8, 11, "∞", "(4, B) (8, D) (9, D) (11, E)"], ["B (4): hopp over", 0, 3, 1, 8, 11, "∞", "(8, D) (9, D) (11, E)"],
+            ["D (8)", 0, 3, 1, 8, 10, 14, "(9, D) (10, E) (11, E) (14, F)"], ["D (9): hopp over", 0, 3, 1, 8, 10, 14, "(10, E) (11, E) (14, F)"],
+            ["E (10)", 0, 3, 1, 8, 10, 13, "(11, E) (13, F) (14, F)"], ["E (11): hopp over", 0, 3, 1, 8, 10, 13, "(13, F) (14, F)"],
+            ["F (13)", 0, 3, 1, 8, 10, 13, "(14, F)"], ["F (14): hopp over", 0, 3, 1, 8, 10, 13, "tom"]]) +
           "<p>Nodene blir besøkt i rekkefølgen A, C, B, D, E, F. Til slutt: A 0, B 3, C 1, D 8, E 10, F 13.</p>",
         fasitVerdi: "A 0, B 3, C 1, D 8, E 10, F 13",
         poeng: ["riktig startoppsett (1p)", "riktige oppdateringer, også B: 4 → 3 (3p)", "riktig rekkefølge nodene tas ut (1p)"] },
@@ -335,7 +343,7 @@
         kjoretid: "O((|V| + |E|) · log(|V|)) med binær heap",
         poeng: ["riktig kjøretid (1p)"] },
       { del: "(e)",
-        tekst: "<p>Rettet graf: (A, B) vekt 2, (A, C) vekt 4, (C, B) vekt −3, (B, D) vekt 1. Dijkstra tar ut B (2) og D (3) før C (4). Når C tas ut, blir dist[B] = 1, men B er besøkt og behandles ikke på nytt, så D blir stående med 3. Korteste vei A → C → B → D har lengde 2. Dijkstra antar at en node som er tatt ut ikke får kortere vei senere, og det holder bare uten negative vekter.</p>",
+        tekst: "<p>Rettet graf: (A, B) vekt 2, (A, C) vekt 4, (C, B) vekt −3, (B, D) vekt 1. Dijkstra tar ut B (2) og D (3) før C (4). Når C tas ut, blir dist[B] = 1, men B er besøkt og behandles ikke på nytt, så D blir stående med 3. Korteste vei A → C → B → D har lengde 2. Dijkstra antar at en node som er tatt ut ikke får kortere vei senere, og det holder bare uten negative vekter. Med negative vekter bruker vi Bellman-Ford.</p>",
         poeng: ["et konkret moteksempel (1p)"] }
     ],
     hvorfor: {
@@ -364,7 +372,7 @@
             ["B", "C 2→1, D 1→0 (push D)", "A, D", "B"], ["D", "E 2→1, F 1→0 (push F)", "A, F", "B, D"], ["F", "G 2→1", "A", "B, D, F"],
             ["A", "C 1→0 (push C)", "C", "B, D, F, A"], ["C", "E 1→0 (push E)", "E", "B, D, F, A, C"], ["E", "G 1→0 (push G)", "G", "B, D, F, A, C, E"],
             ["G", "", "tom", "B, D, F, A, C, E, G"]]) +
-          "<p>Output har 7 = |V| noder, så ordningen er <b>B, D, F, A, C, E, G</b>.</p>",
+          "<p>Output har 7 = |V| noder, så grafen er asyklisk, og ordningen er <b>B, D, F, A, C, E, G</b>.</p>",
         fasitVerdi: "B, D, F, A, C, E, G",
         poeng: ["riktige inngrader (1p)", "riktig kjøring med stakk og output (3p)"] },
       { del: "(b)",
@@ -413,7 +421,7 @@
         fasitVerdi: "E–F, B–D, A–C, B–C, C–E",
         poeng: ["riktig rekkefølge og riktige valg, med begrunnelse for de forkastede kantene (3p)"] },
       { del: "(b)",
-        tekst: "<p>Prim fra A tar alltid den letteste kanten i køen. Har enden alt kommet med i treet, kastes kanten. Nodene legges til i rekkefølgen:</p>" +
+        tekst: "<p>Prim fra A tar alltid den letteste kanten i køen. Har enden alt kommet med i treet, kastes kanten. Står to kanter med lik vekt i køen, tar vi her den eldste først, så rekkefølgen blir entydig. Nodene legges til i rekkefølgen:</p>" +
           tab(["node", "via kant"], [["A", "start"], ["C", "A–C 3"], ["B", "C–B 4"], ["D", "B–D 2"], ["E", "C–E 7"], ["F", "E–F 1"]]) +
           "<p>Før C–E 7 tas ut, kastes D–B 2, B–C 4, C–D 5, D–C 5, A–B 6 og B–A 6, fordi enden allerede er i treet.</p>",
         fasitVerdi: "A, C, B, D, E, F",
@@ -428,7 +436,7 @@
       { del: "(e)",
         tekst: "<p>Kursets Prim. Alle kantene fra den nye noden legges i køen, og kanter til noder som alt er med, kastes når de tas ut:</p>",
         kode: "prim",
-        kjoretid: "O(|E| · log(|V|)): hver kant gir høyst to innsettinger i køen, og hver køoperasjon koster O(log(|E|)) = O(log(|V|))",
+        kjoretid: "O(|E| · log(|V|)): hver kant gir høyst to innsettinger i køen, og hver køoperasjon koster O(log(|E|)) = O(log(|V|)), fordi |E| ≤ |V|²",
         poeng: ["pseudokode (1p)", "kjøretid (1p)"] }
     ],
     hvorfor: {
@@ -452,7 +460,7 @@
     type: "mock",
     svar: [
       { del: "(a)",
-        tekst: "<p>Pivot = A[8] = 5, left = 0, right = 7.</p>" +
+        tekst: "<p>Pivot = A[8] = 5, left = 0, right = 7. left går fram så lenge A[left] ≤ 5, og right går tilbake så lenge A[right] ≥ 5.</p>" +
           tab(["hendelse", "left", "right", "array etterpå"], [
             ["7 &gt; 5 og 1 &lt; 5: bytt", 0, 7, "1, 2, 9, 4, 3, 8, 6, 7, 5"],
             ["left stopper på 9, right stopper på 3: bytt", 2, 4, "1, 2, 3, 4, 9, 8, 6, 7, 5"],
@@ -464,7 +472,7 @@
         tekst: tab(["kall", "pivot", "returnerer", "array etterpå"], [
             ["Partition(A, 0, 3)", 4, 3, "uendret"], ["Partition(A, 0, 2)", 3, 2, "uendret"], ["Partition(A, 0, 1)", 2, 1, "uendret"],
             ["Partition(A, 5, 8)", 9, 8, "uendret"], ["Partition(A, 5, 7)", 7, 6, "bytt 8 og 6, så 8 og 7: 1, 2, 3, 4, 5, 6, 7, 8, 9"]]) +
-          "<p>De andre kallene har low ≥ high og returnerer med en gang.</p>",
+          "<p>De andre kallene har low ≥ high og returnerer med en gang. Venstre del var allerede sortert, og da deler Partition skjevt: ett element av gangen.</p>",
         fasitVerdi: "1, 2, 3, 4, 5, 6, 7, 8, 9",
         poeng: ["rekursjonen med riktige delarrayer (3p)"] },
       { del: "(c)",
@@ -473,7 +481,7 @@
         poeng: ["Quicksort (1p)", "Partition (1p)"] },
       { kode: "partition" },
       { del: "(d)",
-        tekst: "<p><b>O(n²)</b> i verste tilfelle. Med siste element som pivot skjer det når arrayet allerede er sortert (eller sortert baklengs): hver Partition skiller bare ut ett element, så det blir n nivåer med O(n) arbeid.</p>",
+        tekst: "<p><b>O(n²)</b> i verste tilfelle. Med siste element som pivot skjer det når arrayet allerede er sortert (eller sortert baklengs): hver Partition skiller bare ut ett element, så det blir n nivåer med O(n) arbeid. Typisk er kjøretiden O(n log n). For å unngå det verste tilfellet kan pivoten velges på andre måter, for eksempel tilfeldig eller som medianen av første, midterste og siste element.</p>",
         kjoretid: "O(n²) i verste tilfelle, O(n log n) typisk",
         poeng: ["O(n²) med riktig verste-tilfelle-input (1p)"] }
     ],
@@ -511,7 +519,7 @@
       { del: "(c)",
         tekst: "<p>Kursets RadixSort, med siffer d − 1 som enersifferet:</p>",
         kode: "radixSort",
-        etter: "<p class=\"small muted\">BucketSort på siffer i legger hvert tall bakerst i bøtta for sifferet og samler bøttene fra 0 til N − 1. Det er det som gjør den stabil.</p>",
+        etter: "<p class=\"small muted\">BucketSort på siffer i legger hvert tall bakerst i bøtta for sifferet og samler bøttene fra 0 til N − 1. Det er det som gjør den stabil. Her er d = 3 og N = 10.</p>",
         kjoretid: "O(d · (N + n)): hver av de d rundene fordeler n tall og går gjennom N bøtter",
         poeng: ["pseudokode (1p)", "O(d · (N + n)) (1p)"] }
     ],
@@ -537,18 +545,21 @@
     svar: [
       { del: "(a)",
         tekst: "<p>DFS fra A med naboene i alfabetisk rekkefølge gir stien A → B → C → D → E → F → G som DFS-tre. Kursets Visit tar med alle besøkte naboer, også forelderen, når low regnes ut.</p>" +
-          tab(["node", "A", "B", "C", "D", "E", "F", "G"], [["depth", 0, 1, 2, 3, 4, 5, 6], ["low", 0, 0, 0, 2, 3, 3, 5]]),
+          tab(["node", "A", "B", "C", "D", "E", "F", "G"], [["depth", 0, 1, 2, 3, 4, 5, 6], ["low", 0, 0, 0, 2, 3, 3, 5]]) +
+          "<p>depth er dybden i DFS-treet. low[u] er den minste depth u kan nå via subtreet sitt og én kant tilbake. G når bare forelderen F (5). F når D (3) via kanten {D, F}, og E når D via forelderen. D når C (2), og C når A (0) via kanten {A, C}, som B arver. low blir ferdig i rekkefølgen G, F, E, D, C, B, A.</p>",
         poeng: ["depth (2p)", "low (2p)"] },
       { del: "(b)",
         tekst: "<p>En node u som ikke er roten, er en separasjonsnode hvis den har et barn v i DFS-treet med depth[u] ≤ low[v].</p>" +
           "<ul><li>F: barnet G har low 5, og 5 ≤ 5. Ja.</li><li>E: barnet F har low 3, og 4 ≤ 3 er usant. Nei.</li><li>D: barnet E har low 3, og 3 ≤ 3. Ja.</li>" +
           "<li>C: barnet D har low 2, og 2 ≤ 2. Ja.</li><li>B: barnet C har low 0, og 1 ≤ 0 er usant. Nei.</li></ul>" +
-          "<p>Roten A har bare ett barn i DFS-treet (B), så A er ikke en separasjonsnode. Svaret er <b>{C, D, F}</b>.</p>",
+          "<p>Roten A har bare ett barn i DFS-treet (B), så A er ikke en separasjonsnode (C ble nådd via B). Svaret er <b>{C, D, F}</b>, funnet i rekkefølgen F, D, C.</p>",
         fig: graphFig(SN, SE, false, [["A", "B"], ["B", "C"], ["C", "D"], ["D", "E"], ["E", "F"], ["F", "G"]], ["C", "D", "F"], "DFS-treet og separasjonsnodene C, D og F"),
         fasitVerdi: "C, D, F",
         poeng: ["riktige noder med regelen depth[u] ≤ low[v] (2p)", "roten behandlet for seg, med antall barn (1p)"] },
+      { tekst: "<p>Kursets algoritme, til referanse (depth, low og seps er felles for begge prosedyrene):</p>", kode: "sepVertices" },
+      { kode: "sepVisit" },
       { del: "(c)",
-        tekst: "<p>Med {E, G} blir low[G] = depth[E] = 4, og 5 ≤ 4 er usant, så F er ikke lenger en separasjonsnode. D og C er det fortsatt. Svaret er <b>{C, D}</b>.</p>",
+        tekst: "<p>Med {E, G} blir low[G] = depth[E] = 4, og 5 ≤ 4 er usant, så F er ikke lenger en separasjonsnode. D og C er det fortsatt (low[E] = 3 og low[D] = 2). Svaret er <b>{C, D}</b>.</p>",
         poeng: ["{C, D} (1p)"] },
       { del: "(d)",
         tekst: "<p><b>O(|V| + |E|).</b> Det er ett Dybde-først søk med et fast arbeid ekstra per kant. Å fjerne hver node og sjekke om resten henger sammen koster O(|V| + |E|) per node, altså O(|V| · (|V| + |E|)).</p>",

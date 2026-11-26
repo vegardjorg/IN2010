@@ -7,8 +7,8 @@
   <title>IN2010 · interaktiv eksamensguide</title>
   <meta name="description" content="Interaktiv eksamensguide for IN2010 – Algoritmer og datastrukturer. Slik ser eksamen ut, og alle eksamensoppgavene fra H2020 til H2025.">
   <script>(function(){try{var d=document.documentElement;var t=localStorage.getItem('in-theme');if(t!=='dark'&&t!=='system')t='light';if(t!=='system')d.setAttribute('data-theme',t);var l=localStorage.getItem('in-level');if(l!=='eli5'&&l!=='teknisk')l='normal';d.setAttribute('data-level',l);}catch(e){document.documentElement.setAttribute('data-theme','light');document.documentElement.setAttribute('data-level','normal');}})();</script>
-  <link rel="stylesheet" href="assets/css/styles.css?v=20261125l">
-  <link rel="stylesheet" href="assets/css/begrep-tips.css?v=20261125l">
+  <link rel="stylesheet" href="assets/css/styles.css?v=20261126a">
+  <link rel="stylesheet" href="assets/css/begrep-tips.css?v=20261126a">
 </head>
 <body data-page="index">
   <a class="skip-link" href="#main">Hopp til innhold</a>
@@ -101,12 +101,12 @@
     IN2010-guide · laget for eksamensøving · fungerer frakoblet (file://) og på GitHub Pages.
   </footer>
 
-  <script src="assets/js/core.js?v=20261125l"></script>
-  <script src="assets/js/symboler.js?v=20261125l"></script>
-  <script src="assets/js/begreper-data.js?v=20261125l"></script>
-  <script src="assets/js/begrep-tips.js?v=20261125l"></script>
-  <script src="assets/js/data-mock.js?v=20261125l"></script>
-  <script src="assets/js/data-crash.js?v=20261125l"></script>
+  <script src="assets/js/core.js?v=20261126a"></script>
+  <script src="assets/js/symboler.js?v=20261126a"></script>
+  <script src="assets/js/begreper-data.js?v=20261126a"></script>
+  <script src="assets/js/begrep-tips.js?v=20261126a"></script>
+  <script src="assets/js/data-mock.js?v=20261126a"></script>
+  <script src="assets/js/data-crash.js?v=20261126a"></script>
   <script>
   /* Crash course-boksen øverst: samme utregning som løypesiden (IN.crashProgress) */
   (function () {
@@ -142,65 +142,15 @@
     }
 
     // ===== Eksamensoppgavene som er løst på sidene =====
-    // [side, fane, år, oppgavenr., tittel (som på siden), poeng, element-id på siden, (valgfritt) søketekst]
-    // Hentet fra eksamenskortene (IN.examTask) og eksamensdelene i fanene. Gnome sort er oppgave 4 i H2023.
-    var X = {
-      s20sub:  ["sortering", "bucket",     "H2020", "7d", "SortSubanagrams", 6, "exam-h2020-7d"],
-      s21stab: ["sortering", "bucket",     "H2021", "2",  "Stabilitet", 3, "exam-h2021-2"],
-      s21tf:   ["sortering", "test",       "H2021", "3",  "Sant/usant om bubble, selection og insertion", 10, "eksamen-test", "Eksamen H2021"],
-      s23gno:  ["sortering", "gnome",      "H2023", "4",  "Gnome sort", 10, "exam-gnome"],
-      s24ety:  ["sortering", "bucket",     "H2024", "3",  "Etymologisk ordliste", 10, "exam-h2024-3"],
-      k20int:  ["sok",       "sortersok",  "H2020", "5",  "Søk", 12, "exam-sortersok"],
-      k21par:  ["sok",       "triks",      "H2021", "10", "Finn par som summerer til x", 10, "exam-triks"],
-      k23dup:  ["sok",       "duplikat",   "H2023", "3",  "Finn duplikat", 12, "exam-duplikat"],
-      k25kmin: ["sok",       "kminste",    "H2025", "6",  "Finn k minste", 12, "exam-kminste"],
-      h21bin:  ["heap",      "removemin",  "H2021", "4",  "Binære heaps", 6, "exam-removemin"],
-      h22bq:   ["heap",      "pk",         "H2022", "10", "Bucket queue (bøttekø)", 10, "exam-pk"],
-      h22tf:   ["heap",      "test",       "H2022", "5",  "Prioritetskøer og binære heaps (sant/usant)", 10, "exam-test"],
-      h23ins:  ["heap",      "innsetting", "H2023", "2",  "Innsetting i heap", 10, "exam-innsetting"],
-      h24med:  ["heap",      "median",     "H2024", "7",  "Mediankø", 12, "exam-median"],
-      h25lvl:  ["heap",      "levelorder", "H2025", "5",  "Level-order", 12, "exam-levelorder"],
-      t20bst:  ["traer",     "bst",        "H2020", "2",  "Binære søketrær", 4, "exam-h2020-2"],
-      t21rng:  ["traer",     "bst",        "H2021", "8",  "Verdier i et intervall (InRange)", 10, "exam-h2021-8"],
-      t22chk:  ["traer",     "bst",        "H2022", "11", "Er treet et søketre? (CheckBST)", 10, "exam-h2022-10"],
-      t23dia:  ["traer",     "diameter",   "H2023", "5",  "Diameteren til et binærtre", 12, "exam-h2023-5"],
-      t24lca:  ["traer",     "lca",        "H2024", "6",  "Laveste felles forfeder", 12, "exam-h2024-6"],
-      t20avl:  ["traer",     "avl",        "H2020", "6",  "AVL-innsetting", 9, "exam-h2020-6"],
-      t22avl:  ["traer",     "avl",        "H2022", "4",  "Balanserte søketrær (AVL)", 6, "exam-h2022-3"],
-      t25anti: ["traer",     "antiavl",    "H2025", "4",  "Anti-AVL", 12, "exam-h2025-3"],
-      t21huf:  ["traer",     "huffman",    "H2021", "5",  "Huffman-trær", 5, "exam-h2021-5"],
-      t22auto: ["traer",     "huffman",    "H2022", "9",  "Autofullføring: prefikstre mot hashmap", 6, "exam-h2022-8"],
-      t24huf:  ["traer",     "huffman",    "H2024", "2",  "Huffman", 10, "exam-h2024-2"],
-      t25lvl:  ["traer",     "trav",       "H2025", "5",  "Level-order", 12, "exam-h2025-4"],
-      // Hashing
-      x20lp:   ["hashing",   "probing",    "H2020", "4",  "Linear probing", 2, "exam-h2020-4"],
-      x20sub:  ["hashing",   "triks",      "H2020", "7",  "Subanagram (a–c)", 17, "exam-h2020-7"],
-      x21frek: ["hashing",   "triks",      "H2021", "9",  "Flest forekomster", 8, "exam-h2021-9"],
-      x22lp:   ["hashing",   "probing",    "H2022", "7",  "Linear probing", 10, "exam-h2022-7"],
-      x24py:   ["hashing",   "python",     "H2024", "5",  "Python 3.6-ordbøker", 10, "exam-h2024-5"],
-      x25ch:   ["hashing",   "chaining",   "H2025", "2",  "Separate chaining", 10, "exam-h2025-2"],
-      // Grafer
-      g20eg:   ["grafer",    "begreper",   "H2020", "3",  "Grafegenskaper", 8, "exam-h2020-3"],
-      g20t2:   ["grafer",    "mst",        "H2020", "8",  "Fire typer grafer", 38, "exam-h2020-8"],
-      g21dij:  ["grafer",    "dijkstra",   "H2021", "7",  "Korteste avstander", 8, "exam-h2021-7"],
-      g21to:   ["grafer",    "dfs",        "H2021", "11", "To-fargelegge en graf", 10, "exam-h2021-11"],
-      g21opp:  ["grafer",    "sammenheng", "H2021", "12", "Whops!-oppgjør", 10, "exam-h2021-12"],
-      g21log:  ["grafer",    "topologisk", "H2021", "13", "Whops!-logger", 10, "exam-h2021-13"],
-      g22eg:   ["grafer",    "begreper",   "H2022", "3",  "Grafegenskaper", 10, "exam-h2022-2"],
-      g22kj:   ["grafer",    "begreper",   "H2022", "6",  "Kjøretid på grafalgoritmer", 8, "exam-h2022-5"],
-      g22gc:   ["grafer",    "dfs",        "H2022", "8",  "Garbage collection", 8, "exam-h2022-7"],
-      g22fs:   ["grafer",    "scc",        "H2022", "12", "Minimal forside", 10, "exam-h2022-11"],
-      g23bl:   ["grafer",    "mst",        "H2023", "6",  "Blindern-problemet", 10, "exam-h2023-6"],
-      g23dep:  ["grafer",    "sykler",     "H2023", "7",  "Dependency hell", 12, "exam-h2023-7"],
-      g24jz:   ["grafer",    "bfs",        "H2024", "4",  "Jazz eller klassisk?", 10, "exam-h2024-4"],
-      g24dnt:  ["grafer",    "scc",        "H2024", "8",  "Rundtur med DNT", 12, "exam-h2024-8"],
-      g25syk:  ["grafer",    "sykler",     "H2025", "3",  "Sykler i grafer", 11, "exam-h2025-2"],
-      g25kol:  ["grafer",    "mst",        "H2025", "7",  "Kollektivtilbudet i Oslo", 15, "exam-h2025-6"],
-      // Strategi
-      l20tag:  ["lister",    "stakk",      "H2020", "9",  "Velformaterte tagger (stakk)", 12, "exam-h2020-9"],
-      p21pnp:  ["strategi",  "pnp",       "H2021", "6",  "Litt om beregnbarhet og kompleksitet", 8, "exam-h2021-6"],
-      p22tf:   ["strategi",  "kjoretid",   "H2022", "2",  "Litt av hvert", 10, "exam-h2022-2"]
-    };
+    // Samme kortregister som crash course-løypa: IN.CRASH.kort i data-crash.js, som peker på kortene i
+    // assets/js/kort/<side>.js. [side, fane, år, oppgavenr., tittel, poeng, element-id, (fremdriftsnøkkel – brukes ikke her)]
+    // Nye kort i registeret dukker opp her og i oppgavekartet av seg selv. Sjekk mot kortfilene: node plan/sjekk-kortregister.js
+    var X = (IN.CRASH && IN.CRASH.kort) || {};
+    // Tekstfragmentet i dyplenken leter etter overskriften på kortet. SOK: egen søketekst (sant/usant-testen har ingen
+    // kortoverskrift). TITTEL: overskriften på kortet når registeret har en annen tittel (sjekk-kortregister.js lister dem).
+    var SOK = { s21tf: "Eksamen H2021" };
+    var TITTEL = { s20sub: "Sortering av subanagrammer", t23dia: "Diameteren til et tre", g20t2: "Fire typer grafer",
+      g21dij: "Korteste avstander i grafer", l20tag: "Velformaterte tagger" };
     var ICON = '<svg viewBox="0 0 12 12" aria-hidden="true" focusable="false">' +
       '<path d="M3 1.25h4.1L9.5 3.65v7.1H3z" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/>' +
       '<path d="M4.6 6h3.3M4.6 8.2h3.3" stroke="currentColor" stroke-width="1.1" stroke-linecap="round"/></svg>';
@@ -209,8 +159,8 @@
     // tekstfragmentet «:~:text=tittel,-Oppgave» lar nettleseren rulle til oppgavekortet og
     // markere tittelen. Nettlesere uten tekstfragmenter åpner bare fanen.
     function frag(s) { return encodeURIComponent(s).replace(/-/g, "%2D"); }
-    function taskHref(t) {
-      var text = t[7] ? frag(t[7]) : frag(t[4]) + ",-Oppgave";
+    function taskHref(key) {
+      var t = X[key], text = SOK[key] ? frag(SOK[key]) : frag(TITTEL[key] || t[4]) + ",-Oppgave";
       return pageHref[t[0]] + "#fane=" + t[1] + "&oppg=" + t[6] + ":~:text=" + text;
     }
     function taskName(t) { return t[2] + " Oppgave " + t[3] + " – " + t[4]; }
@@ -218,7 +168,7 @@
     function taskLink(key, content, cls) {
       var t = X[key];
       if (!t || !ready[t[0]]) return null;
-      var a = el("a", { class: cls, html: ICON, href: taskHref(t),
+      var a = el("a", { class: cls, html: ICON, href: taskHref(key),
         "aria-label": content + " – eksamensoppgave " + taskName(t) + ", " + t[5] + " poeng" },
         el("span", { text: content }));
       return el("span", { class: "a4-tw" }, [a, el("span", { class: "a4-tip", "aria-hidden": "true", text: taskName(t) + " (" + t[5] + " p)" })]);
@@ -337,71 +287,36 @@
     topicHost.appendChild(el("p", { class: "a4-rare", text: "Sjeldne: P og NP (2020 og 2021) og stakk (2020)." }));
 
     // ===== Oppgavekart =====
-    // [år, oppgavenr. (tom = unummerert), tittel, poeng, side, fane, nøkkel i X når oppgaven er løst på siden]
-    // Settene trykker ingen oppgavenumre. Vi teller oppvarmingen som «Oppgave 1» alle år (H2020–H2025).
-    // side = null: ingen side tar for seg oppgaven (vises som ren tekst).
-    var TASKS = [
-      ["H20", "1",  "Oppvarming", 2, "begreper", "algoritme"],
-      ["H20", "2",  "Binære søketrær", 4, "traer", "bst", "t20bst"],
-      ["H20", "3",  "Grafegenskaper", 8, "grafer", "begreper", "g20eg"],
-      ["H20", "4",  "Linear probing", 2, "hashing", "probing", "x20lp"],
-      ["H20", "5",  "Søk", 12, "sok", "sortersok", "k20int"],
-      ["H20", "6",  "AVL-innsetting", 9, "traer", "avl", "t20avl"],
-      ["H20", "7",  "Subanagrammer: kjøretid, frekvenstabell, strategi (a–c)", 17, "hashing", "triks", "x20sub"],
-      ["H20", "7d", "SortSubanagrams (bøttesortering)", 6, "sortering", "bucket", "s20sub"],
-      ["H20", "8",  "Type 2-grafer: NP, stier, Kruskal, korteste vei (a–h)", 38, "grafer", "mst", "g20t2"],
-      ["H20", "9",  "Velformaterte tagger (stakk)", 12, "lister", "stakk", "l20tag"],
-      ["H21", "1",  "Oppvarming", 2, "begreper", "algoritme"],
-      ["H21", "2",  "Stabilitet", 3, "sortering", "bucket", "s21stab"],
-      ["H21", "3",  "Litt sortering (sant/usant)", 10, "sortering", "test", "s21tf"],
-      ["H21", "4",  "Binære heaps", 6, "heap", "removemin", "h21bin"],
-      ["H21", "5",  "Huffman-trær", 5, "traer", "huffman", "t21huf"],
-      ["H21", "6",  "Litt om beregnbarhet og kompleksitet", 8, "strategi", "pnp", "p21pnp"],
-      ["H21", "7",  "Korteste avstander i grafer", 8, "grafer", "dijkstra", "g21dij"],
-      ["H21", "8",  "Intervall i et binært søketre", 10, "traer", "bst", "t21rng"],
-      ["H21", "9",  "Flest forekomster (hashing)", 8, "hashing", "triks", "x21frek"],
-      ["H21", "10", "Par som summerer til x", 10, "sok", "triks", "k21par"],
-      ["H21", "11", "To-fargelegge en graf", 10, "grafer", "dfs", "g21to"],
-      ["H21", "12", "Whops!-oppgjør", 10, "grafer", "sammenheng", "g21opp"],
-      ["H21", "13", "Whops!-logger", 10, "grafer", "topologisk", "g21log"],
-      ["H22", "1",  "Oppvarming", 2, "begreper", "algoritme"],
-      ["H22", "2",  "Litt av hvert", 10, "strategi", "kjoretid", "p22tf"],
-      ["H22", "3",  "Grafegenskaper", 10, "grafer", "begreper", "g22eg"],
-      ["H22", "4",  "Balanserte søketrær (AVL)", 6, "traer", "avl", "t22avl"],
-      ["H22", "5",  "Prioritetskøer og heaper (sant/usant)", 10, "heap", "test", "h22tf"],
-      ["H22", "6",  "Kjøretid på grafalgoritmer", 8, "grafer", "begreper", "g22kj"],
-      ["H22", "7",  "Linear probing", 10, "hashing", "probing", "x22lp"],
-      ["H22", "8",  "Garbage collection", 8, "grafer", "dfs", "g22gc"],
-      ["H22", "9",  "Autofullføring (prefikstre mot hashmap)", 6, "traer", "huffman", "t22auto"],
-      ["H22", "10", "Bucket queue (bøttekø)", 10, "heap", "pk", "h22bq"],
-      ["H22", "11", "Er binærtreet et søketre?", 10, "traer", "bst", "t22chk"],
-      ["H22", "12", "Minimal forside", 10, "grafer", "scc", "g22fs"],
-      ["H23", "1", "Oppvarming", 2, "begreper", "algoritme"],
-      ["H23", "2", "Innsetting i heap", 10, "heap", "innsetting", "h23ins"],
-      ["H23", "3", "Finn duplikat", 12, "sok", "duplikat", "k23dup"],
-      ["H23", "4", "Gnome sort", 10, "sortering", "gnome", "s23gno"],
-      ["H23", "5", "Diameteren til et tre", 12, "traer", "diameter", "t23dia"],
-      ["H23", "6", "Blindern-problemet (MST)", 10, "grafer", "mst", "g23bl"],
-      ["H23", "7", "Dependency hell (sykel/DAG)", 12, "grafer", "sykler", "g23dep"],
-      ["H24", "1", "Oppvarming", 2, "begreper", "algoritme"],
-      ["H24", "2", "Huffman-trær", 10, "traer", "huffman", "t24huf"],
-      ["H24", "3", "Etymologisk ordliste (bøttesortering)", 10, "sortering", "bucket", "s24ety"],
-      ["H24", "4", "Jazz eller klassisk? (BFS ≤ k)", 10, "grafer", "bfs", "g24jz"],
-      ["H24", "5", "Python 3.6-dict", 10, "hashing", "python", "x24py"],
-      ["H24", "6", "Laveste felles forfeder (LCA)", 12, "traer", "lca", "t24lca"],
-      ["H24", "7", "Mediankø (to heaper)", 12, "heap", "median", "h24med"],
-      ["H24", "8", "Rundtur med DNT (SCC/Dijkstra)", 12, "grafer", "scc", "g24dnt"],
-      ["H25", "1", "Oppvarming", 2, "begreper", "algoritme"],
-      ["H25", "2", "Separate chaining", 10, "hashing", "chaining", "x25ch"],
-      ["H25", "3", "Sykler i grafer", 11, "grafer", "sykler", "g25syk"],
-      ["H25", "4", "Anti-AVL", 12, "traer", "antiavl", "t25anti"],
-      ["H25", "5", "Level-order (heap/BST)", 12, "heap", "levelorder", "h25lvl"],
-      ["H25", "6", "Finn k minste", 12, "sok", "kminste", "k25kmin"],
-      ["H25", "7", "Kollektivtilbudet i Oslo", 15, "grafer", "mst", "g25kol"]
-    ];
+    // Bygget fra kortregisteret X: én rad per eksamensoppgave med kort, pluss oppvarmingen («Oppgave 1») hvert år.
+    // Rad: [år, oppgavenr., navn i kartet, poeng, side, fane, nøkkel i X]. Settene trykker ingen oppgavenumre.
+    // Samme oppgave på to sider (samme år og nr.) vises én gang: den første i registeret.
+    var YEARS = ["H20", "H21", "H22", "H23", "H24", "H25"];
+    var IKKE_I_KART = { p20ver: 1 };   // H2020 8 (a–b) på Strategi: delen av oppgave 8, som står under Grafer
+    // Navn i kartet når det skal si mer enn korttittelen (hva oppgaven handler om)
+    var NAVN = {
+      x20sub: "Subanagrammer: kjøretid, frekvenstabell, strategi (a–c)", s20sub: "SortSubanagrams (bøttesortering)",
+      g20t2: "Type 2-grafer: NP, stier, Kruskal, korteste vei (a–h)", s21tf: "Litt sortering (sant/usant)",
+      g21dij: "Korteste avstander i grafer", t21rng: "Intervall i et binært søketre", x21frek: "Flest forekomster (hashing)",
+      k21par: "Par som summerer til x", h22tf: "Prioritetskøer og heaper (sant/usant)", t22auto: "Autofullføring (prefikstre mot hashmap)",
+      t22chk: "Er binærtreet et søketre?", t23dia: "Diameteren til et tre", g23bl: "Blindern-problemet (MST)",
+      g23dep: "Dependency hell (sykel/DAG)", t24huf: "Huffman-trær", s24ety: "Etymologisk ordliste (bøttesortering)",
+      g24jz: "Jazz eller klassisk? (BFS ≤ k)", x24py: "Python 3.6-dict", t24lca: "Laveste felles forfeder (LCA)",
+      h24med: "Mediankø (to heaper)", g24dnt: "Rundtur med DNT (SCC/Dijkstra)", h25lvl: "Level-order (heap/BST)"
+    };
+    var TASKS = YEARS.map(function (y) { return [y, "1", "Oppvarming", 2, "begreper", "algoritme"]; });
+    var seen = {};
+    Object.keys(X).forEach(function (k) {
+      var t = X[k], y = "H" + t[2].slice(3), id = y + "-" + t[3];
+      if (IKKE_I_KART[k] || seen[id] || YEARS.indexOf(y) < 0) return;
+      seen[id] = 1;
+      TASKS.push([y, t[3], NAVN[k] || t[4], t[5], t[0], t[1], k]);
+    });
+    TASKS.sort(function (a, b) {
+      return YEARS.indexOf(a[0]) - YEARS.indexOf(b[0]) || parseInt(a[1], 10) - parseInt(b[1], 10) || (a[1] < b[1] ? -1 : a[1] > b[1] ? 1 : 0);
+    });
     var DEL1 = { H23: 32, H24: 22, H25: 26 };   // egen del 1 sant/usant (fra 2023), poeng per år
     var mapHost = IN.qs("#task-map");
-    ["H20", "H21", "H22", "H23", "H24", "H25"].forEach(function (y) {
+    YEARS.forEach(function (y) {
       var ol = el("ol");
       TASKS.filter(function (r) { return r[0] === y; }).forEach(function (r, i) {
         var name;

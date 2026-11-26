@@ -166,7 +166,8 @@
         tekst: "<p>Først slår vi sammen kantmengdene og beholder den letteste kanten for hvert par. Så kjører vi Dijkstra fra A:</p>" +
           tab(["Node", "A", "B", "C", "D", "E", "F", "G", "H"], [["Avstand fra A", "0", "2", "2", "1", "4", "7", "8", "10"]]) +
           "<ul><li>D: A–D (1)</li><li>B: A–D–B (1 + 1)</li><li>C: A–D–C (1 + 1). Kanten A–C har vekt 3, så den er dårligere.</li><li>E: A–D–E (1 + 3)</li>" +
-          "<li>F: A–D–E–F (4 + 3). Kanten A–F har vekt 8.</li><li>G: A–D–E–F–G (7 + 1)</li><li>H: A–H (10). Via G blir det 8 + 3 = 11, og via E 4 + 8 = 12.</li></ul>",
+          "<li>F: A–D–E–F (4 + 3). Kanten A–F har vekt 8.</li><li>G: A–D–E–F–G (7 + 1)</li><li>H: A–H (10). Via G blir det 8 + 3 = 11, og via E 4 + 8 = 12.</li></ul>" +
+          "<p>Kjøretid: Dijkstra er O((|V| + |E|) · log(|V|)). E1 gir alle par en kant med vekt 10, så den sammenslåtte grafen er komplett med |E| = |V| · (|V| − 1) / 2 (28 kanter her). I det generelle tilfellet blir det O(|V|² · log(|V|)).</p>",
         fasitVerdi: "A 0, B 2, C 2, D 1, E 4, F 7, G 8, H 10",
         poeng: ["riktig avstand til alle åtte nodene"] }
     ],

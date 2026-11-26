@@ -146,7 +146,7 @@
     svar: [{
       tekst: "<p>Det første kravet er en topologisk ordning, så vi bruker kursets topologiske sortering med inngrader. Det andre kravet løser vi ved å bytte ut stakken med en <b>prioritetskø ordnet på v.ts</b>. Blant nodene som er klare (alle forgjengerne er skrevet ut), tar vi alltid den med minst tidsstempel. Da brytes aldri det første kravet, og tidsstemplene kommer så tidlig som mulig.</p>",
       kode: "logSort",
-      etter: "<p>For eksempelet blir utskriften A1, B2, A4, C3, C5, B6, altså «A sent 50 to B at 1», «B received 50 from A at 2», «A sent 100 to C at 4», «C received 100 from A at 3», «C sent 200 to B at 5», «B received 200 from C at 6». C3 må vente på A4 på grunn av kanten A4 → C3, selv om tidsstempelet er lavere.</p>",
+      etter: "<p>For eksempelet blir utskriften A1, B2, A4, C3, C5, B6, altså «A sent 50 to B at 1», «B received 50 from A at 2», «A sent 100 to C at 4», «C received 100 from A at 3», «C sent 200 to B at 5», «B received 200 from C at 6». I starten er bare A1 klar. Den gjør B2 og A4 klare, og B2 tas først fordi den har lavest ts. Så kommer A4, som gjør C3 klar, og deretter C3, C5 og B6. C3 må vente på A4 på grunn av kanten A4 → C3, selv om tidsstempelet er lavere.</p>",
       kjoretid: "O((|V| + |E|) · log(|V|)): hver node settes inn og tas ut av heapen én gang, O(log |V|) hver, og hver kant telles ned én gang",
       fasitVerdi: "A1, B2, A4, C3, C5, B6",
       poeng: ["topologisk sortering (krav 1)", "heap ordnet på ts i stedet for stakk (krav 2)", "kjøretid O((|V| + |E|) · log(|V|))"] }],
@@ -178,7 +178,7 @@
     ["Grafen har to komponenter", "Ingen", "Begge er sammenhengende, altså én komponent."],
     ["Grafen er rettet", "Ingen", "Ingen av grafene har piler."],
     ["Grafen inneholder en sykel", "G2", "C – E – F – C."],
-    ["Grafen blir ett tre hvis vi fjerner én kant", "G2", "Fjerner vi en kant fra sykelen C – E – F, blir G2 et tre. (Tatt ut av vurderingen.)"],
+    ["Grafen blir ett tre hvis vi fjerner én kant", "G2", "Fjerner vi en kant fra sykelen C – E – F, blir G2 et tre. (Tatt ut av vurderingen fordi formuleringen var uklar.)"],
     ["Grafen er en enkel graf", "Begge", "Ingen løkker og ingen parallelle kanter."]];
   P["H2022-3"] = {
     type: "eksamen",
@@ -197,7 +197,7 @@
 
   /* ---------- H2022 · Oppgave 6 · Kjøretid på grafalgoritmer (8 poeng) ---------- */
   var H22_6 = [["DFSFull", "O(|V| + |E|)", "Hver node besøkes én gang, og hver kant sjekkes fra hver ende."],
-    ["Prim", "O((|V| + |E|) · log(|V|))", "Hver kant går inn og ut av en prioritetskø à O(log |V|)."],
+    ["Prim", "O((|V| + |E|) · log(|V|))", "Hver kant går inn og ut av en prioritetskø à O(log |V|). Grafen er sammenhengende, så kurset skriver også O(|E| · log(|V|))."],
     ["TopSort", "O(|V| + |E|)", "Hver node og hver kant behandles én gang."],
     ["BellmanFord", "O(|V| · |E|)", "|V| − 1 runder over alle kantene."]];
   P["H2022-6"] = {
@@ -219,7 +219,7 @@
   P["H2022-8"] = {
     type: "eksamen",
     svar: [{
-      tekst: "<p>Et objekt skal beholdes hvis og bare hvis det kan nås fra et objekt i R. Vi kjører derfor kursets <b>DFSVisit</b> fra hvert objekt i R, med én felles visited. Etterpå inneholder visited nøyaktig de objektene som kan nås fra R. Så går vi gjennom V og kaller Free på alle som ikke er i visited.</p>",
+      tekst: "<p>Et objekt skal beholdes hvis og bare hvis det kan nås fra et objekt i R. Vi kjører derfor kursets <b>DFSVisit</b> fra hvert objekt i R, med én felles visited (et bredde-først søk med alle i R som startnoder virker like godt). Etterpå inneholder visited nøyaktig de objektene som kan nås fra R. Så går vi gjennom V og kaller Free på alle som ikke er i visited.</p>",
       kode: "garbageCollect",
       etter: "<p>Objekter som peker på hverandre i ring, men som ingen rot når, blir også frigjort. Det er et poeng med å merke det som kan nås, i stedet for å telle referanser.</p>",
       kjoretid: "O(|V| + |E|): søkene deler visited, så hver node og kant behandles høyst én gang, og løkka over V er O(|V|)",
@@ -270,7 +270,7 @@
     type: "eksamen",
     svar: [
       { del: "(a)", tekst: "<ul><li><b>Urettet og vektet.</b> En tunnel kan gås begge veier, og hver har en kostnad. Siden alle par er kartlagt, er grafen komplett.</li><li><b>Nodene</b> er bygningene.</li><li><b>Kantene</b> er mulige tunneler mellom to bygninger, med kostnaden for å grave som vekt.</li></ul>", poeng: ["urettet, vektet (komplett) graf", "noder = bygninger, kanter = tunneler med kostnad"] },
-      { del: "(b)", tekst: "<p>Vi vil ha billigst mulig kantmengde som kobler sammen alle nodene: et <b>minimalt spenntre</b>. Vi bruker <b>Prims algoritme</b>.</p>" +
+      { del: "(b)", tekst: "<p>Vi vil ha billigst mulig kantmengde som kobler sammen alle nodene: et <b>minimalt spenntre</b>. Vi bruker <b>Prims algoritme</b> (Kruskal virker like godt).</p>" +
           "<ul><li><b>Datastrukturer:</b> en prioritetskø (min-heap) med kanter ordnet på vekt, og en ordbok parents som sier hvilke noder som er med i treet (og via hvilken kant).</li>" +
           "<li><b>Slik virker den:</b> start i en vilkårlig bygning. Legg kantene ut fra den i køen. Ta ut den billigste kanten. Går den til en bygning som ikke er med i treet, tar vi den med og legger kantene ut fra den nye bygningen i køen. Går den til en bygning som alt er med, kaster vi den. Når køen er tom, er alle med.</li>" +
           "<li><b>Kjøretid:</b> O((|V| + |E|) · log(|V|)) = O(|E| · log(|V|)). Grafen er komplett, så det er O(|V|² · log(|V|)).</li></ul>",
@@ -304,7 +304,7 @@
   P["H2023-7"] = {
     type: "eksamen",
     svar: [
-      { del: "(a)", tekst: "<p>Vi bruker kursets topologiske sortering med inngrader, men teller bare hvor mange noder som blir behandlet. Først legges alle noder med inngrad 0 på en stakk. Så tar vi ut én node om gangen og teller ned inngraden til naboene. En nabo som får inngrad 0, legges på stakken. Noder på en sykel får aldri inngrad 0, så hvis ikke alle nodene blir behandlet, finnes det en sykel.</p>",
+      { del: "(a)", tekst: "<p>Vi bruker kursets topologiske sortering med inngrader, men teller bare hvor mange noder som blir behandlet. Først legges alle noder med inngrad 0 på en stakk. Så tar vi ut én node om gangen og teller ned inngraden til naboene. En nabo som får inngrad 0, legges på stakken. Noder på en sykel får aldri inngrad 0, så hvis ikke alle nodene blir behandlet, finnes det en sykel. Andre lineære løsninger er å se etter en sterkt sammenhengende komponent med mer enn én node, eller et dybde-først søk med tre tilstander (uoppdaget, under behandling, ferdig).</p>",
         kode: "hasCycleDirected", fasitVerdi: "true",
         kjoretid: "O(|V| + |E|): hver node og hver kant behandles høyst én gang",
         poeng: ["en godt beskrevet algoritme i O(|V| + |E|), med forklaring av topologisk sortering"] },
@@ -417,11 +417,11 @@
   P["H2025-3"] = {
     type: "eksamen",
     svar: [
-      { del: "(a)", tekst: "<p>Dybde-først søk fra hver node vi ikke har besøkt (grafen kan ha flere komponenter). Finner vi en nabo som alt er besøkt, og som <b>ikke er forelderen</b> vi kom fra, har vi funnet en sykel. Forelderen må hoppes over, fordi kanten {p, u} står i nabolista til u i en urettet graf.</p>",
+      { del: "(a)", tekst: "<p>Dybde-først søk fra hver node vi ikke har besøkt (grafen kan ha flere komponenter). Finner vi en nabo som alt er besøkt, og som <b>ikke er forelderen</b> vi kom fra, har vi funnet en sykel. Forelderen må hoppes over, fordi kanten {p, u} står i nabolista til u i en urettet graf. Et alternativ er å telle komponentene c: grafen har en sykel hvis og bare hvis |E| &gt; |V| − c.</p>",
         kode: CYC_U, fig: pfig(CYC_F), fasitVerdi: "true",
         kjoretid: "O(|V| + |E|), som DFSFull",
         poeng: ["DFS som oppdager en besøkt nabo", "unntaket for forelderen", "O(|V| + |E|), godt formidlet med pseudokode"] },
-      { del: "(b)", tekst: "<p>Topologisk sortering med inngrader, der vi bare teller hvor mange noder som blir behandlet. Noder på en sykel får aldri inngrad 0. Blir ikke alle nodene behandlet, finnes det en sykel.</p>",
+      { del: "(b)", tekst: "<p>Topologisk sortering med inngrader, der vi bare teller hvor mange noder som blir behandlet. Noder på en sykel får aldri inngrad 0. Blir ikke alle nodene behandlet, finnes det en sykel. Andre lineære løsninger er et dybde-først søk med tre tilstander, eller å se etter en sterkt sammenhengende komponent med mer enn én node.</p>",
         kode: CYC_D, fasitVerdi: "true",
         kjoretid: "O(|V| + |E|)",
         poeng: ["topologisk sortering som oppdager sykler", "O(|V| + |E|), godt formidlet med pseudokode"] }
@@ -458,13 +458,13 @@
     type: "eksamen",
     svar: [
       { del: "(a)", tekst: "<ul><li><b>Sammenhengende:</b> du kan reise mellom to vilkårlige holdeplasser med kollektivtilbudet.</li><li><b>Urettet:</b> har du reist en strekning, kan du alltid reise samme strekning tilbake.</li></ul>", poeng: ["begge egenskapene forklart for en reisende"] },
-      { del: "(b)", tekst: "<p>Strekninger med reisetid <b>over</b> k er stengt. Vi gjør et dybde-først søk fra en vilkårlig holdeplass og bruker bare kanter med w(u, v) ≤ k. Når alle holdeplassene nås, er det mulig å reise mellom alle par.</p>",
+      { del: "(b)", tekst: "<p>Strekninger med reisetid <b>over</b> k er stengt. Vi gjør et dybde-først søk (bredde-først virker like godt) fra en vilkårlig holdeplass og bruker bare kanter med w(u, v) ≤ k. Når alle holdeplassene nås, er det mulig å reise mellom alle par.</p>",
         kode: PC("CheckConnected", "G, k", "En sammenhengende, urettet og vektet graf G = (V, E) og en grense k", "true hvis alle holdeplassene henger sammen uten strekningene med vekt over k",
           [[1, "s ← an arbitrary node in V"], [1, "visited ← empty set"], [1, "add s to visited"], [1, "stack ← stack containing only s"], [1, "while stack is not empty do"], [2, "u ← stack.pop()"], [2, "for (u, v) ∈ E do"],
            [3, "if w(u, v) ≤ k and v ∉ visited then"], [4, "add v to visited"], [4, "stack.push(v)"], [1, "return |visited| = |V|"]]),
         kjoretid: "O(|V| + |E|), og siden G er sammenhengende er |V| ≤ |E| + 1, så O(|E|)",
         poeng: ["DFS som ignorerer kanter med vekt over k", "sjekk at alle nodene ble nådd", "O(|E|)"] },
-      { del: "(c)", tekst: "<p>Den minste k som virker, er den <b>største kantvekten i et minimalt spenntre</b>. Et minimalt spenntre minimerer også den tyngste kanten som trengs for å holde grafen sammen. Vi finner treet med Prim og tar den største vekten blant kantene.</p>",
+      { del: "(c)", tekst: "<p>Den minste k som virker, er den <b>største kantvekten i et minimalt spenntre</b>. Et minimalt spenntre minimerer også den tyngste kanten som trengs for å holde grafen sammen. Vi finner treet med Prim og tar den største vekten blant kantene. (Et alternativ er å sortere kantvektene og binærsøke etter den minste k der CheckConnected fra (b) svarer true.)</p>",
         kode: PC("FindMinimalK", "G", "En sammenhengende, urettet og vektet graf G = (V, E)", "Den minste k som gjør at CheckConnected(G, k) svarer true",
           [[1, "parents ← Prim(G)"], [1, "k ← 0"], [1, "for v ∈ V do"], [2, "if parents[v] ≠ null then"], [3, "k ← Max(k, w(parents[v], v))"], [1, "return k"]]),
         kjoretid: "O(|E| · log(|V|)) for Prim, pluss O(|V|) for løkka",

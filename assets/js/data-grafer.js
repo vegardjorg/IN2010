@@ -88,9 +88,16 @@
     // To komponenter: et tre og en komponent med sykel
     skog: { directed: false,
       nodes: [N("A", 40, 40), N("B", 150, 40), N("C", 95, 140), N("D", 260, 40), N("E", 370, 40), N("F", 315, 140)],
-      edges: [["A", "B"], ["A", "C"], ["D", "E"], ["D", "F"], ["E", "F"]] }
+      edges: [["A", "B"], ["A", "C"], ["D", "E"], ["D", "F"], ["E", "F"]] },
+    // H2020 oppg. 8 (a) og (d): egen eksempelgraf med den hamiltonske sykelen A, B, C, D, E, F og to korder.
+    // Delt av kort/grafer.js (06-grafer) og kort/strategi.js (07-strategi).
+    hex: { directed: false,
+      nodes: [N("A", 150, 10), N("B", 255, 70), N("C", 255, 190), N("D", 150, 250), N("E", 45, 190), N("F", 45, 70)],
+      edges: [["A", "B"], ["B", "C"], ["C", "D"], ["D", "E"], ["E", "F"], ["F", "A"], ["A", "D"], ["B", "E"]] }
   };
-  IN.grafer = { G: GR, adj: adj, ids: ids, reverse: reverse };
+  // Fargeforklaring til Type2Verifier-demoen (grType2), delt av kort/grafer.js og kort/strategi.js
+  var LEG_T2 = [{ cls: "compare", label: "Kanten vi sjekker" }, { cls: "target", label: "Kanten finnes i G" }, { cls: "sorted", label: "Sjekket" }, { cls: "swap", label: "Kanten mangler: NEI" }];
+  IN.grafer = { G: GR, adj: adj, ids: ids, reverse: reverse, LEG_T2: LEG_T2 };
 
   /* ===================== BFS ===================== */
   reg(IN.algos, "bfsVisit", {

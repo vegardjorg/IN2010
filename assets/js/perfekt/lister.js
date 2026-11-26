@@ -32,7 +32,7 @@
       },
       {
         del: "(b)",
-        tekst: "<p>Nå holder det ikke å telle. Vi må vite <i>hvilken</i> tagg som sist ble åpnet, for det er den neste lukketagg må passe med. Den sist åpnede skal lukkes først: det er LIFO, så vi bruker en <b>stakk</b>.</p>" +
+        tekst: "<p>Nå holder det ikke med én felles teller: da ville for eksempel <code>&lt;div&gt; &lt;/p&gt;</code> sluppet gjennom. Vi må vite <i>hvilken</i> tagg som sist ble åpnet, for det er den neste lukketagg må passe med. Den sist åpnede skal lukkes først: det er LIFO, så vi bruker en <b>stakk</b>.</p>" +
           "<ul><li>Er taggen en åpnetagg (<span class=\"mono\">isOpen(tag)</span>), legger vi den på stakken med push.</li>" +
           "<li>Er den en lukketagg, må stakken ikke være tom, og taggen vi popper, må ha samme type: <span class=\"mono\">TagType(s.pop()) = TagType(tag)</span>. Ellers returnerer vi false.</li>" +
           "<li>Til slutt er taggene velformaterte bare hvis stakken er tom.</li></ul>" +

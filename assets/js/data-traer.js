@@ -362,7 +362,7 @@
 
   /* ============================================================
      ITERATIVE TRAVERSERINGER (egen stakk i stedet for kallstakken)
-     Bygger på ukesoppgavene til Forelesning 03 («skriv om uten rekursjon»),
+     Bygger på ukesoppgavene om balanserte søketrær («skriv om uten rekursjon»),
      med samme løsningsidé: preorder med én stakk (høyre før venstre),
      postorder med to stakker, inorder med en markør v og én stakk.
      ============================================================ */
@@ -436,7 +436,7 @@
       { code: "Push(S, v)", indent: 3,
         eli5: "Vi kan ikke hilse på noden ennå, for alt til venstre skal komme først. Vi legger den i bunken så vi finner tilbake.",
         normal: "Legg v på stakken. Vi må tilbake hit når venstre subtre er ferdig.",
-        teknisk: "Stakken tar vare på v til venstre subtre er ferdig. Det er dette hintet i ukesoppgave 3 peker mot." },
+        teknisk: "Stakken tar vare på v til venstre subtre er ferdig. Det er dette hintet i ukesoppgavene om balanserte søketrær peker mot." },
       { code: "v ← v.left", indent: 3,
         eli5: "Så går vi ett steg ned til venstre.",
         normal: "Gå til venstre barn. Det kan være null.",
@@ -522,7 +522,7 @@
     bigO: { best: "O(n)", avg: "O(n)", worst: "O(n)", space: "O(n)",
       why: t("Hver node går gjennom begge bunkene én gang. Men den andre bunken må holde alle nodene før vi kan begynne å hilse.",
              "Hver node pushes og poppes én gang på S og én gang på R: O(n). R inneholder alle n nodene etter første løkke, så ekstra minne er O(n), mer enn O(h) for den rekursive Postorder.",
-             "2n Push og 2n Pop à O(1) gir O(n). S alene er O(h), men R må holde alle n nodene før første Visit, så totalt O(n) minne. Det finnes varianter med én stakk og O(h) minne, men de er mer fiklete. To stakker er det kursets ukesoppgave foreslår.") }
+             "2n Push og 2n Pop à O(1) gir O(n). S alene er O(h), men R må holde alle n nodene før første Visit, så totalt O(n) minne. Det finnes varianter med én stakk og O(h) minne, men de er mer fiklete. To stakker er det ukesoppgavene om balanserte søketrær foreslår.") }
   });
 
   /* ============================================================

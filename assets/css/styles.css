@@ -1690,8 +1690,6 @@ body[data-page="strategi"] .bigo-compact .bigo-val { white-space: normal; overfl
 /* Operasjonstabell og liten stakk/kø-lab */
 .ls-ops td, .ls-ops th { text-align: center; white-space: nowrap; }
 .ls-ops td:first-child, .ls-ops th:first-child { text-align: left; white-space: normal; }
-.ls-ops .o1 { color: var(--c-sorted); font-weight: 700; }
-.ls-ops .on { color: var(--c-swap); font-weight: 700; }
 .cmp-table.ls-prose td, .cmp-table.ls-prose th { white-space: normal; min-width: 7rem; vertical-align: top; }
 .ls-ops.drill td.v { cursor: pointer; }
 .ls-ops.drill td.v:not(.shown) { color: transparent; background: var(--color-surface-container-high); }

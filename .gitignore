@@ -27,3 +27,6 @@ desktop.ini
 
 # Node (hvis verktøy legges til senere)
 node_modules/
+
+# Kildedata: ikke koblet inn ennå (genereres av plan/kildebank)
+assets/js/data-kilder.js

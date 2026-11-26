@@ -204,7 +204,8 @@
     svar: [
       {
         del: "(a)",
-        tekst: "<p><b>O(n) med to pekere.</b> La i starte på 0 og j på n − 1. Så lenge i &lt; j: er A[i] + A[j] for stor, flytt j ett steg mot venstre. Er summen for liten, flytt i ett steg mot høyre. Er den lik x, skriv ut paret og flytt i (da blir neste sum for stor, og j flyttes i neste runde). Det virker fordi A er sortert: å flytte j gjør summen mindre, og å flytte i gjør den større.</p>",
+        tekst: "<p><b>O(n) med to pekere.</b> La i starte på 0 og j på n − 1. Så lenge i &lt; j: er A[i] + A[j] for stor, flytt j ett steg mot venstre. Er summen for liten, flytt i ett steg mot høyre. Er den lik x, skriv ut paret og flytt i (da blir neste sum for stor, og j flyttes i neste runde). Det virker fordi A er sortert: å flytte j gjør summen mindre, og å flytte i gjør den større.</p>" +
+          "<p>En dobbel løkke som prøver alle par, virker i både (a) og (b), men den er O(n²) og gir mye mindre uttelling.</p>",
         kode: "findSummandsSorted",
         kjoretid: "O(n)",
         fasitVerdi: "(0, 10), (2, 8), (4, 6)",

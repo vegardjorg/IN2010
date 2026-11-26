@@ -157,7 +157,7 @@
         poeng: ["oppslag via indices inn i entries (2p)", "innsetting: indices[i] ← størrelsen av entries, så legg paret bakerst (2p)"] },
       { del: "(b)",
         tekst: "<p>En rehash lager et større underliggende array og setter inn alle elementene på nytt med innsettingsalgoritmen til Linear probing, fordi hjemmeplassen h(k, N) avhenger av N. " +
-          "Den utløses når Load factor n/N blir for høy, altså når det er lite ledig plass igjen og probingen blir lang. (Kurset dobler N.)</p>",
+          "Den utløses når Load factor n/N blir for høy, altså når det er lite ledig plass igjen og probingen blir lang. (Kurset dobler N, og kursnotatet rehasher når n/N når 0,75.)</p>",
         poeng: ["hva en rehash er (1p)", "at høy Load factor n/N utløser den (1p)"] },
       { del: "(c)",
         tekst: "<p><code>entries</code> forblir uendret. Vi lager et større <code>indices</code> og setter inn hver indeks j på nytt med h(entries[j].key, N) og Linear probing. Vi legger ikke noe til i entries.</p>",
@@ -207,7 +207,7 @@
     type: "skjonn",
     svar: [
       { tekst: "<ul>" +
-          "<li><b>Antagelser.</b> Hashmapet er implementert med Linear probing eller Separate chaining slik i kurset, og hashfunksjonen sprer tallene godt. A har n ≥ 1 positive heltall, og k er det største tallet i A.</li>" +
+          "<li><b>Antagelser.</b> Hashmapet er implementert med Linear probing eller Separate chaining slik i kurset, og hashfunksjonen sprer tallene godt. A har n ≥ 1 positive heltall, så tallene kan brukes direkte som indekser i B, og k er det største tallet i A.</li>" +
           "<li><b>Strategi 1 (hashmap).</b> To løkker med n runder, og hver runde gjør et par put og get. Hver av dem er forventet O(1), så forventet kjøretid er <b>O(n)</b>. I verste tilfelle kan alle tallene havne på samme plass, så hver operasjon blir O(n), og totalt <b>O(n²)</b>. Kjøretiden avhenger ikke av k.</li>" +
           "<li><b>Strategi 2 (telle-array).</b> Å finne k er O(n), å lage og nullstille B er O(k), og den siste løkka er O(n). Totalt <b>O(n + k)</b>, både i verste og forventet tilfelle, fordi det ikke er noen hashing. Den bruker O(k) ekstra minne.</li>" +
           "<li><b>Når Strategi 2?</b> Når k ikke er stor, for eksempel k &lt; n. Da er begge lineære, men arrayoperasjonene har lavere konstantfaktorer enn hashing, som må regne hashverdier, håndtere kollisjoner og rehashe. Strategi 2 har heller ingen dårlig verste tilfelle.</li>" +

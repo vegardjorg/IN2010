@@ -90,7 +90,7 @@
       return m ? m[1] : null;
     }
   };
-  var LEG_T2 = [{ cls: "compare", label: "Kanten vi sjekker" }, { cls: "target", label: "Kanten finnes i G" }, { cls: "sorted", label: "Sjekket" }, { cls: "swap", label: "Kanten mangler: NEI" }];
+  var LEG_T2 = IN.grafer.LEG_T2;   // delt med kort/strategi.js (data-grafer.js)
   var LEG_2P = [{ cls: "target", label: "Sti 1 (framover i C)" }, { cls: "min", label: "Sti 2 (bakover i C)" }, { cls: "compare", label: "Nå" }, { cls: "sorted", label: "Skrevet ut" }];
   var LEG_GC = [{ cls: "compare", label: "Nå / kanten vi følger" }, { cls: "target", label: "Rot i R (ikke besøkt ennå)" }, { cls: "sorted", label: "Kan nås fra R (visited)" }, { cls: "swap", label: "Frigjort (Free)" }];
   var LEG_2C = [{ cls: "compare", label: "Nå / kanten vi sjekker" }, { color: DASH, label: "På stakken" }, { label: "Rød (R)", color: "var(--gv-c1)" }, { label: "Blå (B)", color: "var(--gv-c0)" }, { cls: "swap", label: "Naboer med samme farge" }];
@@ -111,9 +111,8 @@
   var T3 = sq([["A", "C"], ["A", "D"], ["B", "D"]], 3);
   var T4 = sq([["A", "D"], ["B", "C"]], 1);
   var S20 = sq([["A", "B", 8], ["C", "D", 8], ["A", "C", 3], ["B", "D", 3], ["A", "D", 1], ["B", "C", 1]]);
-  // H2020 oppg. 8 (a) og (d): egen eksempelgraf med den hamiltonske sykelen A, B, C, D, E, F og to korder
-  var HEX = { directed: false, nodes: [N("A", 150, 10), N("B", 255, 70), N("C", 255, 190), N("D", 150, 250), N("E", 45, 190), N("F", 45, 70)],
-    edges: [["A", "B"], ["B", "C"], ["C", "D"], ["D", "E"], ["E", "F"], ["F", "A"], ["A", "D"], ["B", "E"]] };
+  // H2020 oppg. 8 (a) og (d): egen eksempelgraf med den hamiltonske sykelen A, B, C, D, E, F og to korder (delt, data-grafer.js)
+  var HEX = GR.hex;
   // H2020 oppg. 8 (h): E1–E4 slått sammen (letteste kant per par; alle andre par har vekt 10 fra E1)
   var OCT = (function () {
     var pos = { A: [200, 20], B: [292, 58], C: [330, 150], D: [292, 242], E: [200, 280], F: [108, 242], G: [70, 150], H: [108, 58] }, V = "ABCDEFGH".split(""), w = {};

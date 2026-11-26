@@ -4,7 +4,7 @@
    dynamisk array (PushBack, EnsureCapacity, PopBack, Add, Remove),
    enkelt- og dobbeltlenket liste (NodeAt, InsertAfter, RemoveAfter,
    RemoveNode), velformaterte tagger (H2020 oppgave 9) og «nylige søk»
-   (ukesoppgave 08, ofte kalt LRU-cache).
+   (fra ukesoppgavene om hashing, ofte kalt LRU-cache).
    Alle nøkler har prefikset «ls». Steg tegnes av viz-list.js.
    Demoer med flere pseudokoder bruker linjenummer 100·a + linje.
    Pseudokoden følger notasjonen i forelesning 1 (D.A, D.n, |D.A|, L.first).
@@ -343,7 +343,7 @@
         "O(n) tid: n runder med O(1)-operasjoner (push, pop, isOpen, TagType). O(n) ekstra minne i verste tilfelle (bare åpnetagger).") }
   });
 
-  /* ---------- Nylige søk (ukesoppgave 08, «LRU-cache») ---------- */
+  /* ---------- Nylige søk (ukesoppgavene om hashing, «LRU-cache») ---------- */
   reg(IN.algos, "lsUpdate", {
     title: "Update: nylige søk med kapasitet N", name: "Update", params: "key",
     input: "En nøkkel key. M er et hashmap fra nøkkel til node i L, L er en dobbeltlenket liste med hode og hale (nyeste først), og N er kapasiteten",
@@ -374,7 +374,7 @@
     bigO: { best: "O(1)", avg: "O(1) forventet", worst: "O(N)", space: "O(N)",
       why: t("Hashmapet finner nøkkelen med en gang, og å flytte en node i lista går fort.",
         "Alle hashmap-operasjonene er forventet O(1), og RemoveNode og InsertAfter er O(1). Totalt forventet O(1).",
-        "Forventet O(1) fra hashingen. Verste tilfelle styres også av hashmapet (O(N) ved mange kollisjoner). I løsningen på ukesoppgaven gis hashmapet startstørrelse 2N, så det aldri trenger rehash.") }
+        "Forventet O(1) fra hashingen. Verste tilfelle styres også av hashmapet (O(N) ved mange kollisjoner). I løsningsforslaget til ukesoppgavene om hashing gis hashmapet startstørrelse 2N, så det aldri trenger rehash.") }
   });
 
   /* ================================================================

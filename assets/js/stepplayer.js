@@ -175,7 +175,15 @@
         pcLine.appendChild(el("span", { class: "code", html: code ? code.innerHTML : "" }));
         pcLine.className = "sp-pcline" + (kind ? " ev-" + kind : "");
         pcLine.hidden = false;
-      } else pcLine.hidden = true;
+        pcLine.style.visibility = "";
+      } else if (pcKeep && measuring !== true) {
+        // Ingen aktiv linje i dette steget: hold plassen (usynlig), se stabilize()
+        pcLine.innerHTML = "";
+        pcLine.appendChild(el("span", { class: "ln", text: " " }));
+        pcLine.className = "sp-pcline";
+        pcLine.hidden = false;
+        pcLine.style.visibility = "hidden";
+      } else { pcLine.hidden = true; pcLine.style.visibility = ""; }
     }
 
     function cssVar(cls) {
@@ -191,13 +199,71 @@
     function regen() {
       steps = opts.generate(input) || [];
       goto(0);
+      stabilize();
     }
+
+    /* Fast høyde mens man stepper: scenen, forklaringen og kodelinja varierer fra steg til steg, og da
+       hopper siden (særlig på mobil). Vi tegner alle stegene én gang, måler høyeste og setter min-height
+       på spilleren (og på .et-demo-left rundt den i eksamenskort, der «✓ Samme sluttilstand» kommer til slutt).
+       Måles på nytt ved ny input, nivåbytte og når bredden endres. Usynlig spiller (skjult fane) måles når den vises. */
+    var measuring = false, measuredW = 0, measuredVW = 0, pcKeep = false, MAX_MEASURE = 400;
+    var outer = host.parentNode && host.parentNode.classList && host.parentNode.classList.contains("et-demo-left") ? host.parentNode : null;
+    function hOf(x) { return x.getBoundingClientRect().height; }
+    function stabilize() {
+      if (measuring || !steps.length) return;
+      var w = wrap.offsetWidth;
+      if (!w || wrap.offsetParent === null) { measuredW = 0; return; }   // ikke synlig ennå
+      measuredW = w; measuredVW = window.innerWidth;
+      var parts = [stage, explain];
+      parts.concat(outer ? [outer, pcLine] : [pcLine]).forEach(function (x) { x.style.minHeight = ""; });
+      pcKeep = false;
+      if (steps.length > MAX_MEASURE) { renderStep(); return; }
+      var keep = idx, mx = [0, 0], mo = 0, pcAny = false, pcMax = 0, i;
+      measuring = true;
+      try {
+        // 1: scenen og forklaringen hver for seg
+        for (i = 0; i < steps.length; i++) {
+          idx = i; renderStep();
+          parts.forEach(function (x, j) { mx[j] = Math.max(mx[j], hOf(x)); });
+          if (!pcLine.hidden && pcLine.offsetHeight) { pcAny = true; pcMax = Math.max(pcMax, hOf(pcLine)); }
+        }
+        if (pcMax) pcLine.style.minHeight = Math.ceil(pcMax) + "px";
+        // Kodelinja på mobil: står den i ett steg, står den (tom) i alle, så kontrollene ikke flytter seg
+        pcKeep = pcAny;
+        parts.forEach(function (x, j) { if (mx[j]) x.style.minHeight = Math.ceil(mx[j]) + "px"; });
+        // 2: hele demoen i kortet (med «✓ Samme sluttilstand …» i siste steg), nå med fast scene og forklaring
+        if (outer) {
+          measuring = "outer";
+          for (i = 0; i < steps.length; i++) { idx = i; renderStep(); mo = Math.max(mo, hOf(outer)); }
+          if (mo) outer.style.minHeight = Math.ceil(mo) + "px";
+        }
+      } finally {
+        idx = keep; measuring = false;
+      }
+      renderStep();
+    }
+    // Mål på nytt når spillerens bredde eller vindusbredden er endret (mediespørringer endrer oppsettet
+    // også når spilleren selv får samme bredde), og når en skjult spiller blir synlig.
+    function stale() {
+      var w = wrap.offsetWidth;
+      return w > 0 && (Math.abs(w - measuredW) > 1 || window.innerWidth !== measuredVW);
+    }
+    wrap._stabilize = function () { stabilize(); };
+    if (window.ResizeObserver) new ResizeObserver(function () { if (stale()) stabilize(); }).observe(wrap);
+    var rzT = 0;
+    window.addEventListener("resize", function () {
+      clearTimeout(rzT);
+      rzT = setTimeout(function () { if (stale()) stabilize(); }, 150);
+    });
+    // Reserve når ResizeObserver ikke har meldt fra (f.eks. bakgrunnsfane): sjekk før hvert steg
+    function freshen() { if (!measuring && steps.length && stale()) stabilize(); }
     function goto(i) {
       stopPlay();
+      freshen();
       idx = Math.max(0, Math.min(steps.length - 1, i));
       renderStep();
     }
-    function step(d) { stopPlay(); if (idx + d >= 0 && idx + d < steps.length) { idx += d; renderStep(); } }
+    function step(d) { stopPlay(); freshen(); if (idx + d >= 0 && idx + d < steps.length) { idx += d; renderStep(); } }
 
     function renderStep() {
       var s = steps[idx] || {};
@@ -211,8 +277,8 @@
       counter.textContent = "Steg " + (idx + 1) + " av " + steps.length;
       // Flytt fokus før knappen blir deaktivert, så tastaturbrukere ikke havner øverst på siden
       var atStart = idx === 0, atEnd = idx >= steps.length - 1;
-      if (atEnd && document.activeElement === bNext) bPrev.focus();
-      if (atStart && document.activeElement === bPrev && !atEnd) bNext.focus();
+      if (!measuring && atEnd && document.activeElement === bNext) bPrev.focus();
+      if (!measuring && atStart && document.activeElement === bPrev && !atEnd) bNext.focus();
       bPrev.disabled = atStart;
       bNext.disabled = atEnd;
     }
@@ -233,7 +299,7 @@
     function togglePlay() {
       if (timer) stopPlay();
       else {
-        if (idx >= steps.length - 1) goto(0);
+        if (idx >= steps.length - 1) goto(0); else freshen();
         timer = setInterval(function () {
           if (idx >= steps.length - 1) { stopPlay(); return; }
           idx++; renderStep();
@@ -273,13 +339,13 @@
     });
 
     // Nivåbytte (lokalt eller fra toppen): tegn forklaring + visualisering på nytt
-    scope.onChange(function () { if (steps.length) renderStep(); });
+    scope.onChange(function () { if (steps.length) { renderStep(); stabilize(); } });
 
     // Når fanen vises første gang (fra core.js tabs-event): sørg for layout
     var shown = false;
     // Hendelsen sendes på fane-panelet (som ligger utenfor host), så vi lytter der.
     var panelEl = (host.closest && host.closest("[data-panel]")) || host;
-    panelEl.addEventListener("in:shown", function () { if (!shown && steps.length) { shown = true; renderStep(); } });
+    panelEl.addEventListener("in:shown", function () { if (!shown && steps.length) { shown = true; renderStep(); stabilize(); } });
 
     // Init
     if (opts.initial) setInput(opts.initial);
@@ -287,7 +353,7 @@
 
     return {
       goto: goto, next: function () { step(1); }, prev: function () { step(-1); },
-      setInput: setInput, get steps() { return steps; }, get index() { return idx; }
+      setInput: setInput, stabilize: stabilize, get steps() { return steps; }, get index() { return idx; }
     };
   };
 })();

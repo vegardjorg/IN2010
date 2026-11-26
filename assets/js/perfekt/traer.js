@@ -130,7 +130,7 @@
       { del: "(a)", tekst: "<p>For hver node v gjelder: alle verdier i venstre subtre til v er mindre enn v.element, og alle verdier i høyre subtre er større enn v.element.</p><p class=\"small muted\">Det holder ikke at hvert barn står riktig i forhold til forelderen sin. Kravet gjelder hele subtrær.</p>",
         poeng: ["riktig egenskap, for hele subtrær (2p)"] },
       { del: "(b)",
-        tekst: "<p>Vi sender med et intervall (low, high) som alle nodene i subtreet må ligge strengt innenfor. Roten får (−∞, ∞). Går vi til venstre, blir v.element ny øvre grense. Går vi til høyre, blir v.element ny nedre grense. Da sjekkes hver node bare én gang.</p>",
+        tekst: "<p>Vi sender med et intervall (low, high) som alle nodene i subtreet må ligge strengt innenfor. Roten får (−∞, ∞). Går vi til venstre, blir v.element ny øvre grense. Går vi til høyre, blir v.element ny nedre grense. Da sjekkes hver node bare én gang.</p><p class=\"small muted\">Et like godt alternativ, også O(n): gjør en inorder-traversering og sjekk at lista er strengt stigende. Å sammenligne v.element med FindMax(v.left) og FindMin(v.right) i hver node er også riktig, men O(n<sup>2</sup>).</p>",
         kode: "checkBSTArk",
         etter: "<p>For false-treet stopper algoritmen i 9: den ligger i venstre subtre til 5 og høyre subtre til 2, så intervallet er (2, 5), og 9 er ikke innenfor. Se steg-demoen i dette kortet.</p>",
         kjoretid: "O(n)",
@@ -182,7 +182,7 @@
         poeng: ["riktig svar (1p)", "en god begrunnelse, for eksempel et moteksempel (1p)"] },
       { del: "(c)",
         tekst: "<p>Den lengste stien som går gjennom en node v, går fra den dypeste noden i venstre subtre, via v, til den dypeste noden i høyre subtre. Lengden er hL + hR + 2, der hL og hR er høydene til subtrærne (høyden til et tomt tre er −1). Diameteren er den største slike verdien over alle noder.</p>" +
-          "<p>For å få lineær tid regner vi ut høyden og diameteren i <b>samme</b> rekursjon. Hjelpeprosedyren returnerer paret (h, d) for subtreet:</p>",
+          "<p>For å få lineær tid regner vi ut høyden og diameteren i <b>samme</b> rekursjon. Hjelpeprosedyren returnerer paret (h, d) for subtreet. Det er en postorder: barna regnes ut før noden selv.</p>",
         kode: "diameterArk",
         etter: "<p>For T₂ fra oppgaveteksten gir dette 4, som oppgaven sier. Se steg-demoen i dette kortet.</p>",
         poeng: ["en løsning i lineær tid (opptil 8p). Kvadratisk tid gir opptil 5p"] },
