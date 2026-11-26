@@ -64,7 +64,7 @@
       txt: "Elementet Quicksort deler arrayet rundt: de mindre havner på den ene siden, de større på den andre. Et dårlig valg av pivot gir O(n²).",
       se: ["01-sortering.html#fane=quick", "Sortering → Quicksort"], m: ["pivot(?:en|er|ene|element(?:et)?)?"] },
     sammenligning: { ord: "sammenligningsbasert", tema: "sortering",
-      txt: "Sorteringen finner rekkefølgen bare ved å sammenligne to og to elementer. Ingen slik sortering kan bli raskere enn O(n log n) i verste tilfelle.",
+      txt: "Sorteringen finner rekkefølgen bare ved å sammenligne to og to elementer. I verste tilfelle trenger en slik sortering et antall sammenligninger som vokser som n log n, så den kan ikke bli bedre enn O(n log n).",
       se: ["01-sortering.html#fane=oversikt", "Sortering → Oversikt"], m: ["sammenligningsbaserte?"] },
 
     /* ---------- Lister ---------- */

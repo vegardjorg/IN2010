@@ -18,7 +18,8 @@
      (IN.kortData.progressKey). Et valgfritt 8. felt gir en annen nøkkel: når «kortet» egentlig er en test
      (da teller beste resultat ≥ terskel som «ok»), eller når samme oppgave står på to sider og deler én post. */
   var KORT = {
-    s20sub:  ["sortering", "bucket",     "H2020", "7d", "SortSubanagrams", 6, "exam-h2020-7d"],
+    b25alg:  ["begreper",  "algoritme",  "H2025", "1",  "Algoritme og datastruktur", 2, "exam-oppvarming"],
+    s20sub:  ["sortering", "bucket",     "H2020", "7d", "Sortering av subanagrammer", 6, "exam-h2020-7d"],
     s21stab: ["sortering", "bucket",     "H2021", "2",  "Stabilitet", 3, "exam-h2021-2"],
     s21tf:   ["sortering", "test",       "H2021", "3",  "Sant/usant om Bubble, Selection og Insertion sort", 10, "eksamen-test", "tf:sortering:h2021-oppg3"],
     s23gno:  ["sortering", "gnome",      "H2023", "4",  "Gnome sort", 10, "exam-gnome"],
@@ -36,7 +37,7 @@
     t20bst:  ["traer",     "bst",        "H2020", "2",  "Binære søketrær", 4, "exam-h2020-2"],
     t21rng:  ["traer",     "bst",        "H2021", "8",  "Verdier i et intervall (InRange)", 10, "exam-h2021-8"],
     t22chk:  ["traer",     "bst",        "H2022", "11", "Er treet et søketre? (CheckBST)", 10, "exam-h2022-10"],
-    t23dia:  ["traer",     "diameter",   "H2023", "5",  "Diameteren til et binærtre", 12, "exam-h2023-5"],
+    t23dia:  ["traer",     "diameter",   "H2023", "5",  "Diameteren til et tre", 12, "exam-h2023-5"],
     t24lca:  ["traer",     "lca",        "H2024", "6",  "Laveste felles forfeder", 12, "exam-h2024-6"],
     t20avl:  ["traer",     "avl",        "H2020", "6",  "AVL-innsetting", 9, "exam-h2020-6"],
     t22avl:  ["traer",     "avl",        "H2022", "4",  "Balanserte søketrær (AVL)", 6, "exam-h2022-3"],
@@ -52,8 +53,8 @@
     x24py:   ["hashing",   "python",     "H2024", "5",  "Python 3.6-ordbøker", 10, "exam-h2024-5"],
     x25ch:   ["hashing",   "chaining",   "H2025", "2",  "Separate chaining", 10, "exam-h2025-2"],
     g20eg:   ["grafer",    "begreper",   "H2020", "3",  "Grafegenskaper", 8, "exam-h2020-3"],
-    g20t2:   ["grafer",    "mst",        "H2020", "8",  "Fire typer grafer (Kruskal, Dijkstra for hånd)", 38, "exam-h2020-8"],
-    g21dij:  ["grafer",    "dijkstra",   "H2021", "7",  "Korteste avstander", 8, "exam-h2021-7"],
+    g20t2:   ["grafer",    "mst",        "H2020", "8",  "Fire typer grafer", 38, "exam-h2020-8"],
+    g21dij:  ["grafer",    "dijkstra",   "H2021", "7",  "Korteste avstander i grafer", 8, "exam-h2021-7"],
     g21to:   ["grafer",    "dfs",        "H2021", "11", "To-fargelegge en graf", 10, "exam-h2021-11"],
     g21opp:  ["grafer",    "sammenheng", "H2021", "12", "Whops!-oppgjør", 10, "exam-h2021-12"],
     g21log:  ["grafer",    "topologisk", "H2021", "13", "Whops!-logger", 10, "exam-h2021-13"],
@@ -67,8 +68,10 @@
     g24dnt:  ["grafer",    "scc",        "H2024", "8",  "Rundtur med DNT", 12, "exam-h2024-8"],
     g25syk:  ["grafer",    "sykler",     "H2025", "3",  "Sykler i grafer", 11, "exam-h2025-2"],
     g25kol:  ["grafer",    "mst",        "H2025", "7",  "Kollektivtilbudet i Oslo", 15, "exam-h2025-6"],
-    l20tag:  ["lister",    "stakk",      "H2020", "9",  "Velformaterte tagger (stakk)", 12, "exam-h2020-9"],
-    p20ver:  ["strategi",  "pnp",        "H2020", "8a", "Fire typer grafer: verifikator og NP", 10, "exam-h2020-8"],
+    l20tag:  ["lister",    "stakk",      "H2020", "9",  "Velformaterte tagger", 12, "exam-h2020-9"],
+    p20kj:   ["strategi",  "kjoretid",   "H2020", "7a", "Subanagram: hva er kjøretiden?", 4, "exam-h2020-7a"],
+    p20str:  ["strategi",  "strategier", "H2020", "7c", "Subanagram: to strategier", 6, "exam-h2020-7c"],
+    p20ver:  ["strategi",  "pnp",        "H2020", "8a–b", "Fire typer grafer: verifikator og NP", 10, "exam-h2020-8"],
     p21pnp:  ["strategi",  "pnp",        "H2021", "6",  "Litt om beregnbarhet og kompleksitet", 8, "exam-h2021-6"],
     p22tf:   ["strategi",  "kjoretid",   "H2022", "2",  "Litt av hvert", 10, "exam-h2022-2"]
   };

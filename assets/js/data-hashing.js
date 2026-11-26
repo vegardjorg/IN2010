@@ -336,10 +336,10 @@
       { code: "Insert(B[j].key, B[j].value)", indent: 3, eli5: "Flytt det over. Det kan havne et nytt sted!", normal: "Sett inn på nytt med h(k, N) for den nye N-en.",
         teknisk: "Nøklene må hashes på nytt, fordi hjemmeplassen avhenger av N. Insert utløser ikke ny rehash: n/N ≤ 1/2 etter doblingen." }
     ],
-    bigO: { best: "O(n + N)", avg: "O(n + N) forventet", worst: "O(N + n²)", space: "O(N) ekstra (ny tabell)",
+    bigO: { best: "O(n)", avg: "O(n) forventet", worst: "O(n²)", space: "O(N) ekstra (ny tabell)",
       why: t("Når garderoben blir for full, bygger vi en dobbelt så stor og henger hver jakke opp på nytt. Det tar tid akkurat da, men det skjer sjelden.",
         "Hvert par settes inn på nytt. Rehash skjer først når n/N ≥ 0,75, så rett etter doblingen er N høyst en konstant ganger n (omtrent 8/3 · n). Altså er N = O(n), og med god spredning er hele rehashen forventet O(n).",
-        "O(N) for å gå gjennom B, pluss n innsettinger som hver er forventet O(1) når hashfunksjonen sprer godt. Med Load factor over en fast nedre grense er det forventet O(n). I verste tilfelle havner alle nøklene på samme hjemmeplass. Da koster gjeninnsettingene 1 + 2 + … + n = O(n²), og hele rehashen O(N + n²).") }
+        "O(N) for å gå gjennom B, pluss n innsettinger som hver er forventet O(1) når hashfunksjonen sprer godt. Det gir O(n + N), og siden N = O(n) rett etter doblingen, er det forventet O(n): lineær tid, slik kurset regner en rehash. I verste tilfelle havner alle nøklene på samme hjemmeplass. Da koster gjeninnsettingene 1 + 2 + … + n = O(n²), og hele rehashen O(N + n²) = O(n²).") }
   });
 
   /* ---------- Python 3.6-ordbok ---------- */

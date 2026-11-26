@@ -7,8 +7,8 @@
   <title>IN2010 · interaktiv eksamensguide</title>
   <meta name="description" content="Interaktiv eksamensguide for IN2010 – Algoritmer og datastrukturer. Slik ser eksamen ut, og alle eksamensoppgavene fra H2020 til H2025.">
   <script>(function(){try{var d=document.documentElement;var t=localStorage.getItem('in-theme');if(t!=='dark'&&t!=='system')t='light';if(t!=='system')d.setAttribute('data-theme',t);var l=localStorage.getItem('in-level');if(l!=='eli5'&&l!=='teknisk')l='normal';d.setAttribute('data-level',l);}catch(e){document.documentElement.setAttribute('data-theme','light');document.documentElement.setAttribute('data-level','normal');}})();</script>
-  <link rel="stylesheet" href="assets/css/styles.css?v=20261126c">
-  <link rel="stylesheet" href="assets/css/begrep-tips.css?v=20261126c">
+  <link rel="stylesheet" href="assets/css/styles.css?v=20261126d">
+  <link rel="stylesheet" href="assets/css/begrep-tips.css?v=20261126d">
 </head>
 <body data-page="index">
   <a class="skip-link" href="#main">Hopp til innhold</a>
@@ -108,12 +108,12 @@
     IN2010-guide · laget for eksamensøving · fungerer frakoblet (file://) og på GitHub Pages.
   </footer>
 
-  <script src="assets/js/core.js?v=20261126c"></script>
-  <script src="assets/js/symboler.js?v=20261126c"></script>
-  <script src="assets/js/begreper-data.js?v=20261126c"></script>
-  <script src="assets/js/begrep-tips.js?v=20261126c"></script>
-  <script src="assets/js/data-mock.js?v=20261126c"></script>
-  <script src="assets/js/data-crash.js?v=20261126c"></script>
+  <script src="assets/js/core.js?v=20261126d"></script>
+  <script src="assets/js/symboler.js?v=20261126d"></script>
+  <script src="assets/js/begreper-data.js?v=20261126d"></script>
+  <script src="assets/js/begrep-tips.js?v=20261126d"></script>
+  <script src="assets/js/data-mock.js?v=20261126d"></script>
+  <script src="assets/js/data-crash.js?v=20261126d"></script>
   <script>
   /* Crash course-boksen øverst: samme utregning som løypesiden (IN.crashProgress) */
   (function () {
@@ -153,11 +153,9 @@
     // assets/js/kort/<side>.js. [side, fane, år, oppgavenr., tittel, poeng, element-id, (fremdriftsnøkkel – brukes ikke her)]
     // Nye kort i registeret dukker opp her og i oppgavekartet av seg selv. Sjekk mot kortfilene: node plan/sjekk-kortregister.js
     var X = (IN.CRASH && IN.CRASH.kort) || {};
-    // Tekstfragmentet i dyplenken leter etter overskriften på kortet. SOK: egen søketekst (sant/usant-testen har ingen
-    // kortoverskrift). TITTEL: overskriften på kortet når registeret har en annen tittel (sjekk-kortregister.js lister dem).
+    // Tekstfragmentet i dyplenken leter etter overskriften på kortet (registertittelen er lik korttittelen, se
+    // sjekk-kortregister.js). SOK: egen søketekst (sant/usant-testen har ingen kortoverskrift).
     var SOK = { s21tf: "Eksamen H2021" };
-    var TITTEL = { s20sub: "Sortering av subanagrammer", t23dia: "Diameteren til et tre", g20t2: "Fire typer grafer",
-      g21dij: "Korteste avstander i grafer", l20tag: "Velformaterte tagger" };
     var ICON = '<svg viewBox="0 0 12 12" aria-hidden="true" focusable="false">' +
       '<path d="M3 1.25h4.1L9.5 3.65v7.1H3z" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/>' +
       '<path d="M4.6 6h3.3M4.6 8.2h3.3" stroke="currentColor" stroke-width="1.1" stroke-linecap="round"/></svg>';
@@ -167,7 +165,7 @@
     // markere tittelen. Nettlesere uten tekstfragmenter åpner bare fanen.
     function frag(s) { return encodeURIComponent(s).replace(/-/g, "%2D"); }
     function taskHref(key) {
-      var t = X[key], text = SOK[key] ? frag(SOK[key]) : frag(TITTEL[key] || t[4]) + ",-Oppgave";
+      var t = X[key], text = SOK[key] ? frag(SOK[key]) : frag(t[4]) + ",-Oppgave";
       return pageHref[t[0]] + "#fane=" + t[1] + "&oppg=" + t[6] + ":~:text=" + text;
     }
     function taskName(t) { return t[2] + " Oppgave " + t[3] + " – " + t[4]; }
@@ -296,27 +294,31 @@
     // ===== Oppgavekart =====
     // Bygget fra kortregisteret X: én rad per eksamensoppgave med kort, pluss oppvarmingen («Oppgave 1») hvert år.
     // Rad: [år, oppgavenr., navn i kartet, poeng, side, fane, nøkkel i X]. Settene trykker ingen oppgavenumre.
-    // Samme oppgave på to sider (samme år og nr.) vises én gang: den første i registeret.
+    // Samme oppgave på to sider (samme år og nr.) vises én gang: den første i registeret. Har oppvarmingen et kort
+    // i registeret (H2025-1), lenker raden for det året rett til kortet.
     var YEARS = ["H20", "H21", "H22", "H23", "H24", "H25"];
-    var IKKE_I_KART = { p20ver: 1 };   // H2020 8 (a–b) på Strategi: delen av oppgave 8, som står under Grafer
+    // Deloppgaver på Strategi som allerede står i kartet under en annen side: H2020 8 (a–b) under Grafer,
+    // H2020 7 (a) og 7 (c) under Hashing (Subanagram a–c)
+    var IKKE_I_KART = { p20ver: 1, p20kj: 1, p20str: 1 };
     // Navn i kartet når det skal si mer enn korttittelen (hva oppgaven handler om)
     var NAVN = {
       x20sub: "Subanagrammer: kjøretid, frekvenstabell, strategi (a–c)", s20sub: "SortSubanagrams (bøttesortering)",
       g20t2: "Type 2-grafer: NP, stier, Kruskal, korteste vei (a–h)", s21tf: "Litt sortering (sant/usant)",
-      g21dij: "Korteste avstander i grafer", t21rng: "Intervall i et binært søketre", x21frek: "Flest forekomster (hashing)",
+      t21rng: "Intervall i et binært søketre", x21frek: "Flest forekomster (hashing)",
       k21par: "Par som summerer til x", h22tf: "Prioritetskøer og heaper (sant/usant)", t22auto: "Autofullføring (prefikstre mot hashmap)",
-      t22chk: "Er binærtreet et søketre?", t23dia: "Diameteren til et tre", g23bl: "Blindern-problemet (MST)",
+      t22chk: "Er binærtreet et søketre?", g23bl: "Blindern-problemet (MST)",
       g23dep: "Dependency hell (sykel/DAG)", t24huf: "Huffman-trær", s24ety: "Etymologisk ordliste (bøttesortering)",
       g24jz: "Jazz eller klassisk? (BFS ≤ k)", x24py: "Python 3.6-dict", t24lca: "Laveste felles forfeder (LCA)",
       h24med: "Mediankø (to heaper)", g24dnt: "Rundtur med DNT (SCC/Dijkstra)", h25lvl: "Level-order (heap/BST)"
     };
     var TASKS = YEARS.map(function (y) { return [y, "1", "Oppvarming", 2, "begreper", "algoritme"]; });
     var seen = {};
+    TASKS.forEach(function (r) { seen[r[0] + "-1"] = r; });
     Object.keys(X).forEach(function (k) {
       var t = X[k], y = "H" + t[2].slice(3), id = y + "-" + t[3];
-      if (IKKE_I_KART[k] || seen[id] || YEARS.indexOf(y) < 0) return;
-      seen[id] = 1;
-      TASKS.push([y, t[3], NAVN[k] || t[4], t[5], t[0], t[1], k]);
+      if (IKKE_I_KART[k] || YEARS.indexOf(y) < 0) return;
+      if (seen[id]) { if (!seen[id][6]) seen[id][6] = k; return; }   // oppvarmingsraden får kortet som lenke
+      seen[id] = TASKS[TASKS.push([y, t[3], NAVN[k] || t[4], t[5], t[0], t[1], k]) - 1];
     });
     TASKS.sort(function (a, b) {
       return YEARS.indexOf(a[0]) - YEARS.indexOf(b[0]) || parseInt(a[1], 10) - parseInt(b[1], 10) || (a[1] < b[1] ? -1 : a[1] > b[1] ? 1 : 0);
