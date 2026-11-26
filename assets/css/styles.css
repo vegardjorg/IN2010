@@ -2532,3 +2532,76 @@ body[data-page="crash"] .cr-step { scroll-margin-top: 0; }
 /* Linjelengde på brede skjermer: brødtekst holdes rundt 75 tegn, figurer og tabeller bruker hele bredden */
 main :is(p:not([class*="legend"]), .lead), main :is(ul, ol):not([class]) > li, main dd { max-width: 75ch; }
 main :is(td, th) :is(p, li) { max-width: none; }
+
+/* ============================================================
+   Hentet fra IN2120-guiden (UI/UX 2026-11-26): stegknapper, fanebunn, egenvurdering, quiz
+   ============================================================ */
+/* Stegspiller: «Neste →» er hovedknappen, «▶ Spill av» er sekundær og bare ikon på smal skjerm */
+.sp-controls .sp-next { min-width: 6.5rem; }
+.sp-controls .sp-play { min-width: 2.75rem; }
+@media (max-width: 560px) { .sp-controls .sp-play-tx { display: none; } }
+
+/* Nederst i hvert fanepanel: «↑ Til fanene» og «Neste: <fane> →» */
+.tab-bunn {
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--d-sm);
+  margin: 2rem 0 .5rem; padding-top: var(--d-sm); border-top: 1px solid var(--color-outline-variant);
+}
+.tab-bunn .btn { min-height: 40px; }
+.tab-bunn .tab-neste { margin-left: auto; text-align: right; max-width: 100%; white-space: normal; }
+@media (pointer: coarse) { .tab-bunn .btn { min-height: 44px; } }
+@media print { .tab-bunn { display: none; } }
+
+/* Egenvurderingen er skjult til Løsning/Sensor er åpnet; en tom bunnlinje skjules */
+.et-self[hidden] { display: none; }
+.et-foot:not(:has(> :not([hidden]))) { display: none; }
+
+/* Nedtrekk og utvidbare overskrifter: tommelvennlige på berøringsskjerm */
+@media (pointer: coarse) {
+  select { min-height: 44px; }
+  main details > summary { min-height: 44px; box-sizing: border-box; }
+}
+
+/* Quiz: tettere punkter, flervalgsvalgene som én sammenhengende liste, «Forklaring» høyrestilt i spørsmålet */
+.qz-head { margin-bottom: 2px; }
+.qz-item { padding: 6px 8px 6px .4rem; }
+.qz-prompt { padding-top: .15rem; line-height: 1.4; }
+.qz-ctl { margin-top: .3rem; }
+.qz-mc .qz-choices { gap: 0; }
+.qz-mc .qz-choice { margin-top: -1px; border-radius: 0; padding: 4px 10px; line-height: 1.3; }
+.qz-mc .qz-choice:first-child { margin-top: 0; border-radius: var(--radius-md) var(--radius-md) 0 0; }
+.qz-mc .qz-choice:last-child { border-radius: 0 0 var(--radius-md) var(--radius-md); }
+.qz-mc .qz-choice:only-child { border-radius: var(--radius-md); }
+.qz-mc .qz-choice:is(.sel, .correct, .wrong, .iskey) { position: relative; z-index: 1; }
+.qz-mc .qz-choice:focus-visible { position: relative; z-index: 2; }
+.qz-inline.qz-mc .qz-choices { gap: var(--d-xs); }
+.qz-inline.qz-mc .qz-choice { margin-top: 0; border-radius: var(--radius-md); }
+.qz .qz-exp-float { float: right; position: relative; min-height: 30px; margin: -4px -4px 0 8px; font-weight: 600; }
+.qz .qz-exp-float::after { content: ""; position: absolute; inset: -7px -4px; }
+.qz-foot { margin-top: 6px; }
+@media (max-width: 560px) {
+  .qz-item { grid-template-columns: 1.45rem minmax(0, 1fr); column-gap: 6px; }
+  .qz-num { width: 1.45rem; height: 1.45rem; font-size: 11px; margin-top: 0; }
+}
+@media (pointer: coarse) {
+  .qz-choice { min-height: 44px; }
+  .qz-exp-btn:not(.qz-exp-float), .qz-switch { min-height: 44px; }
+  .qz-foot .btn, .qz-pnav .btn { min-height: 44px; }
+}
+/* Før svar heter knappen «Vis fasit» (som et puggekort), dempet og uten pil. Etter svar: «Forklaring ▾». */
+.qz-exp-btn.qz-peek { color: var(--color-on-surface-variant); font-weight: 500; text-decoration: underline dotted; text-underline-offset: 3px; }
+.qz-exp-btn.qz-peek:hover { color: var(--color-primary); }
+/* «Test deg selv» (sant/usant) i en lukket boks: «Sant eller usant? · 7 påstander» */
+.qz-fold { margin: .75rem 0 1rem; border: 1px solid var(--color-outline-variant); border-radius: var(--radius-lg); background: var(--color-surface-container-lowest); }
+.qz-fold > summary {
+  list-style: none; cursor: pointer; display: flex; flex-wrap: wrap; align-items: center; column-gap: .35rem; min-height: 44px; box-sizing: border-box;
+  padding: 6px 12px; border-radius: var(--radius-lg); font-size: var(--text-sm); font-weight: 600; color: var(--color-on-surface);
+}
+.qz-fold > summary::-webkit-details-marker { display: none; }
+.qz-fold > summary::before { content: "▸"; color: var(--color-primary); display: inline-block; transition: transform .15s; }
+.qz-fold[open] > summary::before { transform: rotate(90deg); }
+.qz-fold > summary:hover { background-image: linear-gradient(var(--state-hover), var(--state-hover)); }
+.qz-fold > summary:focus-visible { outline-offset: -2px; }
+.qz-fold-n, .qz-fold-st { font-weight: 400; color: var(--color-on-surface-variant); }
+.qz-fold > .qz { margin: 0; padding: 0 8px 8px; }
+.qz-fold > .qz .qz-list { border-radius: var(--radius-md); }
+@media print { .qz-fold > .qz { display: block; } }

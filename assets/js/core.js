@@ -351,7 +351,33 @@
 
     var fromHash = (location.hash.match(/fane=([\w-]+)/) || [])[1];
     var ids = btns.map(function (b) { return b.getAttribute("data-tab"); });
-    var start = (fromHash && ids.indexOf(fromHash) >= 0) ? fromHash : ids[0];
+
+    // Nederst i hvert fanepanel: «↑ Til fanene» og «Neste: <fane> →», så man slipper å rulle tilbake på mobil.
+    // Sidens egne skript fyller panelene etterpå, så raden flyttes sist i panelet igjen når siden er lastet.
+    function toBar(id) {
+      var top = bar.getBoundingClientRect().top + window.pageYOffset - (IN.stickyH ? IN.stickyH() : 0) - 8;
+      window.scrollTo({ top: Math.max(0, top), behavior: "instant" });
+      var b = btns.filter(function (x) { return x.getAttribute("data-tab") === id; })[0];
+      if (b) { try { b.focus({ preventScroll: true }); } catch (e) { b.focus(); } }
+    }
+    var bunner = [];
+    panels.forEach(function (p) {
+      var id = p.getAttribute("data-panel"), i = ids.indexOf(id);
+      if (i < 0 || p.querySelector(":scope > .tab-bunn")) return;
+      var nx = ids[i + 1], nb = nx && btns[i + 1];
+      var nav = el("nav", { class: "tab-bunn", "aria-label": "Bytt fane" }, [
+        el("button", { class: "btn tab-opp", type: "button", text: "↑ Til fanene", onclick: function () { toBar(id); } }),
+        nx ? el("button", { class: "btn tab-neste", type: "button",
+          text: "Neste: " + (nb.textContent || "").replace(/\s+/g, " ").trim() + " →",
+          onclick: function () { activate(nx, true); toBar(nx); } }) : null
+      ]);
+      p.appendChild(nav);
+      bunner.push(nav);
+    });
+    function bunnSist() { bunner.forEach(function (n) { var p = n.parentNode; if (p && p.lastElementChild !== n) p.appendChild(n); }); }
+    if (document.readyState === "complete") setTimeout(bunnSist, 0); else window.addEventListener("load", bunnSist);
+
+    var start =(fromHash && ids.indexOf(fromHash) >= 0) ? fromHash : ids[0];
     activate(start, false);
 
     // Dyplenke til en eksamensoppgave: #fane=<fane>&oppg=<element-id eller kanonisk nøkkel, f.eks. H2023-2>.
@@ -492,7 +518,11 @@
     var items = spec.items, mc = spec.kind === "mc", uid = "qz" + (++qzN);
     var follow = o.instant == null;                 // følger den globale bryteren
     var answers = {}, checked = false, open = {}, reported = false, cur = 0;
+    var foldStat = null;
+    var revealed = {};   // «Vis fasit» uten å svare (som et puggekort). Lagres ikke og teller ikke som svar.
     function has(id) { return answers[id] != null; }
+    // Forklaringen (med «Riktig svar: …») åpnes først når punktet er besvart, sjekket eller vist med «Vis fasit»
+    function earned(it) { return has(it.id) || checked || !!revealed[it.id]; }
     /* Lagrede svar er knyttet til punktets plass i lista (id = indeks). Kommer det et nytt punkt eller
        en endret påstand i en ny versjon, ville et gammelt svar havnet på feil spørsmål. Derfor lagres et
        fingeravtrykk per punkt (tekst + svaralternativer + fasit), og et svar hentes bare tilbake når
@@ -506,7 +536,10 @@
     items.forEach(function (it) { fps[it.id] = fp(it); });
     if (spec.storeKey) {
       try {
-        var saved = JSON.parse(IN.store.get(spec.storeKey, "null"));
+        var raw = IN.store.get(spec.storeKey, null);
+        // Eldre nøkler (in-quiz:/in-tf:) var felles for alle guidene på domenet: les dem én gang som reserve
+        if (raw == null && spec.oldKey) raw = IN.store.get(spec.oldKey, null);
+        var saved = JSON.parse(raw == null ? "null" : raw);
         if (saved && saved.a && typeof saved.a === "object" && saved.h && typeof saved.h === "object") {
           var savedN = 0, kept = 0;
           Object.keys(saved.a).forEach(function () { savedN++; });
@@ -575,17 +608,22 @@
         return b;
       });
       var expId = uid + "-x" + pos;
+      var togTxt = el("span"), togCaret = el("span", { class: "qz-caret", "aria-hidden": "true", text: "▾" });
       var tog = el("button", { class: "qz-exp-btn", type: "button", "aria-expanded": "false", "aria-controls": expId,
-        onclick: function () { open[it.id] = !open[it.id]; paint(); } },
-        [el("span", { text: it.explain ? "Forklaring" : "Fasit" }), el("span", { class: "qz-caret", "aria-hidden": "true", text: "▾" })]);
+        onclick: function () {
+          if (!earned(it)) { revealed[it.id] = true; open[it.id] = true; paint(); say("Riktig svar: " + plain(it.keyLabel) + "."); return; }
+          open[it.id] = !open[it.id]; paint();
+        } }, [togTxt, togCaret]);
       var exp = el("div", { class: "qz-exp", id: expId, hidden: true });
       var sr = el("span", { class: "qz-sr" });
-      body.appendChild(el("div", { class: "qz-ctl" }, [group, tog]));
+      // Flervalg: knappen står høyrestilt øverst i spørsmålet (ingen egen rad). Sant/usant: i raden med svarknappene.
+      if (mc) { tog.classList.add("qz-exp-float"); prompt.insertBefore(tog, prompt.firstChild); body.appendChild(el("div", { class: "qz-ctl" }, [group])); }
+      else body.appendChild(el("div", { class: "qz-ctl" }, [group, tog]));
       body.appendChild(exp);
       body.appendChild(sr);
       li.appendChild(num); li.appendChild(body);
       list.appendChild(li);
-      return { it: it, li: li, num: num, btns: btns, tog: tog, exp: exp, sr: sr, pos: pos, filled: false };
+      return { it: it, li: li, num: num, btns: btns, tog: tog, togTxt: togTxt, togCaret: togCaret, exp: exp, sr: sr, pos: pos, filled: false };
     });
 
     function fill(r) {
@@ -604,6 +642,7 @@
         var isSel = b._v === sel, cls = "qz-choice" + (isSel ? " sel" : ""), mk = "";
         if (st && isSel) { if (st === "right") { cls += " correct"; mk = "✓"; } else if (st === "wrong") { cls += " wrong"; mk = "✗"; } }
         if (st === "wrong" && !isSel && b._v === it.key) { cls += " iskey"; mk = "✓"; }
+        if (!st && revealed[it.id] && b._v === it.key) { cls += " iskey"; mk = "✓"; }   // «Vis fasit» uten svar
         b.className = cls; b._mark.textContent = mk;
         b.setAttribute("aria-pressed", isSel ? "true" : "false");
         b.disabled = locked;
@@ -611,10 +650,14 @@
       var key = plain(it.keyLabel);
       r.sr.textContent = st === "right" ? "Riktig." : st === "blank" ? "Ikke besvart." :
         st === "wrong" ? (has(it.id) ? "Feil. " : "Blankt, teller som galt. ") + "Riktig svar: " + key + "." : "";
-      var canExp = !(o.lock && !checked);
-      var isOpen = canExp && !!open[it.id];
+      var canExp = !(o.lock && !checked), got = earned(it);
+      var isOpen = canExp && got && !!open[it.id];
       r.tog.hidden = !canExp;
-      r.tog.setAttribute("aria-expanded", isOpen ? "true" : "false");
+      r.togTxt.textContent = got ? (it.explain ? "Forklaring" : "Fasit") : "Vis fasit";
+      r.togCaret.textContent = got ? "▾" : "";
+      r.tog.classList.toggle("qz-peek", !got);
+      if (got) { r.tog.setAttribute("aria-expanded", isOpen ? "true" : "false"); r.tog.removeAttribute("aria-label"); }
+      else { r.tog.removeAttribute("aria-expanded"); r.tog.setAttribute("aria-label", "Vis fasit for " + (mc ? "spørsmål " : "påstand ") + (r.pos + 1)); }
       if (isOpen && !r.filled) fill(r);
       r.exp.hidden = !isOpen;
     }
@@ -627,7 +670,9 @@
     function paint() {
       if (sw) sw.setAttribute("aria-checked", instant() ? "true" : "false");
       rows.forEach(paintItem);
-      score.innerHTML = scoreHtml(counts());
+      var cc = counts();
+      score.innerHTML = scoreHtml(cc);
+      if (foldStat) foldStat.textContent = checked ? " · " + cc.right + " av " + cc.total + " riktig" : cc.answered ? " · " + cc.answered + " besvart" : "";
       bCheck.disabled = !!(o.lock && checked);
       if (o.pager) paintPager();
     }
@@ -659,7 +704,7 @@
     }
     function doReset() {
       if (o.onReset) { o.onReset(); return; }
-      answers = {}; checked = false; open = {}; reported = false; cur = 0;
+      answers = {}; checked = false; open = {}; revealed = {}; reported = false; cur = 0;
       persist(); clear(res); paint(); say("Nullstilt.");
     }
 
@@ -695,7 +740,16 @@
     var fn = items.some(function (it) { return it.src && it.src.some(function (r) { return r.egneOrd; }); })
       ? el("p", { class: "qz-kilde-fn", text: "* formulert med egne ord" }) : null;
     [head, dotRow, list, pnav, foot, res, fn, live].forEach(function (x) { if (x) wrap.appendChild(x); });
-    host.appendChild(wrap);
+    // o.fold: settet ligger i en lukket <details> («Sant eller usant? · 7 påstander»), med status i oppsummeringen
+    if (o.fold) {
+      foldStat = el("span", { class: "qz-fold-st" });
+      host.appendChild(el("details", { class: "qz-fold" }, [
+        el("summary", { class: "qz-fold-sum" }, [
+          el("span", { class: "qz-fold-t", text: o.foldTitle || (mc ? "Flervalg" : "Sant eller usant?") }),
+          el("span", { class: "qz-fold-n", text: " · " + items.length + (mc ? " spørsmål" : items.length === 1 ? " påstand" : " påstander") }),
+          foldStat]),
+        wrap]));
+    } else host.appendChild(wrap);
     if (checked) rows.forEach(function (r) { open[r.it.id] = state(r.it) === "wrong"; });
     function onPref() { if (!wrap.isConnected) { host._qzOff && host._qzOff(); return; } paint(); }
     document.addEventListener("in:svar-straks", onPref);
@@ -709,7 +763,7 @@
      questions: [{ q (html), options: [html…], answer: idx, explain: html | fn(node), render?: fn(node),
                    kilde?: { ref, egneOrd } | [...] (kildelinje under forklaringen, se kildeRefs) }]
      opts: { id?, pager?: én om gangen med prikker, inline?: alternativene på rad, cls? }
-     Fremdrift: quiz:<side>:<id>. Svar lagres i in-quiz:<side>:<id> når quizen har id. */
+     Fremdrift: quiz:<side>:<id>. Svar lagres i in2010:quiz:<side>:<id> når quizen har id. */
   IN.quiz = function (host, questions, opts) {
     if (typeof host === "string") host = qs(host);
     if (!host || !questions || !questions.length) return;
@@ -729,7 +783,8 @@
         key: item.answer, keyLabel: item.options[item.answer] };
     });
     return answerSet(host, { kind: "mc", items: items, progressId: qid,
-      storeKey: (opts.id || host.id) ? "in-quiz:" + IN.pageId() + ":" + qid : null },
+      storeKey: (opts.id || host.id) ? "in2010:quiz:" + IN.pageId() + ":" + qid : null,
+      oldKey: (opts.id || host.id) ? "in-quiz:" + IN.pageId() + ":" + qid : null },
       { pager: opts.pager, cls: (opts.inline ? "qz-inline" : "") + (opts.cls ? " " + opts.cls : "") });
   };
 
@@ -741,7 +796,7 @@
        «Kilde: …» under forklaringen, og eksamensmerket hentes fra eksamen (streng | false) eller fra
        et årstall i ref («Eksamen H2021, oppgave 3»). Teksten i påstanden brukes da ikke til merket.
        Påstander fra eksamen sorteres først.
-     opts: { id?: lagringsnøkkel in-tf:<id> og fremdrift tf:<side>:<id>, shuffle?,
+     opts: { id?: lagringsnøkkel in2010:tf:<id> og fremdrift tf:<side>:<id>, shuffle?,
              blank?: egen «Blankt»-knapp, og blankt teller som galt ved sjekk,
              instant?: true/false låser modus og skjuler bryteren (udefinert = global bryter),
              lock?: svarene låses etter sjekk, og forklaringene vises først etter sjekk,
@@ -778,8 +833,13 @@
         tag: it.kilde ? { text: it.kilde, cls: "tf-eks", title: "Fra eksamen " + it.kilde } :
           it.tema ? { text: it.tema } : it.blokk ? { text: "Blokk " + it.blokk } : null };
     });
+    // «Test deg selv»-settet (vert #tf-<tema>) ligger i en lukket <details>. opts.fold: true tvinger det fram, false slår det av.
+    // Sett i eksamensformat (lock, låst modus eller egen blankt-knapp) foldes ikke.
+    var o2 = {};
+    for (var k2 in opts) if (Object.prototype.hasOwnProperty.call(opts, k2)) o2[k2] = opts[k2];
+    if (o2.fold == null) o2.fold = !!(host.id && /^tf-[a-z]+$/.test(host.id) && !opts.lock && opts.instant == null && !opts.blank);
     return answerSet(host, { kind: "tf", items: list, progressId: opts.id || host.id,
-      storeKey: opts.id ? "in-tf:" + opts.id : null }, opts);
+      storeKey: opts.id ? "in2010:tf:" + opts.id : null, oldKey: opts.id ? "in-tf:" + opts.id : null }, o2);
   };
 
   /* ---------- Eksamensoppgave (utvidbart kort) ----------
@@ -922,6 +982,8 @@
         catch (e) { panes[id].appendChild(el("p", { class: "muted small", text: "Kunne ikke vise denne delen." })); if (window.console) console.error(e); }
       }
       if (focus) btns[id].focus();
+      // Egenvurderingen vises når man har noe å vurdere seg mot: Løsning eller Sensorveiledning er åpnet
+      if ((id === "losning" || id === "sensor") && self && self._vis) self._vis();
       // Fanerada kan rulle sidelengs på mobil: hold valgt fane synlig
       if (bar.scrollWidth > bar.clientWidth) {
         var br = btns[id].getBoundingClientRect(), rr = bar.getBoundingClientRect();
@@ -981,6 +1043,7 @@
 
     // Bunnlinje: kilde til venstre, «Hvordan gikk det?» til høyre (lik i alle faner)
     var self = selfAssess(card, d, opts);
+    if (curTab === "losning" || curTab === "sensor") self._vis();
     body.appendChild(el("div", { class: "et-foot" }, [src.firstChild ? src : null, self]));
     card.appendChild(body);
     host.appendChild(card);
@@ -1398,11 +1461,15 @@
     function key() { return cardKey(card, d, opts); }
     var bOk = el("button", { class: "btn sm et-self-ok", type: "button", text: "✓ Fikk det til" });
     var bOv = el("button", { class: "btn sm et-self-ov", type: "button", text: "↻ Må øve mer" });
+    /* «Hvordan gikk det?» er skjult til Løsning eller Sensorveiledning er åpnet, eller en vurdering er lagret */
+    var vist = false;
     function paint() {
       var r = IN.progress && IN.progress.get(key()), s = r && r.status;
       bOk.setAttribute("aria-pressed", s === "ok" ? "true" : "false");
       bOv.setAttribute("aria-pressed", s === "ovmer" ? "true" : "false");
+      wrap.hidden = !(vist || s === "ok" || s === "ovmer");
     }
+    wrap._vis = function () { if (!vist) { vist = true; paint(); } };
     function pick(s) {
       if (!IN.progress) return;
       var r = IN.progress.get(key());
@@ -1856,7 +1923,7 @@
      mellomlager ved oppstart, når fanen blir synlig igjen og hver halvtime. Er den nyere, vises en
      liten melding med «Oppdater». Fremdrift og svar ligger i localStorage og overlever oppdateringen.
      Virker bare over http(s): via file:// finnes det ingen gammel kopi å bekymre seg for. */
-  IN.VERSION = "20261126g";
+  IN.VERSION = "20261126h";
   function initVersionCheck() {
     if (!/^https?:$/.test(location.protocol) || !window.fetch) return;
     var DISMISS = "in2010:ny-versjon-skjult", last = 0, shown = null;
