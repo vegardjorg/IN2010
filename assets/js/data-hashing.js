@@ -228,7 +228,8 @@
       { code: "A[i] ← A[j]", indent: 3, eli5: "Flytt den inn i hullet, så den kan finnes igjen.", normal: "Flytt paret inn i hullet.", teknisk: "Nå kan den nås igjen fra hjemmeplassen sin." },
       { code: "A[j] ← null", indent: 3, eli5: "Nå er hullet der den sto.", normal: "Det nye hullet er på plass j.", teknisk: "Nøkkelen er flyttet, så nå er plass j hullet. Det nye hullet kan igjen skjule nøkler lenger ut." },
       { code: "i ← j", indent: 3, eli5: "Vi fortsetter å tette det nye hullet.", normal: "Fortsett med å tette det nye hullet.", teknisk: "Samme som det rekursive kallet i kursets versjon." },
-      { code: "j ← (j + 1) mod N", indent: 2, eli5: "Vi går videre til neste i rekka.", normal: "Se på neste plass.", teknisk: "Neste plass i segmentet. Løkka stopper ved første null, og det kommer siden arrayet ikke er fullt.", grense: MODN }
+      { code: "j ← (j + 1) mod N", indent: 2, eli5: "Vi går videre til neste i rekka.", normal: "Se på neste plass.", teknisk: "Neste plass i segmentet. Løkka stopper ved første null, og det kommer siden arrayet ikke er fullt.", grense: MODN },
+      { code: "return A", indent: 1, eli5: "Ferdig! Hullet er tettet, og alle de andre kan fortsatt finnes.", normal: "Ferdig.", teknisk: "Ferdig. n gikk ned med 1." }
     ],
     bigO: { best: "O(1)", avg: "O(1) forventet", worst: "O(n)", space: "O(1) ekstra",
       why: t("Først leter vi fram nøkkelen, og så ser vi bare på dem som står på rad etter hullet. Som regel er det få.",
@@ -252,7 +253,8 @@
       { code: "return A", indent: 3, eli5: "Ferdig! Vi byttet ut den gamle verdien.", normal: "Ferdig.", teknisk: "Ferdig. Vi gikk bare fram til plassen der nøkkelen lå." },
       { code: "i ← (i + 1) mod N", indent: 2, eli5: "Plassen var opptatt av en annen. Vi går ett skritt til høyre. Fra den siste plassen går vi tilbake til den første.", normal: "Neste plass.", teknisk: "Linear probing videre, forbi både andre nøkler og merker.", grense: MODN },
       { code: "if p ≠ null then i ← p", indent: 1, eli5: "Fant vi et merke, bruker vi den plassen.", normal: "Gjenbruk det første merket hvis vi fant et.", teknisk: "Kortere probing neste gang." },
-      { code: "A[i] ← (k, v)", indent: 1, eli5: "Legg paret her. Nøkkelen fantes ikke fra før.", normal: "Sett inn.", teknisk: "Én skriving, enten i det første merket eller i den ledige plassen. n øker med 1, og et gjenbrukt merke forsvinner." }
+      { code: "A[i] ← (k, v)", indent: 1, eli5: "Legg paret her. Nøkkelen fantes ikke fra før.", normal: "Sett inn.", teknisk: "Én skriving, enten i det første merket eller i den ledige plassen. n øker med 1, og et gjenbrukt merke forsvinner." },
+      { code: "return A", indent: 1, eli5: "Ferdig! Paret ligger nå i tabellen.", normal: "Ferdig.", teknisk: "Ferdig etter én skriving." }
     ],
     bigO: { best: "O(1)", avg: "O(1) forventet", worst: "O(n)", space: "O(1) ekstra",
       why: t("Vi går forbi opptatte plasser og plasser med slettemerke til vi finner en tom. Merkene gjør køene lengre, men vanligvis er det bare noen få steg.", "Merker teller som opptatte når vi leter, så mange merker gjør letingen lengre.",

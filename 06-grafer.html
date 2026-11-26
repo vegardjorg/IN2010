@@ -7,9 +7,9 @@
   <title>Blokk 6 · Grafer · IN2010</title>
   <meta name="description" content="Grafer i IN2010: begreper, bredde-først og dybde-først søk, topologisk sortering, Dijkstra og Bellman-Ford, minimale spenntrær (Prim og Kruskal), sterkt sammenhengende komponenter, sykler og 2-sammenheng – med stegvise demoer, pseudokode og eksamensoppgaver.">
   <script>(function(){try{var d=document.documentElement;var t=localStorage.getItem('in-theme');if(t!=='dark'&&t!=='system')t='light';if(t!=='system')d.setAttribute('data-theme',t);var l=localStorage.getItem('in-level');if(l!=='eli5'&&l!=='teknisk')l='normal';d.setAttribute('data-level',l);}catch(e){document.documentElement.setAttribute('data-theme','light');document.documentElement.setAttribute('data-level','normal');}})();</script>
-  <link rel="stylesheet" href="assets/css/styles.css?v=20261126i">
-  <link rel="stylesheet" href="assets/css/dra.css?v=20261126i">
-  <link rel="stylesheet" href="assets/css/begrep-tips.css?v=20261126i">
+  <link rel="stylesheet" href="assets/css/styles.css?v=20261126j">
+  <link rel="stylesheet" href="assets/css/dra.css?v=20261126j">
+  <link rel="stylesheet" href="assets/css/begrep-tips.css?v=20261126j">
 </head>
 <body data-page="grafer">
   <a class="skip-link" href="#main">Hopp til innhold</a>
@@ -120,7 +120,7 @@
         <table class="cmp-table" id="tbl-grafer">
           <thead><tr><th>Algoritme</th><th>Kjøretid</th><th>Brukes til</th></tr></thead>
           <tbody>
-            <tr><td>Bredde-først søk (BFS)</td><td data-tip="Hver node går inn og ut av køen én gang, og hver kant sjekkes fra begge ender.">O(|V| + |E|)</td><td>Traversering, korteste vei uten vekter</td></tr>
+            <tr><td>Bredde-først søk (BFS)</td><td data-tip="Hver node går inn og ut av køen én gang, og hver kant sjekkes høyst to ganger (fra begge ender i en urettet graf).">O(|V| + |E|)</td><td>Traversering, korteste vei uten vekter</td></tr>
             <tr><td>Dybde-først søk (DFS)</td><td data-tip="Ett kall per node og én sjekk per kant-ende.">O(|V| + |E|)</td><td>Traversering, komponenter, sykler</td></tr>
             <tr><td>Topologisk sortering</td><td data-tip="Inngradene telles én gang, hver node pushes og popes én gang, hver kant telles ned én gang.">O(|V| + |E|)</td><td>Rekkefølge i en DAG, sykeltest</td></tr>
             <tr><td>Korteste vei i en DAG</td><td data-tip="Topologisk sortering, og så relakseres hver kant én gang i den rekkefølgen.">O(|V| + |E|)</td><td>Vektet DAG, også negative vekter</td></tr>
@@ -383,7 +383,7 @@
       <div id="demo-kruskal"></div>
       <div class="callout uni"><span class="lbl">Universitetsnivå: hvorfor grådig er trygt</span>
         <p>Hvorfor er grådig trygt her? Del nodene i to grupper på hvilken som helst måte. Den letteste kanten mellom gruppene kan alltid være med i et minimalt spenntre: bytter vi den inn for en tyngre kant mellom gruppene, blir treet ikke dyrere.
-          Prim bruker dette med «treet» og «resten» som gruppene. Kruskal bruker det med de to trærne kanten kobler sammen.</p>
+          Prim bruker dette med «treet» og «resten» som gruppene. Kruskal bruker det med de to trærne kanten kobler sammen.</p><p>Forelesningen nevner også <b>Borůvkas algoritme</b>: hver node starter som sitt eget lille tre, og i hver runde tar hvert tre med seg den billigste kanten til et annet tre.</p>
       </div>
       <div class="table-wrap">
         <table class="cmp-table">
@@ -465,7 +465,7 @@
       <div class="grid cols-2">
         <div><h4 style="margin:.2rem 0 .4rem">HasCycle (ytre løkke)</h4><div id="pc-hascycle"></div></div>
         <div class="callout uni"><span class="lbl">Universitetsnivå: tell kanter</span>
-          <p>Alternativ uten søk etter sykelen selv: en skog med c komponenter har nøyaktig |V| − c kanter. Tell komponentene med DFSFull. Er |E| &gt; |V| − c, finnes det en sykel. Begge metodene er O(|V| + |E|).</p></div>
+          <p>Alternativ uten søk etter sykelen selv: en skog med c komponenter har nøyaktig |V| − c kanter. Tell komponentene med DFSFull. Er |E| &gt; |V| − c (tell hver kant {u, v} én gang, ikke én gang per naboliste), finnes det en sykel. Begge metodene er O(|V| + |E|).</p></div>
       </div>
       <h3>Rettet graf: topologisk sortering som teller</h3>
       <p class="muted small">Noder på en sykel venter på hverandre og får aldri inngrad 0. Teller vi hvor mange som blir behandlet, er svaret «sykel» hvis det er færre enn |V|.</p>
@@ -520,7 +520,7 @@
 
       <h3>Separasjonsnoder i lineær tid</h3>
       <p class="muted small">Ett dybde-først søk holder. <b>depth[u]</b> er dybden til u i DFS-treet (roten har dybde 0).
-        <b>low[u]</b> svarer på spørsmålet: hvor høyt opp i DFS-treet kan vi komme hvis vi starter i u, går nedover i subtreet til u og så tar maksimalt én tilbakekant? «Høyt» betyr lav dybde, så low[u] er den laveste dybden vi kan nå slik.</p>
+        <b>low[u]</b> svarer på spørsmålet: hvor høyt opp i DFS-treet kan vi komme hvis vi starter i u, går nedover i subtreet til u og så tar maksimalt én tilbakekant? «Høyt» betyr lav dybde, så low[u] er den laveste dybden vi kan nå slik. Kursets Visit sjekker ikke om naboen er forelderen, så også kanten opp til forelderen teller. En løvnode får derfor low lik dybden til forelderen, eller lavere hvis den har en tilbakekant høyere opp.</p>
       <div class="grid cols-2">
         <div><h4 style="margin:.2rem 0 .4rem">SeparationVertices</h4><div id="pc-sep"></div></div>
         <div><h4 style="margin:.2rem 0 .4rem">Visit</h4><div id="pc-sepvisit"></div></div>
@@ -531,7 +531,7 @@
       <div class="callout uni"><span class="lbl">Universitetsnivå: hvorfor low virker</span>
         <p>Se på en node u (ikke roten) og et barn v av u i DFS-treet. Har ingen node nede i subtreet til v en kant som går høyere opp enn u, er u den eneste forbindelsen mellom subtreet og resten av grafen. Fjerner vi u, faller subtreet av. Det er akkurat det testen depth[u] ≤ low[v] sjekker.
           Roten behandles for seg: den er en separasjonsnode bare hvis den har minst to barn i DFS-treet.</p>
-        <p><code>IsBiconnected(G)</code> er da bare «er SeparationVertices(G) tom?». Den naive metoden – fjern hver node og sjekk sammenheng – er O(|V| · (|V| + |E|)).</p>
+        <p><code>IsBiconnected(G)</code> er da bare «er SeparationVertices(G) tom?». Den naive metoden – fjern hver node og sjekk sammenheng – er O(|V| · (|V| + |E|)).</p><p>En <b>bro</b> er en kant som deler grafen i flere komponenter hvis den fjernes. I et tre er alle kantene broer.</p>
       </div>
       <h3>Eksamen</h3>
       <div id="exam-h2021-12"></div>
@@ -563,22 +563,22 @@
     <p class="muted small">IN2010 · Blokk 6 · Grafer. Egne forklaringer og demoer basert på pensum. Eksamensoppgavene er gjengitt ordrett med kildelinje.</p>
   </footer>
 
-  <script src="assets/js/core.js?v=20261126i"></script>
-  <script src="assets/js/symboler.js?v=20261126i"></script>
-  <script src="assets/js/begreper-data.js?v=20261126i"></script>
-  <script src="assets/js/begrep-tips.js?v=20261126i"></script>
-  <script src="assets/js/data-tf.js?v=20261126i"></script>
-  <script src="assets/js/pseudocode.js?v=20261126i"></script>
-  <script src="assets/js/stepplayer.js?v=20261126i"></script>
-  <script src="assets/js/varline.js?v=20261126i"></script>
-  <script src="assets/js/viz-graph.js?v=20261126i"></script>
-  <script src="assets/js/data-algos.js?v=20261126i"></script>
-  <script src="assets/js/data-grafer.js?v=20261126i"></script>
-  <script src="assets/js/perfekt/grafer.js?v=20261126i"></script>
-  <script src="assets/js/perfekt/delt.js?v=20261126i"></script>
-  <script src="assets/js/kort/grafer.js?v=20261126i"></script>
-  <script src="assets/js/dra.js?v=20261126i"></script>
-  <script src="assets/js/data-dra.js?v=20261126i"></script>
+  <script src="assets/js/core.js?v=20261126j"></script>
+  <script src="assets/js/symboler.js?v=20261126j"></script>
+  <script src="assets/js/begreper-data.js?v=20261126j"></script>
+  <script src="assets/js/begrep-tips.js?v=20261126j"></script>
+  <script src="assets/js/data-tf.js?v=20261126j"></script>
+  <script src="assets/js/pseudocode.js?v=20261126j"></script>
+  <script src="assets/js/stepplayer.js?v=20261126j"></script>
+  <script src="assets/js/varline.js?v=20261126j"></script>
+  <script src="assets/js/viz-graph.js?v=20261126j"></script>
+  <script src="assets/js/data-algos.js?v=20261126j"></script>
+  <script src="assets/js/data-grafer.js?v=20261126j"></script>
+  <script src="assets/js/perfekt/grafer.js?v=20261126j"></script>
+  <script src="assets/js/perfekt/delt.js?v=20261126j"></script>
+  <script src="assets/js/kort/grafer.js?v=20261126j"></script>
+  <script src="assets/js/dra.js?v=20261126j"></script>
+  <script src="assets/js/data-dra.js?v=20261126j"></script>
   <script>
   (function () {
     "use strict";
@@ -633,7 +633,7 @@
     IN.explain("#intro-bfs", t(
       "BFS er som å lete etter noen i et hus: først ser du i rommet du står i, så i alle rommene ved siden av, så rommene ved siden av dem igjen.",
       "BFS bruker en kø og besøker nodene i rekkefølge etter hvor mange kanter de er fra start. Derfor finner den korteste vei i en uvektet graf. Kjøretid O(|V| + |E|).",
-      "Invarianten er at køen inneholder noder på avstand d etterfulgt av noder på avstand d + 1. Hver node legges i køen høyst én gang (merkes ved oppdagelse), og hver kant sjekkes fra begge ender: O(|V| + |E|) med naboliste."
+      "Invarianten er at køen inneholder noder på avstand d etterfulgt av noder på avstand d + 1. Hver node legges i køen høyst én gang (merkes ved oppdagelse), og hver kant sjekkes høyst to ganger (én gang fra hver ende i en urettet graf): O(|V| + |E|) med naboliste."
     ), { label: "Nivå:" });
     mountDemo("#demo-bfs", { algo: "bfsVisit", gen: "grBFS", legend: LEG_TRAV,
       presets: { "Eksempelgraf fra A": [GR.u7, "A"], "Fra D": [GR.u7, "D"], "To komponenter fra A": [GR.u2k, "A"] } });
@@ -909,7 +909,7 @@
         explain: "En indre node har minst to naboer, og den eneste stien mellom dem går gjennom noden. Fjerner vi den, faller treet i flere deler. Løvnodene er ikke separasjonsnoder." },
       { s: "En graf som har en sykel, kan ikke ha separasjonsnoder.", answer: false, blokk: "6",
         explain: "Moteksempel: to trekanter som deler én node. Begge trekantene er sykler, men den felles noden er en separasjonsnode – uten den faller grafen i to." },
-      { s: "En rettet graf uten selvløkker (kanter fra en node til seg selv) der hver node har minst én kant ut, må ha en sykel.", answer: true, blokk: "6",
+      { s: "En rettet graf med minst én node, uten selvløkker (kanter fra en node til seg selv) der hver node har minst én kant ut, må ha en sykel.", answer: true, blokk: "6",
         explain: "Følg en kant ut fra node til node. Grafen har bare |V| noder, så etter høyst |V| steg må vi komme til en node vi har vært i før. Da har vi gått i ring." },
       { s: "En DAG med minst én node har alltid minst én node med inngrad 0.", answer: true, blokk: "6",
         explain: "Hadde alle nodene en kant inn, kunne vi fulgt kantene baklengs for alltid og måttet komme tilbake til en node vi har sett – en sykel. Det er derfor topologisk sortering alltid har en node å starte med." },

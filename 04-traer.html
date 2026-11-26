@@ -7,9 +7,9 @@
   <title>Blokk 4 · Trær · IN2010</title>
   <meta name="description" content="Trær i IN2010: begreper, traverseringer, binære søketrær, diameter, laveste felles forfeder, AVL og rotasjoner, Anti-AVL og Huffman – med stegvise demoer, pseudokode og eksamensoppgaver.">
   <script>(function(){try{var d=document.documentElement;var t=localStorage.getItem('in-theme');if(t!=='dark'&&t!=='system')t='light';if(t!=='system')d.setAttribute('data-theme',t);var l=localStorage.getItem('in-level');if(l!=='eli5'&&l!=='teknisk')l='normal';d.setAttribute('data-level',l);}catch(e){document.documentElement.setAttribute('data-theme','light');document.documentElement.setAttribute('data-level','normal');}})();</script>
-  <link rel="stylesheet" href="assets/css/styles.css?v=20261126i">
-  <link rel="stylesheet" href="assets/css/dra.css?v=20261126i">
-  <link rel="stylesheet" href="assets/css/begrep-tips.css?v=20261126i">
+  <link rel="stylesheet" href="assets/css/styles.css?v=20261126j">
+  <link rel="stylesheet" href="assets/css/dra.css?v=20261126j">
+  <link rel="stylesheet" href="assets/css/begrep-tips.css?v=20261126j">
   <style>
     /* Sidelokalt: stakk-kolonner ved siden av treet (fanen «Uten rekursjon»). Bare designtokens fra styles.css. */
     .itv { display: flex; flex-direction: column; gap: .55rem; min-width: 0; }
@@ -154,11 +154,11 @@
             <th data-tip="Hvis treet er balansert (høyde O(log n)), som et AVL-tre.">Balansert</th></tr></thead>
           <tbody>
             <tr><td>Søk / innsetting / fjerning i binært søketre (BST)</td>
-              <td data-tip="Svaret ligger i roten (søk), eller treet er tomt (innsetting).">O(1)</td>
+              <td data-tip="Søk: svaret ligger i roten. Innsetting: x skal rett inn som barn av roten, eller ligger i roten fra før.">O(1)</td>
               <td data-tip="Én sti fra roten og ned, altså O(h). For en kjede er h = n − 1.">O(n)</td>
               <td data-tip="h = O(log n), så én sti er O(log n).">O(log n)</td></tr>
             <tr><td>Søk / innsetting / fjerning i AVL</td>
-              <td data-tip="Søk: svaret ligger i roten, O(1). Innsetting og fjerning må alltid ned mot en løvnode og så rebalansere på vei opp, så de er O(log n) også i beste fall.">O(1) søk, O(log n) ellers</td>
+              <td data-tip="Søk: svaret ligger i roten, O(1). Innsetting av en ny nøkkel og fjerning må ned i treet og så rebalansere på vei opp, så de er O(log n) også i beste fall. Unntaket er innsetting av en nøkkel som allerede ligger i roten.">O(1) søk, O(log n) ellers</td>
               <td data-tip="AVL-regelen holder høyden O(log n), og hver rotasjon er O(1).">O(log n)</td>
               <td data-tip="AVL-trær er alltid balanserte.">O(log n)</td></tr>
             <tr><td>Pre-/in-/post-/level-order</td>
@@ -688,23 +688,23 @@
     <p class="muted small">IN2010 · Blokk 4 · Trær. Egne forklaringer og demoer basert på pensum. Eksamensoppgavene er gjengitt ordrett fra eksamensarkene (UiO, IN2010), med kildelinje og eventuelle avvik på hvert kort.</p>
   </footer>
 
-  <script src="assets/js/core.js?v=20261126i"></script>
-  <script src="assets/js/varline.js?v=20261126i"></script>
-  <script src="assets/js/symboler.js?v=20261126i"></script>
-  <script src="assets/js/begreper-data.js?v=20261126i"></script>
-  <script src="assets/js/begrep-tips.js?v=20261126i"></script>
-  <script src="assets/js/data-tf.js?v=20261126i"></script>
-  <script src="assets/js/pseudocode.js?v=20261126i"></script>
-  <script src="assets/js/stepplayer.js?v=20261126i"></script>
-  <script src="assets/js/viz-bars.js?v=20261126i"></script>
-  <script src="assets/js/viz-tree.js?v=20261126i"></script>
-  <script src="assets/js/data-algos.js?v=20261126i"></script>
-  <script src="assets/js/data-traer.js?v=20261126i"></script>
-  <script src="assets/js/perfekt/traer.js?v=20261126i"></script>
-  <script src="assets/js/perfekt/delt.js?v=20261126i"></script>
-  <script src="assets/js/kort/traer.js?v=20261126i"></script>
-  <script src="assets/js/dra.js?v=20261126i"></script>
-  <script src="assets/js/data-dra.js?v=20261126i"></script>
+  <script src="assets/js/core.js?v=20261126j"></script>
+  <script src="assets/js/varline.js?v=20261126j"></script>
+  <script src="assets/js/symboler.js?v=20261126j"></script>
+  <script src="assets/js/begreper-data.js?v=20261126j"></script>
+  <script src="assets/js/begrep-tips.js?v=20261126j"></script>
+  <script src="assets/js/data-tf.js?v=20261126j"></script>
+  <script src="assets/js/pseudocode.js?v=20261126j"></script>
+  <script src="assets/js/stepplayer.js?v=20261126j"></script>
+  <script src="assets/js/viz-bars.js?v=20261126j"></script>
+  <script src="assets/js/viz-tree.js?v=20261126j"></script>
+  <script src="assets/js/data-algos.js?v=20261126j"></script>
+  <script src="assets/js/data-traer.js?v=20261126j"></script>
+  <script src="assets/js/perfekt/traer.js?v=20261126j"></script>
+  <script src="assets/js/perfekt/delt.js?v=20261126j"></script>
+  <script src="assets/js/kort/traer.js?v=20261126j"></script>
+  <script src="assets/js/dra.js?v=20261126j"></script>
+  <script src="assets/js/data-dra.js?v=20261126j"></script>
   <script>
   (function () {
     "use strict";

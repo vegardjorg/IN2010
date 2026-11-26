@@ -51,7 +51,7 @@
     ["hasCycle", "Sjekke om en urettet graf har en sykel"], ["sepVertices", "Finne alle separasjonsnoder"]
   ];
   /* Korte merknader på baksiden: hva symbolene betyr, eller hvorfor verste tilfelle er som det er */
-  var BST_H = "Verste tilfelle er O(h), og h kan bli n når treet er skjevt (en lang sti).";
+  var BST_H = "Verste tilfelle er O(h), og h kan bli n − 1 når treet er skjevt (en lang sti). Da er det O(n).";
   var MERK = {
     bucketSort: "N er antall bøtter.",
     radixSort: "d er antall siffer og N antall mulige sifferverdier (10 i titallsystemet).",

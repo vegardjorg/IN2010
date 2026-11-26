@@ -743,7 +743,7 @@
     var L = base.lines;
     function cp(l, code) { var c = {}; for (var k in l) c[k] = l[k]; c.code = code; return c; }
     reg(IN.algos, "checkBSTArk", {
-      title: "Er binærtreet et søketre? (H2022 a)",
+      title: "Er binærtreet et søketre? (H2022 b)",
       name: "CheckBST", params: "v",
       input: "Roten v til et binærtre med unike heltall",
       output: "true hvis treet er et binært søketre, ellers false",

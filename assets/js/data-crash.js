@@ -848,7 +848,7 @@
         kjerne: t(
           "En separasjonsnode er en by som alle veiene mellom to deler av landet går gjennom. Stenger du den, blir landet delt i to. Et nett uten slike byer tåler at hvilken som helst by stenges.",
           "<p>En <b>separasjonsnode</b> gjør grafen usammenhengende hvis den fjernes. En sammenhengende graf er <b>2-sammenhengende</b> hvis den ikke har noen. Brute force (fjern hver node og kjør DFS) er O(|V| · (|V| + |E|)). Med én DFS og tallene depth og low finner du alle separasjonsnodene i O(|V| + |E|). <b>Bellman-Ford</b> finner korteste vei med negative kanter og oppdager negative sykler, O(|V| · |E|).</p>",
-          "<p>low[u] er den laveste dybden vi kan nå fra subtreet til u med én kant utenfor DFS-treet. Roten er separasjonsnode hvis den har mer enn ett barn i DFS-treet. En annen node u er det hvis et barn v har low[v] ≥ depth[u]. Bellman-Ford: si hvilken node du starter fra, eller bruk en superkilde (ellers −1 p i 2025).</p>"),
+          "<p>low[u] er den laveste dybden vi kan nå fra subtreet til u med maksimalt én kant tilbake. Kursets Visit sjekker ikke om naboen er forelderen, så også kanten opp til forelderen teller. Roten er separasjonsnode hvis den har mer enn ett barn i DFS-treet. En annen node u er det hvis et barn v har low[v] ≥ depth[u]. Bellman-Ford: si hvilken node du starter fra, eller bruk en superkilde (ellers −1 p i 2025).</p>"),
         les: [["grafer", "sammenheng", null, "Grafer → Sammenheng"], ["grafer", "dijkstra", "pc-bellman", "Bellman-Ford (i Dijkstra-fanen)"]],
         oppskrift: [
           "Oversett «tåler at én holdeplass stenges» til «2-sammenhengende» og «ingen separasjonsnoder».",

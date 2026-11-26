@@ -230,7 +230,7 @@
         "Sensor la vekt på at teksten er tydelig: en setning som ikke er forståelig etter to gjennomlesninger, ignoreres.", "Tips: gi en konkret situasjon for hver strategi (liten k og stor k)."]
     }; });
 
-    def("H2020-7", { host: "#exam-h2020-7" }, function () { return { key: "H2020-7", deler: ["(a)", "(b)", "(c)"], year: "H2020", title: "Subanagram (a–c)", oppgave_nr: "Oppgave 7", points: 17,
+    def("H2020-7", { host: "#exam-h2020-7" }, function () { return { key: "H2020-7", year: "H2020", title: "Subanagram (a–c)", oppgave_nr: "Oppgave 7", points: 17,
       ark: "Subanagram", ordrett: true, deler: ["(a)", "(b)", "(c)"],
       oppgave: fillSkel(IN.oppg({
         intro: "<p>Vi ønsker å lage en nettside for å hjelpe sleipe Scrabble-spillere. En Scrabble-spiller har noen bokstaver som de skal prøve å forme ord fra, og disse ordene må stå i en ordbok. I denne oppgaven ignorerer alle andre Scrabble-regler, og fokuserer på det vi skal kalle subanagrammer.</p>" +

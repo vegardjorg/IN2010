@@ -138,7 +138,7 @@
       },
       {
         del: "(c)",
-        tekst: "<p><b>Bøttesortering (Bucket sort).</b> Alderen er et heltall fra 0 til 100, så vi kan bruke N = 101 bøtter. Det gir O(N + n) = O(n), som slår alle sammenligningsbaserte sorteringer (O(n log n) i beste fall).</p>",
+        tekst: "<p><b>Bøttesortering (Bucket sort).</b> Alderen er et heltall fra 0 til 100, så vi kan bruke N = 101 bøtter. Det gir O(N + n) = O(n), som slår alle sammenligningsbaserte sorteringer. De kan ikke bli raskere enn O(n log n) i verste fall.</p>",
         fasitVerdi: "Bucket sort"
       }
     ],

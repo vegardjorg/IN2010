@@ -120,7 +120,7 @@
 
     /* ---------- Heap ---------- */
     heap: { ord: "heap", forveks: "Må ikke forveksles med «heapen» i minnet der et program lagrer objekter. Det er noe helt annet enn datastrukturen her.", tema: "heap",
-      txt: "Et komplett binærtre der hver node er større enn eller lik forelderen. Da ligger det minste elementet alltid i roten.",
+      txt: "Et komplett binærtre der hver node står i fast rekkefølge til forelderen. I en min-heap er hver node større enn eller lik forelderen, så det minste elementet ligger i roten. I en max-heap er det motsatt, og det største ligger i roten.",
       se: ["03-heap.html#fane=hva", "Heap → Hva er en heap"], m: ["(?:binær |min-|max-)?heap(?:en|er|ene)?"], ikke: ["heap"] },
     prioritetsko: { ord: "prioritetskø", forveks: "Må ikke forveksles med heap. Prioritetskøen er ADT-en (hva man kan gjøre), heapen er en datastruktur som implementerer den.", tema: "heap",
       txt: "En ADT der vi setter inn elementer og alltid tar ut det minste først (removeMin). Den lages vanligvis med en heap.",

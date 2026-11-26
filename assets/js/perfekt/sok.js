@@ -129,7 +129,7 @@
   /* ---------- H2025 · Oppgave 6 · Finn k minste (12 poeng) ---------- */
   IN.PERFEKT["H2025-6"] = {
     type: "eksamen",
-    intro: "<p>En løsning på (c) er også en løsning på (a) og (b), fordi en raskere algoritme oppfyller de svakere kravene. Skriver du det, får du full uttelling for alle tre.</p>",
+    intro: "<p>En løsning på (c) er også en løsning på (a) og (b), fordi en raskere algoritme oppfyller de svakere kravene. Skriver du det, får du full uttelling for alle tre.</p><p>Oppgaven ber om en liste. Koden her gir et array. Det trekker ikke alene, men sensor kan trekke for det sammen med andre unøyaktigheter. Vil du være helt trygg, start med <code>list ← an empty list</code> og bruk <code>append</code>.</p>",
     svar: [
       {
         del: "(a)",

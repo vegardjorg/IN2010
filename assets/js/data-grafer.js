@@ -161,7 +161,7 @@
       L("BFSVisit(G, v, visited)", 3, "Vi sprer oss ut fra v, lag for lag, og setter kryss ved alt vi når.", "Besøk alt som kan nås fra v.", "Summert over alle kall: O(|V| + |E|).")
     ],
     bigO: { best: "O(|V| + |E|)", avg: "O(|V| + |E|)", worst: "O(|V| + |E|)", space: "O(|V|)",
-      why: t("Hver node blir besøkt én gang, og hver kant blir sett på fra begge ender. Mer arbeid enn det blir det ikke.", "Hver node besøkes én gang, og hver kant sjekkes fra begge ender.", "Den ytre løkka er O(|V|), og kallene deler visited, så til sammen blir det O(|V| + |E|).") }
+      why: t("Hver node blir besøkt én gang, og hver kant blir sett på fra begge ender. Mer arbeid enn det blir det ikke.", "Hver node besøkes én gang, og hver kant sjekkes høyst to ganger (fra begge ender i en urettet graf).", "Den ytre løkka er O(|V|), og kallene deler visited, så til sammen blir det O(|V| + |E|).") }
   });
 
   reg(IN.gen, "grBFS", function (inp) {
@@ -256,7 +256,7 @@
       L("DFSVisit(G, v, visited)", 3, "Vi går så dypt vi kan ut fra v og setter kryss ved alt vi når.", "Besøk alt som kan nås fra v.", "Kallene deler visited, så summen av arbeidet er O(|V| + |E|).")
     ],
     bigO: { best: "O(|V| + |E|)", avg: "O(|V| + |E|)", worst: "O(|V| + |E|)", space: "O(|V|)",
-      why: t("Hver node blir besøkt én gang, og hver kant blir sett på fra begge ender. Mer arbeid enn det blir det ikke.", "Hver node besøkes én gang, hver kant sjekkes fra begge ender.", "Ytre løkke O(|V|) pluss O(|V| + |E|) for alle DFSVisit-kallene til sammen.") }
+      why: t("Hver node blir besøkt én gang, og hver kant blir sett på fra begge ender. Mer arbeid enn det blir det ikke.", "Hver node besøkes én gang, hver kant sjekkes høyst to ganger (fra begge ender i en urettet graf).", "Ytre løkke O(|V|) pluss O(|V| + |E|) for alle DFSVisit-kallene til sammen.") }
   });
 
   reg(IN.gen, "grDFS", function (inp) {

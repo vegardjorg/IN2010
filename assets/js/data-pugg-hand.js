@@ -53,7 +53,7 @@
     kort("bf-hva", "Hva Bellman-Ford tåler og gir", "Bellman-Ford",
       "Hva tåler Bellman-Ford som Dijkstra ikke tåler, og hva mer gir den?",
       ["Den tåler <b>negative vekter</b> og finner korteste vei fra startnoden.",
-       "I tillegg <b>oppdager</b> den negative sykler. Da finnes det ingen korteste vei, fordi en runde til i sykelen alltid gjør veien kortere."],
+       "I tillegg <b>oppdager</b> den negative sykler som kan nås fra startnoden. Da finnes det ingen korteste vei, fordi en runde til i sykelen alltid gjør veien kortere."],
       F_VEKT),
     kort("bf-runder", "Hvorfor |V| − 1 runder", "Bellman-Ford",
       "Hvorfor holder det med |V| − 1 runder, og hva betyr det om noe blir kortere i runde |V|?",
