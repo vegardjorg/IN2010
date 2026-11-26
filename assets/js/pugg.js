@@ -7,8 +7,13 @@
    IN.pugg(host, deck, opts) → { reset() }
      deck = { id, tittel, intro?, vend?: true|false,   vend: kortene kan øves begge veier
               retning?: ["Figur → betydning", "Betydning → figur"],
-              kort: [{ id, a: side, b: side, kilde?: "F05-01 lysark 7" }] }
-     side = "html" | { html?, er?: <figur for IN.vizEr>, pre?: "monospace-tekst", etter?: "html" }
+              spm?: spm,                                     standardspørsmål når kortet ikke har eget
+              kort: [{ id, a: side, b: side, spm?: spm, kilde?: "F05-01 lysark 7" }] }
+     spm  = "tekst" (bare retning 0) | ["retning 0", "retning 1"]
+            Kort spørsmålslinje under forsiden, så det er tydelig hva som skal svares. Et kort med
+            spm for en retning bruker sitt eget (også "" = ingen linje); ellers brukes deck.spm.
+     side = "html" | { html?, er?: <figur for IN.vizEr>, pre?: "monospace-tekst", etter?: "html",
+                       foran?: "html" }   foran: vises i stedet når siden står på forsiden
      opts = { side?: progress-side }
 
    Lagring: in2010:pugg:<deck.id>:<retning> = { k: { <kort-id>: <fingeravtrykk> } }
@@ -133,6 +138,13 @@
     }
     // En side kan ha egen tekst når den står på forsiden ({ html, foran }): da skjules svaret i spørsmålet.
     function forsideAv(k) { var s = dir === 0 ? k.a : k.b; return s && s.foran ? { html: s.foran } : s; }
+    function spmFra(v) { if (v == null) return null; if (Array.isArray(v)) return v[dir] == null ? null : v[dir]; return dir === 0 ? v : null; }
+    function spmAv(k) { var s = spmFra(k.spm); return s != null ? s : (spmFra(deck.spm) || ""); }
+    function tegnFor(n, k) { // forsiden + spørsmålslinja (samme tegning i maal(), så høyden stemmer)
+      tegnSide(n, forsideAv(k));
+      var s = spmAv(k);
+      if (s) n.appendChild(el("p", { class: "pg-spm", html: s }));
+    }
     function baksideAv(k) { return dir === 0 ? k.b : k.a; }
 
     /* ---------- Fast høyde: mål høyeste for- og bakside i stokken ---------- */
@@ -145,17 +157,21 @@
       kort.appendChild(m);
       var hFor = 0, hBak = 0;
       deck.kort.forEach(function (k) {
-        tegnSide(m, forsideAv(k)); hFor = Math.max(hFor, m.offsetHeight);
-        tegnBak(m, k); hBak = Math.max(hBak, m.offsetHeight);
+        m.className = "pg-side pg-for"; tegnFor(m, k); hFor = Math.max(hFor, m.getBoundingClientRect().height);
+        m.className = "pg-side pg-bak"; tegnBak(m, k); hBak = Math.max(hBak, m.getBoundingClientRect().height);
       });
       kort.removeChild(m);
-      forside.style.minHeight = hFor + "px";
-      bakside.style.minHeight = hBak + "px";
+      forside.style.minHeight = Math.ceil(hFor) + "px";
+      bakside.style.minHeight = Math.ceil(hBak) + "px";
     }
     if (typeof ResizeObserver === "function") {
       var ventRO = 0;
       new ResizeObserver(function () { clearTimeout(ventRO); ventRO = setTimeout(function () { maal(false); }, 30); }).observe(kort);
     }
+    // Fanen med kortstokken vises (core.js sender in:shown): mål med en gang, ikke først ved første snu.
+    document.addEventListener("in:shown", function (e) {
+      if (e.target && e.target.contains && e.target.contains(root)) setTimeout(function () { maal(false); }, 0);
+    });
 
     /* ---------- Flyt ---------- */
     function oppdaterStatus() {
@@ -191,7 +207,7 @@
         oppdaterStatus(); tegnListe();
         return;
       }
-      tegnSide(forside, forsideAv(cur));
+      tegnFor(forside, cur);
       plassholder();
       knappeModus("snu");
       oppdaterStatus();
@@ -239,6 +255,7 @@
       var ul = el("ul", { class: "pg-liste-ul" });
       deck.kort.forEach(function (k) {
         var s = forsideAv(k), tekst = k.navn || (typeof s === "string" ? s : s.html);
+        if (!tekst && s && s.pre) tekst = s.pre.split("\n").slice(0, 2).join(" · ").replace(/[&<>]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;" }[c]; });
         if (!tekst) { // Figur på forsiden: bruk starten av baksiden som navn i lista
           var bs = baksideAv(k), tmp = document.createElement("div");
           tmp.innerHTML = typeof bs === "string" ? bs : (bs.html || bs.pre || "");

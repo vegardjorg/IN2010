@@ -7,7 +7,7 @@
   <title>Puggekort · IN2010</title>
   <meta name="description" content="Puggekort i IN2010: kjøretider for sortering, operasjoner og grafalgoritmer, stabil og in-place, og begreper. Kortene du kan forsvinner, de andre kommer igjen til de sitter.">
   <script>(function(){try{var d=document.documentElement;var t=localStorage.getItem('in-theme');if(t!=='dark'&&t!=='system')t='light';if(t!=='system')d.setAttribute('data-theme',t);var l=localStorage.getItem('in-level');if(l!=='eli5'&&l!=='teknisk')l='normal';d.setAttribute('data-level',l);}catch(e){document.documentElement.setAttribute('data-theme','light');document.documentElement.setAttribute('data-level','normal');}})();</script>
-  <link rel="stylesheet" href="assets/css/styles.css?v=20261126b">
+  <link rel="stylesheet" href="assets/css/styles.css?v=20261126c">
   <style>
     /* Puggekort: sidespesifikt */
     .pg { max-width: 760px; outline: none; }
@@ -43,6 +43,8 @@
     .pg-tekst p { margin: .25rem 0; }
     .pg-tekst ol { margin: .25rem 0 .25rem 1.3rem; padding: 0; }
     .pg-etter { font-size: .9rem; color: var(--color-on-surface-variant); margin-top: .25rem; }
+    .pg-spm { margin: .45rem 0 0; padding: .1rem 0 .1rem .55rem; border-left: 3px solid var(--color-primary);
+      font-size: .92rem; font-weight: 500; line-height: 1.4; color: var(--color-on-surface-variant); }
     .pg-fig { margin: 0; }
     .pg-fig .exam-fig-h svg { max-width: 100%; max-height: 200px; width: auto; height: auto; display: block; margin: 0 auto; }
     .pg-pre { font-family: var(--font-mono, ui-monospace, monospace); font-size: 13.5px; line-height: 1.45; padding: .45rem .7rem; margin: .2rem 0;
@@ -61,7 +63,7 @@
     .pg-kan { background: var(--color-tone-ok); color: var(--color-on-tone-ok); border-color: transparent; }
     .pg-knapper kbd { font: 500 .7rem var(--font-mono, ui-monospace, monospace); padding: .05rem .3rem; margin-left: .45rem; border-radius: 4px;
       border: 1px solid currentColor; opacity: .6; }
-    @media (hover: none) { .pg-knapper kbd { display: none; } }
+    @media (hover: none), (max-width: 420px) { .pg-knapper kbd { display: none; } }
     .pg-plass { height: 100%; min-height: 3rem; display: flex; align-items: center; justify-content: center; text-align: center;
       font-size: .88rem; color: var(--color-on-surface-variant); opacity: .7; border-radius: 8px; background: var(--color-surface-container); }
     .pg-bak .pg-plass { position: absolute; inset: 0; }
@@ -95,6 +97,9 @@
       <button data-tab="operasjoner">Operasjoner</button>
       <button data-tab="grafer-tid">Grafer</button>
       <button data-tab="begreper">Begreper</button>
+      <button data-tab="grafer-krav">Grafalgoritmer</button>
+      <button data-tab="trer-heap">Trær og heap</button>
+      <button data-tab="hashing-regler">Hashing</button>
       <button data-tab="om">Slik virker det</button>
     </div>
 
@@ -103,6 +108,9 @@
     <section data-panel="operasjoner" hidden><div id="pugg-operasjoner"></div></section>
     <section data-panel="grafer-tid" hidden><div id="pugg-grafer-tid"></div></section>
     <section data-panel="begreper" hidden><div id="pugg-begreper"></div></section>
+    <section data-panel="grafer-krav" hidden><div id="pugg-grafer-krav"></div></section>
+    <section data-panel="trer-heap" hidden><div id="pugg-trer-heap"></div></section>
+    <section data-panel="hashing-regler" hidden><div id="pugg-hashing-regler"></div></section>
     <section data-panel="om" hidden>
       <h3>Slik virker puggekortene</h3>
       <ul>
@@ -122,18 +130,19 @@
 
   <footer class="footer">IN2010-guide · Puggekort</footer>
 
-  <script src="assets/js/core.js?v=20261126b"></script>
-  <script src="assets/js/symboler.js?v=20261126b"></script>
-  <script src="assets/js/begreper-data.js?v=20261126b"></script>
-  <script src="assets/js/data-algos.js?v=20261126b"></script>
-  <script src="assets/js/data-heap.js?v=20261126b"></script>
-  <script src="assets/js/data-grafer.js?v=20261126b"></script>
-  <script src="assets/js/data-hashing.js?v=20261126b"></script>
-  <script src="assets/js/data-traer.js?v=20261126b"></script>
-  <script src="assets/js/data-lister.js?v=20261126b"></script>
-  <script src="assets/js/data-sok.js?v=20261126b"></script>
-  <script src="assets/js/pugg.js?v=20261126b"></script>
-  <script src="assets/js/data-pugg.js?v=20261126b"></script>
+  <script src="assets/js/core.js?v=20261126c"></script>
+  <script src="assets/js/symboler.js?v=20261126c"></script>
+  <script src="assets/js/begreper-data.js?v=20261126c"></script>
+  <script src="assets/js/data-algos.js?v=20261126c"></script>
+  <script src="assets/js/data-heap.js?v=20261126c"></script>
+  <script src="assets/js/data-grafer.js?v=20261126c"></script>
+  <script src="assets/js/data-hashing.js?v=20261126c"></script>
+  <script src="assets/js/data-traer.js?v=20261126c"></script>
+  <script src="assets/js/data-lister.js?v=20261126c"></script>
+  <script src="assets/js/data-sok.js?v=20261126c"></script>
+  <script src="assets/js/pugg.js?v=20261126c"></script>
+  <script src="assets/js/data-pugg.js?v=20261126c"></script>
+  <script src="assets/js/data-pugg-hand.js?v=20261126c"></script>
   <script>
   (function () {
     "use strict";
