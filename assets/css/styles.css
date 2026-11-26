@@ -2530,5 +2530,5 @@ body[data-page="crash"] .cr-step { scroll-margin-top: 0; }
 }
 
 /* Linjelengde på brede skjermer: brødtekst holdes rundt 75 tegn, figurer og tabeller bruker hele bredden */
-main :is(p, li, dd, .lead) { max-width: 75ch; }
+main :is(p:not([class*="legend"]), .lead), main :is(ul, ol):not([class]) > li, main dd { max-width: 75ch; }
 main :is(td, th) :is(p, li) { max-width: none; }
