@@ -923,7 +923,7 @@
         kjerne: t(
           "Lat som det er eksamensdagen. Start klokka, gjør oppgavene i rekkefølge, og sjekk løsningen først når du er ferdig med hver.",
           "<p>Løs oppgavene på papir i rekkefølge. Den anbefalte tiden er fordelt etter poeng. Åpne løsningen i kortet etterpå og merk med «Fikk det til» eller «Må øve mer».</p>",
-          "<p>Varigheten står ikke i kildene våre. Tallene under fordeler en tid du selv velger (forslag: 2 minutter per poeng) etter poengene. Sjekk den faktiske varigheten i eksamensinformasjonen.</p>"),
+          "<p>Eksamen varer 4 timer (emnesiden). Tallene under gir 2 minutter per poeng, altså 200 minutter for 100 poeng. Da har du rundt 40 minutter igjen til å lese settet og se over svarene.</p>"),
         les: [],
         oppskrift: [
           "Les gjennom hele settet først (2–3 minutter).",
