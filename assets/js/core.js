@@ -45,6 +45,7 @@
     { id: "index",      href: "index.html",        label: "Forside",     ready: true },
     { id: "crash",      href: "crash.html",        label: "Crash course", ready: true },
     { id: "pseudokode", href: "pseudokode.html",   label: "Pseudokode",  ready: true },
+    { id: "pugg",       href: "pugg.html",         label: "Puggekort",   ready: true },
     { id: "begreper",   href: "00-begreper.html",  label: "0 · Begreper", ready: true },
     { id: "lister",     href: "lister.html",       label: "Lister & stakk", ready: true },
     { id: "sortering",  href: "01-sortering.html", label: "1 · Sortering", ready: true },
@@ -1837,7 +1838,7 @@
      mellomlager ved oppstart, når fanen blir synlig igjen og hver halvtime. Er den nyere, vises en
      liten melding med «Oppdater». Fremdrift og svar ligger i localStorage og overlever oppdateringen.
      Virker bare over http(s): via file:// finnes det ingen gammel kopi å bekymre seg for. */
-  IN.VERSION = "20261126a";
+  IN.VERSION = "20261126b";
   function initVersionCheck() {
     if (!/^https?:$/.test(location.protocol) || !window.fetch) return;
     var DISMISS = "in2010:ny-versjon-skjult", last = 0, shown = null;

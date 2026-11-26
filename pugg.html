@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="nb">
+<head>
+  <meta charset="utf-8">
+  <link rel="icon" href="data:,">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Puggekort · IN2010</title>
+  <meta name="description" content="Puggekort i IN2010: kjøretider for sortering, operasjoner og grafalgoritmer, stabil og in-place, og begreper. Kortene du kan forsvinner, de andre kommer igjen til de sitter.">
+  <script>(function(){try{var d=document.documentElement;var t=localStorage.getItem('in-theme');if(t!=='dark'&&t!=='system')t='light';if(t!=='system')d.setAttribute('data-theme',t);var l=localStorage.getItem('in-level');if(l!=='eli5'&&l!=='teknisk')l='normal';d.setAttribute('data-level',l);}catch(e){document.documentElement.setAttribute('data-theme','light');document.documentElement.setAttribute('data-level','normal');}})();</script>
+  <link rel="stylesheet" href="assets/css/styles.css?v=20261126b">
+  <style>
+    /* Puggekort: sidespesifikt */
+    .pg { max-width: 760px; outline: none; }
+    .pg [hidden] { display: none !important; }
+    .pg { overflow-x: hidden; overflow-x: clip; padding-bottom: 2px; }
+    .pg-kort { touch-action: pan-y; will-change: transform; }
+    /* Ingen egne sideveis-rulleflater inne i kortet: de tar over sveipet (pointercancel).
+       Skjemaene brytes i stedet for å rulle, figurene skaleres til bredden. */
+    .pg-kort * { touch-action: pan-y; }
+    .pg-kort .exam-fig, .pg-kort .exam-fig-h { overflow: visible; }
+    .pg-kort .pg-pre { overflow: visible; white-space: pre-wrap; overflow-wrap: anywhere; }
+    @media (pointer: coarse) { .pg-kort { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; } }
+    .pg-plass { flex-direction: column; gap: .25rem; }
+    .pg-plass-pc, .pg-plass-mob { font-size: .8rem; opacity: .85; }
+    .pg-plass-mob { display: none; }
+    @media (hover: none) and (pointer: coarse) { .pg-plass-pc { display: none; } .pg-plass-mob { display: inline; } }
+    /* Kortet: topplinje, fremdrift, spørsmål, fast knapperad, svar */
+    .pg-kort { position: relative; border: 1px solid var(--color-outline-variant); border-radius: 12px; background: var(--color-surface-container-lowest);
+      color: var(--color-on-surface); padding: .55rem .9rem .7rem; box-shadow: 0 1px 3px rgba(0,0,0,.08); }
+    .pg-topp { display: flex; flex-wrap: wrap; gap: .35rem .8rem; align-items: center; justify-content: space-between; min-height: 30px; }
+    .pg-status { font-size: .88rem; color: var(--color-on-surface-variant); font-variant-numeric: tabular-nums; white-space: nowrap; }
+    .pg-status b { color: var(--color-on-surface); }
+    .pg-dir { display: inline-flex; border: 1px solid var(--color-outline-variant); border-radius: 999px; overflow: hidden; }
+    .pg-dir button { font: inherit; font-size: .8rem; padding: .22rem .65rem; border: 0; background: transparent; color: var(--color-on-surface-variant); cursor: pointer; }
+    .pg-dir button + button { border-left: 1px solid var(--color-outline-variant); }
+    .pg-dir button[aria-pressed="true"] { background: var(--color-primary-container); color: var(--color-on-surface); font-weight: 600; }
+    .pg-dir button:focus-visible { outline: 2px solid var(--color-primary); outline-offset: -2px; }
+    .pg-bar { height: 4px; border-radius: 2px; background: var(--color-surface-container-high, var(--color-surface-container)); overflow: hidden; margin: .35rem 0 .5rem; }
+    .pg-bar > span { display: block; height: 100%; width: 0; background: var(--color-tone-ok, var(--color-primary)); transition: width .25s; }
+    .pg-side { overflow-wrap: anywhere; box-sizing: border-box; }
+    .pg-for { display: flex; flex-direction: column; justify-content: center; }
+    .pg-tekst { font-size: 1.02rem; line-height: 1.5; }
+    .pg-tekst p { margin: .25rem 0; }
+    .pg-tekst ol { margin: .25rem 0 .25rem 1.3rem; padding: 0; }
+    .pg-etter { font-size: .9rem; color: var(--color-on-surface-variant); margin-top: .25rem; }
+    .pg-fig { margin: 0; }
+    .pg-fig .exam-fig-h svg { max-width: 100%; max-height: 200px; width: auto; height: auto; display: block; margin: 0 auto; }
+    .pg-pre { font-family: var(--font-mono, ui-monospace, monospace); font-size: 13.5px; line-height: 1.45; padding: .45rem .7rem; margin: .2rem 0;
+      border-radius: 8px; background: var(--color-surface-container); border: 1px solid var(--color-outline-variant); overflow-x: auto; white-space: pre; }
+    .pg-tegn { font-family: var(--font-mono, ui-monospace, monospace); font-size: 1.6rem; display: inline-block; padding: .2rem 0; }
+    .pg-tegn sub { font-size: .55em; }
+    .pg-kilde { margin: .35rem 0 0; font-size: .78rem; color: var(--color-on-surface-variant); }
+    .pg-ferdig { text-align: center; }
+    /* Knapperaden står fast mellom spørsmål og svar; samme høyde i alle tilstander */
+    .pg-knapper { display: grid; grid-template-columns: 44px 1fr 1fr 44px; gap: .5rem; padding: .55rem 0; margin: .45rem 0;
+      border-top: 1px dashed var(--color-outline-variant); border-bottom: 1px dashed var(--color-outline-variant); }
+    .pg-knapper .btn { min-height: 42px; margin: 0; font-size: .98rem; font-weight: 600; justify-content: center; }
+    .pg-knapper .pg-snu { grid-column: 2 / 4; }
+    .pg-knapper .pg-nav { min-width: 0; padding: 0; font-size: 1.5rem; line-height: 1; font-weight: 400; }
+    .pg-knapper .pg-nav:disabled { opacity: .35; cursor: default; }
+    .pg-kan { background: var(--color-tone-ok); color: var(--color-on-tone-ok); border-color: transparent; }
+    .pg-knapper kbd { font: 500 .7rem var(--font-mono, ui-monospace, monospace); padding: .05rem .3rem; margin-left: .45rem; border-radius: 4px;
+      border: 1px solid currentColor; opacity: .6; }
+    @media (hover: none) { .pg-knapper kbd { display: none; } }
+    .pg-plass { height: 100%; min-height: 3rem; display: flex; align-items: center; justify-content: center; text-align: center;
+      font-size: .88rem; color: var(--color-on-surface-variant); opacity: .7; border-radius: 8px; background: var(--color-surface-container); }
+    .pg-bak .pg-plass { position: absolute; inset: 0; }
+    .pg-bak { position: relative; min-height: 3rem; }
+    /* Under kortet: liste, nullstill og forklaring */
+    .pg-bunn { display: flex; align-items: center; justify-content: space-between; gap: .5rem; margin: .4rem 0 0; }
+    .pg-liste > summary { cursor: pointer; font-size: .9rem; padding: .3rem 0; color: var(--color-on-surface-variant); }
+    .pg-liste-inn { margin: .2rem 0 .6rem; }
+    .pg-liste-ul { list-style: none; padding: 0; margin: 0; }
+    .pg-liste-ul li { display: flex; gap: .6rem; align-items: center; justify-content: space-between; padding: .3rem .2rem; border-bottom: 1px solid var(--color-outline-variant); font-size: .9rem; }
+    .pg-li-kan .pg-li-t { color: var(--color-on-surface-variant); }
+    .pg-li-t code, .pg-li-t .pg-tegn { font-size: 1em; padding: 0; }
+    .pg-forkl { margin: .3rem 0 1rem; }
+    .pg-forkl > summary { cursor: pointer; font-size: .9rem; padding: .3rem 0; color: var(--color-on-surface-variant); }
+    .pg-intro p { margin: .3rem 0; }
+  </style>
+</head>
+<body data-page="pugg">
+  <a class="skip-link" href="#main">Hopp til innhold</a>
+  <header id="topnav"></header>
+
+  <main id="main" class="wrap">
+    <div class="pagehead">
+      <h1>Puggekort</h1>
+      <p class="lead">Svar, snu, og si om det satt. Kortene du kan, forsvinner. De andre kommer igjen til de sitter.</p>
+    </div>
+
+    <div class="tabs" role="tablist" aria-label="Kortstokker">
+      <button data-tab="sortering-tid">Sortering</button>
+      <button data-tab="stabil">Stabil og in-place</button>
+      <button data-tab="operasjoner">Operasjoner</button>
+      <button data-tab="grafer-tid">Grafer</button>
+      <button data-tab="begreper">Begreper</button>
+      <button data-tab="om">Slik virker det</button>
+    </div>
+
+    <section data-panel="sortering-tid"><div id="pugg-sortering-tid"></div></section>
+    <section data-panel="stabil" hidden><div id="pugg-stabil"></div></section>
+    <section data-panel="operasjoner" hidden><div id="pugg-operasjoner"></div></section>
+    <section data-panel="grafer-tid" hidden><div id="pugg-grafer-tid"></div></section>
+    <section data-panel="begreper" hidden><div id="pugg-begreper"></div></section>
+    <section data-panel="om" hidden>
+      <h3>Slik virker puggekortene</h3>
+      <ul>
+        <li><b>Vis svaret</b> (eller mellomrom) snur kortet. Svar før du snur, ellers lurer du bare deg selv.</li>
+        <li><b>✓ Kan den</b> (J) tar kortet ut av bunken. Det huskes i denne nettleseren til du nullstiller.</li>
+        <li><b>↻ Øv mer</b> (F) legger kortet tilbake noen plasser lenger ned, så det kommer igjen snart.</li>
+        <li><b>‹ og ›</b> (piltastene, eller sveip på mobil) blar til forrige eller neste kort uten å svare.</li>
+        <li><b>Nullstill kortstokken</b> tar alle kortene inn igjen. Under «Alle kortene i stokken» kan du også ta tilbake enkeltkort.</li>
+        <li>Begreper kan øves begge veier, og hver retning huskes for seg.</li>
+        <li>Kjøretidene og forklaringene hentes fra de samme dataene som resten av guiden. Blir noe rettet, kommer kortet tilbake i bunken av seg selv.</li>
+      </ul>
+      <p>Hvorfor kjøretidene er som de er, står på sidene <a href="01-sortering.html">Sortering</a>, <a href="lister.html">Lister &amp; stakk</a>,
+        <a href="03-heap.html">Heap</a>, <a href="04-traer.html">Trær</a>, <a href="05-hashing.html">Hashing</a> og <a href="06-grafer.html">Grafer</a>.
+        Ordlista ligger på <a href="00-begreper.html#fane=ordliste">Begreper</a>.</p>
+    </section>
+  </main>
+
+  <footer class="footer">IN2010-guide · Puggekort</footer>
+
+  <script src="assets/js/core.js?v=20261126b"></script>
+  <script src="assets/js/symboler.js?v=20261126b"></script>
+  <script src="assets/js/begreper-data.js?v=20261126b"></script>
+  <script src="assets/js/data-algos.js?v=20261126b"></script>
+  <script src="assets/js/data-heap.js?v=20261126b"></script>
+  <script src="assets/js/data-grafer.js?v=20261126b"></script>
+  <script src="assets/js/data-hashing.js?v=20261126b"></script>
+  <script src="assets/js/data-traer.js?v=20261126b"></script>
+  <script src="assets/js/data-lister.js?v=20261126b"></script>
+  <script src="assets/js/data-sok.js?v=20261126b"></script>
+  <script src="assets/js/pugg.js?v=20261126b"></script>
+  <script src="assets/js/data-pugg.js?v=20261126b"></script>
+  <script>
+  (function () {
+    "use strict";
+    var IN = window.IN;
+    if (!IN || !IN.pugg || !IN.PUGG) return;
+    IN.PUGG.forEach(function (deck) {
+      var h = document.getElementById("pugg-" + deck.id);
+      if (h) IN.pugg(h, deck, { side: "pugg" });
+    });
+  })();
+  </script>
+</body>
+</html>
