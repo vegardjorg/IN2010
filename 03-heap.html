@@ -7,9 +7,9 @@
   <title>Blokk 3 · Heap · IN2010</title>
   <meta name="description" content="Binære heaper i IN2010: array-representasjon, insert (boble opp), removeMin (boble ned), BuildMinHeap på O(n), level-order, mediankø, Heapsort og prioritetskøer – med stegvise demoer og eksamensoppgaver.">
   <script>(function(){try{var d=document.documentElement;var t=localStorage.getItem('in-theme');if(t!=='dark'&&t!=='system')t='light';if(t!=='system')d.setAttribute('data-theme',t);var l=localStorage.getItem('in-level');if(l!=='eli5'&&l!=='teknisk')l='normal';d.setAttribute('data-level',l);}catch(e){document.documentElement.setAttribute('data-theme','light');document.documentElement.setAttribute('data-level','normal');}})();</script>
-  <link rel="stylesheet" href="assets/css/styles.css?v=20261127f">
-  <link rel="stylesheet" href="assets/css/dra.css?v=20261127f">
-  <link rel="stylesheet" href="assets/css/begrep-tips.css?v=20261127f">
+  <link rel="stylesheet" href="assets/css/styles.css?v=20261127g">
+  <link rel="stylesheet" href="assets/css/dra.css?v=20261127g">
+  <link rel="stylesheet" href="assets/css/begrep-tips.css?v=20261127g">
 </head>
 <body data-page="heap">
   <a class="skip-link" href="#main">Hopp til innhold</a>
@@ -22,14 +22,6 @@
         lagres helt uten pekere, rett i et array. Her lærer du å sette inn (boble opp), ta ut minste
         (boble ned), bygge en heap på lineær tid, og bruke heaper som prioritetskø, mediankø og i Heapsort.
         Alle demoene følger pseudokoden linje for linje.</p>
-      <div class="badges">
-        <span class="badge" data-go="innsetting"><b>H2023</b> · Innsetting i heap · <span class="pts">10p</span></span>
-        <span class="badge" data-go="median"><b>H2024</b> · Mediankø · <span class="pts">12p</span></span>
-        <span class="badge" data-go="levelorder"><b>H2025</b> · Level-order · <span class="pts">12p</span></span>
-        <span class="badge" data-go="removemin"><b>H2021</b> · Binære heaps · <span class="pts">6p</span></span>
-        <span class="badge" data-go="test"><b>H2022</b> · Sant/usant om heaper · <span class="pts">10p</span></span>
-        <span class="badge" data-go="pk"><b>H2022</b> · Bucket queue · <span class="pts">10p</span></span>
-      </div>
     </div>
 
     <div class="tabs" role="tablist" aria-label="Heap-temaer">
@@ -44,11 +36,34 @@
       <button data-tab="test">Sant/usant</button>
     </div>
 
+    <div class="pagehead-info">
+      <div class="badges">
+        <span class="badge" data-go="innsetting"><b>H2023</b> · Innsetting i heap · <span class="pts">10p</span></span>
+        <span class="badge" data-go="median"><b>H2024</b> · Mediankø · <span class="pts">12p</span></span>
+        <span class="badge" data-go="levelorder"><b>H2025</b> · Level-order · <span class="pts">12p</span></span>
+        <span class="badge" data-go="removemin"><b>H2021</b> · Binære heaps · <span class="pts">6p</span></span>
+        <span class="badge" data-go="test"><b>H2022</b> · Sant/usant om heaper · <span class="pts">10p</span></span>
+        <span class="badge" data-go="pk"><b>H2022</b> · Bucket queue · <span class="pts">10p</span></span>
+      </div>
+    </div>
+
     <!-- ================= HVA ER EN HEAP ================= -->
     <section data-panel="hva">
       <h3>Hva er en heap?</h3>
+      <div class="callout eks-spor"><span class="lbl">Hva eksamen spør om</span>
+        <p><span class="tag merke kjerne">kommer ofte</span> Begrepene på denne fanen er grunnlaget for alle heap-oppgavene:
+          H2021, H2022, H2023 og H2025.</p>
+        <ul>
+          <li><b>H2021 4</b> (6p): les en heap som både tre og array, og finn minste mulige verdi på et dypere nivå (like verdier er lov).</li>
+          <li><b>H2022 5</b> (10p): sant/usant om heap-egenskapen, blant annet om dybder, søsken og hvor det største elementet ligger.</li>
+          <li><b>H2023 2</b> (10p): fyll ut array-representasjonen etter innsettinger.</li>
+          <li><b>H2025 5a</b> (2p): utnytt at heap-arrayet allerede er i level-order.</li>
+        </ul>
+      </div>
       <p class="small muted">Bygger på trebegreper: en heap er et binærtre. Er rot, barn, løvnode og høyde nye ord, les
         <a href="04-traer.html#fane=begreper">Blokk 4 · Trær → Begreper</a> først (5 min).</p>
+
+      <h4 class="del">1. To krav: komplett og heap-egenskapen <span class="tag merke kjerne">kommer ofte</span></h4>
       <div class="callout begrep"><span class="lbl">Begrep: heap</span>
         En (binær) <b>heap</b> er et binærtre med to krav:
         <ol>
@@ -65,7 +80,17 @@
         som alle under seg. Da vet du at den aller yngste sitter øverst, uten å lete. Men to personer på samme
         nivå kan stå i hvilken som helst rekkefølge.</div>
 
-      <h4>Treet <i>er</i> arrayet – klikk på en node</h4>
+      <div class="callout felle"><span class="lbl">Vanlig felle: «sortert på hvert nivå»</span>
+        Heap-egenskapen gjelder bare <b>forelder mot barn</b>. Søsken kan stå i hvilken som helst rekkefølge, og en node
+        dypt nede kan godt være mindre enn en node høyere oppe på en annen gren. En heap er altså <i>ikke</i> sortert,
+        bortsett fra langs hver sti fra roten og ned. Derfor kan du ikke søke i en heap som i et søketre: for å finne
+        et vilkårlig element må du i verste tilfelle se på alle, O(n). Bare det minste ligger på en fast plass (roten).
+        Det største har ingen barn som er større, så det står i en løvnode, men det kan være hvilken som helst av dem.</div>
+
+      <h4 class="del">2. Treet er arrayet: indeksformlene <span class="tag merke kjerne">kommer ofte</span></h4>
+      <p class="muted small">Klikk på en node eller velg et eksempel. Hold musa over en node eller en celle for å se den
+        samme plassen begge steder. Tallet ved siden av hver node er indeksen i arrayet, og under treet regnes
+        formlene i tabellen ut for noden du har valgt.</p>
       <div class="hv-static">
         <div class="hv-tools">
           <span class="muted small">Eksempler:</span>
@@ -83,8 +108,6 @@
         <div class="hv-msg small" id="ex-msg" aria-live="polite"></div>
         <div class="hv-info small" id="ex-info" aria-live="polite"></div>
       </div>
-      <p class="muted small">Hold musa over en node eller en celle for å se den samme plassen begge steder. Tallet ved
-        siden av hver node er indeksen i arrayet.</p>
 
       <div class="table-wrap">
         <table>
@@ -100,34 +123,38 @@
         </table>
       </div>
 
+      <div class="callout uni"><span class="lbl">Universitetsnivå: høyde og «komplett»</span>
+        Et komplett binærtre med n noder har høyde <span class="mono">⌊log n⌋</span>. Nivå d har plass til 2<sup>d</sup>
+        noder, så antallet dobles for hvert nivå, og bare ⌊log n⌋ + 1 nivåer trengs. Det er derfor insert og removeMin blir
+        O(log n). «Komplett» er ikke det samme som «perfekt» (alle nivåer helt fulle), og heller ikke «fullt» binærtre
+        (hver node har 0 eller 2 barn). Fordi treet er komplett, er det ingen hull i arrayet, og vi trenger ingen pekere.</div>
+      <p>Heapen holder seg komplett av seg selv, fordi vi alltid setter inn og fjerner bakerst i arrayet. Derfor
+        trenger den aldri rotasjoner slik AVL-trær gjør (se <a href="04-traer.html">Blokk 4 · Trær</a>).</p>
+
       <div class="callout felle"><span class="lbl">Vanlig felle: 1-indeksering</span>
         Mange bøker og nettsider lar roten stå på plass 1. Da blir formlene <span class="mono">⌊i/2⌋</span>,
         <span class="mono">2i</span> og <span class="mono">2i + 1</span>. IN2010 bruker 0-indeksering. Blander du
         dem, havner du på feil node. Sjekk alltid med roten: barna til <span class="mono">A[0]</span> må bli
         <span class="mono">A[1]</span> og <span class="mono">A[2]</span>.</div>
 
-      <div class="callout felle"><span class="lbl">Vanlig felle: «sortert på hvert nivå»</span>
-        Heap-egenskapen gjelder bare <b>forelder mot barn</b>. Søsken kan stå i hvilken som helst rekkefølge, og en node
-        dypt nede kan godt være mindre enn en node høyere oppe på en annen gren. En heap er altså <i>ikke</i> sortert,
-        bortsett fra langs hver sti fra roten og ned. Derfor kan du ikke søke i en heap som i et søketre: for å finne
-        et vilkårlig element må du i verste tilfelle se på alle, O(n). Bare det minste ligger på en fast plass (roten).</div>
-
-      <div class="callout uni"><span class="lbl">Universitetsnivå: høyde og «komplett»</span>
-        Et komplett binærtre med n noder har høyde <span class="mono">⌊log n⌋</span>. Nivå d har plass til 2<sup>d</sup>
-        noder, så antallet dobles for hvert nivå, og bare ⌊log n⌋ + 1 nivåer trengs. Det er derfor insert og removeMin blir
-        O(log n). «Komplett» er ikke det samme som «perfekt» (alle nivåer helt fulle), og heller ikke «fullt» binærtre
-        (hver node har 0 eller 2 barn). Fordi treet er komplett, er det ingen hull i arrayet, og vi trenger ingen pekere.</div>
-
-      <div class="callout uni"><span class="lbl">Array-heap eller peker-heap?</span>
-        Samme tre kan lagres med noder og pekere. Da trenger hver node en peker til forelderen (for å boble opp), og vi
-        må finne den siste noden. Et triks: skriv nummeret til den siste noden (talt fra 1, i level-order) binært, og dropp
-        første siffer. Resten er veien fra roten: <span class="mono">0</span> = venstre, <span class="mono">1</span> = høyre.
-        For n = 6 er det <span class="mono">110</span> → «10» → høyre, så venstre. Det tar O(log n). Arrayet er likevel
-        enklere og raskere, og det er det kurset og eksamen bruker.</div>
+      <details class="fordyp"><summary>Array-heap eller peker-heap? <span class="tag merke fordyp">Fordypning, ikke nødvendig til eksamen</span></summary>
+        <div class="callout uni"><span class="lbl">Array-heap eller peker-heap?</span>
+          Samme tre kan lagres med noder og pekere. Da trenger hver node en peker til forelderen (for å boble opp), og vi
+          må finne den siste noden. Et triks: skriv nummeret til den siste noden (talt fra 1, i level-order) binært, og dropp
+          første siffer. Resten er veien fra roten: <span class="mono">0</span> = venstre, <span class="mono">1</span> = høyre.
+          For n = 6 er det <span class="mono">110</span> → «10» → høyre, så venstre. Det tar O(log n). Arrayet er likevel
+          enklere og raskere, og det er det kurset og eksamen bruker.</div>
+      </details>
 
       <div class="callout snarvei"><span class="lbl">Eksamenstips: begge kravene</span>
         Når du forklarer en heap på eksamen, nevn <b>begge</b> kravene (komplett + heap-egenskap) og indeksformlene.
         «Minste øverst» alene er en ufullstendig forklaring, fordi den ikke sier noe om formen.</div>
+
+      <div class="husk"><h4>Huskeregler</h4><ul>
+        <li>To krav: <b>komplett</b> (fylles fra venstre) og <b>forelder ≤ barn</b>. Like verdier er lov.</li>
+        <li>0-indeksert: forelder <span class="mono">⌊(i − 1)/2⌋</span>, barn <span class="mono">2i + 1</span> og <span class="mono">2i + 2</span>. Sjekk med roten.</li>
+        <li>Minste ligger alltid i <span class="mono">A[0]</span>. Største ligger i en løvnode, men du vet ikke hvilken.</li>
+      </ul></div>
 
       <h4>Øv selv</h4>
       <div id="quiz-hva"></div>
@@ -136,6 +163,15 @@
     <!-- ================= INSERT ================= -->
     <section data-panel="innsetting">
       <h3>Insert – boble opp</h3>
+      <div class="callout eks-spor"><span class="lbl">Hva eksamen spør om</span>
+        <p><span class="tag merke kjerne">kommer ofte</span> Spurt H2021, H2022 og H2023.</p>
+        <ul>
+          <li><b>H2023 2</b> (10p): sett inn 3, 5, 10, 8, 4, 2, 7 i et tomt array og skriv sluttraden (2p), forklar
+            algoritmen med pseudokode (6p), og begrunn kjøretiden (2p).</li>
+          <li><b>H2021 4b</b> (2p): hvordan ser heapen ut etter <span class="mono">Insert(7)</span>?</li>
+          <li><b>H2022 5d</b>: sant/usant om at innsetting er O(log n) i verste tilfelle.</li>
+        </ul>
+      </div>
       <div id="intro-ins"></div>
       <div class="callout eksempel"><span class="lbl">Enkelt eksempel</span>
         Heapen er <span class="mono">[2, 4, 3]</span>, og vi setter inn 1. Den havner bakerst på plass 3. Forelderen er
@@ -154,19 +190,25 @@
         elementet allerede er større enn eller likt forelderen. Å sette inn n elementer ett og ett koster O(n log n) til
         sammen. Det er raskere å bygge med BuildMinHeap (O(n)) hvis du har alle elementene på forhånd.</div>
 
+      <h4>Koden, linje for linje</h4>
+      <div id="exp-ins"></div>
+
       <div class="callout felle"><span class="lbl">Vanlig felle: lete ovenfra</span>
         Å starte i roten og lete seg nedover etter riktig plass. Nytt element legges <b>alltid bakerst</b> (plass n), så
         treet forblir komplett, og så bobler det <b>opp</b>. Og: én innsetting er O(log n), ikke O(n log n).</div>
-
-      <h4>Eksamensoppgaven</h4>
-      <div id="exam-innsetting"></div>
 
       <div class="callout snarvei"><span class="lbl">Snarvei for (a)-oppgaver</span>
         Tegn treet ved siden av arrayet og hold styr på bare én sti: fra den nye plassen og opp til roten. For hvert tall:
         legg bakerst, sammenlign med foreldernoden, bytt så lenge det nye er minst. Skriv bare <b>sluttraden</b> som svar.</div>
 
-      <h4>Koden, linje for linje</h4>
-      <div id="exp-ins"></div>
+      <div class="husk"><h4>Huskeregler</h4><ul>
+        <li>Legg bakerst, boble <b>opp</b> så lenge det nye er mindre enn foreldernoden.</li>
+        <li>Én innsetting: O(log n), fordi den følger én sti opp til roten.</li>
+      </ul></div>
+
+      <h4>Eksamensoppgaven</h4>
+      <div id="exam-innsetting"></div>
+
       <h4>Øv selv: sett linjene i riktig rekkefølge</h4>
       <div id="parsons-ins"></div>
       <div id="quiz-ins"></div>
@@ -175,6 +217,15 @@
     <!-- ================= REMOVEMIN ================= -->
     <section data-panel="removemin">
       <h3>RemoveMin – boble ned</h3>
+      <div class="callout eks-spor"><span class="lbl">Hva eksamen spør om</span>
+        <p><span class="tag merke kjerne">kommer ofte</span> Spurt direkte H2021, og brukt som byggekloss i løsningene på
+          H2024 og H2025.</p>
+        <ul>
+          <li><b>H2021 4a</b> (2p): hvordan ser heapen ut etter ett kall på <span class="mono">RemoveMin()</span>?</li>
+          <li><b>H2021 4c</b> (2p): minste verdi som kan ligge på dybde 4, når du bare kjenner dybde 3 (like verdier er lov).</li>
+          <li><b>H2024 7</b> (mediankø) og <b>H2025 6</b> (finn k minste): løsningene tar ut roten av en heap, O(log n) per uttak.</li>
+        </ul>
+      </div>
       <div id="intro-rm"></div>
       <div class="callout eksempel"><span class="lbl">Enkelt eksempel</span>
         Heapen er <span class="mono">[1, 3, 2, 7, 4]</span>. Vi tar vare på 1 og flytter det siste tallet, 4, opp i roten:
@@ -188,9 +239,8 @@
       <p class="muted small">Pseudokoden følger forelesningen: n endres ikke i prosedyren, og derfor står grensen som
         <span class="mono">n − 1</span> i løkka. Trykk på «?» ved linjene for å se hvorfor.</p>
 
-      <div class="callout felle"><span class="lbl">Vanlig felle: feil barn</span>
-        Det fristende er å bytte med «et» barn, eller med venstre. Du må bytte med det <b>minste</b> barnet. Bytter du med
-        det største, havner det store tallet over sin mindre søsken, og heap-egenskapen er brutt på nytt.</div>
+      <h4>Koden, linje for linje</h4>
+      <div id="exp-rm"></div>
 
       <div class="callout uni"><span class="lbl">Universitetsnivå: hvorfor siste element?</span>
         Det eneste vi kan fjerne og fortsatt ha et komplett tre, er den <b>siste</b> noden. Derfor flytter vi den til
@@ -198,14 +248,21 @@
         så det blir høyst ⌊log n⌋ runder: O(log n) i verste tilfelle. Siste element er gjerne stort, så det synker
         ofte nesten helt ned.</div>
 
+      <div class="callout felle"><span class="lbl">Vanlig felle: feil barn</span>
+        Det fristende er å bytte med «et» barn, eller med venstre. Du må bytte med det <b>minste</b> barnet. Bytter du med
+        det største, havner det store tallet over sin mindre søsken, og heap-egenskapen er brutt på nytt.</div>
+
+      <div class="husk"><h4>Huskeregler</h4><ul>
+        <li>Ta vare på roten, flytt <b>siste</b> til roten, boble <b>ned</b> mot det <b>minste</b> barnet.</li>
+        <li>Å lese minste er O(1). Å fjerne det er O(log n), fordi heapen må repareres.</li>
+      </ul></div>
+
       <h4>Eksamensoppgaven</h4>
       <div id="exam-removemin"></div>
       <div class="callout sensor"><span class="lbl">Sensortips (H2021)</span>
         Deloppgavene er uavhengige: begge starter fra H1, ikke fra svaret på (a). I (c) er fellen å glemme at like
         verdier er lov. Forelder ≤ barn, ikke &lt;. Svaret 28 ga bare 1 av 2 poeng.</div>
 
-      <h4>Koden, linje for linje</h4>
-      <div id="exp-rm"></div>
       <h4>Øv selv: sett linjene i riktig rekkefølge</h4>
       <div id="parsons-rm"></div>
       <div id="quiz-rm"></div>
@@ -214,6 +271,15 @@
     <!-- ================= BUILDHEAP ================= -->
     <section data-panel="buildheap">
       <h3>BuildHeap – fra array til heap på O(n)</h3>
+      <div class="callout eks-spor"><span class="lbl">Hva eksamen spør om</span>
+        <p><span class="tag merke kjerne">kommer ofte</span> Spurt H2022 og brukt i løsningen på H2025, men aldri som egen
+          oppgave der du skal bygge heapen steg for steg.</p>
+        <ul>
+          <li><b>H2022 5a</b>: sant/usant om at et array med n elementer kan gjøres om til en heap i O(n) (sant).</li>
+          <li><b>H2025 6</b> (finn k minste): sensorveiledningen bygger en heap i lineær tid og tar ut k ganger,
+            O(n + k log n). Se <a href="02-sok.html#fane=kminste">Blokk 2 · Søk → Finn k minste</a>.</li>
+        </ul>
+      </div>
       <div id="intro-build"></div>
       <div class="callout eksempel"><span class="lbl">Enkelt eksempel</span>
         <span class="mono">[5, 3, 1]</span>: n = 3, og vi starter på ⌊3/2⌋ = 1. Plass 1 har ingen barn, så der skjer det
@@ -231,17 +297,26 @@
         Her er de speilvendt til en heap med minste i roten: bare sammenligningene snus. H2025-løsningen bruker
         nettopp at en slik BuildMinHeap også er lineær.</p>
 
-      <div class="callout uni"><span class="lbl">Universitetsnivå: hvorfor bare O(n)?</span>
-        Det ser ut som ⌊n/2⌋ kall à O(log n), altså O(n log n). Men det er for grovt. BubbleDown fra en node koster høyst
-        like mye som <b>høyden</b> til noden, og de fleste nodene er lave:
-        <ul>
-          <li>ca. n/2 noder er løvnoder (høyde 0) og koster ingenting,</li>
-          <li>ca. n/4 har høyde 1, ca. n/8 har høyde 2, ca. n/16 høyde 3, …</li>
-        </ul>
-        Totalt: <span class="mono">n · (1/4 + 2/8 + 3/16 + …)</span>. Hvert ledd er høyden ganger andelen noder med den høyden.
-        Nevneren dobles mens telleren bare vokser med 1, så leddene krymper raskt, og summen i parentesen blir nøyaktig 1.
-        Arbeidet er altså høyst n, og BuildMinHeap er O(n). Selve beviset er ikke pensum. Det du må kunne, er
-        <i>at</i> det er lineært, og intuisjonen: de mange nodene nederst er billige, og bare roten kan synke hele veien.</div>
+      <h4>Koden, linje for linje</h4>
+      <div id="exp-build"></div>
+      <div id="exp-bdmin"></div>
+
+      <p>Kjøretiden er <b>O(n)</b>, ikke O(n log n). Løvnodene er allerede heaper, så de hoppes over. BubbleDown fra en
+        node koster høyst like mye som høyden til noden, og de fleste nodene er lave og billige. Bare roten kan synke
+        hele veien ned.</p>
+      <details class="fordyp"><summary>Hvorfor summen blir O(n) <span class="tag merke fordyp">Fordypning, ikke nødvendig til eksamen</span></summary>
+        <div class="callout uni"><span class="lbl">Universitetsnivå: hvorfor bare O(n)?</span>
+          Det ser ut som ⌊n/2⌋ kall à O(log n), altså O(n log n). Men det er for grovt. BubbleDown fra en node koster høyst
+          like mye som <b>høyden</b> til noden, og de fleste nodene er lave:
+          <ul>
+            <li>ca. n/2 noder er løvnoder (høyde 0) og koster ingenting,</li>
+            <li>ca. n/4 har høyde 1, ca. n/8 har høyde 2, ca. n/16 høyde 3, …</li>
+          </ul>
+          Totalt: <span class="mono">n · (1/4 + 2/8 + 3/16 + …)</span>. Hvert ledd er høyden ganger andelen noder med den høyden.
+          Nevneren dobles mens telleren bare vokser med 1, så leddene krymper raskt, og summen i parentesen blir nøyaktig 1.
+          Arbeidet er altså høyst n, og BuildMinHeap er O(n). Selve beviset er ikke pensum. Det du må kunne, er
+          <i>at</i> det er lineært, og intuisjonen: de mange nodene nederst er billige, og bare roten kan synke hele veien.</div>
+      </details>
 
       <div class="callout felle"><span class="lbl">Vanlig felle: feil retning</span>
         Å gå <b>oppover</b> fra 0. BubbleDown krever at begge subtrærne allerede er heaper, og det har vi bare når vi
@@ -252,24 +327,37 @@
         Har du alle elementene på forhånd: BuildMinHeap, O(n). Kommer de ett og ett: insert hver gang, O(log n) per
         element. H2022 (a) «Et array med n elementer kan gjøres om til en heap i O(n)» er <b>sant</b>.</div>
 
-      <h4>Koden, linje for linje</h4>
-      <div id="exp-build"></div>
-      <div id="exp-bdmin"></div>
+      <div class="husk"><h4>Huskeregler</h4><ul>
+        <li>Baklengs fra ⌊n/2⌋ ned til 0, og boble ned fra hver node. Løvnodene hoppes over.</li>
+        <li>BuildMinHeap er O(n). n innsettinger er O(n log n).</li>
+      </ul></div>
+
       <div id="quiz-build"></div>
     </section>
 
     <!-- ================= LEVEL-ORDER ================= -->
     <section data-panel="levelorder">
       <h3>Level-order – en heap er allerede i level-order</h3>
-      <div id="intro-lo"></div>
+      <div class="callout eks-spor"><span class="lbl">Hva eksamen spør om</span>
+        <p><span class="tag merke eksbas">eksamensbasert</span> Spurt H2025.</p>
+        <ul>
+          <li><b>H2025 5</b> (12p): (a) level-order for en heap i et array (2p), (b) level-order for et binært søketre (6p),
+            (c) kjøretiden til begge (1p), og (d) hva som skjer når elementene settes inn i et nytt søketre i
+            level-order (3p).</li>
+        </ul>
+      </div>
       <div class="callout begrep"><span class="lbl">Begrep: level-order</span>
         <b>Level-order</b> betyr å besøke nodene nivå for nivå: først roten (dybde 0), så alle nodene på dybde 1 fra
         venstre mot høyre, så dybde 2, og så videre. En heap fylles nettopp slik, så <b>arrayet er level-order</b>.</div>
+      <div id="intro-lo"></div>
 
       <div class="grid cols-2">
         <div class="heapviz"><div id="tracer-lo"></div></div>
         <div><h4 style="margin:.2rem 0 .4rem">Pseudokode (følger demoen)</h4><div id="pc-lo"></div></div>
       </div>
+
+      <h4>Koden, linje for linje</h4>
+      <div id="exp-lo"></div>
 
       <div class="callout uni"><span class="lbl">Universitetsnivå: heap kontra binært søketre</span>
         For en heap er svaret gratis: O(n) bare for å kopiere (eller O(1) om du bare returnerer A). For et vanlig
@@ -277,25 +365,38 @@
         barna bakerst. Det er også O(n). Med en stakk i stedet for kø får du dybde-først, og det er <i>ikke</i>
         level-order. Det trekker sensor for. Mer om trær og bredde-først søk (BFS) i <a href="04-traer.html">Blokk 4 · Trær</a>.</div>
 
+      <div class="husk"><h4>Huskeregler</h4><ul>
+        <li>Heap-arrayet <b>er</b> level-order: returner A.</li>
+        <li>Vanlig tre: level-order = bredde-først = <b>kø</b>, ikke stakk.</li>
+      </ul></div>
+
       <h4>Eksamensoppgaven</h4>
       <div id="exam-levelorder"></div>
       <div class="callout sensor"><span class="lbl">Eksamenstips (H2025)</span>
         I (a) er det ingen triks: skriv at arrayet allerede er i level-order, og vis en enkel løkke (eller returner A).
         Et bredde-først søk på heapen er unødvendig arbeid. Det enkle svaret viser at du har forstått array-representasjonen.</div>
-
-      <h4>Koden, linje for linje</h4>
-      <div id="exp-lo"></div>
     </section>
 
     <!-- ================= MEDIANKØ ================= -->
     <section data-panel="median">
       <h3>Mediankø – to heaper rygg mot rygg</h3>
+      <div class="callout eks-spor"><span class="lbl">Hva eksamen spør om</span>
+        <p><span class="tag merke eksbas">eksamensbasert</span> Spurt H2024.</p>
+        <ul>
+          <li><b>H2024 7</b> (12p): (a) de tre første medianene for 4, 1, 8, 3, 2 (1p), (b) hvordan du representerer en
+            mediankø (1p), (c) insert og removeMedian (6p), (d) kjøretiden (2p), og (e) hvordan et binært søketre av
+            medianene ser ut (2p).</li>
+        </ul>
+      </div>
       <div id="intro-med"></div>
       <div class="callout eli5"><span class="lbl">5-åring: to bunker</span>
         Del tallene i to bunker: de små og de store. I bunken med de små vil vi kunne se det <i>største</i> tallet raskt,
         og i bunken med de store det <i>minste</i>. Holder vi bunkene like store, eller lar den lille ha ett tall mer,
         ligger medianen alltid på toppen av den lille bunken.</div>
 
+      <p class="muted small">Demoen setter inn tallene ett og ett og tar så ut medianen igjen og igjen. Til venstre står
+        <span class="mono">Q.small</span> (max-heap), til høyre <span class="mono">Q.large</span> (minste øverst). Under
+        heapene ser du alle tallene sortert, med medianen uthevet, og hva removeMedian har gitt så langt.</p>
       <div class="heapviz"><div id="tracer-med"></div></div>
       <div class="grid cols-3">
         <div><h4 style="margin:.2rem 0 .4rem">insert</h4><div id="pc-med-ins"></div></div>
@@ -303,12 +404,23 @@
         <div><h4 style="margin:.2rem 0 .4rem">removeMedian</h4><div id="pc-med-rm"></div></div>
       </div>
 
+      <h4>Koden, linje for linje</h4>
+      <div id="exp-med-ins"></div>
+      <div id="exp-med-bal"></div>
+      <div id="exp-med-rm"></div>
+
       <div class="callout uni"><span class="lbl">Universitetsnivå: invarianten</span>
         To krav holdes hele tiden: (1) alt i <span class="mono">Q.small</span> ≤ alt i <span class="mono">Q.large</span>,
         og (2) <span class="mono">|Q.small| = |Q.large|</span> eller <span class="mono">|Q.small| = |Q.large| + 1</span>.
         Da er roten i <span class="mono">Q.small</span> medianen, både ved oddetall og ved partall (der oppgaven vil ha
         den minste av de to midterste). Hver operasjon er et konstant antall heap-operasjoner à O(log n), så både
         insert og removeMedian blir <b>O(log n)</b>.</div>
+
+      <div class="husk"><h4>Huskeregler</h4><ul>
+        <li><span class="mono">Q.small</span> = max-heap (nedre halvdel), <span class="mono">Q.large</span> = min-heap (øvre halvdel).</li>
+        <li>Q.small har like mange eller ett mer. Da er roten i Q.small medianen.</li>
+        <li>Begge operasjonene: O(log n).</li>
+      </ul></div>
 
       <h4>Eksamensoppgaven</h4>
       <div id="exam-median"></div>
@@ -332,16 +444,20 @@
         To heaper gir full uttelling på (c). En sortert dobbeltlenket liste med midtpeker gir opptil 4 av 6 poeng, og en
         usortert struktur som sorteres ved behov opptil 2. Husk å si <i>hvilken</i> heap som er max og hvilken som er min,
         og knytt O(log n) i (d) til din egen løsning.</div>
-
-      <h4>Koden, linje for linje</h4>
-      <div id="exp-med-ins"></div>
-      <div id="exp-med-bal"></div>
-      <div id="exp-med-rm"></div>
     </section>
 
     <!-- ================= HEAPSORT ================= -->
     <section data-panel="heapsort">
       <h3>Heapsort – sorter med en max-heap, rett i arrayet</h3>
+      <div class="callout eks-spor"><span class="lbl">Hva eksamen spør om</span>
+        <p><span class="tag merke ny">pensum, ikke spurt før</span> Heapsort har aldri vært en egen eksamensoppgave, og den
+          står ikke i de kjente sant/usant-påstandene. Sant/usant-delen fra 2023 er ikke kjent.</p>
+        <ul>
+          <li><b>H2023 3</b> og <b>H2023 4</b>: sensorveiledningene nevner Heapsort sammen med Merge sort og Quicksort som
+            de raske sammenligningsbaserte sorteringsalgoritmene i pensum, O(n log n).</li>
+          <li>Nyttig å kunne hvis den dukker opp: in-place, ikke stabil, O(n log n) også i verste tilfelle.</li>
+        </ul>
+      </div>
       <div id="intro-hs"></div>
       <div class="callout eli5"><span class="lbl">5-åring: selection sort med turbo</span>
         Heapsort gjør nesten det samme som selection sort: finn det største, legg det bakerst, og gjenta. Forskjellen er
@@ -349,6 +465,8 @@
         et uttak tar bare noen få steg, selv når heapen er stor.</div>
 
       <div class="heapviz hv-side"><div id="tracer-hs"></div></div>
+      <p class="muted small">Treet viser bare heapdelen A[0..i − 1]. Den grønne halen i arrayet er ferdig sortert og
+        hører ikke lenger til heapen. Pseudokoden følger forelesningen «Litt mer sortering».</p>
       <div class="grid cols-2">
         <div class="pc-stack">
           <h4>HeapSort</h4><div id="pc-hs"></div>
@@ -356,8 +474,11 @@
         </div>
         <div class="pc-stack"><h4>BubbleDown (max-heap)</h4><div id="pc-bdmax"></div></div>
       </div>
-      <p class="muted small">Treet viser bare heapdelen A[0..i − 1]. Den grønne halen i arrayet er ferdig sortert og
-        hører ikke lenger til heapen. Pseudokoden følger forelesningen «Litt mer sortering».</p>
+
+      <h4>Koden, linje for linje</h4>
+      <div id="exp-hs"></div>
+      <div id="exp-bmax"></div>
+      <div id="exp-bdmax"></div>
 
       <div class="callout uni"><span class="lbl">Universitetsnivå: kjøretid og egenskaper</span>
         Selection sort bruker O(n) per runde på å lete etter det neste elementet, og det gir O(n²). Heapsort bruker bare
@@ -376,32 +497,33 @@
       <p>Heapsort sammenlignet med de andre sorteringsalgoritmene: se <a href="01-sortering.html#fane=heap">Blokk 1 ·
         Sortering → Heapsort</a>.</p>
 
-      <h4>Koden, linje for linje</h4>
-      <div id="exp-hs"></div>
-      <div id="exp-bmax"></div>
-      <div id="exp-bdmax"></div>
+      <div class="husk"><h4>Huskeregler</h4><ul>
+        <li>BuildMaxHeap, så bytt roten med <span class="mono">A[i]</span> og boble ned i <span class="mono">A[0..i − 1]</span>.</li>
+        <li>O(n log n) i alle tilfeller, in-place, ikke stabil.</li>
+      </ul></div>
+
       <div id="quiz-hs"></div>
     </section>
 
     <!-- ================= PRIORITETSKØ ================= -->
     <section data-panel="pk">
       <h3>Prioritetskø – der heapen brukes</h3>
-      <div id="intro-pk"></div>
-
-      <div class="table-wrap">
-        <table>
-          <thead><tr><th>Implementasjon av prioritetskø</th><th>insert</th><th>removeMin</th><th>Kommentar</th></tr></thead>
-          <tbody>
-            <tr><td>Usortert liste</td><td>O(1)</td><td>O(n)</td><td>Må lete etter minste</td></tr>
-            <tr><td>Sortert liste</td><td>O(n)</td><td>O(1)</td><td>Må finne plassen ved innsetting</td></tr>
-            <tr><td><b>Binær heap</b></td><td><b>O(log n)</b></td><td><b>O(log n)</b></td><td>Standardvalget, rett i et array</td></tr>
-            <tr><td>Balansert søketre (AVL)</td><td>O(log n)</td><td>O(log n)</td><td>Fungerer også (H2022 (e) er sant)</td></tr>
-            <tr><td>Bøttekø (prioritet 0 … N − 1)</td><td>O(1)</td><td>O(N)</td><td>O(1) når N er en konstant (H2022 10)</td></tr>
-          </tbody>
-        </table>
+      <div class="callout eks-spor"><span class="lbl">Hva eksamen spør om</span>
+        <p><span class="tag merke kjerne">kommer ofte</span> Spurt direkte H2022, og prioritetskøen er en del av løsningen på
+          oppgaver hvert år fra H2021 til H2025.</p>
+        <ul>
+          <li><b>H2022 10</b> (10p): bøttekø. Datastruktur (1p), Insert (3p), RemoveMin (4p) og kjøretid med N = 100 (2p).</li>
+          <li><b>H2022 5e og 5h</b>: sant/usant om AVL-tre som prioritetskø og om Dijkstra med en prioritetskø med O(1) på alt.</li>
+          <li>Brukt i løsningene på <b>H2021 13</b> (topologisk sortering med en heap ordnet etter tidsstempel), <b>H2023 6</b>
+            (Prim), <b>H2024 2</b> (Huffman), <b>H2024 7</b> (mediankø) og <b>H2025 6</b> (finn k minste).</li>
+        </ul>
       </div>
 
-      <h4>Lekeplass: bruk heapen som prioritetskø</h4>
+      <h4 class="del">1. Prioritetskøen og implementasjonene <span class="tag merke kjerne">kommer ofte</span></h4>
+      <div id="intro-pk"></div>
+
+      <p class="muted small">Lekeplassen: skriv et tall og trykk «insert», eller trykk «removeMin». Demoen kjører
+        operasjonen steg for steg på heapen og følger pseudokoden til høyre. Ved siden av knappene ser du hva Peek gir.</p>
       <div class="hv-tools" id="pg-tools">
         <label class="muted small" for="pg-x">Tall:</label>
         <input id="pg-x" type="number" value="6" min="-99" max="999" aria-label="Tall som skal settes inn">
@@ -419,7 +541,20 @@
         </div>
       </div>
 
-      <h4>Hvor brukes prioritetskøen?</h4>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Implementasjon av prioritetskø</th><th>insert</th><th>removeMin</th><th>Kommentar</th></tr></thead>
+          <tbody>
+            <tr><td>Usortert liste</td><td>O(1)</td><td>O(n)</td><td>Må lete etter minste</td></tr>
+            <tr><td>Sortert liste</td><td>O(n)</td><td>O(1)</td><td>Må finne plassen ved innsetting</td></tr>
+            <tr><td><b>Binær heap</b></td><td><b>O(log n)</b></td><td><b>O(log n)</b></td><td>Standardvalget, rett i et array</td></tr>
+            <tr><td>Balansert søketre (AVL)</td><td>O(log n)</td><td>O(log n)</td><td>Fungerer også (H2022 (e) er sant)</td></tr>
+            <tr><td>Bøttekø (prioritet 0 … N − 1)</td><td>O(1)</td><td>O(N)</td><td>O(1) når N er en konstant (H2022 10)</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h4 class="del">2. Hvor brukes prioritetskøen? <span class="tag merke kjerne">kommer ofte</span></h4>
       <div class="grid cols-2">
         <div class="card"><b>Dijkstra og Prim</b>
           <p class="small">Ta alltid ut noden med lavest avstand (Dijkstra) eller billigst kant (Prim). Med en binær heap
@@ -436,51 +571,70 @@
             Heapen har aldri mer enn k elementer, så n elementer totalt gir <span class="mono">O(n log k)</span>.</p></div>
       </div>
 
-      <div class="callout uni"><span class="lbl">Universitetsnivå: når prioriteten endres</span>
-        Kort fortalt: Dijkstra-versjonen guiden bruker i <a href="06-grafer.html#fane=dijkstra">Blokk 6 · Grafer → Dijkstra</a>
-        trenger ikke DecreasePriority. Den legger heller inn noden på nytt og hopper over gamle oppføringer.
-        Resten av boksen forklarer hvorfor.<br><br>
-        Den tradisjonelle Dijkstra legger alle noder inn med prioritet ∞ og kaller <span class="mono">DecreasePriority(queue, v, c)</span>
-        når en kortere vei blir funnet. Analysen antar at dette er logaritmisk. Men en vanlig binær heap kan ikke det
-        direkte, fordi vi ikke vet <i>hvor</i> i arrayet v ligger. I litteraturen løses det med såkalte <i>locators</i>
-        (Goodrich &amp; Tamassia): hver node husker plassen sin, så den kan boble opp derfra. Kurset viser derfor også en
-        versjon uten DecreasePriority: legg bare inn v på nytt med den nye prioriteten, og hopp over noder som allerede er
-        ferdige når de tas ut igjen (<span class="mono">if u ∈ visited then continue</span>). Samme «late» triks brukes ofte
-        med Pythons heapq. Køen kan bli større, men kjøretiden er fortsatt
-        <span class="mono">O((|V| + |E|) · log |V|)</span>.</div>
-
-      <h4>Eksamensoppgaven: bøttekø (H2022)</h4>
-      <div id="exam-pk"></div>
-      <div class="callout felle"><span class="lbl">Vanlig felle: binær heap til bøttekø</span>
-        Å svare med en binær heap. Den virker, men er O(log n) og gir lav uttelling (maks 4 av 10). Poenget er at
-        prioritetene ligger i et fast, lite område. Da kan de brukes direkte som indeks, som i bøttesortering.</div>
-
       <div class="callout snarvei"><span class="lbl">Finn k minste (H2025)</span>
         Heapen er nøkkelen til den raskeste løsningen på H2025 6: enten en max-heap med plass til k
         (<span class="mono">O(n log k)</span>), eller BuildMinHeap av hele arrayet og så removeMin k ganger
         (<span class="mono">O(n + k log n)</span>). Hele oppgaven, med demo og løsning, står i
         <a href="02-sok.html#fane=kminste">Blokk 2 · Søk → Finn k minste</a>.</div>
 
+      <details class="fordyp"><summary>Når prioriteten endres (DecreasePriority) <span class="tag merke fordyp">Fordypning, ikke nødvendig til eksamen</span></summary>
+        <div class="callout uni"><span class="lbl">Universitetsnivå: når prioriteten endres</span>
+          Kort fortalt: Dijkstra-versjonen guiden bruker i <a href="06-grafer.html#fane=dijkstra">Blokk 6 · Grafer → Dijkstra</a>
+          trenger ikke DecreasePriority. Den legger heller inn noden på nytt og hopper over gamle oppføringer.
+          Resten av boksen forklarer hvorfor.<br><br>
+          Den tradisjonelle Dijkstra legger alle noder inn med prioritet ∞ og kaller <span class="mono">DecreasePriority(queue, v, c)</span>
+          når en kortere vei blir funnet. Analysen antar at dette er logaritmisk. Men en vanlig binær heap kan ikke det
+          direkte, fordi vi ikke vet <i>hvor</i> i arrayet v ligger. I litteraturen løses det med såkalte <i>locators</i>
+          (Goodrich &amp; Tamassia): hver node husker plassen sin, så den kan boble opp derfra. Kurset viser derfor også en
+          versjon uten DecreasePriority: legg bare inn v på nytt med den nye prioriteten, og hopp over noder som allerede er
+          ferdige når de tas ut igjen (<span class="mono">if u ∈ visited then continue</span>). Samme «late» triks brukes ofte
+          med Pythons heapq. Køen kan bli større, men kjøretiden er fortsatt
+          <span class="mono">O((|V| + |E|) · log |V|)</span>.</div>
+      </details>
+
+      <h4 class="del">3. Bøttekø: når prioritetene ligger i et fast område <span class="tag merke eksbas">eksamensbasert</span></h4>
+      <p>En <b>bøttekø</b> (bucket queue) har ett array med N bøtter, én for hver prioritet fra 0 til N − 1, akkurat som
+        bøttene i bøttesortering. Insert legger elementet i bøtta for prioriteten sin, O(1). RemoveMin leter fra bøtte 0 og
+        oppover til den finner en som ikke er tom, O(N). Når N er en konstant, er begge O(1).</p>
       <h4>Koden, linje for linje</h4>
       <div id="exp-bq-ins"></div>
       <div id="exp-bq-rm"></div>
+      <div class="callout felle"><span class="lbl">Vanlig felle: binær heap til bøttekø</span>
+        Å svare med en binær heap. Den virker, men er O(log n) og gir lav uttelling (maks 4 av 10). Poenget er at
+        prioritetene ligger i et fast, lite område. Da kan de brukes direkte som indeks, som i bøttesortering.</div>
+
+      <div class="husk"><h4>Huskeregler</h4><ul>
+        <li>Prioritetskø er grensesnittet (insert, removeMin, peek). Heapen er én implementasjon, med O(log n) på begge.</li>
+        <li>Fast, lite område 0 … N − 1: bøttekø, O(1) når N er konstant.</li>
+        <li>Dijkstra, Prim, Huffman og «finn k minste» bruker alle en prioritetskø.</li>
+      </ul></div>
+
+      <h4>Eksamensoppgaven: bøttekø (H2022)</h4>
+      <div id="exam-pk"></div>
     </section>
 
     <!-- ================= SANT/USANT ================= -->
     <section data-panel="test">
       <h3>Sant eller usant? (heaper og prioritetskøer)</h3>
+      <div class="callout eks-spor"><span class="lbl">Hva eksamen spør om</span>
+        <p><span class="tag merke eksbas">eksamensbasert</span> Spurt H2022.</p>
+        <ul>
+          <li><b>H2022 5</b> (10p): ti sant/usant-påstander om heaper og prioritetskøer: BuildMinHeap, reversering, dybder,
+            innsetting, AVL-tre, stier, søsken, Dijkstra, største element og de to dypeste nivåene.</li>
+        </ul>
+      </div>
       <p>Påstandene fra H2022 5, pluss noen ekstra fra samme tankegang. Svar på alle, og trykk så «Sjekk».</p>
+      <div class="callout sensor"><span class="lbl">Eksamenstips: sant/usant (H2022)</span>
+        Oppgaven har ti påstander og 10 poeng, så det er trolig 1 poeng per påstand (sensorveiledningen sier ikke noe om
+        poengfordelingen). Les «alle», «hver» og «alltid» ekstra nøye. Heap-egenskapen sier bare noe om forelder og barn,
+        så en påstand om at <i>verdiene</i> er ordnet mellom hele nivåer eller mellom søsken er usann. Påstander om
+        <i>antall</i> noder på nivåene kan derimot være sanne, som (j).</div>
       <h4>Eksamensoppgaven</h4>
       <div id="exam-test"></div>
       <h4 style="margin-top:1.5rem">Påstandene</h4>
       <div id="tf-heap"></div>
       <h4 style="margin-top:1.5rem">Dra og plasser</h4>
       <div id="dra-heap"></div>
-      <div class="callout sensor"><span class="lbl">Eksamenstips: sant/usant (H2022)</span>
-        Oppgaven har ti påstander og 10 poeng, så det er trolig 1 poeng per påstand (sensorveiledningen sier ikke noe om
-        poengfordelingen). Les «alle», «hver» og «alltid» ekstra nøye. Heap-egenskapen sier bare noe om forelder og barn,
-        så en påstand om at <i>verdiene</i> er ordnet mellom hele nivåer eller mellom søsken er usann. Påstander om
-        <i>antall</i> noder på nivåene kan derimot være sanne, som (j).</div>
 
       <h3 style="margin-top:2rem">Test deg selv – heap og prioritetskø</h3>
       <p class="muted small">Disse påstandene har aldri stått på eksamen. De er laget ut fra hva eksamenene og
@@ -492,24 +646,24 @@
 
   <footer class="footer">IN2010-guide · Blokk 3 · Heap</footer>
 
-  <script src="assets/js/core.js?v=20261127f"></script>
-<script src="assets/js/eksamensvekt.js?v=20261127f"></script>
-  <script src="assets/js/varline.js?v=20261127f"></script>
-  <script src="assets/js/viz-tree.js?v=20261127f"></script>
-  <script src="assets/js/symboler.js?v=20261127f"></script>
-  <script src="assets/js/begreper-data.js?v=20261127f"></script>
-  <script src="assets/js/begrep-tips.js?v=20261127f"></script>
-  <script src="assets/js/data-tf.js?v=20261127f"></script>
-  <script src="assets/js/pseudocode.js?v=20261127f"></script>
-  <script src="assets/js/stepplayer.js?v=20261127f"></script>
-  <script src="assets/js/viz-bars.js?v=20261127f"></script>
-  <script src="assets/js/data-algos.js?v=20261127f"></script>
-  <script src="assets/js/data-heap.js?v=20261127f"></script>
-  <script src="assets/js/perfekt/heap.js?v=20261127f"></script>
-  <script src="assets/js/perfekt/delt.js?v=20261127f"></script>
-  <script src="assets/js/kort/heap.js?v=20261127f"></script>
-  <script src="assets/js/dra.js?v=20261127f"></script>
-  <script src="assets/js/data-dra.js?v=20261127f"></script>
+  <script src="assets/js/core.js?v=20261127g"></script>
+<script src="assets/js/eksamensvekt.js?v=20261127g"></script>
+  <script src="assets/js/varline.js?v=20261127g"></script>
+  <script src="assets/js/viz-tree.js?v=20261127g"></script>
+  <script src="assets/js/symboler.js?v=20261127g"></script>
+  <script src="assets/js/begreper-data.js?v=20261127g"></script>
+  <script src="assets/js/begrep-tips.js?v=20261127g"></script>
+  <script src="assets/js/data-tf.js?v=20261127g"></script>
+  <script src="assets/js/pseudocode.js?v=20261127g"></script>
+  <script src="assets/js/stepplayer.js?v=20261127g"></script>
+  <script src="assets/js/viz-bars.js?v=20261127g"></script>
+  <script src="assets/js/data-algos.js?v=20261127g"></script>
+  <script src="assets/js/data-heap.js?v=20261127g"></script>
+  <script src="assets/js/perfekt/heap.js?v=20261127g"></script>
+  <script src="assets/js/perfekt/delt.js?v=20261127g"></script>
+  <script src="assets/js/kort/heap.js?v=20261127g"></script>
+  <script src="assets/js/dra.js?v=20261127g"></script>
+  <script src="assets/js/data-dra.js?v=20261127g"></script>
   <script>
   (function () {
     var IN = window.IN, qs = IN.qs, el = IN.el;
@@ -783,14 +937,14 @@
 
     /* ================= SANT/USANT ================= */
     var TF = [
-      { s: "Et array med n elementer kan gjøres om til en heap i O(n).", answer: true, explain: "Sant. BuildMinHeap bobler ned nedenfra og opp, og summen av høydene er O(n). (H2022 a)", kilde: "H2022" },
-      { s: "Reverserer vi arrayet til en heap (minste i roten), får vi en max-heap.", answer: false, explain: "Usant. Moteksempel: [1, 2, 5, 3, 4] reversert er [4, 3, 5, 2, 1], og der er 5 barn av 4. (H2022 b)", kilde: "H2022" },
-      { s: "Alle elementer på dybde d er mindre enn alle elementer på dybde d + 1.", answer: false, explain: "Usant. Heap-egenskapen gjelder bare forelder mot barn. I [1, 2, 9, 3] er 9 på dybde 1 større enn 3 på dybde 2. (H2022 c)", kilde: "H2022" },
-      { s: "Innsetting i en heap med n elementer er O(log n) i verste tilfelle.", answer: true, explain: "Sant. Boble opp går høyst fra den nye løvnoden til roten, altså høyden til treet: ⌊log(n + 1)⌋ nivåer, O(log n). (H2022 d)", kilde: "H2022" },
-      { s: "Et AVL-tre kan brukes som prioritetskø med samme kjøretid som en heap.", answer: true, explain: "Sant. Innsetting og å fjerne minste (lengst til venstre) er begge O(log n) i et AVL-tre. (H2022 e)", kilde: "H2022" },
-      { s: "Langs en sti fra roten til en løvnode er nodene ordnet fra minst til størst.", answer: true, explain: "Sant. Hver node er større enn eller lik foreldernoden, så verdiene vokser (eller står stille) nedover. (H2022 f)", kilde: "H2022" },
-      { s: "Bytter to søskennoder plass, er det fremdeles en heap.", answer: false, explain: "Usant (sensor kalte den litt tvetydig). Søsknene har samme forelder, men barna under dem følger ikke med, og da kan heap-egenskapen brytes lenger ned. Eksempel: [1, 2, 5, 3] → [1, 5, 2, 3] gir 3 under 5. (H2022 g)", kilde: "H2022" },
-      { s: "Med en prioritetskø der alle operasjoner er O(1), ville Dijkstra blitt O(|V| + |E|).", answer: true, explain: "Sant. Utenom køen gjør Dijkstra bare lineært arbeid over noder og kanter. Køen er flaskehalsen. (H2022 h)", kilde: "H2022" },
+      { s: "Et array med n elementer kan gjøres om til en heap i O(n).", answer: true, explain: "Sant. BuildMinHeap bobler ned nedenfra og opp, og summen av høydene er O(n). (H2022 5a)", kilde: "H2022" },
+      { s: "Reverserer vi arrayet til en heap (minste i roten), får vi en max-heap.", answer: false, explain: "Usant. Moteksempel: [1, 2, 5, 3, 4] reversert er [4, 3, 5, 2, 1], og der er 5 barn av 4. (H2022 5b)", kilde: "H2022" },
+      { s: "Alle elementer på dybde d er mindre enn alle elementer på dybde d + 1.", answer: false, explain: "Usant. Heap-egenskapen gjelder bare forelder mot barn. I [1, 2, 9, 3] er 9 på dybde 1 større enn 3 på dybde 2. (H2022 5c)", kilde: "H2022" },
+      { s: "Innsetting i en heap med n elementer er O(log n) i verste tilfelle.", answer: true, explain: "Sant. Boble opp går høyst fra den nye løvnoden til roten, altså høyden til treet: ⌊log(n + 1)⌋ nivåer, O(log n). (H2022 5d)", kilde: "H2022" },
+      { s: "Et AVL-tre kan brukes som prioritetskø med samme kjøretid som en heap.", answer: true, explain: "Sant. Innsetting og å fjerne minste (lengst til venstre) er begge O(log n) i et AVL-tre. (H2022 5e)", kilde: "H2022" },
+      { s: "Langs en sti fra roten til en løvnode er nodene ordnet fra minst til størst.", answer: true, explain: "Sant. Hver node er større enn eller lik foreldernoden, så verdiene vokser (eller står stille) nedover. (H2022 5f)", kilde: "H2022" },
+      { s: "Bytter to søskennoder plass, er det fremdeles en heap.", answer: false, explain: "Usant (sensor kalte den litt tvetydig). Søsknene har samme forelder, men barna under dem følger ikke med, og da kan heap-egenskapen brytes lenger ned. Eksempel: [1, 2, 5, 3] → [1, 5, 2, 3] gir 3 under 5. (H2022 5g)", kilde: "H2022" },
+      { s: "Med en prioritetskø der alle operasjoner er O(1), ville Dijkstra blitt O(|V| + |E|).", answer: true, explain: "Sant. Utenom køen gjør Dijkstra bare lineært arbeid over noder og kanter. Køen er flaskehalsen. (H2022 5h)", kilde: "H2022" },
       { s: "Det største elementet i en heap (minste i roten) kan finnes i O(log n).", answer: false, explain: "Usant. Det kan ligge i en hvilken som helst løvnode, og omtrent halvparten av nodene er løvnoder, så det er O(n). (H2022 i)", kilde: "H2022" },
       { s: "Over halvparten av elementene i en heap ligger på de to dypeste nivåene.", answer: true, explain: "Sant. Det nest nederste nivået er fullt, og et fullt nivå har én node mer enn alle nivåene over til sammen (2<sup>d</sup> mot 2<sup>d</sup> − 1). Legger vi til nodene på det nederste nivået, er de to nederste nivåene over halvparten. (H2022 j)", kilde: "H2022" },
       { s: "Et sortert array (stigende) er alltid en heap.", answer: true, explain: "Sant. For hver i er A[i] ≤ A[2i + 1] og A[i] ≤ A[2i + 2], fordi barna står lenger bak. Det motsatte gjelder ikke." },

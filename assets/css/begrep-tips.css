@@ -56,7 +56,7 @@
 }
 .bt-ol-sok input:focus-visible { outline: 2px solid var(--color-primary); outline-offset: 1px; }
 .bt-ol { margin: 0 0 1.2rem; }
-.bt-ol dt { margin-top: .75rem; scroll-margin-top: 6rem; }
+.bt-ol dt { margin-top: .75rem; scroll-margin-top: var(--stick-h, 6rem); }
 .bt-ol dt b { color: var(--color-on-surface); }
 .bt-ol-full { color: var(--color-on-surface-variant); }
 .bt-ol dd { margin: .15rem 0 0; padding-left: .9rem; border-left: 2px solid var(--color-outline-variant); }

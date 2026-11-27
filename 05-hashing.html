@@ -7,9 +7,9 @@
   <title>Blokk 5 · Hashing · IN2010</title>
   <meta name="description" content="Hashing i IN2010: hashfunksjoner, Separate chaining, Linear probing med sletting, Load factor og rehash, Python 3.6-ordbøker og hashing som verktøy – med stegvise demoer, pseudokode og eksamensoppgaver.">
   <script>(function(){try{var d=document.documentElement;var t=localStorage.getItem('in-theme');if(t!=='dark'&&t!=='system')t='light';if(t!=='system')d.setAttribute('data-theme',t);var l=localStorage.getItem('in-level');if(l!=='eli5'&&l!=='teknisk')l='normal';d.setAttribute('data-level',l);}catch(e){document.documentElement.setAttribute('data-theme','light');document.documentElement.setAttribute('data-level','normal');}})();</script>
-  <link rel="stylesheet" href="assets/css/styles.css?v=20261127f">
-  <link rel="stylesheet" href="assets/css/dra.css?v=20261127f">
-  <link rel="stylesheet" href="assets/css/begrep-tips.css?v=20261127f">
+  <link rel="stylesheet" href="assets/css/styles.css?v=20261127g">
+  <link rel="stylesheet" href="assets/css/dra.css?v=20261127g">
+  <link rel="stylesheet" href="assets/css/begrep-tips.css?v=20261127g">
 </head>
 <body data-page="hashing">
   <a class="skip-link" href="#main">Hopp til innhold</a>
@@ -21,14 +21,6 @@
       <p class="lead">Et hashmap finner en nøkkel uten å lete gjennom alt: en hashfunksjon regner ut hvor nøkkelen skal ligge.
         Her lærer du de to kollisjonsmetodene i kurset, Separate chaining og Linear probing, hvorfor sletting er vanskelig,
         hva Load factor og rehash betyr for kjøretiden, og hvordan Python-ordbøker bygger på det samme.</p>
-      <div class="badges">
-        <span class="badge" data-go="probing" data-card="h2020-4"><b>H2020</b> · Linear probing · <span class="pts">2p</span></span>
-        <span class="badge" data-go="triks" data-card="h2020-7"><b>H2020</b> · Subanagram · <span class="pts">17p</span></span>
-        <span class="badge" data-go="triks" data-card="h2021-9"><b>H2021</b> · Flest forekomster · <span class="pts">8p</span></span>
-        <span class="badge" data-go="probing" data-card="h2022-7"><b>H2022</b> · Linear probing · <span class="pts">10p</span></span>
-        <span class="badge" data-go="python" data-card="h2024-5"><b>H2024</b> · Python 3.6-ordbøker · <span class="pts">10p</span></span>
-        <span class="badge" data-go="chaining" data-card="h2025-2"><b>H2025</b> · Separate chaining · <span class="pts">10p</span></span>
-      </div>
     </div>
 
     <div class="tabs" role="tablist" aria-label="Emner om hashing">
@@ -41,11 +33,32 @@
       <button data-tab="test">Sant/usant</button>
     </div>
 
+    <div class="pagehead-info">
+      <div class="badges">
+        <span class="badge" data-go="probing" data-card="h2020-4"><b>H2020</b> · Linear probing · <span class="pts">2p</span></span>
+        <span class="badge" data-go="triks" data-card="h2020-7"><b>H2020</b> · Subanagram · <span class="pts">17p</span></span>
+        <span class="badge" data-go="triks" data-card="h2021-9"><b>H2021</b> · Flest forekomster · <span class="pts">8p</span></span>
+        <span class="badge" data-go="probing" data-card="h2022-7"><b>H2022</b> · Linear probing · <span class="pts">10p</span></span>
+        <span class="badge" data-go="python" data-card="h2024-5"><b>H2024</b> · Python 3.6-ordbøker · <span class="pts">10p</span></span>
+        <span class="badge" data-go="chaining" data-card="h2025-2"><b>H2025</b> · Separate chaining · <span class="pts">10p</span></span>
+      </div>
+    </div>
+
     <!-- ===================== BEGREPER ===================== -->
     <section data-panel="begreper">
+      <div class="callout eks-spor"><span class="lbl">Hva eksamen spør om</span>
+        <p>Ingen egen oppgave, men begrepene her brukes i alle hashing-oppgavene H2020–H2025.</p>
+        <ul>
+          <li><b>H2020 4, H2022 7a og H2025 2a</b>: et tomt array med N = 10 og h(k, N) = k mod N. Du setter inn nøklene for hånd.</li>
+          <li><b>H2024 5b</b> (2p): hva en rehash er, og hva som forårsaker den. Svaret bygger på Load factor.</li>
+          <li>Hashfunksjoner for strenger (summen av tegnkodene og 31-hashen) har ikke vært spurt om.</li>
+        </ul>
+      </div>
+
+      <h4 class="del">1. Hashmap og hashset <span class="tag merke kjerne">kommer ofte</span></h4>
       <div class="callout begrep"><span class="lbl">Begrep: hashmap og hashset</span>
         <p>Et <b>hashmap</b> lagrer par av <b>nøkkel</b> og <b>verdi</b>, og støtter innsetting, oppslag og sletting av nøkler.
-          Hver nøkkel finnes høyst én gang. Et <b>hashset</b> er det samme, bare uten verdier: det lagrer bare nøkler.
+          Hver nøkkel finnes høyst én gang: setter vi inn en nøkkel som finnes fra før, overskrives den gamle verdien. Et <b>hashset</b> er det samme, bare uten verdier: det lagrer bare nøkler.
           Begge bygger på et array A med N plasser og en <b>hashfunksjon</b> h(k, N), som gir et tall mellom 0 og N − 1:
           plassen der nøkkelen k hører hjemme.</p>
       </div>
@@ -63,7 +76,7 @@
         </div>
       </div>
 
-      <h3>Hashfunksjonen</h3>
+      <h4 class="del">2. Hashfunksjonen <span class="tag merke kjerne">kommer ofte</span></h4>
       <div class="callout begrep"><span class="lbl">Begrep: en god hashfunksjon</span>
         <ul>
           <li><b>Konsistent:</b> samme nøkkel må alltid gi samme tall. Ellers finner vi aldri nøkkelen igjen.</li>
@@ -82,7 +95,11 @@
           Et hashmap trenger derfor alltid en metode for å håndtere kollisjoner.</p>
       </div>
 
-      <h3>To måter å håndtere kollisjoner</h3>
+      <h4 class="del">3. To måter å håndtere kollisjoner <span class="tag merke kjerne">kommer ofte</span></h4>
+      <div class="callout begrep"><span class="lbl">Begrep: Load factor</span>
+        <p><b>Load factor</b> er n/N: antall nøkkel-verdi-par delt på antall plasser i arrayet. Lav Load factor gir få kollisjoner, men mye ubrukt plass.
+          Forelesningen anslår at en god Load factor trolig ligger mellom 1/2 og 3/4 (det bør avgjøres ved å prøve), og kursnotatets kode gjør tabellen større (rehash) når n/N når 0,75. Mer om det under <a href="#fane=kjoretid">Rehash &amp; kjøretid</a>.</p>
+      </div>
       <p class="muted small">Samme nøkler (21, 31, 5, 15, 41) med N = 10 og h(k, N) = k mod N:</p>
       <div class="grid cols-2">
         <div class="card"><h4 style="margin-top:.2rem">Separate chaining</h4>
@@ -105,10 +122,12 @@
           </tbody>
         </table>
       </div>
-      <div class="callout begrep"><span class="lbl">Begrep: Load factor</span>
-        <p><b>Load factor</b> er n/N: antall nøkkel-verdi-par delt på antall plasser i arrayet. Lav Load factor gir få kollisjoner, men mye ubrukt plass.
-          Forelesningen anslår at en god Load factor trolig ligger mellom 1/2 og 3/4 (det bør avgjøres ved å prøve), og kursnotatets kode gjør tabellen større (rehash) når n/N når 0,75. Mer om det under <a href="#fane=kjoretid">Rehash &amp; kjøretid</a>.</p>
-      </div>
+      <div class="husk"><h4>Huskeregler</h4><ul>
+        <li>Med N = 10 og k mod N hasher et tall til sitt siste siffer.</li>
+        <li>Finnes nøkkelen fra før: overskriv verdien, aldri et nytt par.</li>
+        <li>Separate chaining: en liste per plass. Linear probing: neste ledige plass, alltid mod N.</li>
+        <li>Load factor = n/N.</li>
+      </ul></div>
 
       <h3>Sjekk deg selv</h3>
       <div id="quiz-begreper"></div>
@@ -116,6 +135,16 @@
 
     <!-- ===================== SEPARATE CHAINING ===================== -->
     <section data-panel="chaining" hidden>
+      <div class="callout eks-spor"><span class="lbl">Hva eksamen spør om</span>
+        <p><span class="tag merke eksbas">eksamensbasert</span> Spurt H2025 (10p), som første oppgave i del 2.</p>
+        <ul>
+          <li><b>H2025 2a</b> (3p): sett inn sju nøkkel-verdi-par med N = 10 og k mod N, og skriv ned bøttene.</li>
+          <li><b>H2025 2b</b> (5p): forklar innsetting og skisser den med pseudokode.</li>
+          <li><b>H2025 2c</b> (2p): kjøretiden for innsetting, både forventet og i verste tilfelle.</li>
+        </ul>
+      </div>
+
+      <h4 class="del">1. Innsetting og oppslag <span class="tag merke eksbas">eksamensbasert</span></h4>
       <div class="callout begrep"><span class="lbl">Begrep: Separate chaining</span>
         <p>Med <b>Separate chaining</b> er hver plass i arrayet enten null eller en <b>bøtte</b>: en liste med nøkkel-verdi-par.
           Alle nøkler som hasher til plass i, ligger i bøtta A[i]. Bøtta lages først når den første nøkkelen hasher dit.</p>
@@ -137,8 +166,7 @@
         </div>
       </div>
 
-      <h3>Innsetting og oppslag, steg for steg</h3>
-      <p class="muted small hs-syntax">Eget eksempel: skriv par som <code>21=a</code>, og et oppslag som <code>?21</code>. Legg til <code>N=7</code> for en annen størrelse. Tekstnøkler hashes med 31-hashen.</p>
+      <p class="muted small hs-syntax"><b>Steg for steg:</b> demoen starter med H2025-eksempelet. Eget eksempel: skriv par som <code>21=a</code>, og et oppslag som <code>?21</code>. Legg til <code>N=7</code> for en annen størrelse. Tekstnøkler hashes med 31-hashen.</p>
       <div id="demo-chaining"></div>
 
       <div class="grid cols-2">
@@ -154,20 +182,39 @@
             så innsetting koster O(1 + |B|), ikke alltid O(1).</p>
         </div>
       </div>
+
+      <h4 class="del">2. Kjøretid <span class="tag merke eksbas">eksamensbasert</span></h4>
       <div class="callout uni"><span class="lbl">Universitetsnivå: hvor lange blir bøttene?</span>
         <p>Med en god hashfunksjon og en tilstrekkelig lav Load factor er lengden på hver bøtte begrenset av en konstant. Da er oppslag og sletting forventet O(1).
           Innsetting er forventet <b>amortisert</b> O(1), fordi vi av og til må rehashe for å holde Load factor lav. Hasher alle nøklene til samme bøtte, blir hver operasjon O(n).</p>
       </div>
-
-      <h3>Sjekk deg selv</h3>
-      <div id="quiz-chaining"></div>
+      <p>Kort sagt: alle operasjonene koster O(1 + |B|), der |B| er lengden på bøtta. Det er forventet O(1) og O(n) i verste tilfelle. H2025 2c ga ett poeng for hver av de to.</p>
+      <div class="husk"><h4>Huskeregler</h4><ul>
+        <li>A[i] er null: lag en ny bøtte med (k, v).</li>
+        <li>Let gjennom bøtta først. Finnes k, overskriv. Ellers legg (k, v) bakerst.</li>
+        <li>Kjøretid: forventet O(1), O(n) i verste tilfelle. Skriv begge.</li>
+      </ul></div>
 
       <h3>Eksamen</h3>
       <div id="exam-h2025-2"></div>
+
+      <h3>Sjekk deg selv</h3>
+      <div id="quiz-chaining"></div>
     </section>
 
     <!-- ===================== LINEAR PROBING ===================== -->
     <section data-panel="probing" hidden>
+      <div class="callout eks-spor"><span class="lbl">Hva eksamen spør om</span>
+        <p><span class="tag merke kjerne">kommer ofte</span> Spurt H2020 og H2022. H2024 5 bygger også på Linear probing (se <a href="#fane=python">Python-ordbøker</a>).</p>
+        <ul>
+          <li><b>H2020 4</b> (2p): sett inn sju tall med N = 10 og k mod N, og fyll ut tabellen.</li>
+          <li><b>H2022 7a</b> (2p): samme type, med svaret som en kommaseparert liste der _ er en tom plass.</li>
+          <li><b>H2022 7b</b> (8p): forklar innsetting og skisser den med pseudokode.</li>
+          <li>Sletting, slettet-merker og lange segmenter uten hull har ikke vært spurt om. Sant/usant-delen fra 2023 er ikke kjent.</li>
+        </ul>
+      </div>
+
+      <h4 class="del">1. Innsetting og oppslag <span class="tag merke kjerne">kommer ofte</span></h4>
       <div class="callout begrep"><span class="lbl">Begrep: Linear probing</span>
         <p>Med <b>Linear probing</b> ligger alle parene i selve arrayet, høyst ett par per plass. Vi starter på hjemmeplassen i = h(k, N).
           Er den opptatt av en annen nøkkel, prøver vi i + 1, i + 2 og så videre, alltid mod N, slik at vi går rundt til 0 etter siste plass.
@@ -190,12 +237,24 @@
         </div>
       </div>
 
-      <h3>Innsetting, oppslag og sletting</h3>
-      <p class="muted small hs-syntax">Eget eksempel: tall settes inn, <code>?20</code> er et oppslag og <code>-10</code> sletter 10. Legg til <code>N=7</code> for en annen størrelse.
-        Vi viser bare nøklene. Prikket ramme og «h» viser hjemmeplassen, og den lilla streken under viser segmenter uten hull.</p>
+      <p class="muted small hs-syntax"><b>Steg for steg:</b> demoen starter med H2020-eksempelet. Eget eksempel: tall settes inn, <code>?20</code> er et oppslag og <code>-10</code> sletter 10 (sletting forklares i del 2). Legg til <code>N=7</code> for en annen størrelse.
+        Vi viser bare nøklene. Prikket ramme og «h» viser hjemmeplassen, og den lilla streken under viser segmenter uten hull (del 4).</p>
       <div id="demo-probing"></div>
 
-      <h3>Hvorfor er sletting vanskelig?</h3>
+      <div class="callout sensor"><span class="lbl">Sensortips (H2022)</span>
+        <ul>
+          <li>Glem ikke <b>mod N</b>. En prosedyre som går utenfor arrayet, ga 2 poeng trekk på H2022.</li>
+          <li>Ved samme nøkkel skal verdien overskrives. Ellers 1 poeng trekk.</li>
+          <li>Bruk h bare på nøkkelen. Feil bruk av hashfunksjonen, som i ← h(i + 1, N), ga 1 poeng trekk.</li>
+          <li>Tips: skriv tabellen med _ for tomme plasser, og sjekk at du har tatt med rundturen fra siste til første plass.</li>
+        </ul>
+      </div>
+      <div class="husk"><h4>Huskeregler</h4><ul>
+        <li>Start på i = h(k, N), gå videre med i ← (i + 1) mod N.</li>
+        <li>Stopp ved lik nøkkel (overskriv) eller ved null (sett inn her / finnes ikke).</li>
+      </ul></div>
+
+      <h4 class="del">2. Sletting <span class="tag merke ny">pensum, ikke spurt før</span></h4>
       <div class="callout felle"><span class="lbl">Felle: A[i] ← null ved sletting</span>
         <p>Setter vi bare plassen til null, kan andre nøkler bli borte. Under er 10 slettet fra tabellen fra H2022 ved å skrive null på plass 0.
           Et oppslag på 20 starter på hjemmeplassen 0, treffer null med en gang og svarer «finnes ikke», selv om 20 ligger på plass 3.</p>
@@ -227,7 +286,7 @@
           Har den hjemmeplass 7, må den flyttes til plass 8.</p>
       </div>
 
-      <h3>Strategi 2: slettet-merker</h3>
+      <h4 class="del">3. Strategi 2: slettet-merker <span class="tag merke ny">pensum, ikke spurt før</span></h4>
       <p class="muted small hs-syntax">Samme syntaks som over. Et merke vises som ×. Kurset sier at innsetting regner merkede plasser som ledige.
         Vår presisering i demoen: innsettingen leter likevel helt til en ledig plass før den gjenbruker det første merket, for nøkkelen kan ligge lenger ut, og da ville vi fått et duplikat.</p>
       <div id="demo-marks"></div>
@@ -242,8 +301,13 @@
           </tbody>
         </table>
       </div>
+      <div class="husk"><h4>Huskeregler</h4><ul>
+        <li>Sett aldri bare A[i] ← null ved sletting: tett hullet eller merk som slettet.</li>
+        <li>Tett hullet: flytt en nøkkel inn hvis hjemmeplassen dens ikke ligger i (i, j].</li>
+        <li>Merker: oppslag går forbi dem, innsetting kan gjenbruke dem, rehash fjerner dem.</li>
+      </ul></div>
 
-      <h3>Lange segmenter uten hull</h3>
+      <h4 class="del">4. Lange segmenter uten hull <span class="tag merke ny">pensum, ikke spurt før</span></h4>
       <div class="callout begrep"><span class="lbl">Begrep: segmenter uten hull</span>
         <p>Med Linear probing kan vi få <b>lange segmenter uten hull</b>: mange opptatte plasser på rad. Da blir probingen lang, og i verste fall lineær.
           Vår forklaring på hvorfor det forsterker seg selv: en nøkkel som hasher inn i et slikt segment, må probe til enden av det og blir selv en del av segmentet, så det vokser videre. Lav Load factor holder segmentene korte.</p>
@@ -251,30 +315,35 @@
       <div class="card"><div id="fig-cluster"></div>
         <p class="muted small">11, 12, 13, 21, 22 og 31 satt inn med N = 10. 31 hører hjemme på plass 1, men må gå forbi fem opptatte plasser (1–5) før den finner plass 6.</p></div>
 
-      <div class="callout sensor"><span class="lbl">Sensortips (H2022)</span>
-        <ul>
-          <li>Glem ikke <b>mod N</b>. En prosedyre som går utenfor arrayet, ga 2 poeng trekk på H2022.</li>
-          <li>Ved samme nøkkel skal verdien overskrives. Ellers 1 poeng trekk.</li>
-          <li>Bruk h bare på nøkkelen. Feil bruk av hashfunksjonen, som i ← h(i + 1, N), ga 1 poeng trekk.</li>
-          <li>Tips: skriv tabellen med _ for tomme plasser, og sjekk at du har tatt med rundturen fra siste til første plass.</li>
-        </ul>
-      </div>
-
-      <h3>Sjekk deg selv</h3>
-      <div id="quiz-probing"></div>
-
       <h3>Eksamen</h3>
       <div id="exam-h2020-4"></div>
       <div id="exam-h2022-7"></div>
+
+      <h3>Sjekk deg selv</h3>
+      <div id="quiz-probing"></div>
     </section>
 
     <!-- ===================== KJØRETID ===================== -->
     <section data-panel="kjoretid" hidden>
+      <div class="callout eks-spor"><span class="lbl">Hva eksamen spør om</span>
+        <p><span class="tag merke kjerne">kommer ofte</span> Kjøretid og rehash er spurt som deloppgaver H2021, H2024 og H2025.</p>
+        <ul>
+          <li><b>H2025 2c</b> (2p): kjøretiden for innsetting med Separate chaining. Ett poeng for forventet og ett for verste tilfelle.</li>
+          <li><b>H2021 9</b> (8p): forventet og verste kjøretid for en hashmap-løsning mot et telle-array (se <a href="#fane=triks">Hashing som verktøy</a>).</li>
+          <li><b>H2024 5b</b> (2p): hva er en rehash, og hva forårsaker den? <b>5c</b> (2p) spør hvordan rehash foregår i Python-strukturen.</li>
+          <li>Hvorfor innsetting blir amortisert O(1) (dobling mot N ← N + 1), har ikke vært spurt om.</li>
+        </ul>
+      </div>
+
+      <h4 class="del">1. Forventet og verste tilfelle <span class="tag merke kjerne">kommer ofte</span></h4>
       <div id="intro-kjoretid"></div>
       <div class="callout eli5"><span class="lbl">5-åring: én lang kø på én knagg</span>
         <p>Hashing er raskt nesten alltid, men ikke alltid. Får alle samme knaggnummer, blir det én lang kø på én knagg, og vakten må lete gjennom alt.
           Derfor sier vi O(1) forventet, men O(n) i verste tilfelle.</p>
       </div>
+      <div class="card"><h4 style="margin-top:.2rem">Verste tilfelle: alt i samme bøtte</h4>
+        <div id="fig-verst"></div>
+        <p class="muted small">0, 10, 20, 30 og 40 med N = 10 og k mod N. Et oppslag på 40 må gå gjennom hele bøtta: O(n).</p></div>
       <div class="table-wrap">
         <table class="cmp-table">
           <thead><tr><th>Operasjon</th><th>Forventet</th><th>Verste tilfelle</th></tr></thead>
@@ -291,7 +360,7 @@
           Verste tilfelle er når mange nøkler hasher til samme plass. H2025 ga ett poeng for hver av de to delene.</p>
       </div>
 
-      <h3>Rehash</h3>
+      <h4 class="del">2. Rehash <span class="tag merke eksbas">eksamensbasert</span></h4>
       <div class="callout begrep"><span class="lbl">Begrep: rehash</span>
         <p>En <b>rehash</b> lager et nytt, større array (kurset dobler N) og setter inn alle parene på nytt med den nye N-en.
           Hjemmeplassen h(k, N) avhenger av N, så parene havner ofte på nye plasser. Kurset sjekker før hver innsetting om n/N ≥ 0,75, og starter med N = 1.
@@ -300,18 +369,22 @@
       <p class="muted small hs-syntax">Eget eksempel: tall som settes inn, f.eks. <code>5, 12, 7, 20</code>. Legg til <code>N=4</code> for å starte med 4 plasser.</p>
       <div id="demo-rehash"></div>
 
-      <h3>Hvorfor blir det amortisert O(1)?</h3>
+      <h4 class="del">3. Hvorfor blir det amortisert O(1)? <span class="tag merke ny">pensum, ikke spurt før</span></h4>
       <div id="intro-amort"></div>
       <div class="card" id="hs-amort"></div>
 
+      <details class="fordyp"><summary>Forventet og amortisert, mer presist <span class="tag merke fordyp">Fordypning, ikke nødvendig til eksamen</span></summary>
       <div class="callout uni"><span class="lbl">Universitetsnivå: forventet og amortisert</span>
         <p>«Forventet» forutsetter at hashfunksjonen sprer nøklene godt. Under antakelsen om uniform hashing er antall nøkler per plass i snitt Load factor, som rehash holder under en konstant. (Lysarkene sier bare at dette gir forventet O(1); snittet n/N er vår egen utregning.)
           «Amortisert» betyr at enkelte innsettinger er dyre (de som utløser en rehash, forventet O(n)), men at gjennomsnittet over mange innsettinger er O(1).
           Dobling er nøkkelen: rehashene skjer ved n ≈ 0,75 · 1, 2, 4, 8, … og summen av arbeidet er en geometrisk rekke, O(n) totalt.</p>
       </div>
-      <div class="card"><h4 style="margin-top:.2rem">Verste tilfelle: alt i samme bøtte</h4>
-        <div id="fig-verst"></div>
-        <p class="muted small">0, 10, 20, 30 og 40 med N = 10 og k mod N. Et oppslag på 40 må gå gjennom hele bøtta: O(n).</p></div>
+      </details>
+      <div class="husk"><h4>Huskeregler</h4><ul>
+        <li>Skriv alltid begge: forventet O(1) og O(n) i verste tilfelle (innsetting: forventet amortisert O(1)).</li>
+        <li>Rehash: når n/N blir for høy (kurset: 0,75), doble N og sett inn alle parene på nytt. Koster forventet O(n).</li>
+        <li>Dobling gir amortisert O(1). N ← N + 1 gir O(n) per innsetting.</li>
+      </ul></div>
 
       <h3>Sjekk deg selv</h3>
       <div id="quiz-kjoretid"></div>
@@ -319,6 +392,17 @@
 
     <!-- ===================== PYTHON ===================== -->
     <section data-panel="python" hidden>
+      <div class="callout eks-spor"><span class="lbl">Hva eksamen spør om</span>
+        <p><span class="tag merke eksbas">eksamensbasert</span> Spurt H2024 (10p). Oppgaven bygger på Linear probing og rehash.</p>
+        <ul>
+          <li><b>H2024 5a</b> (4p): forklar med naturlig språk hvordan oppslag og innsetting med Linear probing må endres for indices og entries.</li>
+          <li><b>H2024 5b</b> (2p): hva er en rehash, og hva forårsaker den?</li>
+          <li><b>H2024 5c</b> (2p): hvordan foregår en rehash i den nye strukturen?</li>
+          <li><b>H2024 5d</b> (2p): hva er fordelene med den nye strukturen?</li>
+        </ul>
+      </div>
+
+      <h4 class="del">1. Indices og entries <span class="tag merke eksbas">eksamensbasert</span></h4>
       <div class="callout begrep"><span class="lbl">Begrep: Python-ordbøker</span>
         <p>En Python-<b>ordbok</b> (dict) er et hashmap. H2024 lot oss anta, som en forenkling, at ordbøker fram til Python 3.6 brukte Linear probing
           slik det undervises i IN2010: ett array med N plasser, der hver plass har plass til et helt nøkkel-verdi-par.
@@ -336,12 +420,12 @@
       </div>
       <p class="muted small">Eksempelet fra H2024: d["timmy"] = "red", d["barry"] = "green", d["guido"] = "blue", med N = 8.</p>
 
-      <h3>Oppslag og innsetting, steg for steg</h3>
-      <p class="muted small hs-syntax">Eget eksempel: <code>timmy=red, ?timmy, rehash</code>. Navnene fra H2024 har faste hashverdier valgt slik at plasseringene blir som i oppgaven.
+      <h4 class="del">2. Oppslag, innsetting og rehash <span class="tag merke eksbas">eksamensbasert</span></h4>
+      <p class="muted small hs-syntax"><b>Steg for steg:</b> demoen starter med H2024-eksempelet. Velg «Med rehash» for å se 5c. Eget eksempel: <code>timmy=red, ?timmy, rehash</code>. Navnene fra H2024 har faste hashverdier valgt slik at plasseringene blir som i oppgaven.
         Andre tekstnøkler bruker 31-hashen. Den nederste, svake tabellen viser hvordan det samme ville sett ut før 3.6.</p>
       <div id="demo-python"></div>
 
-      <h3>Fordelene med den nye strukturen</h3>
+      <h4 class="del">3. Fordelene med den nye strukturen <span class="tag merke eksbas">eksamensbasert</span></h4>
       <div class="callout eksempel"><span class="lbl">Fordeler med indices og entries</span>
         <ul>
           <li><b>Innsettingsrekkefølgen bevares</b>, fordi nye par alltid legges bakerst i entries.</li>
@@ -350,16 +434,32 @@
           <li><b>Mindre minne:</b> de tomme plassene i indices er bare små tall, ikke hele par.</li>
         </ul>
       </div>
-
-      <h3>Sjekk deg selv</h3>
-      <div id="quiz-python"></div>
+      <div class="husk"><h4>Huskeregler</h4><ul>
+        <li>N er nå størrelsen på indices. Probingen skjer i indices.</li>
+        <li>Nøkkelen sammenlignes i entries[indices[i]].</li>
+        <li>Nye par legges bakerst i entries. Rehash bygger bare indices på nytt.</li>
+        <li>H2024 5d ga full uttelling for to fordeler.</li>
+      </ul></div>
 
       <h3>Eksamen</h3>
       <div id="exam-h2024-5"></div>
+
+      <h3>Sjekk deg selv</h3>
+      <div id="quiz-python"></div>
     </section>
 
     <!-- ===================== TRIKS ===================== -->
     <section data-panel="triks" hidden>
+      <div class="callout eks-spor"><span class="lbl">Hva eksamen spør om</span>
+        <p><span class="tag merke kjerne">kommer ofte</span> Spurt H2020 og H2021, og hashing som verktøy dukker opp i oppgaver på andre sider også.</p>
+        <ul>
+          <li><b>H2020 7a</b> (4p): kjøretiden til en subanagram-sjekk med lister (flervalg). <b>7b</b> (7p): skriv IsSubanagramOf2 med frekvenstabeller i O(w + s). <b>7c</b> (6p): drøft to strategier for å finne subanagrammer i en ordbok.</li>
+          <li><b>H2021 9</b> (8p): drøft et hashmap mot et telle-array for å finne tallet som forekommer flest ganger, med verste og forventet kjøretid.</li>
+          <li>Samme verktøy brukes i <b>H2021 10</b> (<a href="02-sok.html#fane=triks">par med sum x</a>), <b>H2023 3</b> (<a href="02-sok.html#fane=duplikat">finn duplikat</a>) og <b>H2022 9</b> (<a href="04-traer.html#fane=huffman">autofullføring: prefikstre mot hashmap</a>).</li>
+        </ul>
+      </div>
+
+      <h4 class="del">1. Kjenn igjen oppgaven <span class="tag merke kjerne">kommer ofte</span></h4>
       <div id="intro-triks"></div>
       <div class="grid cols-2">
         <div class="callout eli5"><span class="lbl">5-åring: huskelista</span>
@@ -386,23 +486,30 @@
       </div>
       <p class="small">Duplikater og summer fra blokk 2 bruker samme idé: se <a href="02-sok.html#fane=duplikat">Finn duplikat</a> og <a href="02-sok.html#fane=triks">Array-triks</a>.</p>
 
-      <h3>Telling med hashmap</h3>
+      <h4 class="del">2. Telling med hashmap <span class="tag merke eksbas">eksamensbasert</span></h4>
+      <p class="small">Demoen går gjennom arrayet én gang, teller hvert tall i et hashmap og husker underveis tallet m med flest forekomster. Det er samme idé som Strategi 1 i H2021 9.</p>
       <div id="demo-mostfreq"></div>
       <div class="callout felle"><span class="lbl">Felle: forventet er ikke garantert</span>
         <p>Hashmap-operasjonene er forventet O(1), ikke garantert. Én gjennomgang med n operasjoner er derfor forventet O(n), men O(n²) i verste tilfelle.
           Er verdiene små heltall (høyst k), gir et vanlig telle-array garantert O(n + k).</p>
       </div>
 
-      <h3>Frekvenstabeller: subanagram</h3>
+      <h4 class="del">3. Frekvenstabeller: subanagram <span class="tag merke eksbas">eksamensbasert</span></h4>
       <div class="callout begrep"><span class="lbl">Begrep: frekvenstabell</span>
         <p>En <b>frekvenstabell</b> for en streng er et hashmap fra bokstav til antall forekomster. W kan skrives med bokstavene i S (uten gjenbruk)
           nøyaktig når W ikke trenger flere av noen bokstav enn S har.</p>
       </div>
+      <p class="small">Til venstre står IsSubanagramOf2, løsningen på H2020 7b: bygg én frekvenstabell for W og én for S, og sjekk hver bokstav i W. Til høyre kan du prøve selv: skriv et ord W og bokstavene S, og se hvilken bokstav det eventuelt er for få av.</p>
       <div class="grid cols-2">
         <div><div id="pc-subanagram"></div></div>
         <div class="card" id="hs-subw"></div>
       </div>
       <details class="card" style="margin-top:.6rem"><summary><b>Koden, linje for linje</b> (IsSubanagramOf2)</summary><div id="exp-subanagram"></div></details>
+      <div class="husk"><h4>Huskeregler</h4><ul>
+        <li>«Har jeg sett dette før?» → hashset. «Hvor mange av hver?» → hashmap.</li>
+        <li>Én gjennomgang med hashing: forventet O(n), O(n²) i verste tilfelle. Oppgi begge.</li>
+        <li>Små heltall (høyst k): et telle-array gir garantert O(n + k).</li>
+      </ul></div>
 
       <h3>Eksamen</h3>
       <div id="exam-h2021-9"></div>
@@ -411,6 +518,10 @@
 
     <!-- ===================== SANT/USANT ===================== -->
     <section data-panel="test" hidden>
+      <div class="callout eks-spor"><span class="lbl">Hva eksamen spør om</span>
+        <p><span class="tag merke ny">pensum, ikke spurt før</span> Hashing har ikke vært med i de kjente sant/usant-oppgavene (H2021 3, H2022 2 og 5). Sant/usant-delen fra 2023 er ikke kjent.
+          Påstandene under øver på det de andre fanene går gjennom, og som eksamen spør om i oppgavene for hånd.</p>
+      </div>
       <h3>Sant eller usant?</h3>
       <p class="muted small">Ta stilling til hver påstand, og sjekk svarene. Forklaringen viser hvorfor.</p>
       <div id="tf-hashing"></div>
@@ -429,23 +540,23 @@
     <p class="muted small">IN2010 · Blokk 5 · Hashing. Egne forklaringer og demoer basert på pensum. Eksamensoppgavene og sensorveiledningene er gjengitt ordrett med kildelinje, og avvik fra eksamensarket står i hvert kort.</p>
   </footer>
 
-  <script src="assets/js/core.js?v=20261127f"></script>
-<script src="assets/js/eksamensvekt.js?v=20261127f"></script>
-  <script src="assets/js/symboler.js?v=20261127f"></script>
-  <script src="assets/js/begreper-data.js?v=20261127f"></script>
-  <script src="assets/js/begrep-tips.js?v=20261127f"></script>
-  <script src="assets/js/data-tf.js?v=20261127f"></script>
-  <script src="assets/js/pseudocode.js?v=20261127f"></script>
-  <script src="assets/js/stepplayer.js?v=20261127f"></script>
-  <script src="assets/js/varline.js?v=20261127f"></script>
-  <script src="assets/js/viz-hash.js?v=20261127f"></script>
-  <script src="assets/js/data-algos.js?v=20261127f"></script>
-  <script src="assets/js/data-hashing.js?v=20261127f"></script>
-  <script src="assets/js/perfekt/hashing.js?v=20261127f"></script>
-  <script src="assets/js/perfekt/delt.js?v=20261127f"></script>
-  <script src="assets/js/kort/hashing.js?v=20261127f"></script>
-  <script src="assets/js/dra.js?v=20261127f"></script>
-  <script src="assets/js/data-dra.js?v=20261127f"></script>
+  <script src="assets/js/core.js?v=20261127g"></script>
+<script src="assets/js/eksamensvekt.js?v=20261127g"></script>
+  <script src="assets/js/symboler.js?v=20261127g"></script>
+  <script src="assets/js/begreper-data.js?v=20261127g"></script>
+  <script src="assets/js/begrep-tips.js?v=20261127g"></script>
+  <script src="assets/js/data-tf.js?v=20261127g"></script>
+  <script src="assets/js/pseudocode.js?v=20261127g"></script>
+  <script src="assets/js/stepplayer.js?v=20261127g"></script>
+  <script src="assets/js/varline.js?v=20261127g"></script>
+  <script src="assets/js/viz-hash.js?v=20261127g"></script>
+  <script src="assets/js/data-algos.js?v=20261127g"></script>
+  <script src="assets/js/data-hashing.js?v=20261127g"></script>
+  <script src="assets/js/perfekt/hashing.js?v=20261127g"></script>
+  <script src="assets/js/perfekt/delt.js?v=20261127g"></script>
+  <script src="assets/js/kort/hashing.js?v=20261127g"></script>
+  <script src="assets/js/dra.js?v=20261127g"></script>
+  <script src="assets/js/data-dra.js?v=20261127g"></script>
   <script>
   (function () {
     "use strict";

@@ -7,9 +7,9 @@
   <title>Lister &amp; stakk · IN2010</title>
   <meta name="description" content="Lister i IN2010: arrayer, dynamiske arrayer, enkelt- og dobbeltlenkede lister, stakk, kø og deque, nylige søk (LRU) og eksamensoppgaven om velformaterte tagger – med stegvise demoer, pseudokode og sant/usant.">
   <script>(function(){try{var d=document.documentElement;var t=localStorage.getItem('in-theme');if(t!=='dark'&&t!=='system')t='light';if(t!=='system')d.setAttribute('data-theme',t);var l=localStorage.getItem('in-level');if(l!=='eli5'&&l!=='teknisk')l='normal';d.setAttribute('data-level',l);}catch(e){document.documentElement.setAttribute('data-theme','light');document.documentElement.setAttribute('data-level','normal');}})();</script>
-  <link rel="stylesheet" href="assets/css/styles.css?v=20261127f">
-  <link rel="stylesheet" href="assets/css/dra.css?v=20261127f">
-  <link rel="stylesheet" href="assets/css/begrep-tips.css?v=20261127f">
+  <link rel="stylesheet" href="assets/css/styles.css?v=20261127g">
+  <link rel="stylesheet" href="assets/css/dra.css?v=20261127g">
+  <link rel="stylesheet" href="assets/css/begrep-tips.css?v=20261127g">
 </head>
 <body data-page="lister">
   <a class="skip-link" href="#main">Hopp til innhold</a>
@@ -21,9 +21,6 @@
       <p class="lead">De enkleste datastrukturene i kurset, og byggeklossene i nesten alt annet.
         Her ser du hvordan en liste kan lages med et dynamisk array eller med lenkede noder, hvorfor de har ulike kjøretider,
         og hvordan stakk og kø bygges på toppen. Til slutt: eksamensoppgaven om velformaterte tagger, og «nylige søk» med hashmap og lenket liste.</p>
-      <div class="badges">
-        <span class="badge" data-go="stakk" data-card="h2020-9"><b>H2020</b> · Velformaterte tagger · <span class="pts">12p</span></span>
-      </div>
     </div>
 
     <div class="tabs" role="tablist" aria-label="Emner om lister og stakk">
@@ -35,8 +32,24 @@
       <button data-tab="test">Sant/usant</button>
     </div>
 
+    <div class="pagehead-info">
+      <div class="badges">
+        <span class="badge" data-go="stakk" data-card="h2020-9"><b>H2020</b> · Velformaterte tagger · <span class="pts">12p</span></span>
+      </div>
+    </div>
+
     <!-- ===================== LISTER ===================== -->
     <section data-panel="begreper">
+      <div class="callout eks-spor"><span class="lbl">Hva eksamen spør om</span>
+        <p><span class="tag merke eksbas">eksamensbasert</span> Lister har aldri vært en egen eksamensoppgave i 2020–2025, men kjøretidene under brukes i andre oppgaver:</p>
+        <ul>
+          <li><b>H2022 2e</b> (sant/usant): «Binærsøk på arrayer er betydelig raskere enn binærsøk på lenkede lister.» Svaret er sant (kilde: sensorveiledning IN2010 H2022 2e).</li>
+          <li><b>H2022 10a</b> (1p): bøttene i en bøttekø kan være enkeltlenkede lister (kilde: sensorveiledning IN2010 H2022 10a). Se <a href="03-heap.html#fane=pk">prioritetskøer</a>.</li>
+          <li><b>H2024 5</b> (10p): Python-ordbøker lagrer parene i et tettpakket, dynamisk array. Se <a href="05-hashing.html#fane=python">hashing</a>.</li>
+        </ul>
+      </div>
+
+      <h4 class="del">1. Liste: en abstrakt datatype (ADT) og to datastrukturer <span class="tag merke ny">pensum, ikke spurt før</span></h4>
       <div class="callout begrep"><span class="lbl">Begrep: liste</span>
         <p>En <b>liste</b> er en endelig samling elementer i en bestemt rekkefølge. <b>Indeksen</b> til et element er hvor mange elementer som står foran det,
           så en liste med n elementer har indeksene 0, 1, …, n − 1. De fire grunnoperasjonene er
@@ -56,8 +69,7 @@
         </div>
       </div>
 
-      <h3>Liste er en ADT, array og lenket liste er datastrukturer</h3>
-      <p>Lista sier bare <i>hva</i> vi kan gjøre (Get, Set, Add, Remove). Hvordan det gjøres, avgjøres av datastrukturen under.
+      <p><b>Liste er en ADT, array og lenket liste er datastrukturer.</b> Lista er en abstrakt datatype (ADT). Den sier bare <i>hva</i> vi kan gjøre (Get, Set, Add, Remove). Hvordan det gjøres, avgjøres av datastrukturen under.
         Kurset viser to måter: et <b>dynamisk array</b>, der elementene ligger etter hverandre i minnet, og en <b>lenket liste</b>, der hvert element ligger i en egen node som peker videre.
         Mer om skillet mellom ADT og datastruktur finner du på <a href="00-begreper.html#fane=adt">Begreper</a>.</p>
       <div class="grid cols-2">
@@ -66,7 +78,7 @@
           <ul>
             <li>Fast lengde N, bestemt når arrayet lages.</li>
             <li>Elementene ligger etter hverandre i minnet.</li>
-            <li><code>A[i]</code> og <code>|A|</code> er O(1).</li>
+            <li><code>A[i]</code> og <code>|A|</code> er O(1): plass i kan regnes ut direkte, uten å gå gjennom plassene foran.</li>
             <li>Kan ikke vokse. Det er det dynamiske arrayet løser.</li>
           </ul>
         </div>
@@ -79,12 +91,14 @@
           </ul>
         </div>
       </div>
-      <div class="callout uni"><span class="lbl">Universitetsnivå: hvorfor A[i] er O(1)</span>
-        <p>Fordi alle plassene er like store og ligger etter hverandre, kan maskinen regne ut hvor plass i ligger: startadressen pluss i ganger størrelsen på én plass.
-          Det er én regneoperasjon, uansett hvor stort arrayet er. En lenket liste har ingen slik formel: nodene kan ligge hvor som helst, og den eneste veien til node i går via de i nodene foran.</p>
-      </div>
+      <details class="fordyp"><summary>Hvorfor A[i] er O(1) <span class="tag merke fordyp">Fordypning, ikke nødvendig til eksamen</span></summary>
+        <div class="callout uni"><span class="lbl">Universitetsnivå: hvorfor A[i] er O(1)</span>
+          <p>Fordi alle plassene er like store og ligger etter hverandre, kan maskinen regne ut hvor plass i ligger: startadressen pluss i ganger størrelsen på én plass.
+            Det er én regneoperasjon, uansett hvor stort arrayet er. En lenket liste har ingen slik formel: nodene kan ligge hvor som helst, og den eneste veien til node i går via de i nodene foran.</p>
+        </div>
+      </details>
 
-      <h3 id="tbl-ops">Kjøretider å kunne utenat</h3>
+      <h4 class="del" id="tbl-ops">2. Kjøretider å kunne utenat <span class="tag merke eksbas">eksamensbasert</span></h4>
       <p class="muted small">Tabellen er fra ukesoppgavene om sekvensielle datastrukturer. «Fullt» betyr at det dynamiske arrayet ikke har ledig plass, så neste innsetting må doble.
         Trykk på <b>Øv</b> for å skjule svarene, og trykk på en celle for å se den.</p>
       <div class="btn-row" style="margin:.2rem 0 .5rem"><button class="btn sm" type="button" id="ops-drill">Øv: skjul svarene</button></div>
@@ -103,14 +117,24 @@
       <p class="muted small">Alle tallene betyr O(…): 1 er O(1) og n er O(n).</p>
 
       <div class="callout felle"><span class="lbl">Felle: binærsøk på lenket liste</span>
-        <p>Binærsøk er O(log n) bare fordi vi kan hoppe rett til midten. I en lenket liste koster hvert hopp O(n), så binærsøk blir O(n log n), verre enn å gå gjennom lista én gang.
-          På en sortert lenket liste bruker du derfor rett-frem søk.</p>
+        <p>Binærsøk er O(log n) bare fordi vi kan hoppe rett til midten. I en lenket liste koster hvert hopp O(n), fordi vi må gå node for node. Starter vi fra L.first hver gang, blir binærsøk O(n log n), verre enn å gå gjennom lista én gang.
+          På en sortert lenket liste bruker du derfor rett-frem søk. Det var dette H2022 2e testet: binærsøk på arrayer er betydelig raskere enn på lenkede lister.</p>
       </div>
+      <div class="husk"><h4>Huskeregler</h4><ul>
+        <li>Array: rask til plass i, treg til å sette inn og fjerne fremst (alt må flyttes).</li>
+        <li>Lenket liste: rask til å hekte inn og ut fremst, treg til å finne plass i (må gå dit).</li>
+        <li>Siste-peker gir addLast O(1). Bare prev-pekere gir removeLast O(1).</li>
+      </ul></div>
       <div id="quiz-begreper"></div>
     </section>
 
     <!-- ===================== DYNAMISK ARRAY ===================== -->
     <section data-panel="dynamisk" hidden>
+      <div class="callout eks-spor"><span class="lbl">Hva eksamen spør om</span>
+        <p><span class="tag merke ny">pensum, ikke spurt før</span> Det dynamiske arrayet har ikke vært egen oppgave eller kjent sant/usant-påstand i 2020–2025. Sant/usant-delen fra 2023 er ikke kjent.
+          Det brukes som byggekloss i <b>H2024 5</b> (10p, Python-ordbøker med et tettpakket, dynamisk array), og kjøretidene her trengs når du skal begrunne kjøretid i andre oppgaver.</p>
+      </div>
+
       <div class="callout begrep"><span class="lbl">Begrep: dynamisk array</span>
         <p>Et dynamisk array D består av et vanlig array <code>D.A</code> og et tall <code>D.n</code>, som er hvor mange elementer som faktisk er i bruk.
           Elementene ligger på plass 0 til D.n − 1, og resten av D.A er ledig. <b>Kapasiteten</b> <code>|D.A|</code> er hvor mange plasser arrayet har.
@@ -118,7 +142,7 @@
       </div>
       <div id="intro-dynamisk"></div>
 
-      <h3>PushBack, EnsureCapacity og PopBack</h3>
+      <h4 class="del">1. PushBack, EnsureCapacity og PopBack <span class="tag merke ny">pensum, ikke spurt før</span></h4>
       <p>Følg med på telleren «kopieringer totalt». Når en PushBack er ferdig, er den alltid mindre enn «2 · PushBack-er».</p>
       <div id="demo-pushback"></div>
 
@@ -133,8 +157,12 @@
         <p>Hvis EnsureCapacity bare la til én plass (eller et fast antall), måtte vi kopiere nesten hver gang. n PushBack-er ville kostet 1 + 2 + 3 + … + n, altså O(n²).
           Det er doblingen som gjør at kopieringene blir sjeldne.</p>
       </div>
+      <div class="husk"><h4>Huskeregler</h4><ul>
+        <li>Ledig plass: PushBack er O(1). Fullt: doble, kopier alt, O(n) den ene gangen.</li>
+        <li>Over mange PushBack-er blir det amortisert O(1) hver. PopBack er alltid O(1).</li>
+      </ul></div>
 
-      <h3>Add og Remove: sett inn og fjern på plass i</h3>
+      <h4 class="del">2. Add og Remove: sett inn og fjern på plass i <span class="tag merke ny">pensum, ikke spurt før</span></h4>
       <p>For å sette inn på plass i må alt fra i og bakover flyttes én plass til høyre. Å fjerne plass i er det motsatte: alt bak i flyttes én plass til venstre.
         Jo nærmere starten, jo mer må flyttes.</p>
       <div id="demo-addremove"></div>
@@ -148,18 +176,30 @@
             <code>xs.insert(0, x)</code> og <code>xs.pop(0)</code> er Add og Remove på plass 0, og de er O(n).</p>
         </div>
       </div>
+      <div class="husk"><h4>Huskeregler</h4><ul>
+        <li>Add og Remove på plass i flytter D.n − i elementer (Remove: D.n − i − 1). Fremst er dyrest, bakerst er gratis.</li>
+        <li>Add flytter baklengs, Remove flytter forlengs.</li>
+      </ul></div>
       <div id="quiz-dynamisk"></div>
     </section>
 
     <!-- ===================== LENKEDE LISTER ===================== -->
     <section data-panel="lenket" hidden>
+      <div class="callout eks-spor"><span class="lbl">Hva eksamen spør om</span>
+        <p><span class="tag merke eksbas">eksamensbasert</span> Lenkede lister har ikke vært egen oppgave, men dukket opp to steder i H2022:</p>
+        <ul>
+          <li><b>H2022 2e</b> (sant/usant): binærsøk på arrayer er betydelig raskere enn på lenkede lister. Sant, fordi lista må gås node for node (se fellen i fanen Lister).</li>
+          <li><b>H2022 10a</b> (1p): en bøttekø er et array av bøtter, og hver bøtte kan være en enkeltlenket liste.</li>
+        </ul>
+      </div>
+
+      <h4 class="del">1. Enkeltlenket liste: finn, sett inn og fjern <span class="tag merke eksbas">eksamensbasert</span></h4>
       <div class="callout begrep"><span class="lbl">Begrep: node og lenket liste</span>
         <p>En <b>node</b> v har et element <code>v.elem</code> og en peker <code>v.next</code> til neste node, eller <code>null</code> hvis den er sist.
           En <b>enkeltlenket liste</b> L holder bare <code>L.first</code>, den første noden. Er lista tom, er L.first <code>null</code>.</p>
       </div>
       <div id="intro-lenket"></div>
 
-      <h3>Finn, sett inn og fjern</h3>
       <p>Alle de fire listeoperasjonene trenger først noden på plass i, og den finner vi bare ved å gå fra starten. Selve innsettingen og fjerningen er O(1).
         Hver boks viser elementet og hva <code>next</code> peker på, så du ser pekerne endre seg ett steg av gangen.</p>
       <div id="demo-lenket"></div>
@@ -172,8 +212,13 @@
             Derfor heter operasjonen RemoveAfter(v).</p>
         </div>
       </div>
+      <div class="husk"><h4>Huskeregler</h4><ul>
+        <li>Å finne plass i er O(n). Å hekte inn eller ut når du står på noden, er O(1).</li>
+        <li>InsertAfter: først <code>u.next ← v.next</code>, så <code>v.next ← u</code>.</li>
+        <li>For å fjerne trenger du noden foran.</li>
+      </ul></div>
 
-      <h3 id="dobbel">Dobbeltlenket liste med hode og hale</h3>
+      <h4 class="del" id="dobbel">2. Dobbeltlenket liste med hode og hale <span class="tag merke ny">pensum, ikke spurt før</span></h4>
       <div class="callout begrep"><span class="lbl">Begrep: prev, hode og hale</span>
         <p>I en <b>dobbeltlenket liste</b> har hver node også en peker <code>v.prev</code> til noden foran, og lista holder både første og siste node.
           Det blir enklere med to tomme hjelpenoder, <b>hode- og halenoder</b>: <b>hodet</b> <code>L.head</code> helt først og <b>halen</b> <code>L.tail</code> helt sist. Ingen av dem bærer et element, og de blir liggende så lenge lista finnes.
@@ -190,15 +235,32 @@
           <p>Med prev-pekere får vi InsertBefore(v, e) ved å kalle InsertAfter(v.prev, e). Med hode og hale finnes v.prev alltid.</p>
         </div>
       </div>
-      <div class="callout uni"><span class="lbl">Universitetsnivå: hva koster prev?</span>
-        <p>Én ekstra peker per node i minne, og omtrent dobbelt så mange pekerendringer per innsetting og fjerning. Til gjengjeld blir removeLast og RemoveNode(v) O(1).
-          Lista er fortsatt en lenket liste, så get(i) er O(n). (Man kan starte fra den enden som er nærmest, men det er fortsatt O(n).)</p>
-      </div>
+      <div class="husk"><h4>Huskeregler</h4><ul>
+        <li>Hode og hale er tomme hjelpenoder: første element er <code>L.head.next</code>, siste er <code>L.tail.prev</code>.</li>
+        <li>Tom liste: <code>L.head.next = L.tail</code>.</li>
+        <li>removeLast og RemoveNode(v) er O(1), men get(i) er fortsatt O(n).</li>
+      </ul></div>
+      <details class="fordyp"><summary>Hva koster prev? <span class="tag merke fordyp">Fordypning, ikke nødvendig til eksamen</span></summary>
+        <div class="callout uni"><span class="lbl">Universitetsnivå: hva koster prev?</span>
+          <p>Én ekstra peker per node i minne, og omtrent dobbelt så mange pekerendringer per innsetting og fjerning. Til gjengjeld blir removeLast og RemoveNode(v) O(1).
+            Lista er fortsatt en lenket liste, så get(i) er O(n). (Man kan starte fra den enden som er nærmest, men det er fortsatt O(n).)</p>
+        </div>
+      </details>
       <div id="quiz-lenket"></div>
     </section>
 
     <!-- ===================== STAKK & KØ ===================== -->
     <section data-panel="stakk" hidden>
+      <div class="callout eks-spor"><span class="lbl">Hva eksamen spør om</span>
+        <p><span class="tag merke eksbas">eksamensbasert</span> Spurt én gang, H2020, som skriv-pseudokode-oppgave:</p>
+        <ul>
+          <li><b>H2020 9a</b> (4p): GoodDivs, sjekk at <code>&lt;div&gt;</code>-taggene er velformaterte. En teller holder.</li>
+          <li><b>H2020 9b</b> (8p): GoodTags, samme sjekk med mange taggtyper. Her trengs en stakk.</li>
+        </ul>
+        <p>Stakk og kø går også igjen inni grafoppgaver: sensorveiledningen til H2022 8 (garbage collection) bruker en stakk for å gå gjennom grafen.</p>
+      </div>
+
+      <h4 class="del">1. Stakk og kø: LIFO og FIFO <span class="tag merke eksbas">eksamensbasert</span></h4>
       <div class="grid cols-2">
         <div class="callout begrep"><span class="lbl">Begrep: stakk (LIFO)</span>
           <p>En <b>stakk</b> (engelsk <i>stack</i>) er en liste vi bare legger til i og tar ut fra på ett sted, toppen.
@@ -211,7 +273,7 @@
       </div>
       <div id="intro-stakk"></div>
 
-      <h3 id="demo-stakk-ko">Prøv selv: samme input, ulik rekkefølge ut</h3>
+      <h4 id="demo-stakk-ko">Prøv selv: samme input, ulik rekkefølge ut</h4>
       <div class="card">
         <p class="muted small" style="margin-top:0">«Sett inn» gjør push på stakken og enqueue i køen med samme tall. «Ta ut» gjør pop og dequeue. Se hvem som kommer ut.</p>
         <div class="ls-lab-form">
@@ -227,8 +289,11 @@
         </div>
         <p class="ls-lab-log muted" id="lab-log" aria-live="polite"></p>
       </div>
+      <div class="husk"><h4>Huskeregler</h4><ul>
+        <li>Stakk: sist inn, først ut (LIFO). Kø: først inn, først ut (FIFO).</li>
+      </ul></div>
 
-      <h3>Implementasjon: begge får O(1)</h3>
+      <h4 class="del">2. Implementasjon: begge får O(1) <span class="tag merke ny">pensum, ikke spurt før</span></h4>
       <div class="table-wrap">
         <table class="cmp-table ls-prose">
           <thead><tr><th>ADT</th><th>Med dynamisk array</th><th>Med lenket liste</th></tr></thead>
@@ -253,9 +318,10 @@
         </div>
       </div>
 
-      <h3 id="tagger">Velformaterte tagger med stakk</h3>
+      <h4 class="del" id="tagger">3. Velformaterte tagger med stakk <span class="tag merke eksbas">eksamensbasert</span></h4>
       <p>En HTML-tagg som <code>&lt;div&gt;</code> åpner noe, og <code>&lt;/div&gt;</code> lukker det. Taggene kan ligge inni hverandre, men den som ble åpnet sist, må lukkes først.
-        Det er nettopp LIFO. Med bare én type tagg holder det å telle hvor mange som står åpne. Med flere typer må vi huske <i>hvilke</i> som står åpne, i rekkefølge: en stakk.</p>
+        Det er nettopp LIFO. Med bare én type tagg holder det å telle hvor mange som står åpne. Med flere typer må vi huske <i>hvilke</i> som står åpne, i rekkefølge: en stakk.
+        Hver tagg gir én push, eller én pop og én sammenligning med toppen, så begge sjekkene er O(n) for n tagger.</p>
       <div class="grid cols-2">
         <div class="callout eli5"><span class="lbl">5-åring: bokser i bokser</span>
           <p>Du legger en boks i en boks i en boks. Skal du lukke dem, må du lukke den innerste først. Prøver du å lukke den store boksen mens en liten fortsatt er åpen inni, går det ikke.</p>
@@ -274,16 +340,27 @@
         <p>Både telleren og stakken trenger to sjekker: <b>underveis</b> (lukker vi noe som ikke er åpent, eller feil type?) og <b>til slutt</b> (står noe fortsatt åpent?).
           Sensorveiledningen til H2020 trekker 2 poeng for å glemme sjekken underveis og 1 poeng for å glemme sjekken til slutt.</p>
       </div>
+      <div class="husk"><h4>Huskeregler</h4><ul>
+        <li>Åpnetagg: push. Lukketagg: stakken må ikke være tom, og toppen må ha samme type. Pop.</li>
+        <li>Til slutt må stakken være tom.</li>
+        <li>To sjekker: underveis og til slutt.</li>
+      </ul></div>
+
+      <h3>Eksamensoppgaven</h3>
+      <div id="exam-h2020-9"></div>
+
       <h4>Pusle sammen GoodTags</h4>
       <div class="card" id="parsons-tags"></div>
-
-      <h3>Eksamen</h3>
-      <div id="exam-h2020-9"></div>
       <div id="quiz-stakk"></div>
     </section>
 
     <!-- ===================== NYLIGE SØK (LRU) ===================== -->
     <section data-panel="lru" hidden>
+      <div class="callout eks-spor"><span class="lbl">Hva eksamen spør om</span>
+        <p><span class="tag merke ny">pensum, ikke spurt før</span> Dette har ikke vært eksamensoppgave eller kjent sant/usant-påstand i 2020–2025, og sant/usant-delen fra 2023 er ikke kjent.
+          Oppgaven er fra ukesoppgavene om hashing, og den er god trening i å kombinere to datastrukturer: et hashmap og en dobbeltlenket liste.</p>
+      </div>
+
       <div class="callout begrep"><span class="lbl">Begrep: nylige søk</span>
         <p>En nettside skal vise de N siste søkene, med det nyeste først. Søker noen på noe som allerede står i lista, flyttes det fremst. Er lista full, faller det eldste ut.
           Operasjonen <code>update(key)</code> skal ta forventet O(1). Oppgaven er fra ukesoppgavene om hashing, og samme idé kalles ofte en <b>LRU-cache</b> (least recently used):
@@ -291,6 +368,10 @@
       </div>
       <div id="intro-lru"></div>
 
+      <h3>Demo: update(key)</h3>
+      <div id="demo-lru"></div>
+
+      <p>Hvorfor trengs begge strukturene? Tabellen viser hva hver av dem klarer alene.</p>
       <div class="table-wrap">
         <table class="cmp-table ls-prose">
           <thead><tr><th>Bare …</th><th>Godt til</th><th>Problemet</th></tr></thead>
@@ -302,8 +383,6 @@
         </table>
       </div>
 
-      <h3>Demo: update(key)</h3>
-      <div id="demo-lru"></div>
       <div class="grid cols-2">
         <div class="callout felle"><span class="lbl">Felle: glemme hashmapet</span>
           <p>Når den eldste kastes ut av lista, må den også fjernes fra hashmapet. Ellers tror vi senere at nøkkelen fortsatt er der, og peker på en node som ikke lenger er i lista.</p>
@@ -312,17 +391,26 @@
           <p>For å ta ut en node midt i lista på O(1) trenger vi noden foran den. Det gir bare en dobbeltlenket liste. Med enkeltlenket liste blir update O(N).</p>
         </div>
       </div>
-      <div class="callout uni"><span class="lbl">Universitetsnivå: detaljer fra løsningsforslaget</span>
-        <p>Løsningsforslaget til ukesoppgaven lager hashmapet med plass til 2N nøkler fra start, så det aldri trenger rehash. Det bruker bare én ekstra node som både hode og hale
-          (lista er sirkulær, så forrige node før hodet er den siste). Det er samme idé som hode og hale her: ingen spesialtilfeller med null.</p>
-      </div>
-      <p class="muted small">Dette har ikke vært eksamensoppgave i 2020–2025, men det kombinerer to ting som går igjen: hashmap og dobbeltlenket liste.</p>
+      <div class="husk"><h4>Huskeregler</h4><ul>
+        <li>Hashmapet går fra nøkkel til node, lista holder rekkefølgen med nyeste først.</li>
+        <li>Kastes den eldste, må den ut av både lista og hashmapet.</li>
+      </ul></div>
+      <details class="fordyp"><summary>Detaljer fra løsningsforslaget <span class="tag merke fordyp">Fordypning, ikke nødvendig til eksamen</span></summary>
+        <div class="callout uni"><span class="lbl">Universitetsnivå: detaljer fra løsningsforslaget</span>
+          <p>Løsningsforslaget til ukesoppgaven lager hashmapet med plass til 2N nøkler fra start, så det aldri trenger rehash. Det bruker bare én ekstra node som både hode og hale
+            (lista er sirkulær, så forrige node før hodet er den siste). Det er samme idé som hode og hale her: ingen spesialtilfeller med null.</p>
+        </div>
+      </details>
       <div id="quiz-lru"></div>
     </section>
 
     <!-- ===================== SANT/USANT ===================== -->
     <section data-panel="test" hidden>
       <h3>Sant eller usant?</h3>
+      <div class="callout eks-spor"><span class="lbl">Hva eksamen spør om</span>
+        <p><span class="tag merke eksbas">eksamensbasert</span> Den eneste kjente sant/usant-påstanden om lister er <b>H2022 2e</b>: «Binærsøk på arrayer er betydelig raskere enn binærsøk på lenkede lister.» Sant (kilde: sensorveiledning IN2010 H2022 2e).
+          Sant/usant-delen fra 2023 er ikke kjent. Påstandene under er laget for å øve på samme type spørsmål.</p>
+      </div>
       <p class="muted small">Ta stilling til hver påstand, og sjekk svarene. Forklaringen viser hvorfor.</p>
       <div id="tf-lister"></div>
       <h4 style="margin-top:1.5rem">Dra og plasser</h4>
@@ -339,22 +427,22 @@
     <p class="muted small">IN2010 · Lister &amp; stakk. Egne forklaringer og demoer basert på pensum. Eksamensoppgaven og sensorveiledningen er gjengitt ordrett med kildelinje, og avvik fra arket står på kortet.</p>
   </footer>
 
-  <script src="assets/js/core.js?v=20261127f"></script>
-<script src="assets/js/eksamensvekt.js?v=20261127f"></script>
-  <script src="assets/js/symboler.js?v=20261127f"></script>
-  <script src="assets/js/begreper-data.js?v=20261127f"></script>
-  <script src="assets/js/begrep-tips.js?v=20261127f"></script>
-  <script src="assets/js/data-tf.js?v=20261127f"></script>
-  <script src="assets/js/pseudocode.js?v=20261127f"></script>
-  <script src="assets/js/stepplayer.js?v=20261127f"></script>
-  <script src="assets/js/varline.js?v=20261127f"></script>
-  <script src="assets/js/viz-list.js?v=20261127f"></script>
-  <script src="assets/js/data-algos.js?v=20261127f"></script>
-  <script src="assets/js/data-lister.js?v=20261127f"></script>
-  <script src="assets/js/perfekt/lister.js?v=20261127f"></script>
-  <script src="assets/js/kort/lister.js?v=20261127f"></script>
-  <script src="assets/js/dra.js?v=20261127f"></script>
-  <script src="assets/js/data-dra.js?v=20261127f"></script>
+  <script src="assets/js/core.js?v=20261127g"></script>
+<script src="assets/js/eksamensvekt.js?v=20261127g"></script>
+  <script src="assets/js/symboler.js?v=20261127g"></script>
+  <script src="assets/js/begreper-data.js?v=20261127g"></script>
+  <script src="assets/js/begrep-tips.js?v=20261127g"></script>
+  <script src="assets/js/data-tf.js?v=20261127g"></script>
+  <script src="assets/js/pseudocode.js?v=20261127g"></script>
+  <script src="assets/js/stepplayer.js?v=20261127g"></script>
+  <script src="assets/js/varline.js?v=20261127g"></script>
+  <script src="assets/js/viz-list.js?v=20261127g"></script>
+  <script src="assets/js/data-algos.js?v=20261127g"></script>
+  <script src="assets/js/data-lister.js?v=20261127g"></script>
+  <script src="assets/js/perfekt/lister.js?v=20261127g"></script>
+  <script src="assets/js/kort/lister.js?v=20261127g"></script>
+  <script src="assets/js/dra.js?v=20261127g"></script>
+  <script src="assets/js/data-dra.js?v=20261127g"></script>
   <script>
   (function () {
     "use strict";

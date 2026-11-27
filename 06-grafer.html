@@ -7,9 +7,9 @@
   <title>Blokk 6 · Grafer · IN2010</title>
   <meta name="description" content="Grafer i IN2010: begreper, bredde-først og dybde-først søk, topologisk sortering, Dijkstra og Bellman-Ford, minimale spenntrær (Prim og Kruskal), sterkt sammenhengende komponenter, sykler og 2-sammenheng – med stegvise demoer, pseudokode og eksamensoppgaver.">
   <script>(function(){try{var d=document.documentElement;var t=localStorage.getItem('in-theme');if(t!=='dark'&&t!=='system')t='light';if(t!=='system')d.setAttribute('data-theme',t);var l=localStorage.getItem('in-level');if(l!=='eli5'&&l!=='teknisk')l='normal';d.setAttribute('data-level',l);}catch(e){document.documentElement.setAttribute('data-theme','light');document.documentElement.setAttribute('data-level','normal');}})();</script>
-  <link rel="stylesheet" href="assets/css/styles.css?v=20261127f">
-  <link rel="stylesheet" href="assets/css/dra.css?v=20261127f">
-  <link rel="stylesheet" href="assets/css/begrep-tips.css?v=20261127f">
+  <link rel="stylesheet" href="assets/css/styles.css?v=20261127g">
+  <link rel="stylesheet" href="assets/css/dra.css?v=20261127g">
+  <link rel="stylesheet" href="assets/css/begrep-tips.css?v=20261127g">
 </head>
 <body data-page="grafer">
   <a class="skip-link" href="#main">Hopp til innhold</a>
@@ -19,6 +19,22 @@
     <div class="pagehead">
       <h1>Blokk 6 · Grafer</h1>
       <p class="lead">Søk, rekkefølge, korteste vei, spenntrær og sammenheng – hver algoritme med stegvis demo, pseudokode, kjøretid og eksamensoppgaver.</p>
+    </div>
+
+    <div class="tabs" role="tablist" aria-label="Emner om grafer">
+      <button data-tab="begreper">Begreper</button>
+      <button data-tab="bfs">Bredde-først (BFS)</button>
+      <button data-tab="dfs">Dybde-først (DFS)</button>
+      <button data-tab="topologisk">Topologisk sortering</button>
+      <button data-tab="dijkstra">Korteste vei</button>
+      <button data-tab="mst">Minimale spenntrær</button>
+      <button data-tab="scc">Sterkt sammenhengende</button>
+      <button data-tab="sykler">Sykler</button>
+      <button data-tab="sammenheng">2-sammenheng</button>
+      <button data-tab="test">Sant/usant</button>
+    </div>
+
+    <div class="pagehead-info">
       <details class="badge-fold" id="badge-fold" open><summary>16 eksamensoppgaver om grafer (H2020–H2025)</summary>
       <div class="badges">
         <span class="badge" data-go="begreper" data-card="h2020-3"><b>H2020</b> · Grafegenskaper · <span class="pts">8p</span></span>
@@ -41,21 +57,20 @@
       </details>
     </div>
 
-    <div class="tabs" role="tablist" aria-label="Emner om grafer">
-      <button data-tab="begreper">Begreper</button>
-      <button data-tab="bfs">Bredde-først (BFS)</button>
-      <button data-tab="dfs">Dybde-først (DFS)</button>
-      <button data-tab="topologisk">Topologisk sortering</button>
-      <button data-tab="dijkstra">Korteste vei</button>
-      <button data-tab="mst">Minimale spenntrær</button>
-      <button data-tab="scc">Sterkt sammenhengende</button>
-      <button data-tab="sykler">Sykler</button>
-      <button data-tab="sammenheng">2-sammenheng</button>
-      <button data-tab="test">Sant/usant</button>
-    </div>
-
     <!-- ===================== BEGREPER ===================== -->
     <section data-panel="begreper">
+      <div class="callout eks-spor"><span class="lbl">Hva eksamen spør om</span>
+        <p><span class="tag merke kjerne">kommer ofte</span> Spurt H2020, H2022, H2023, H2024 og H2025. Begrepene brukes i nesten alle grafoppgavene, og noen oppgaver spør bare om dem.</p>
+        <ul>
+          <li><b>H2020 3</b> (8p): må vi legge til eller fjerne kanter for at en graf skal bli (eller ikke bli) sammenhengende, et tre, en DAG eller sterkt sammenhengende?</li>
+          <li><b>H2022 3</b> (10p): ti påstander om to grafer, 1p per påstand: sammenhengende, 2-sammenhengende, tre, separasjonsnoder, komponenter, sykel og enkel graf.</li>
+          <li><b>H2022 6</b> (8p): kryss av den laveste kjøretiden for DFSFull, Prim, TopSort og BellmanFord, 2p per rad.</li>
+          <li><b>H2022 2 (j)</b> (sant/usant): «En graf med n noder kan ikke har mer enn n kanter.» Usant.</li>
+          <li><b>H2023 6a</b> (2p) og <b>H2024 4a</b> (1p): oversett historien til en graf. Hva er nodene og kantene, og er grafen rettet og vektet? <b>H2025 7a</b> (1p): forklar hva «sammenhengende» og «urettet» betyr for en som reiser kollektivt.</li>
+        </ul>
+      </div>
+
+      <h4 class="del">1. Graf, node og kant <span class="tag merke kjerne">kommer ofte</span></h4>
       <div class="callout begrep"><span class="lbl">Begrep: graf, node og kant</span>
         <p>En <b>graf</b> G = (V, E) består av en mengde <b>noder</b> V og en mengde <b>kanter</b> E. En kant forbinder to noder.
           I en <b>urettet</b> graf skriver vi kanten som {u, v}, og den kan følges begge veier. I en <b>rettet</b> graf skriver vi (u, v), og den går bare fra u til v.
@@ -72,8 +87,12 @@
         <div class="card"><h4 style="margin-top:.2rem">Vektet</h4><div class="gv-mini" id="mini-vektet"></div>
           <p class="muted small">Hver kant har en vekt w(u, v). Korteste vei og minimale spenntrær handler om vektene.</p></div>
       </div>
+      <div class="callout eli5"><span class="lbl">5-åring: et kart med byer</span>
+        <p>Tenk på et kart over byer og veier. Byene er nodene, veiene er kantene. Enveiskjørte gater er rettede kanter.
+          Står det hvor mange minutter det tar å kjøre en vei, er grafen vektet. Kan du kjøre fra hvilken som helst by til hvilken som helst annen, er grafen sammenhengende.</p>
+      </div>
 
-      <h3>Stier, sykler og sammenheng</h3>
+      <h4 class="del">2. Stier, sykler og sammenheng <span class="tag merke kjerne">kommer ofte</span></h4>
       <div class="callout begrep"><span class="lbl">Begrep: sti, sykel og sammenheng</span>
         <ul>
           <li><b>Sti:</b> en følge noder forbundet av kanter, der ingen node gjentas. En <b>vei</b> er løsere: der er det bare kantene som ikke kan gjentas, så samme node kan dukke opp flere ganger. (Slik bruker forelesningen ordene.)</li>
@@ -93,12 +112,16 @@
         <div class="card"><h4 style="margin-top:.2rem">To komponenter</h4><div class="gv-mini" id="mini-komp"></div>
           <p class="muted small">Ikke sammenhengende: det finnes ingen sti fra A til E.</p></div>
       </div>
-      <div class="callout eli5"><span class="lbl">5-åring: et kart med byer</span>
-        <p>Tenk på et kart over byer og veier. Byene er nodene, veiene er kantene. Enveiskjørte gater er rettede kanter.
-          Står det hvor mange minutter det tar å kjøre en vei, er grafen vektet. Kan du kjøre fra hvilken som helst by til hvilken som helst annen, er grafen sammenhengende.</p>
+      <div class="husk"><h4>Huskeregler</h4>
+        <ul>
+          <li>Tre = sammenhengende og uten sykler. Da er |E| = |V| − 1.</li>
+          <li>Å fjerne kanter gjør aldri en graf mer sammenhengende, og å legge til kanter fjerner aldri en sykel (H2020 3).</li>
+          <li>En enkel urettet graf kan ha opptil |V| · (|V| − 1) / 2 kanter, altså langt flere enn |V| (H2022 2 (j)).</li>
+        </ul>
       </div>
 
-      <h3>Hvordan lagrer vi en graf?</h3>
+      <h4 class="del">3. Hvordan lagrer vi en graf? <span class="tag merke ny">pensum, ikke spurt før</span></h4>
+      <p class="muted small">Representasjonen er ikke spurt om som egen oppgave, og sant/usant-delen fra 2023 er ikke kjent. Sensorveiledningen for H2021 12 sier at du selv kan velge representasjon. Kjøretidene på siden forutsetter naboliste.</p>
       <div class="grid cols-2">
         <div class="callout begrep"><span class="lbl">Naboliste</span>
           <p>For hver node lagrer vi en liste (eller mengde) med naboene. Plass O(|V| + |E|). Å gå gjennom naboene til u tar O(deg(u)).
@@ -106,16 +129,18 @@
         <div class="callout begrep"><span class="lbl">Nabomatrise</span>
           <p>En |V| × |V|-tabell der M[u][v] sier om (u, v) ∈ E. Plass O(|V|²). «Er u og v naboer?» tar O(1), men å finne alle naboene til u tar O(|V|).</p></div>
       </div>
+      <details class="fordyp"><summary>log(|E|) og log(|V|) <span class="tag merke fordyp">Fordypning, ikke nødvendig til eksamen</span></summary>
+        <div class="callout uni"><span class="lbl">Universitetsnivå: log(|E|) og log(|V|)</span>
+          <p>I en enkel graf er |E| ≤ |V|². Derfor er log(|E|) ≤ 2 · log(|V|), og O(log(|E|)) = O(log(|V|)). Det er grunnen til at Dijkstra og Prim kan skrives med log(|V|) selv om prioritetskøen kan inneholde opptil |E| elementer.
+            For en sammenhengende graf er |E| ≥ |V| − 1, så der er O(|V| + |E|) = O(|E|).</p>
+        </div>
+      </details>
       <div class="callout felle"><span class="lbl">Felle: nabomatrise gir ikke lineær tid</span>
         <p>Med nabomatrise blir BFS og DFS O(|V|²), ikke O(|V| + |E|), fordi hver node må sjekke en hel rad. Skriv hvilken representasjon du antar hvis det betyr noe.</p>
       </div>
-      <div class="callout uni"><span class="lbl">Universitetsnivå: log(|E|) og log(|V|)</span>
-        <p>I en enkel graf er |E| ≤ |V|². Derfor er log(|E|) ≤ 2 · log(|V|), og O(log(|E|)) = O(log(|V|)). Det er grunnen til at Dijkstra og Prim kan skrives med log(|V|) selv om prioritetskøen kan inneholde opptil |E| elementer.
-          For en sammenhengende graf er |E| ≥ |V| − 1, så der er O(|V| + |E|) = O(|E|).</p>
-      </div>
 
-      <h3>Kjøretider på ett sted</h3>
-      <p class="muted small">Alle tider forutsetter naboliste. Hold musa over – eller trykk på – en celle for å se <i>hvorfor</i>.</p>
+      <h4 class="del">4. Kjøretider på ett sted <span class="tag merke kjerne">kommer ofte</span></h4>
+      <p class="muted small">Alle tider forutsetter naboliste. Hold musa over – eller trykk på – en celle for å se <i>hvorfor</i>. H2022 6 spør bare om kjøretider, og de fleste algoritmeoppgavene ber deg oppgi kjøretiden.</p>
       <div class="table-wrap">
         <table class="cmp-table" id="tbl-grafer">
           <thead><tr><th>Algoritme</th><th>Kjøretid</th><th>Brukes til</th></tr></thead>
@@ -134,10 +159,16 @@
           </tbody>
         </table>
       </div>
+      <div class="husk"><h4>Huskeregler</h4>
+        <ul>
+          <li>Søk, topologisk sortering, sterkt sammenhengende komponenter og separasjonsnoder: O(|V| + |E|).</li>
+          <li>Prioritetskø gir en log-faktor (Dijkstra og Prim). Bellman-Ford er O(|V| · |E|).</li>
+        </ul>
+      </div>
 
       <div id="historie">
-        <h3>Fra historie til graf</h3>
-        <p>På eksamen er grafen nesten aldri tegnet. Du får en historie om byer, venner, emner eller kabler, og må selv se grafen og velge algoritme. Still deg disse fem spørsmålene:</p>
+        <h4 class="del">5. Fra historie til graf <span class="tag merke kjerne">kommer ofte</span></h4>
+        <p>På eksamen er grafen nesten aldri tegnet. Du får en historie om byer, venner, emner eller kabler, og må selv se grafen og velge algoritme (H2023 6a og H2024 4a spør om akkurat dette). Still deg disse fem spørsmålene:</p>
         <div class="husk"><h4>Sjekkliste: fem spørsmål</h4>
           <ol>
             <li>Hva er <b>nodene</b>? (byer, personer, emner, kryss …)</li>
@@ -156,9 +187,6 @@
             <li>«Kan alle nå alle?» i en rettet graf: <b>sterkt sammenhengende komponenter</b>. «Tåler at én node faller ut?»: <b>separasjonsnoder</b>.</li>
           </ul>
         </div>
-        <h4>Øv selv: åtte små historier</h4>
-        <p class="muted small">Tenk gjennom de fem spørsmålene før du velger. Forklaringen viser noder, kanter, retning, vekter og kjøretid.</p>
-        <div id="quiz-historie"></div>
       </div>
 
       <h3>Eksamen</h3>
@@ -171,10 +199,26 @@
           <li>Kjøretider oppgis med |V| og |E|. Skriv O(|V| + |E|), ikke O(n).</li>
         </ul>
       </div>
+
+      <h3>Øv selv: åtte små historier</h3>
+      <p class="muted small">Tenk gjennom de fem spørsmålene fra del 5 før du velger. Forklaringen viser noder, kanter, retning, vekter og kjøretid.</p>
+      <div id="quiz-historie"></div>
     </section>
 
     <!-- ===================== BFS ===================== -->
     <section data-panel="bfs" hidden>
+      <div class="callout eks-spor"><span class="lbl">Hva eksamen spør om</span>
+        <p><span class="tag merke kjerne">kommer ofte</span> Spurt H2020, H2021, H2023, H2024 og H2025, oftest som «hvilken algoritme?» eller som et søk du skal tilpasse.</p>
+        <ul>
+          <li><b>H2024 4</b> (10p): (a) vennenettverket som graf (1p), (b) skriv en algoritme som finner sjangeren flest liker innen k ledd (7p), (c) hvilken algoritme inviterer venner lag for lag (2p).</li>
+          <li><b>H2021 7</b> (2p av 8): raskeste algoritme for korteste avstander i en uvektet graf.</li>
+          <li><b>H2020 8g</b> (2p): korteste sti når alle kantene har samme vekt.</li>
+          <li><b>H2023 6c</b> (3p): korteste sti i et tunnelsystem som er et tre. BFS eller DFS gir opptil 3p, Dijkstra opptil 1p.</li>
+          <li><b>H2025 7b</b> (4p): et søk som hopper over strekninger over k minutter og sjekker om alle holdeplassene nås.</li>
+        </ul>
+      </div>
+
+      <h4 class="del">1. Bredde-først søk steg for steg <span class="tag merke kjerne">kommer ofte</span></h4>
       <div class="callout begrep"><span class="lbl">Begrep: bredde-først søk</span>
         <p><b>Bredde-først søk (BFS)</b> besøker grafen lag for lag: først startnoden, så alle naboene, så naboenes naboer, og så videre.
           En <b>kø</b> (først inn, først ut) holder styr på hvem som står for tur. Nodene merkes som besøkt når de oppdages, så ingen kommer i køen to ganger.</p>
@@ -186,21 +230,28 @@
         <div class="callout eksempel"><span class="lbl">Eksempel: avstand fra A</span>
           <p>Fra A i eksempelgrafen under: A (0), så B og C (1), så D og E (2), så F (3) og til slutt G (4). Tallet er antall kanter fra A, og det er den korteste avstanden i antall kanter.</p></div>
       </div>
-      <h3>Steg for steg</h3>
       <div id="demo-bfs"></div>
-      <h3>Hele grafen: BFSFull</h3>
-      <p class="muted small">BFSVisit når bare det som henger sammen med s. For å besøke alle nodene starter vi på nytt fra hver node som ikke er besøkt.</p>
+      <div class="callout felle"><span class="lbl">Felle: merk for sent</span>
+        <p>Merk noden som besøkt når den <b>legges i køen</b>, ikke når den tas ut. Ellers kan samme node legges i køen mange ganger (én gang per nabo), og antall køoperasjoner kan bli O(|E|) i stedet for O(|V|).</p>
+      </div>
+
+      <h4 class="del">2. Hele grafen og korteste stier <span class="tag merke kjerne">kommer ofte</span></h4>
+      <p class="muted small">BFSVisit når bare det som henger sammen med s. For å besøke alle nodene starter BFSFull på nytt fra hver node som ikke er besøkt.</p>
       <div class="grid cols-2">
         <div id="pc-bfsfull"></div>
         <div class="callout uni"><span class="lbl">Universitetsnivå: hvorfor korteste stier?</span>
           <p>BFS gir <b>korteste stier i uvektede grafer</b>: køen inneholder alltid noder på avstand d foran noder på avstand d + 1, så første gang vi oppdager en node, er det via en korteste sti.
             Lagrer vi forelderen til hver node når den oppdages, får vi BFS-treet, og stien leses baklengs fra målet. Med vekter holder ikke dette – da trengs Dijkstra.</p></div>
       </div>
-      <div class="callout felle"><span class="lbl">Felle: merk for sent</span>
-        <p>Merk noden som besøkt når den <b>legges i køen</b>, ikke når den tas ut. Ellers kan samme node legges i køen mange ganger (én gang per nabo), og antall køoperasjoner kan bli O(|E|) i stedet for O(|V|).</p>
+      <div class="husk"><h4>Huskeregler</h4>
+        <ul>
+          <li>Kø (først inn, først ut) gir lag for lag, nærmeste først.</li>
+          <li>Første gang en node oppdages, er det via en korteste vei i antall kanter.</li>
+          <li>Merk noden når den legges i køen.</li>
+          <li>Vektet graf: ikke BFS, men Dijkstra.</li>
+        </ul>
       </div>
-      <h4>Øv selv</h4>
-      <div id="quiz-bfs"></div>
+
       <h3>Eksamen</h3>
       <div id="exam-h2024-4"></div>
       <div class="callout sensor"><span class="lbl">Sensortips (H2024): «innen k ledd»</span>
@@ -209,30 +260,48 @@
           <li>Glemmer du begrensningen (her k), trekker sensor poeng selv om resten er riktig.</li>
         </ul>
       </div>
+
+      <h3>Øv selv</h3>
+      <div id="quiz-bfs"></div>
     </section>
 
     <!-- ===================== DFS ===================== -->
     <section data-panel="dfs" hidden>
+      <div class="callout eks-spor"><span class="lbl">Hva eksamen spør om</span>
+        <p><span class="tag merke kjerne">kommer ofte</span> Spurt H2021, H2022 og H2025, oftest som et kjent søk du skal tilpasse: samme søk, men med noe ekstra underveis.</p>
+        <ul>
+          <li><b>H2022 8</b> (8p): GarbageCollect. Frigjør alt som ikke kan nås fra R, med ett søk fra alle i R og felles visited.</li>
+          <li><b>H2021 11</b> (10p): to-farg en sammenhengende graf, eller skriv ut at det ikke går.</li>
+          <li><b>H2022 6</b> (2p av 8): kjøretiden til DFSFull.</li>
+          <li>DFS brukes også i <b>H2021 12</b> (komponenter, fanen 2-sammenheng) og <b>H2025 3a</b> (sykler i urettet graf, fanen Sykler).</li>
+        </ul>
+      </div>
+
+      <h4 class="del">1. Dybde-først søk steg for steg <span class="tag merke kjerne">kommer ofte</span></h4>
       <div class="callout begrep"><span class="lbl">Begrep: dybde-først søk</span>
         <p><b>Dybde-først søk (DFS)</b> går så langt som mulig langs én sti før det snur. Når en node ikke har flere ubesøkte naboer, går vi tilbake til forrige node og prøver neste nabo der.
-          DFS skrives naturlig rekursivt – kallstakken er stakken som husker hvor vi skal tilbake.</p>
+          DFS skrives naturlig rekursivt – kallstakken er stakken som husker hvor vi skal tilbake. En <b>visited</b>-mengde husker hvilke noder vi har vært i, så vi ikke går i ring og hver node besøkes én gang.</p>
       </div>
       <div id="intro-dfs"></div>
       <div class="callout eli5"><span class="lbl">5-åring: labyrint med garnnøste</span>
         <p>Du går inn i en labyrint med et garnnøste. Du går så langt du kan i én retning. Møter du en blindvei, ruller du opp garnet tilbake til forrige kryss og prøver en gang du ikke har gått før.
           Kritt på veggen viser hvor du har vært, så du ikke går samme vei to ganger.</p>
       </div>
-      <h3>Steg for steg</h3>
       <p class="muted small">Demoen kjører DFSFull: når DFSVisit er ferdig og noen noder ikke er nådd, starter den på nytt fra neste ubesøkte node. Prøv eksempelet «To komponenter».</p>
       <div id="demo-dfs"></div>
-      <h3>Hele grafen: DFSFull</h3>
+      <div class="callout felle"><span class="lbl">Felle: rekkefølgen på naboene</span>
+        <p>Rekkefølgen avhenger av hvilken rekkefølge naboene ligger i. Tips: står det i oppgaven hvilken rekkefølge naboene skal behandles i, så følg den. Står det ingenting, velg alfabetisk og si det. En annen rekkefølge gir et annet, men også gyldig, svar.</p>
+      </div>
+
+      <h4 class="del">2. Hele grafen: DFSFull <span class="tag merke kjerne">kommer ofte</span></h4>
       <div class="grid cols-2">
         <div id="pc-dfsfull"></div>
         <div class="callout uni"><span class="lbl">Universitetsnivå: komponenter og postorder</span>
           <p>I en urettet graf starter den ytre løkka i DFSFull ett nytt søk per <b>sammenhengende komponent</b>. Tell kallene, så har du antall komponenter.
             Rekkefølgen nodene blir <i>ferdige</i> i (postorder), er grunnlaget for topologisk sortering med DFS og for sterkt sammenhengende komponenter.</p></div>
       </div>
-      <h3>BFS eller DFS?</h3>
+
+      <h4 class="del">3. BFS eller DFS? <span class="tag merke kjerne">kommer ofte</span></h4>
       <div class="table-wrap">
         <table class="cmp-table">
           <thead><tr><th></th><th>BFS</th><th>DFS</th></tr></thead>
@@ -245,12 +314,14 @@
           </tbody>
         </table>
       </div>
-      <div class="callout felle"><span class="lbl">Felle: rekkefølgen på naboene</span>
-        <p>Rekkefølgen avhenger av hvilken rekkefølge naboene ligger i. Tips: står det i oppgaven hvilken rekkefølge naboene skal behandles i, så følg den. Står det ingenting, velg alfabetisk og si det. En annen rekkefølge gir et annet, men også gyldig, svar.</p>
+      <div class="husk"><h4>Huskeregler</h4>
+        <ul>
+          <li>Én felles visited for alle søkene. Nytt visited per startnode kan gi kvadratisk tid.</li>
+          <li>Hvert nytt søk fra den ytre løkka i DFSFull er en ny komponent.</li>
+          <li>«Alt som kan nås fra …»: BFS og DFS er like gode. «Færrest steg»: BFS.</li>
+        </ul>
       </div>
-      <h4>Øv selv: sett linjene i DFSVisit i riktig rekkefølge</h4>
-      <div id="parsons-dfs"></div>
-      <div id="quiz-dfs"></div>
+
       <h3>Eksamen</h3>
       <div id="exam-h2022-7"></div>
       <div id="exam-h2021-11"></div>
@@ -260,10 +331,27 @@
           <li>«Alt som kan nås fra …» er et søk. Det spiller sjelden noen rolle om du velger BFS eller DFS.</li>
         </ul>
       </div>
+
+      <h3>Øv selv</h3>
+      <h4>Sett linjene i DFSVisit i riktig rekkefølge</h4>
+      <div id="parsons-dfs"></div>
+      <div id="quiz-dfs"></div>
     </section>
 
     <!-- ===================== TOPOLOGISK SORTERING ===================== -->
     <section data-panel="topologisk" hidden>
+      <div class="callout eks-spor"><span class="lbl">Hva eksamen spør om</span>
+        <p><span class="tag merke kjerne">kommer ofte</span> Spurt H2021, H2022, H2023 og H2025, både som egen oppgave og som verktøy i andre oppgaver.</p>
+        <ul>
+          <li><b>H2021 13</b> (10p): Whops!-logger. Skriv ut hendelsene slik at kantene respekteres, og ellers etter tidsstempel: topologisk sortering med prioritetskø.</li>
+          <li><b>H2021 7</b> (2p av 8): raskeste algoritme for korteste avstander i en vektet DAG.</li>
+          <li><b>H2022 6</b> (2p av 8): kjøretiden til TopSort.</li>
+          <li><b>H2022 12b</b> (3p): minimal forside for en DAG. Tell nodene med inngrad 0.</li>
+          <li><b>H2023 7a</b> og <b>H2025 3b</b>: sykeltest i en rettet graf med topologisk sortering (fanen Sykler).</li>
+        </ul>
+      </div>
+
+      <h4 class="del">1. Topologisk sortering med inngrader <span class="tag merke kjerne">kommer ofte</span></h4>
       <div class="callout begrep"><span class="lbl">Begrep: topologisk ordning og inngrad</span>
         <p>En <b>topologisk ordning</b> av en rettet graf er en rekkefølge av alle nodene slik at u kommer før v for hver kant (u, v). Den finnes hvis og bare hvis grafen er en <b>DAG</b>.
           <b>Inngraden</b> til en node er antall kanter som går inn til den. En node med inngrad 0 har ingen forgjengere og kan komme først.</p>
@@ -275,25 +363,32 @@
         <div class="callout eksempel"><span class="lbl">Eksempel: mange riktige svar</span>
           <p>Demoen under gir B, D, F, A, C, E, G. A, B, C, D, E, F, G er også gyldig. En DAG kan ha mange topologiske ordninger – alle er riktige svar.</p></div>
       </div>
-      <h3>Steg for steg</h3>
       <p class="muted small">Eksempel: emner (A–G) med forkunnskapskrav. En kant (u, v) betyr at u må tas før v. Prøv også «Med sykel».</p>
       <div id="demo-topsort"></div>
-      <h3>Med dybde-først søk</h3>
-      <p class="muted small">Kurset viser også en DFS-variant: push hver node på en stakk når den er <b>ferdig</b>. Tar du dem av fra toppen, kommer de i topologisk rekkefølge.</p>
+
+      <h4 class="del">2. Med dybde-først søk <span class="tag merke ny">pensum, ikke spurt før</span></h4>
+      <p class="muted small">Kurset viser også en DFS-variant: push hver node på en stakk når den er <b>ferdig</b>. Tar du dem av fra toppen, kommer de i topologisk rekkefølge.
+        Varianten er ikke spurt om alene (sant/usant-delen fra 2023 er ikke kjent), men den er første fase i algoritmen for sterkt sammenhengende komponenter.</p>
       <div class="grid cols-2">
         <div><h4 style="margin:.2rem 0 .4rem">DFSTopSort</h4><div id="pc-dfstopsort"></div></div>
         <div><h4 style="margin:.2rem 0 .4rem">DFSVisit (pusher når ferdig)</h4><div id="pc-dfsvisitstack"></div></div>
       </div>
-      <div class="callout uni"><span class="lbl">Universitetsnivå: korteste vei i en DAG</span>
-        <p><b>Korteste vei i en DAG</b> (også med negative vekter): gå gjennom nodene i topologisk rekkefølge og relakser kantene ut fra hver node.
-          Når vi kommer til u, er alle stier inn til u allerede behandlet, så dist[u] er riktig. Totalt O(|V| + |E|), raskere enn både Dijkstra og Bellman-Ford.</p>
-      </div>
       <div class="callout felle"><span class="lbl">Felle: DFS-varianten ser ikke sykler</span>
         <p>DFS-varianten sjekker ikke selv om grafen har en sykel – den gir bare en rekkefølge. Varianten med inngrader oppdager sykelen gratis: |output| &lt; |V|.</p>
       </div>
-      <h4>Øv selv: sett linjene i TopSort i riktig rekkefølge</h4>
-      <div id="parsons-topsort"></div>
-      <div id="quiz-topologisk"></div>
+
+      <h4 class="del">3. Korteste vei i en DAG <span class="tag merke eksbas">eksamensbasert</span></h4>
+      <p><b>Korteste vei i en DAG</b> (også med negative vekter): gå gjennom nodene i topologisk rekkefølge og relakser kantene ut fra hver node (å relaksere forklares i fanen Korteste vei).
+        Når vi kommer til u, er alle stier inn til u allerede behandlet, så dist[u] er riktig. Totalt O(|V| + |E|), raskere enn både Dijkstra og Bellman-Ford. Det var svaret for «vektet DAG» i H2021 7.</p>
+      <div class="husk"><h4>Huskeregler</h4>
+        <ul>
+          <li>Inngrad 0 = klar til å tas.</li>
+          <li>|output| &lt; |V| betyr at grafen har en sykel.</li>
+          <li>Et kriterium for hvem som velges blant de klare (som tidsstempel): bytt stakken med en prioritetskø (H2021 13).</li>
+          <li>En DAG kan ha mange gyldige ordninger.</li>
+        </ul>
+      </div>
+
       <h3>Eksamen</h3>
       <div id="exam-h2021-13"></div>
       <div class="callout sensor"><span class="lbl">Sensortips (H2021): prioritetskø blant de klare</span>
@@ -301,10 +396,27 @@
           <li>«u må komme før v» er topologisk sortering. Er det i tillegg et kriterium for hvem som skal velges blant de klare, bytt stakken ut med en prioritetskø.</li>
         </ul>
       </div>
+
+      <h3>Øv selv</h3>
+      <h4>Sett linjene i TopSort i riktig rekkefølge</h4>
+      <div id="parsons-topsort"></div>
+      <div id="quiz-topologisk"></div>
     </section>
 
     <!-- ===================== KORTESTE VEI ===================== -->
     <section data-panel="dijkstra" hidden>
+      <div class="callout eks-spor"><span class="lbl">Hva eksamen spør om</span>
+        <p><span class="tag merke kjerne">kommer ofte</span> Spurt H2020, H2021, H2022, H2024 og H2025: velg riktig algoritme, kjør Dijkstra for hånd, eller tilpass en kjent algoritme.</p>
+        <ul>
+          <li><b>H2021 7</b> (8p): velg raskeste algoritme for fire graftyper (uvektet, vektet DAG, ingen negative kanter, ingen negative sykler), 2p per rad.</li>
+          <li><b>H2020 8h</b> (8p): korteste avstand fra A til alle nodene i en sammenslått graf, fylt ut i en tabell.</li>
+          <li><b>H2024 8b</b> (7p): utfartsstedet med kortest vei til t. Snu kantene og kjør Dijkstra én gang fra t.</li>
+          <li><b>H2025 7e</b> (3p): kan man tjene vilkårlig mye på negative billettpriser? Bellman-Ford finner negative sykler.</li>
+          <li><b>H2022 6</b> (2p av 8): kjøretiden til BellmanFord. <b>H2022 5 (h)</b> (sant/usant): en prioritetskø med konstant tid på alle operasjoner ville gitt Dijkstra O(|V| + |E|). Sant.</li>
+        </ul>
+      </div>
+
+      <h4 class="del">1. Dijkstra steg for steg <span class="tag merke kjerne">kommer ofte</span></h4>
       <div class="callout begrep"><span class="lbl">Begrep: korteste vei og relaksering</span>
         <p>Lengden av en sti i en vektet graf er summen av vektene langs den. <b>Korteste vei</b> fra s til v er stien med lavest sum, og dist[v] er lengden av den.
           Å <b>relaksere</b> en kant (u, v) betyr å sjekke om veien via u er kortere enn det vi vet om v: er dist[u] + w(u, v) &lt; dist[v], oppdaterer vi dist[v].</p>
@@ -316,10 +428,18 @@
         <div class="callout eksempel"><span class="lbl">Eksempel: avstander fra A</span>
           <p>I den urettede grafen under, fra A: C = 2, B = 3 (via C, ikke den direkte kanten med vekt 4), D = 8, E = 10, F = 13. Steg gjennom demoen og se at avstandene blir endelige i akkurat denne rekkefølgen.</p></div>
       </div>
-      <h3>Dijkstra steg for steg</h3>
       <div id="demo-dijkstra"></div>
+      <p class="muted small">Kursets Dijkstra legger inn en ny lapp for v i prioritetskøen hver gang dist[v] blir mindre, i stedet for å endre den gamle. Tas en gammel lapp ut senere, er v allerede i visited, og lappen hoppes over. Høyst én innsetting per kant gir O((|V| + |E|) · log(|V|)).</p>
 
-      <h3>Negative vekter: Bellman-Ford</h3>
+      <h4 class="del">2. Negative vekter: Bellman-Ford <span class="tag merke kjerne">kommer ofte</span></h4>
+      <p class="muted small">Dijkstra tåler ikke negative vekter (se figuren og fellen under). Da bruker vi Bellman-Ford.</p>
+      <div class="grid cols-2">
+        <div><h4 style="margin:.2rem 0 .4rem">BellmanFord</h4><div id="pc-bellman"></div></div>
+        <div class="callout uni"><span class="lbl">Universitetsnivå: hvorfor |V| − 1 runder?</span>
+          <p>Bellman-Ford relakserer <i>alle</i> kantene |V| − 1 ganger. Etter runde i er dist riktig for noder med en korteste sti på høyst i kanter.
+            En ekstra runde avslører <b>negative sykler</b>: blir noe fortsatt kortere, kan vi gå rundt i sykelen og gjøre veien vilkårlig kort – da finnes det ingen korteste vei.
+            I en urettet graf blir hver kant to rettede kanter, så én negativ kant {u, v} er i seg selv en negativ sykel (u → v → u).</p></div>
+      </div>
       <div class="grid cols-2">
         <div>
           <div class="gv-mini" id="fig-neg"></div>
@@ -329,15 +449,8 @@
           <p>Dijkstra forutsetter at ingen vekter er negative. Med negative vekter kan en node som alt er «ferdig», få en kortere vei senere, og svaret kan bli feil.
             Å legge til en konstant på alle vektene hjelper ikke: det straffer stier med mange kanter.</p></div>
       </div>
-      <div class="grid cols-2">
-        <div><h4 style="margin:.2rem 0 .4rem">BellmanFord</h4><div id="pc-bellman"></div></div>
-        <div class="callout uni"><span class="lbl">Universitetsnivå: hvorfor |V| − 1 runder?</span>
-          <p>Bellman-Ford relakserer <i>alle</i> kantene |V| − 1 ganger. Etter runde i er dist riktig for noder med en korteste sti på høyst i kanter.
-            En ekstra runde avslører <b>negative sykler</b>: blir noe fortsatt kortere, kan vi gå rundt i sykelen og gjøre veien vilkårlig kort – da finnes det ingen korteste vei.
-            I en urettet graf blir hver kant to rettede kanter, så én negativ kant {u, v} er i seg selv en negativ sykel (u → v → u).</p></div>
-      </div>
 
-      <h3>Hvilken algoritme?</h3>
+      <h4 class="del">3. Hvilken algoritme? <span class="tag merke kjerne">kommer ofte</span></h4>
       <div class="table-wrap">
         <table class="cmp-table">
           <thead><tr><th>Grafen er …</th><th>Algoritme</th><th>Kjøretid</th></tr></thead>
@@ -349,8 +462,14 @@
           </tbody>
         </table>
       </div>
-      <h4>Øv selv</h4>
-      <div id="quiz-dijkstra"></div>
+      <div class="husk"><h4>Huskeregler</h4>
+        <ul>
+          <li>Velg den raskeste som virker: uvektet → BFS, vektet DAG → topologisk sortering, vekter ≥ 0 → Dijkstra, negative vekter → Bellman-Ford.</li>
+          <li>Mange startsteder, ett mål: snu kantene og kjør Dijkstra fra målet (H2024 8b).</li>
+          <li>Bellman-Ford: |V| − 1 runder, og én runde til avslører negative sykler.</li>
+        </ul>
+      </div>
+
       <h3>Eksamen</h3>
       <div id="exam-h2021-7"></div>
       <div class="callout sensor"><span class="lbl">Eksamenstips: velg raskeste algoritme som virker</span>
@@ -360,10 +479,24 @@
           <li>«Korteste vei fra s til t som er innom m» (ukeoppgave): kjør Dijkstra fra s og fra m, og svar dist<sub>s</sub>[m] + dist<sub>m</sub>[t]. To kjøringer gir samme kjøretid, O((|V| + |E|) · log(|V|)).</li>
         </ul>
       </div>
+
+      <h3>Øv selv</h3>
+      <div id="quiz-dijkstra"></div>
     </section>
 
     <!-- ===================== MINIMALE SPENNTRÆR ===================== -->
     <section data-panel="mst" hidden>
+      <div class="callout eks-spor"><span class="lbl">Hva eksamen spør om</span>
+        <p><span class="tag merke kjerne">kommer ofte</span> Spurt H2020, H2022, H2023 og H2025. Kjenn igjen «billigst å koble sammen alt», og kunne Prim eller Kruskal med datastrukturer og kjøretid.</p>
+        <ul>
+          <li><b>H2023 6</b> (10p): (a) tunnelene som graf (2p), (b) algoritme, sentrale datastrukturer og kjøretid for det billigste tunnelsystemet (5p), (c) korteste sti i det ferdige tunnelsystemet (3p).</li>
+          <li><b>H2025 7c</b> (4p): den minste k som gjør at alle holdeplassene fortsatt henger sammen. Svaret er den tyngste kanten i et minimalt spenntre.</li>
+          <li><b>H2020 8e–f</b> (3p + 4p): slå sammen fire grafer og svar på spørsmål om Kruskal: er spenntreet entydig, holder én kanttype, og hva veier den siste kanten?</li>
+          <li><b>H2022 6</b> (2p av 8): kjøretiden til Prim.</li>
+        </ul>
+      </div>
+
+      <h4 class="del">1. Spenntre og Prim steg for steg <span class="tag merke kjerne">kommer ofte</span></h4>
       <div class="callout begrep"><span class="lbl">Begrep: spenntre og minimalt spenntre</span>
         <p>Et <b>spenntre</b> for en sammenhengende, urettet graf er et tre som inneholder alle nodene og bare kanter fra grafen. Det har |V| − 1 kanter.
           Et <b>minimalt spenntre</b> er et spenntre med lavest mulig sum av vekter. Er grafen ikke sammenhengende, får vi i stedet en <b>spennskog</b>: ett spenntre per komponent.
@@ -375,16 +508,14 @@
           Prim starter i ett hus og kobler hele tiden på den billigste kabelen fra nettet til et hus som ikke har strøm ennå.
           Kruskal kjøper de billigste kablene først, men aldri en kabel mellom to hus som alt har strøm fra samme nett – den ville bare laget en ring.</p>
       </div>
-      <h3>Prim steg for steg</h3>
       <p class="muted small">Prim lar ett tre vokse fra en startnode. Hver gang tar den den letteste kanten som går ut av treet.</p>
       <div id="demo-prim"></div>
-      <h3>Kruskal steg for steg</h3>
+
+      <h4 class="del">2. Kruskal steg for steg <span class="tag merke kjerne">kommer ofte</span></h4>
       <p class="muted small">Kruskal ser på alle kantene, sortert fra lettest til tyngst, og tar med hver kant som ikke lager en sykel. Kurset beskriver Kruskal med ord; pseudokoden er vår egen.</p>
       <div id="demo-kruskal"></div>
-      <div class="callout uni"><span class="lbl">Universitetsnivå: hvorfor grådig er trygt</span>
-        <p>Hvorfor er grådig trygt her? Del nodene i to grupper på hvilken som helst måte. Den letteste kanten mellom gruppene kan alltid være med i et minimalt spenntre: bytter vi den inn for en tyngre kant mellom gruppene, blir treet ikke dyrere.
-          Prim bruker dette med «treet» og «resten» som gruppene. Kruskal bruker det med de to trærne kanten kobler sammen.</p><p>Forelesningen nevner også <b>Borůvkas algoritme</b>: hver node starter som sitt eget lille tre, og i hver runde tar hvert tre med seg den billigste kanten til et annet tre.</p>
-      </div>
+
+      <h4 class="del">3. Prim eller Kruskal? <span class="tag merke kjerne">kommer ofte</span></h4>
       <div class="table-wrap">
         <table class="cmp-table">
           <thead><tr><th></th><th>Prim</th><th>Kruskal</th></tr></thead>
@@ -396,14 +527,27 @@
           </tbody>
         </table>
       </div>
+      <p>Prim og Kruskal sammenligner bare vektene på enkeltkanter og summerer dem aldri langs en sti. Derfor virker de også når noen vekter er negative. Det er Dijkstra som ikke tåler negative vekter.</p>
+      <details class="fordyp"><summary>Hvorfor grådig er trygt <span class="tag merke fordyp">Fordypning, ikke nødvendig til eksamen</span></summary>
+        <div class="callout uni"><span class="lbl">Universitetsnivå: hvorfor grådig er trygt</span>
+          <p>Hvorfor er grådig trygt her? Del nodene i to grupper på hvilken som helst måte. Den letteste kanten mellom gruppene kan alltid være med i et minimalt spenntre: bytter vi den inn for en tyngre kant mellom gruppene, blir treet ikke dyrere.
+            Prim bruker dette med «treet» og «resten» som gruppene. Kruskal bruker det med de to trærne kanten kobler sammen.</p><p>Forelesningen nevner også <b>Borůvkas algoritme</b>: hver node starter som sitt eget lille tre, og i hver runde tar hvert tre med seg den billigste kanten til et annet tre.</p>
+        </div>
+      </details>
       <div class="callout felle"><span class="lbl">Felle: entydighet, og MST er ikke korteste vei</span>
         <p>Er flere kanter like tunge, kan det finnes flere minimale spenntrær med samme totalvekt. Er alle vektene ulike, er det minimale spenntreet entydig.</p>
         <p>Et minimalt spenntre gjør summen av <i>alle</i> kantene minst. Det sier ingenting om at stien mellom to bestemte noder i treet er kortest.
           Eksempel: en trekant med A–B 2, B–C 2 og A–C 3. Det minimale spenntreet er A–B og B–C (totalvekt 4), og der er stien fra A til C 4 lang.
           Korteste vei fra A til C er den direkte kanten med vekt 3, så treet av korteste stier fra A er A–B og A–C (totalvekt 5).</p>
       </div>
-      <h4>Øv selv</h4>
-      <div id="quiz-mst"></div>
+      <div class="husk"><h4>Huskeregler</h4>
+        <ul>
+          <li>«Billigst å koble sammen alt» → minimalt spenntre, ikke Dijkstra.</li>
+          <li>Prim: prioritetskø, ett tre. Kruskal: kantene sortert, en skog.</li>
+          <li>Alle vektene ulike → bare ett minimalt spenntre.</li>
+        </ul>
+      </div>
+
       <h3>Eksamen</h3>
       <div id="exam-h2023-6"></div>
       <div id="exam-h2025-6"></div>
@@ -414,10 +558,23 @@
           <li>Tips: ikke svar Dijkstra på et spenntreproblem. Dijkstra finner korteste stier fra én node, ikke det billigste nettet. I (c), der tunnelsystemet er et tre, gir sensorveiledningen opptil 1 poeng for Dijkstra, mot opptil 3 for BFS eller DFS.</li>
         </ul>
       </div>
+
+      <h3>Øv selv</h3>
+      <div id="quiz-mst"></div>
     </section>
 
     <!-- ===================== STERKT SAMMENHENGENDE KOMPONENTER ===================== -->
     <section data-panel="scc" hidden>
+      <div class="callout eks-spor"><span class="lbl">Hva eksamen spør om</span>
+        <p><span class="tag merke kjerne">kommer ofte</span> Spurt H2020, H2022 og H2024, som oftest gjemt i en historie om rundturer eller lenker.</p>
+        <ul>
+          <li><b>H2024 8a</b> (5p): finn alle rundturene når hver node ligger på høyst én sykel. Svaret er komponentene med mer enn én node.</li>
+          <li><b>H2022 12</b> (10p): minst mulig lenker fra en ny forside i (a) en urettet graf, (b) en DAG og (c) en rettet graf med sykler (4p). (c) løses med komponentgrafen.</li>
+          <li><b>H2020 3</b> (del av 8p): må vi legge til eller fjerne kanter for at en rettet graf skal bli (eller ikke bli) sterkt sammenhengende?</li>
+        </ul>
+      </div>
+
+      <h4 class="del">1. Komponenter og komponentgrafen <span class="tag merke kjerne">kommer ofte</span></h4>
       <div class="callout begrep"><span class="lbl">Begrep: sterkt sammenhengende komponent</span>
         <p>En rettet graf er <b>sterkt sammenhengende</b> hvis det finnes en sti fra hver node til hver annen node, i riktig retning.
           En <b>sterkt sammenhengende komponent</b> er en største mulig gruppe noder der alle kan nå alle. Hver node ligger i nøyaktig én slik komponent (kanskje alene).
@@ -430,14 +587,22 @@
         <div class="callout eksempel"><span class="lbl">Eksempel: tre komponenter</span>
           <p>I demoen under er komponentene {A, B, C}, {G, H} og {D, E, F}. Komponentgrafen har kantene {A, B, C} → {D, E, F}, {A, B, C} → {G, H} og {G, H} → {D, E, F}.</p></div>
       </div>
-      <h3>Steg for steg (Kosaraju)</h3>
-      <p class="muted small">Fase 1: dybde-først søk som pusher nodene når de er ferdige. Fase 2: snu alle kantene, og kjør dybde-først søk i rekkefølgen fra stakken. Hvert søk finner én komponent.</p>
+
+      <h4 class="del">2. Kosaraju steg for steg <span class="tag merke kjerne">kommer ofte</span></h4>
+      <p class="muted small">Fase 1: dybde-først søk som pusher nodene når de er ferdige. Fase 2: snu alle kantene, og kjør dybde-først søk i rekkefølgen fra stakken. Hvert søk finner én komponent.
+        Når kantene er snudd, når et søk fra u bare noder som kan nå u i den opprinnelige grafen. Starter vi i rekkefølgen fra stakken, holder hvert søk seg derfor inne i én komponent.</p>
       <div id="demo-scc"></div>
       <div class="callout felle"><span class="lbl">Felle: naivt søk og feil rekkefølge</span>
         <p>Å kjøre et søk fra hver node og sjekke hvem som når hverandre, er O(|V| · (|V| + |E|)). Kosaraju er O(|V| + |E|). Rekkefølgen i andre fase må være fra <i>toppen</i> av stakken.</p>
       </div>
-      <h4>Øv selv</h4>
-      <div id="quiz-scc"></div>
+      <div class="husk"><h4>Huskeregler</h4>
+        <ul>
+          <li>Rettet graf og «alle kan nå alle» eller «rundturer» → sterkt sammenhengende komponenter.</li>
+          <li>Komponentgrafen er alltid en DAG.</li>
+          <li>En komponent med én node (uten løkke) er ikke en sykel (H2024 8a).</li>
+        </ul>
+      </div>
+
       <h3>Eksamen</h3>
       <div id="exam-h2024-8"></div>
       <div id="exam-h2022-11"></div>
@@ -447,10 +612,21 @@
           <li>En komponent med bare én node er ikke en sykel (så lenge den ikke har en kant til seg selv). Ta den ikke med når du skal finne sykler. I H2024 8a trekker sensorveiledningen 1 poeng for det.</li>
         </ul>
       </div>
+
+      <h3>Øv selv</h3>
+      <div id="quiz-scc"></div>
     </section>
 
     <!-- ===================== SYKLER ===================== -->
     <section data-panel="sykler" hidden>
+      <div class="callout eks-spor"><span class="lbl">Hva eksamen spør om</span>
+        <p><span class="tag merke kjerne">kommer ofte</span> Spurt H2023 og H2025, begge ganger med pseudokode.</p>
+        <ul>
+          <li><b>H2025 3</b> (11p): skriv en prosedyre som avgjør om grafen har en sykel, (a) urettet (5p) og (b) rettet (6p).</li>
+          <li><b>H2023 7</b> (12p): (a) syklisk avhengighet i en rettet graf (5p), (b) diamantavhengighet i en DAG (7p).</li>
+          <li><b>H2024 8a</b>: rundturer i en rettet graf, løst med sterkt sammenhengende komponenter (fanen Sterkt sammenhengende).</li>
+        </ul>
+      </div>
       <div class="callout begrep"><span class="lbl">Begrep: sykel i urettet og rettet graf</span>
         <p>En <b>sykel</b> er en sti som kommer tilbake til der den startet. I en urettet graf må den ha minst tre noder – å gå fram og tilbake langs samme kant teller ikke.
           I en rettet graf må kantene peke rundt, og to noder holder (u → v → u). Urettede og rettede grafer trenger ulike algoritmer.</p>
@@ -459,15 +635,25 @@
       <div class="callout eli5"><span class="lbl">5-åring: merket i skogen</span>
         <p>Du går tur i skogen og setter et merke på hvert tre du passerer. Plutselig står du ved et merke du selv satte tidligere – og det er ikke treet du nettopp gikk forbi. Da vet du at du har gått i ring.</p>
       </div>
-      <h3>Urettet graf: dybde-først søk med forelder</h3>
+
+      <h4 class="del">1. Urettet graf: dybde-først søk med forelder <span class="tag merke eksbas">eksamensbasert</span></h4>
       <p class="muted small">Møter vi en besøkt nabo som ikke er noden vi kom fra, har vi gått i ring.</p>
       <div id="demo-cyc-u"></div>
       <div class="grid cols-2">
         <div><h4 style="margin:.2rem 0 .4rem">HasCycle (ytre løkke)</h4><div id="pc-hascycle"></div></div>
-        <div class="callout uni"><span class="lbl">Universitetsnivå: tell kanter</span>
-          <p>Alternativ uten søk etter sykelen selv: en skog med c komponenter har nøyaktig |V| − c kanter. Tell komponentene med DFSFull. Er |E| &gt; |V| − c (tell hver kant {u, v} én gang, ikke én gang per naboliste), finnes det en sykel. Begge metodene er O(|V| + |E|).</p></div>
+        <details class="fordyp"><summary>Tell kanter i stedet <span class="tag merke fordyp">Fordypning, ikke nødvendig til eksamen</span></summary>
+          <div class="callout uni"><span class="lbl">Universitetsnivå: tell kanter</span>
+            <p>Alternativ uten søk etter sykelen selv: en skog med c komponenter har nøyaktig |V| − c kanter. Tell komponentene med DFSFull. Er |E| &gt; |V| − c (tell hver kant {u, v} én gang, ikke én gang per naboliste), finnes det en sykel. Begge metodene er O(|V| + |E|).</p></div>
+        </details>
       </div>
-      <h3>Rettet graf: topologisk sortering som teller</h3>
+      <div class="callout felle"><span class="lbl">Felle: forelderen og flere komponenter</span>
+        <ul>
+          <li>Urettet: glemmer du å hoppe over forelderen, svarer algoritmen «sykel» for alle grafer med minst én kant.</li>
+          <li>Begge: grafen kan ha flere komponenter. Start et søk fra hver node som ikke er besøkt.</li>
+        </ul>
+      </div>
+
+      <h4 class="del">2. Rettet graf: topologisk sortering som teller <span class="tag merke kjerne">kommer ofte</span></h4>
       <p class="muted small">Noder på en sykel venter på hverandre og får aldri inngrad 0. Teller vi hvor mange som blir behandlet, er svaret «sykel» hvis det er færre enn |V|.</p>
       <div id="demo-cyc-d"></div>
       <div class="callout uni"><span class="lbl">Universitetsnivå: tre tilstander</span>
@@ -475,13 +661,17 @@
           En vanlig visited-mengde holder ikke i rettede grafer: en ferdig node kan nås fra flere kanter uten at det finnes en sykel (som i en diamant A → B → D, A → C → D).
           Du kan også bruke sterkt sammenhengende komponenter: det finnes en sykel hvis og bare hvis en komponent har mer enn én node (når grafen ikke har løkker).</p>
       </div>
-      <div class="callout felle"><span class="lbl">Felle: forelderen, diamanter og flere komponenter</span>
+      <div class="callout felle"><span class="lbl">Felle: diamanter</span>
+        <p>Rettet: å bruke urettet-algoritmen gir feil svar for diamanter.</p>
+      </div>
+      <div class="husk"><h4>Huskeregler</h4>
         <ul>
-          <li>Urettet: glemmer du å hoppe over forelderen, svarer algoritmen «sykel» for alle grafer med minst én kant.</li>
-          <li>Rettet: å bruke urettet-algoritmen gir feil svar for diamanter.</li>
-          <li>Begge: grafen kan ha flere komponenter. Start et søk fra hver node som ikke er besøkt.</li>
+          <li>Urettet: dybde-først søk, og hopp over forelderen.</li>
+          <li>Rettet: tell behandlede noder i topologisk sortering. Færre enn |V| betyr sykel.</li>
+          <li>Ett søk med felles visited, startet fra hver ubesøkte node – ikke et nytt søk per node.</li>
         </ul>
       </div>
+
       <h3>Eksamen</h3>
       <div id="exam-h2025-2"></div>
       <div id="exam-h2023-7"></div>
@@ -495,6 +685,17 @@
 
     <!-- ===================== 2-SAMMENHENG ===================== -->
     <section data-panel="sammenheng" hidden>
+      <div class="callout eks-spor"><span class="lbl">Hva eksamen spør om</span>
+        <p><span class="tag merke kjerne">kommer ofte</span> Spurt H2020, H2021, H2022 og H2025. Oftest skal du kjenne igjen problemet og navngi algoritmen, ikke kjøre den for hånd.</p>
+        <ul>
+          <li><b>H2025 7d</b> (3p): garanti om alternativ rute når én holdeplass stopper. Sjekk at grafen er 2-sammenhengende med separasjonsnoder.</li>
+          <li><b>H2020 8c</b> (3p): forklar hvorfor en graf med en hamiltonsk sykel er 2-sammenhengende. <b>H2020 8d</b> (8p): skriv ut to distinkte stier fra s til t. (Kortet står i fanen Minimale spenntrær.)</li>
+          <li><b>H2022 3</b> (del av 10p): påstander om 2-sammenheng og antall separasjonsnoder (fanen Begreper).</li>
+          <li><b>H2021 12</b> (10p): Whops!-oppgjør. Oppgjøret går opp hvis summen er 0 i hver komponent.</li>
+        </ul>
+      </div>
+
+      <h4 class="del">1. Separasjonsnoder og 2-sammenheng <span class="tag merke kjerne">kommer ofte</span></h4>
       <div class="callout begrep"><span class="lbl">Begrep: separasjonsnode og 2-sammenheng</span>
         <p>En <b>separasjonsnode</b> er en node som gjør grafen usammenhengende hvis vi fjerner den (sammen med kantene dens).
           En sammenhengende graf er <b>2-sammenhengende</b> hvis den ikke har noen separasjonsnoder: uansett hvilken node som faller ut, henger resten sammen.
@@ -505,20 +706,14 @@
         <p>Tenk på et veinett. Henger det sammen, kan du kjøre fra hvilken som helst by til hvilken som helst annen. En separasjonsnode er en by som alle veiene mellom to deler av landet går gjennom.
           Stenger du den byen, blir landet delt i to.</p>
       </div>
-
-      <h3>Komponenter</h3>
-      <p>Antall komponenter i en urettet graf finner vi med DFSFull eller BFSFull: hvert nytt søk fra den ytre løkka er en ny komponent. Gi hver node nummeret til søket som fant den, så vet vi også hvilken komponent hver node er i.
-        Se demoen under <a href="#fane=dfs&amp;oppg=demo-dfs">Dybde-først (DFS)</a>, eksempelet «To komponenter».</p>
-
-      <h3>Prøv selv: fjern en node</h3>
-      <p class="muted small">Trykk på en av knappene «Fjern X» for å fjerne den noden. Fargene viser hvilke deler grafen faller i.</p>
+      <p class="muted small"><b>Prøv selv: fjern en node.</b> Trykk på en av knappene «Fjern X» for å fjerne den noden. Fargene viser hvilke deler grafen faller i.</p>
       <div class="tv-switch" role="group" aria-label="Velg node å fjerne" id="sep-btns"></div>
       <div class="grid cols-2">
         <div class="gv-mini" id="sep-fig"></div>
         <div class="card" id="sep-out" aria-live="polite"></div>
       </div>
 
-      <h3>Separasjonsnoder i lineær tid</h3>
+      <h4 class="del">2. Separasjonsnoder i lineær tid <span class="tag merke eksbas">eksamensbasert</span></h4>
       <p class="muted small">Ett dybde-først søk holder. <b>depth[u]</b> er dybden til u i DFS-treet (roten har dybde 0).
         <b>low[u]</b> svarer på spørsmålet: hvor høyt opp i DFS-treet kan vi komme hvis vi starter i u, går nedover i subtreet til u og så tar maksimalt én tilbakekant? «Høyt» betyr lav dybde, så low[u] er den laveste dybden vi kan nå slik. Kursets Visit sjekker ikke om naboen er forelderen, så også kanten opp til forelderen teller. En løvnode får derfor low lik dybden til forelderen, eller lavere hvis den har en tilbakekant høyere opp.</p>
       <div class="grid cols-2">
@@ -528,11 +723,26 @@
       <details class="card" style="margin-top:.6rem"><summary><b>Koden, linje for linje</b> (SeparationVertices og Visit)</summary>
         <div id="exp-sep"></div><div id="exp-sepvisit"></div>
       </details>
-      <div class="callout uni"><span class="lbl">Universitetsnivå: hvorfor low virker</span>
-        <p>Se på en node u (ikke roten) og et barn v av u i DFS-treet. Har ingen node nede i subtreet til v en kant som går høyere opp enn u, er u den eneste forbindelsen mellom subtreet og resten av grafen. Fjerner vi u, faller subtreet av. Det er akkurat det testen depth[u] ≤ low[v] sjekker.
-          Roten behandles for seg: den er en separasjonsnode bare hvis den har minst to barn i DFS-treet.</p>
-        <p><code>IsBiconnected(G)</code> er da bare «er SeparationVertices(G) tom?». Den naive metoden – fjern hver node og sjekk sammenheng – er O(|V| · (|V| + |E|)).</p><p>En <b>bro</b> er en kant som deler grafen i flere komponenter hvis den fjernes. I et tre er alle kantene broer.</p>
+      <p><code>IsBiconnected(G)</code> er bare «er SeparationVertices(G) tom?». Den naive metoden – fjern hver node og sjekk sammenheng – er O(|V| · (|V| + |E|)). På eksamen holder det å forklare at garantien betyr 2-sammenheng (ingen separasjonsnoder), navngi algoritmen for separasjonsnoder og oppgi kjøretiden O(|V| + |E|), som i H2025 7d.</p>
+      <details class="fordyp"><summary>Hvorfor low virker <span class="tag merke fordyp">Fordypning, ikke nødvendig til eksamen</span></summary>
+        <div class="callout uni"><span class="lbl">Universitetsnivå: hvorfor low virker</span>
+          <p>Se på en node u (ikke roten) og et barn v av u i DFS-treet. Har ingen node nede i subtreet til v en kant som går høyere opp enn u, er u den eneste forbindelsen mellom subtreet og resten av grafen. Fjerner vi u, faller subtreet av. Det er akkurat det testen depth[u] ≤ low[v] sjekker.
+            Roten behandles for seg: den er en separasjonsnode bare hvis den har minst to barn i DFS-treet.</p>
+          <p>En <b>bro</b> er en kant som deler grafen i flere komponenter hvis den fjernes. I et tre er alle kantene broer.</p>
+        </div>
+      </details>
+
+      <h4 class="del">3. Komponenter <span class="tag merke kjerne">kommer ofte</span></h4>
+      <p>Antall komponenter i en urettet graf finner vi med DFSFull eller BFSFull: hvert nytt søk fra den ytre løkka er en ny komponent. Gi hver node nummeret til søket som fant den, så vet vi også hvilken komponent hver node er i.
+        Se demoen under <a href="#fane=dfs&amp;oppg=demo-dfs">Dybde-først (DFS)</a>, eksempelet «To komponenter». Komponenter var kjernen i H2021 12 og H2022 12a.</p>
+      <div class="husk"><h4>Huskeregler</h4>
+        <ul>
+          <li>«Alternativ rute uansett hvilken node som faller ut» = 2-sammenhengende = ingen separasjonsnoder.</li>
+          <li>Separasjonsnodene finnes med ett DFS (depth og low) i O(|V| + |E|). Den naive metoden er O(|V| · (|V| + |E|)).</li>
+          <li>Penger eller informasjon kan bare flyte innenfor en komponent (H2021 12).</li>
+        </ul>
       </div>
+
       <h3>Eksamen</h3>
       <div id="exam-h2021-12"></div>
       <div class="callout sensor"><span class="lbl">Eksamenstips: 2-sammenheng og komponenter</span>
@@ -545,6 +755,13 @@
 
     <!-- ===================== SANT/USANT ===================== -->
     <section data-panel="test" hidden>
+      <div class="callout eks-spor"><span class="lbl">Hva eksamen spør om</span>
+        <p><span class="tag merke eksbas">eksamensbasert</span> To kjente sant/usant-påstander om grafer, begge fra H2022. Sant/usant-delen fra 2023 og senere er ikke kjent, så påstandene under er laget ut fra de skriftlige oppgavene.</p>
+        <ul>
+          <li><b>H2022 2 (j)</b>: «En graf med n noder kan ikke har mer enn n kanter.» Usant.</li>
+          <li><b>H2022 5 (h)</b>: «En prioritetskø med konstant tid på alle operasjoner ville gjort at Dijkstra hadde kjøretidskompleksitet O(|V| + |E|).» Sant.</li>
+        </ul>
+      </div>
       <h3>Sant eller usant?</h3>
       <p class="muted small">Ta stilling til hver påstand, og sjekk svarene. Forklaringen viser hvorfor.</p>
       <div id="tf-grafer"></div>
@@ -563,23 +780,23 @@
     <p class="muted small">IN2010 · Blokk 6 · Grafer. Egne forklaringer og demoer basert på pensum. Eksamensoppgavene er gjengitt ordrett med kildelinje.</p>
   </footer>
 
-  <script src="assets/js/core.js?v=20261127f"></script>
-<script src="assets/js/eksamensvekt.js?v=20261127f"></script>
-  <script src="assets/js/symboler.js?v=20261127f"></script>
-  <script src="assets/js/begreper-data.js?v=20261127f"></script>
-  <script src="assets/js/begrep-tips.js?v=20261127f"></script>
-  <script src="assets/js/data-tf.js?v=20261127f"></script>
-  <script src="assets/js/pseudocode.js?v=20261127f"></script>
-  <script src="assets/js/stepplayer.js?v=20261127f"></script>
-  <script src="assets/js/varline.js?v=20261127f"></script>
-  <script src="assets/js/viz-graph.js?v=20261127f"></script>
-  <script src="assets/js/data-algos.js?v=20261127f"></script>
-  <script src="assets/js/data-grafer.js?v=20261127f"></script>
-  <script src="assets/js/perfekt/grafer.js?v=20261127f"></script>
-  <script src="assets/js/perfekt/delt.js?v=20261127f"></script>
-  <script src="assets/js/kort/grafer.js?v=20261127f"></script>
-  <script src="assets/js/dra.js?v=20261127f"></script>
-  <script src="assets/js/data-dra.js?v=20261127f"></script>
+  <script src="assets/js/core.js?v=20261127g"></script>
+<script src="assets/js/eksamensvekt.js?v=20261127g"></script>
+  <script src="assets/js/symboler.js?v=20261127g"></script>
+  <script src="assets/js/begreper-data.js?v=20261127g"></script>
+  <script src="assets/js/begrep-tips.js?v=20261127g"></script>
+  <script src="assets/js/data-tf.js?v=20261127g"></script>
+  <script src="assets/js/pseudocode.js?v=20261127g"></script>
+  <script src="assets/js/stepplayer.js?v=20261127g"></script>
+  <script src="assets/js/varline.js?v=20261127g"></script>
+  <script src="assets/js/viz-graph.js?v=20261127g"></script>
+  <script src="assets/js/data-algos.js?v=20261127g"></script>
+  <script src="assets/js/data-grafer.js?v=20261127g"></script>
+  <script src="assets/js/perfekt/grafer.js?v=20261127g"></script>
+  <script src="assets/js/perfekt/delt.js?v=20261127g"></script>
+  <script src="assets/js/kort/grafer.js?v=20261127g"></script>
+  <script src="assets/js/dra.js?v=20261127g"></script>
+  <script src="assets/js/data-dra.js?v=20261127g"></script>
   <script>
   (function () {
     "use strict";

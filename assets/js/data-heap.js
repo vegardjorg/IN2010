@@ -690,7 +690,7 @@
     }
   });
 
-  /* ===================== LEVELORDERHEAP (H2025 a) ===================== */
+  /* ===================== LEVELORDERHEAP (H2025 5a) ===================== */
   def(IN.algos, "levelOrderHeap", {
     title: "LevelOrderHeap – en heap er allerede i level-order",
     name: "LevelOrderHeap", params: "A",

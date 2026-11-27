@@ -7,8 +7,8 @@
   <title>Blokk 0 · Begreper · IN2010</title>
   <meta name="description" content="Grunnbegreper i IN2010: algoritme, datastruktur, stor O, stabil/in-place, ADT, rekursjon.">
   <script>(function(){try{var d=document.documentElement;var t=localStorage.getItem('in-theme');if(t!=='dark'&&t!=='system')t='light';if(t!=='system')d.setAttribute('data-theme',t);var l=localStorage.getItem('in-level');if(l!=='eli5'&&l!=='teknisk')l='normal';d.setAttribute('data-level',l);}catch(e){document.documentElement.setAttribute('data-theme','light');document.documentElement.setAttribute('data-level','normal');}})();</script>
-  <link rel="stylesheet" href="assets/css/styles.css?v=20261127f">
-  <link rel="stylesheet" href="assets/css/begrep-tips.css?v=20261127f">
+  <link rel="stylesheet" href="assets/css/styles.css?v=20261127g">
+  <link rel="stylesheet" href="assets/css/begrep-tips.css?v=20261127g">
 </head>
 <body data-page="begreper">
   <a class="skip-link" href="#main">Hopp til innhold</a>
@@ -19,9 +19,6 @@
       <h1>Blokk 0 · Begreper</h1>
       <p class="lead">Fundamentet: hva en algoritme og en datastruktur er, kjøretid og stor O,
         stabil/in-place, ADT vs. datastruktur, og rekursjon.</p>
-      <div class="badges">
-        <span class="badge" data-go="algoritme"><b>Oppvarming</b> · alle år · <span class="pts">2p</span></span>
-      </div>
     </div>
 
     <div class="tabs" role="tablist" aria-label="Underemner">
@@ -34,8 +31,20 @@
       <button data-tab="test">Sant/usant</button>
     </div>
 
+    <div class="pagehead-info">
+      <div class="badges">
+        <span class="badge" data-go="algoritme"><b>Oppvarming</b> · alle år · <span class="pts">2p</span></span>
+      </div>
+    </div>
+
     <!-- ALGORITME -->
     <section data-panel="algoritme">
+      <h3>Algoritme og datastruktur</h3>
+      <div class="callout eks-spor"><span class="lbl">Hva eksamen spør om</span>
+        <p><span class="tag merke kjerne">kommer ofte</span> Spurt hvert år fra H2020 til H2025, med samme tekst.</p>
+        <ul><li><b>Oppgave 1</b> (2p, oppvarmingen): «Hva er en algoritme?» og «Hva er en datastruktur?», maks fire setninger hver. Alle rimelige svar gir full uttelling.</li></ul>
+      </div>
+
       <div class="callout begrep"><span class="lbl">Begrep</span>
         <b>Algoritme:</b> en presis, endelig oppskrift med steg som løser et problem.
         <b>Datastruktur:</b> en måte å organisere og lagre data på, slik at operasjonene vi trenger blir effektive.</div>
@@ -47,11 +56,19 @@
 
       <h3>Forklaring</h3>
       <div id="ex-algoritme"></div>
+      <p>Introduksjonsforelesningen lister fire krav: en algoritme må stoppe etter endelig mange steg, hvert steg må
+        være helt presist, den tar <b>null eller flere</b> input, og den gir et output som henger sammen med input.
+        Den er ikke knyttet til et programmeringsspråk: pseudokode holder.</p>
 
       <div class="callout snarvei"><span class="lbl">Eksamenstips</span>
         Få med at en algoritme er presis og entydig, at den tar slutt, og at den går fra input til output.
         For en datastruktur: at den organiserer data, og at valget avhenger av hvilke operasjoner som skal gå fort.
         Oppgaven under står likt på hver eksamen fra H2020 til H2025.</div>
+
+      <div class="husk"><h4>Huskeregler</h4><ul>
+        <li>Algoritme = <i>hva vi gjør</i> (stegene). Datastruktur = <i>hvordan dataene ligger</i>.</li>
+        <li>Algoritmen: presis, tar slutt, fra input til output.</li>
+      </ul></div>
 
       <h3>Eksamen: oppvarmingen</h3>
       <div id="exam-oppvarming"></div>
@@ -62,6 +79,18 @@
 
     <!-- BIG-O -->
     <section data-panel="bigo">
+      <h3>Kjøretid og stor O</h3>
+      <div class="callout eks-spor"><span class="lbl">Hva eksamen spør om</span>
+        <p><span class="tag merke kjerne">kommer ofte</span> Spurt hvert år H2020–H2025. Nesten alle implementasjonsoppgaver
+          ber deg oppgi kjøretidskompleksiteten, og fra H2023 står det i «Om eksamen» at lavere kjøretidskompleksitet foretrekkes.</p>
+        <ul>
+          <li><b>H2020 5</b> (12p): velg prosedyren med minimal kjøretidskompleksitet når k er 1, log n, n eller n².</li>
+          <li><b>H2020 7a</b> (4p): «Hva er kjøretidskompleksiteten til algoritmen?»</li>
+          <li><b>H2022 2</b> (10p, sant/usant): blant annet hva lineær kjøretid er, og om bedre kjøretidskompleksitet alltid gir færre steg.</li>
+          <li><b>H2022 6</b> (8p): kryss av laveste korrekte kjøretidskompleksitet for grafalgoritmer.</li>
+        </ul>
+      </div>
+
       <div class="callout begrep"><span class="lbl">Begrep</span>
         <b>Stor O</b> (på engelsk <i>Big O</i>) beskriver hvordan kjøretiden vokser når input n blir stor – vi ser bort fra konstanter
         og lavordensledd og bryr oss bare om veksttakten. De vanlige klassene er O(1), O(log n), O(n),
@@ -74,13 +103,6 @@
         Tenk deg at du skal dele ut én lapp til hver elev. Blir klassen dobbelt så stor, tar det dobbelt så lang tid.
         Skal derimot alle håndhilse på alle, blir det omtrent fire ganger så mye jobb når klassen dobles. Store O sier
         hvor fort jobben vokser når det blir flere. Den sier ikke hvor mange sekunder det tar.</div>
-
-      <h3>Forklaring</h3>
-      <div id="ex-bigo"></div>
-
-      <div class="callout felle"><span class="lbl">Felle: hvilken logaritme?</span>
-        log₂ n og log₁₀ n er like i O. De skiller seg bare med en fast faktor (log₂ n er omtrent 3,3 · log₁₀ n), og
-        faste faktorer forsvinner i O. Skriv bare <span class="mono">O(log n)</span>.</div>
 
       <h3>Voksehierarki – lek med n</h3>
       <p class="muted small">Dra i n og se hvor ulikt klassene vokser. Skru på logaritmisk skala når
@@ -101,12 +123,51 @@
         «I implementasjonsoppgaver foretrekkes lavere kjøretidskompleksitet.»
         <span class="muted small">(Kilde: eksamen IN2010 H2023, «Om eksamen». H2024 og H2025 skriver at lavere kjøretidskompleksitet er «mer poenggivende».)</span></div>
 
+      <h3>Forklaring</h3>
+      <div id="ex-bigo"></div>
+      <p><b>Slik teller du løkker.</b> Én løkke over n elementer med konstant arbeid i hver runde gir O(n). To slike løkker
+        <i>etter hverandre</i> gir O(n + n) = O(n): de legges sammen, ikke ganges. En løkke <i>inni</i> en løkke ganges:
+        går begge n ganger, blir det n · n = O(n²), men går den indre bare log n ganger, blir det O(n log n).
+        En løkke som halverer n hver runde (n → n/2 → n/4 …), går omtrent log n ganger, som i binærsøk.</p>
+      <p>O(n), O(n²) og O(n³) er <b>polynomielle</b> kjøretider (n opphøyd i et fast tall). O(2ⁿ) er <b>eksponentiell</b>:
+        den vokser raskere enn alle polynomer. Skillet brukes i kompleksitetsteorien: et avgjørelsesproblem (et ja/nei-spørsmål)
+        er i NP hvis et ja-svar kan sjekkes i polynomiell tid. Om P og NP er like, er ikke bevist, så ingen har vist at
+        problemene i NP er vanskeligere enn de i P. Mer om dette under
+        <a href="07-strategi.html#fane=pnp">Strategi → P og NP</a>.</p>
+
+      <div class="callout felle"><span class="lbl">Felle: hvilken logaritme?</span>
+        log₂ n og log₁₀ n er like i O. De skiller seg bare med en fast faktor (log₂ n er omtrent 3,3 · log₁₀ n), og
+        faste faktorer forsvinner i O. Skriv bare <span class="mono">O(log n)</span>.</div>
+
+      <div class="callout felle"><span class="lbl">Felle: bedre O er ikke alltid færre steg</span>
+        Stor O sier hvordan kjøretiden vokser når n blir stor. For små n kan konstantene gjøre at en O(n²)-algoritme bruker
+        færre steg enn en O(n log n)-algoritme. Påstanden «bedre kjøretidskompleksitet gir alltid færre steg uansett størrelse
+        på input» er usann (H2022 2g).<br>
+        O er dessuten en <b>øvre grense</b>: det som er O(log n), er også O(n), og en algoritme som er O(n²), kan godt også være O(n).
+        Derfor oppgir vi den laveste grensen vi kan begrunne.</div>
+
+      <div class="husk"><h4>Huskeregler</h4><ul>
+        <li>1 &lt; log n &lt; n &lt; n log n &lt; n² &lt; 2ⁿ.</li>
+        <li>Stryk konstanter og lavere ledd: O(n² + n + 1) = O(n²).</li>
+        <li>Etter hverandre: legg sammen. Inni hverandre: gang.</li>
+      </ul></div>
+
       <h3>Tell operasjoner</h3>
       <div id="quiz-bigo"></div>
     </section>
 
     <!-- STABIL & IN-PLACE -->
     <section data-panel="stabil">
+      <h3>Stabil og in-place</h3>
+      <div class="callout eks-spor"><span class="lbl">Hva eksamen spør om</span>
+        <p><span class="tag merke kjerne">kommer ofte</span> Spurt H2021, H2023 og H2024. Oppgavene med løsning ligger på sorteringssiden.</p>
+        <ul>
+          <li><b>H2021 2</b> (3p): personer sortert etter alder. Var sorteringen stabil? <a href="01-sortering.html#fane=bucket&amp;oppg=exam-h2021-2">Sortering → Bøtte</a></li>
+          <li><b>H2023 4</b> (10p): Gnome sort. En del av svaret er å redegjøre for om den er stabil og/eller in-place. <a href="01-sortering.html#fane=gnome&amp;oppg=exam-gnome">Sortering → Gnome</a></li>
+          <li><b>H2024 3</b> (10p): sorter en ordliste <i>stabilt</i> etter kategori, uten å kalle sorteringsalgoritmer. <a href="01-sortering.html#fane=bucket&amp;oppg=exam-h2024-3">Sortering → Bøtte</a></li>
+        </ul>
+      </div>
+
       <div class="callout begrep"><span class="lbl">Begrep</span>
         <b>Stabil:</b> like elementer beholder sin innbyrdes rekkefølge etter sortering.
         <b>In-place:</b> algoritmen sorterer i selve arrayet, uten en ekstra datastruktur (som et hjelpearray
@@ -115,9 +176,6 @@
       <div class="callout eli5"><span class="lbl">5-åring: køen i klassen</span>
         Elevene står i kø sortert etter fornavn. Nå sorterer læreren dem etter klasse. En stabil sortering passer på
         at to elever i samme klasse står i samme rekkefølge som før. Ingen sniker forbi en klassekamerat.</div>
-
-      <h3>Forklaring</h3>
-      <div id="ex-stabil"></div>
 
       <h3>Stabil vs. ustabil – samme nøkkel, ulik farge</h3>
       <p class="muted small">Vi sorterer på <b>tallet</b>. Bokstaven viser opprinnelig rekkefølge blant like tall.
@@ -154,12 +212,30 @@
       <p class="muted small">In-place betyr at algoritmen ikke mellomlagrer elementene i en ekstra datastruktur.
         Derfor er quicksort in-place, mens merge sort (hjelpearray) og bøtte/radix (bøttene) ikke er det.</p>
       <p class="muted small">Om en sortering er stabil, kan avhenge av hvordan den er skrevet. Tabellen gjelder variantene i kurset. At quicksort og heapsort er ustabile og radix sort stabil, er vår egen utledning: quicksort og heapsort bytter elementer som ikke står ved siden av hverandre, og radix sort er stabil fordi hvert pass er en stabil bøttesortering.</p>
-      <p class="muted small">Eksamen: H2021 2 (3p) spør om en sortering var stabil. Oppgaven med løsning ligger under
-        <a href="01-sortering.html#fane=bucket&amp;oppg=exam-h2021-2">Sortering → Bøtte</a>.</p>
+
+      <h3>Forklaring</h3>
+      <div id="ex-stabil"></div>
+
+      <div class="husk"><h4>Huskeregler</h4><ul>
+        <li>Stabil: like nøkler står i samme rekkefølge etterpå. Har alle elementene ulik nøkkel, er det ingenting å bevare.</li>
+        <li>In-place: ingen ekstra datastruktur til å mellomlagre elementene.</li>
+        <li>Merge sort: stabil, ikke in-place. Quicksort og heapsort: in-place, ikke stabile.</li>
+      </ul></div>
     </section>
 
     <!-- ADT -->
     <section data-panel="adt">
+      <h3>ADT og datastruktur</h3>
+      <div class="callout eks-spor"><span class="lbl">Hva eksamen spør om</span>
+        <p><span class="tag merke kjerne">kommer ofte</span> Skillet mellom hva en samling kan gjøre (ADT-en) og hvordan den
+          er laget (datastrukturen), er spurt H2022 og H2024.</p>
+        <ul>
+          <li><b>H2022 5e</b> (sant/usant): kan et AVL-tre brukes som en prioritetskø med samme kjøretidskompleksitet som en heap?</li>
+          <li><b>H2022 10</b> (10p): bucket queue, «en datastruktur» som «kan brukes som en prioritetskø». Forklar hvilken datastruktur som passer.</li>
+          <li><b>H2024 7</b> (12p): «En mediankø er en abstrakt datatype». Forklar hvordan du vil representere den og implementere operasjonene.</li>
+        </ul>
+      </div>
+
       <div class="callout begrep"><span class="lbl">Begrep</span>
         En <b>abstrakt datatype (ADT)</b> sier HVA du kan gjøre (operasjonene), ikke HVORDAN. En
         <b>datastruktur</b> er en konkret implementasjon. Samme ADT kan ha flere datastrukturer.</div>
@@ -168,15 +244,25 @@
         En ADT er som knappene på en fjernkontroll. Du vet hva «neste kanal» og «volum opp» gjør, men ikke hvordan
         det er bygd inni. Datastrukturen er selve elektronikken. De samme knappene kan bygges på flere måter.</div>
 
-      <h3>Forklaring</h3>
-      <div id="ex-adt"></div>
-
       <div class="grid cols-2">
         <div class="card"><h4 style="margin-top:.2rem">ADT (hva)</h4>
           <ul class="muted"><li>Liste</li><li>Stakk (LIFO)</li><li>Kø (FIFO)</li><li>Prioritetskø</li><li>Mengde</li><li>Ordbok / map</li></ul></div>
         <div class="card"><h4 style="margin-top:.2rem">Datastruktur (hvordan)</h4>
           <ul class="muted"><li>Array / dynamisk array</li><li>Lenket liste</li><li>Heap (binær)</li><li>Hashtabell</li><li>Binært søketre / AVL</li></ul></div>
       </div>
+      <p>Vanlige par: en <b>prioritetskø</b> lages ofte med en binær heap (finn-minste O(1), innsetting og fjern-minste
+        O(log n)). En <b>ordbok</b> lages med en hashtabell (oppslag O(1) forventet) eller et balansert søketre
+        (O(log n) garantert, og elementene kan gås gjennom i sortert rekkefølge). En <b>stakk</b> (LIFO, sist inn, først ut)
+        gir elementene ut i motsatt rekkefølge av den de kom inn i, og en <b>kø</b> (FIFO, først inn, først ut) i samme
+        rekkefølge. Begge kan lages med array eller lenket liste. Innsetting bakerst i et dynamisk array er O(1)
+        amortisert, men O(n) i verste tilfelle, når arrayet er fullt og må kopieres over i et dobbelt så stort.</p>
+
+      <h3>Forklaring</h3>
+      <div id="ex-adt"></div>
+
+      <div class="callout felle"><span class="lbl">Felle: prioritetskø er ikke det samme som heap</span>
+        Prioritetskøen er ADT-en, heapen er én datastruktur som kan lage den. Et AVL-tre eller en bucket queue kan også
+        brukes som prioritetskø. Sensorveiledningen for H2022 5e sier at påstanden om AVL-treet er sann.</div>
 
       <h3>Match ADT med en vanlig datastruktur</h3>
       <div id="quiz-adt"></div>
@@ -184,6 +270,18 @@
 
     <!-- REKURSJON -->
     <section data-panel="rekursjon">
+      <h3>Rekursjon</h3>
+      <div class="callout eks-spor"><span class="lbl">Hva eksamen spør om</span>
+        <p><span class="tag merke ny">pensum, ikke spurt før</span> Rekursjon har ikke vært en egen oppgave, og står ikke i de
+          kjente sant/usant-påstandene (H2021 3, H2022 2 og 5). Sant/usant-delen fra 2023 er ikke kjent. Men du trenger det:
+          løsningene i sensorveiledningen på treoppgavene er rekursive.</p>
+        <ul>
+          <li><b>H2021 8</b> (10p): InRange. <a href="04-traer.html#fane=bst&amp;oppg=exam-h2021-8">Trær → Binært søketre</a></li>
+          <li><b>H2022 11</b> (10p): CheckBST. <a href="04-traer.html#fane=bst&amp;oppg=exam-h2022-10">Trær → Binært søketre</a></li>
+          <li><b>H2023 5</b> (12p): diameteren til et tre. <a href="04-traer.html#fane=diameter&amp;oppg=exam-h2023-5">Trær → Diameter</a></li>
+        </ul>
+      </div>
+
       <div class="callout begrep"><span class="lbl">Begrep</span>
         En <b>rekursiv</b> algoritme kaller seg selv på et mindre problem. Den trenger et <b>basistilfelle</b>
         (som stopper) og et <b>rekursivt steg</b> (som nærmer seg basis).</div>
@@ -191,9 +289,6 @@
       <div class="callout eli5"><span class="lbl">5-åring: russiske dukker</span>
         Tenk på russiske dukker. For å komme til den minste åpner du én dukke og gjør nøyaktig det samme med dukken
         inni. Du fortsetter til du kommer til den lille som ikke kan åpnes. Den er basistilfellet, og der stopper du.</div>
-
-      <h3>Forklaring</h3>
-      <div id="ex-rekursjon"></div>
 
       <h3>Kallstakk – fakultet n!</h3>
       <p class="muted small">På vei <b>ned</b> legger hvert kall seg oppå stakken og venter med et uferdig regnestykke
@@ -204,11 +299,24 @@
         <div><div id="rk-pseudo"></div></div>
       </div>
 
+      <h3>Forklaring</h3>
+      <div id="ex-rekursjon"></div>
+      <p><b>Rekursjon på binærtrær.</b> I treoppgavene er basistilfellet som regel at noden er null (et tomt tre).
+        Det rekursive steget kaller prosedyren på venstre og høyre barn. Det gir <i>ikke</i> eksponentiell kjøretid:
+        hver node besøkes én gang, så med konstant arbeid per node blir det O(n) for et tre med n noder.</p>
+
+      <div class="husk"><h4>Huskeregler</h4><ul>
+        <li>Skriv basistilfellet først. Hvert kall må gjøre problemet mindre.</li>
+        <li>Kjøretid = antall kall · arbeid per kall.</li>
+      </ul></div>
+
+      <details class="fordyp"><summary>Rekurrensligninger <span class="tag merke fordyp">Fordypning, ikke nødvendig til eksamen</span></summary>
       <div class="callout uni"><span class="lbl">Universitetsnivå</span>
         Noen ganger ser du en formel som <span class="mono">T(n) = 2·T(n/2) + n</span>: del i to, og gjør O(n) arbeid for å
         sette sammen. Du trenger ikke løse slike ligninger på eksamen. Les den som en kortversjon av det du ser i
         rekursjonstreet: <span class="mono">log n</span> nivåer, og hvert nivå gjør til sammen n arbeid. Det gir
         <span class="mono">O(n log n)</span>, og det er mønsteret bak merge sort.</div>
+      </details>
     </section>
 
     <!-- ORDLISTE: bygges fra IN.BEGREPER og IN.SYMBOLER (begrep-tips.js), samme kilde som tipsene -->
@@ -222,6 +330,13 @@
     <!-- SANT/USANT -->
     <section data-panel="test">
       <h3>Test deg selv – begreper</h3>
+      <div class="callout eks-spor"><span class="lbl">Hva eksamen spør om</span>
+        <p><span class="tag merke kjerne">kommer ofte</span> Sant/usant-påstander står på hver eksamen fra H2021, og fra H2023 er hele del 1 sant/usant.</p>
+        <ul>
+          <li><b>H2022 2</b> (10p): «Litt av hvert», ti påstander, flere av dem om kjøretidskompleksitet (se fanen Kjøretid &amp; stor O).</li>
+          <li>Påstandene fra H2023, H2024 og H2025 er ikke kjent.</li>
+        </ul>
+      </div>
       <p class="muted small">Disse påstandene er ikke hentet ordrett fra eksamen. De er laget ut fra hva eksamenene og
         sensorveiledningene H2020–H2025 tester igjen og igjen, så du kan sjekke at du kan det sensor ser etter.
         De oftest testede står først.</p>
@@ -232,18 +347,18 @@
 
   <footer class="footer">IN2010-guide · Blokk 0 · Begreper</footer>
 
-  <script src="assets/js/core.js?v=20261127f"></script>
-<script src="assets/js/eksamensvekt.js?v=20261127f"></script>
-  <script src="assets/js/symboler.js?v=20261127f"></script>
-  <script src="assets/js/begreper-data.js?v=20261127f"></script>
-  <script src="assets/js/begrep-tips.js?v=20261127f"></script>
-  <script src="assets/js/data-tf.js?v=20261127f"></script>
-  <script src="assets/js/pseudocode.js?v=20261127f"></script>
-  <script src="assets/js/stepplayer.js?v=20261127f"></script>
-  <script src="assets/js/varline.js?v=20261127f"></script>
-  <script src="assets/js/viz-bars.js?v=20261127f"></script>
-  <script src="assets/js/perfekt/begreper.js?v=20261127f"></script>
-  <script src="assets/js/kort/begreper.js?v=20261127f"></script>
+  <script src="assets/js/core.js?v=20261127g"></script>
+<script src="assets/js/eksamensvekt.js?v=20261127g"></script>
+  <script src="assets/js/symboler.js?v=20261127g"></script>
+  <script src="assets/js/begreper-data.js?v=20261127g"></script>
+  <script src="assets/js/begrep-tips.js?v=20261127g"></script>
+  <script src="assets/js/data-tf.js?v=20261127g"></script>
+  <script src="assets/js/pseudocode.js?v=20261127g"></script>
+  <script src="assets/js/stepplayer.js?v=20261127g"></script>
+  <script src="assets/js/varline.js?v=20261127g"></script>
+  <script src="assets/js/viz-bars.js?v=20261127g"></script>
+  <script src="assets/js/perfekt/begreper.js?v=20261127g"></script>
+  <script src="assets/js/kort/begreper.js?v=20261127g"></script>
   <script>
   (function () {
     var IN = window.IN, el = IN.el, qs = IN.qs;
@@ -276,7 +391,7 @@
     }, { label: "Nivå:" });
 
     IN.explain("#ex-rekursjon", {
-      eli5: "<p>Når du har kommet inn til den minste dukken, er du ikke ferdig: nå setter du dukkene sammen igjen. Den siste du åpnet, lukker du først. Datamaskinen gjør det samme med kallene. Hvert kall venter på at kallet inni blir ferdig, og så blir det selv ferdig. Det er det du ser i demoen under: kallene stables opp, og så «foldes» de tilbake ett og ett.</p>",
+      eli5: "<p>Når du har kommet inn til den minste dukken, er du ikke ferdig: nå setter du dukkene sammen igjen. Den siste du åpnet, lukker du først. Datamaskinen gjør det samme med kallene. Hvert kall venter på at kallet inni blir ferdig, og så blir det selv ferdig. Det er det du ser i demoen over: kallene stables opp, og så «foldes» de tilbake ett og ett.</p>",
       normal: "<p>En rekursiv funksjon løser et problem ved å kalle seg selv på en mindre del, og kombinere svarene. Den må ha et basistilfelle for å stoppe. Hvert kall legges på <b>kallstakken</b> og venter der til kallet over det har svart; da regner det seg ferdig og fjernes fra toppen.</p>",
       teknisk: "<p>Hvert kall løser en mindre utgave av samme problem og har sine egne lokale variabler. For å finne kjøretiden teller vi kall og arbeid per kall: fakultet gjør n kall med O(1) arbeid hver, altså O(n).</p>"
     }, { label: "Nivå:" });

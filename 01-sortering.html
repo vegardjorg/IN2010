@@ -7,9 +7,9 @@
   <title>Blokk 1 · Sortering · IN2010</title>
   <meta name="description" content="Sorteringsalgoritmer i IN2010: selection, bubble, insertion, gnome, merge, quick, bøtte, radix og heapsort – med stegvise demoer og kjøretid i stor O.">
   <script>(function(){try{var d=document.documentElement;var t=localStorage.getItem('in-theme');if(t!=='dark'&&t!=='system')t='light';if(t!=='system')d.setAttribute('data-theme',t);var l=localStorage.getItem('in-level');if(l!=='eli5'&&l!=='teknisk')l='normal';d.setAttribute('data-level',l);}catch(e){document.documentElement.setAttribute('data-theme','light');document.documentElement.setAttribute('data-level','normal');}})();</script>
-  <link rel="stylesheet" href="assets/css/styles.css?v=20261127f">
-  <link rel="stylesheet" href="assets/css/dra.css?v=20261127f">
-  <link rel="stylesheet" href="assets/css/begrep-tips.css?v=20261127f">
+  <link rel="stylesheet" href="assets/css/styles.css?v=20261127g">
+  <link rel="stylesheet" href="assets/css/dra.css?v=20261127g">
+  <link rel="stylesheet" href="assets/css/begrep-tips.css?v=20261127g">
 </head>
 <body data-page="sortering">
   <a class="skip-link" href="#main">Hopp til innhold</a>
@@ -21,10 +21,6 @@
       <p class="lead">Ni sorteringsalgoritmer – fra de enkle kvadratiske, via de lineæritmiske, til bøtte og
         radix, som slipper unna O(n log n) ved aldri å sammenligne.
         Gå gjennom hver av dem steg for steg, se pseudokoden lyse opp, og lær kjøretiden og hvorfor.</p>
-      <div class="badges">
-        <span class="badge" data-go="gnome"><b>H2023</b> · Gnome sort · <span class="pts">10p</span></span>
-        <span class="badge" data-go="bucket"><b>H2024</b> · Etymologisk ordliste (bøttesortering) · <span class="pts">10p</span></span>
-      </div>
     </div>
 
     <div class="tabs" role="tablist" aria-label="Sorteringsalgoritmer">
@@ -41,9 +37,34 @@
       <button data-tab="test">Sant/usant</button>
     </div>
 
+    <div class="pagehead-info">
+      <div class="badges">
+        <span class="badge" data-go="gnome"><b>H2023</b> · Gnome sort · <span class="pts">10p</span></span>
+        <span class="badge" data-go="bucket"><b>H2024</b> · Etymologisk ordliste (bøttesortering) · <span class="pts">10p</span></span>
+      </div>
+    </div>
+
     <!-- OVERSIKT -->
     <section data-panel="oversikt">
-      <h3>Hvorfor sortere?</h3>
+      <h3>Oversikt over sorteringene</h3>
+      <div class="callout eks-spor"><span class="lbl">Hva eksamen spør om</span>
+        <p><span class="tag merke kjerne">kommer ofte</span> Flere eksamensoppgaver handler egentlig om å
+          <b>velge riktig sortering</b>: hva den koster, og om den kan brukes på dataene. Spurt H2020, H2021, H2023 og H2025.</p>
+        <ul>
+          <li><b>H2020 5</b> (12p, Søk/Intersection): lønner det seg å sortere én gang før mange søk? –
+            <a href="02-sok.html#fane=sortersok">Søk → Sorter én gang</a></li>
+          <li><b>H2021 10</b> (10p, finn par som summerer til x): radix sort gir O(n) og full pott; merge sort gir
+            O(n log n) og noe trekk. – <a href="02-sok.html#fane=triks">Søk → Array-triks</a></li>
+          <li><b>H2023 3</b> (12p, finn duplikat): elementene kan bare sammenlignes, så bøtte og radix er utelukket –
+            merge sort eller heapsort. – <a href="02-sok.html#fane=duplikat">Søk → Finn duplikat</a></li>
+          <li><b>H2025 6</b> (12p, finn k minste): k runder av selection sort (O(k·n)), sorter alt (O(n log n)),
+            eller bruk en heap. – <a href="02-sok.html#fane=kminste">Søk → Finn k minste</a></li>
+        </ul>
+        <p>Selve algoritmene spørres i fanene: bøttesortering (H2020 7d, H2021 2, H2024 3), gnome sort (H2023 4)
+          og sant/usant om bubble, selection og insertion (H2021 3).</p>
+      </div>
+
+      <h4 class="del">1. Hvorfor sortere?</h4>
       <div id="ex-hvorfor"></div>
       <div class="grid cols-3">
         <div class="card"><h4 style="margin-top:.2rem">1 · Samle like</h4>
@@ -54,14 +75,22 @@
           <p class="muted small">Binærsøk O(log n) forutsetter at dataene er sortert først.</p></div>
       </div>
 
-      <h3>Kart over blokka</h3>
+      <h4 class="del">2. Kart over blokka</h4>
       <p>Vi går fra de enkleste sorteringene til de raskeste. Først fire enkle som bytter naboer eller finner
         det minste (selection, bubble, insertion og gnome). De er lette å forstå, men trege på store lister. Så to
         som deler lista i to (merge og quick). Så to som ikke sammenligner elementene i det hele tatt (bøtte og
         radix). Til slutt heapsort, som bruker en heap. Tabellen under er et oppslagsverk: skum den nå, og kom
         tilbake til den når du har sett algoritmene i fanene.</p>
 
-      <h3>Sammenlign algoritmene</h3>
+      <h4 class="del">3. Sammenlign algoritmene <span class="tag merke kjerne">kommer ofte</span></h4>
+      <div class="callout begrep"><span class="lbl">Begreper</span>
+        <ul>
+          <li><b>Best, snitt og verst:</b> kjøretiden for den gunstigste inputen, i gjennomsnitt, og for den mest
+            ugunstige. Står det bare «kjøretid» i en oppgave, er det som regel verste tilfelle som menes.</li>
+          <li><b>Stabil:</b> like elementer beholder rekkefølgen de hadde i input. Det handler om rekkefølge, ikke om tid.</li>
+          <li><b>In-place:</b> sorterer i selve arrayet, uten en ekstra datastruktur (hjelpearray, bøtter) å
+            mellomlagre elementene i. In-place betyr ikke «ingen bytter», og stabil og in-place er to uavhengige egenskaper.</li>
+        </ul></div>
       <p class="muted small">Alle tider er O(…). Hold musa over – eller trykk på – en overskrift eller celle for å se <i>hvorfor</i>.</p>
       <div class="table-wrap">
         <table class="cmp-table">
@@ -130,37 +159,35 @@
         </table>
       </div>
 
-      <div class="callout snarvei"><span class="lbl">Snarvei på eksamen</span>
-        Trenger du garantert O(n log n)? Velg <b>merge</b> (stabil, men ikke in-place) eller <b>heapsort</b>
-        (in-place, men ustabil). <b>Ikke</b> quicksort når oppgaven krever O(n log n) i verste fall –
-        quicksort er O(n²) ved uheldig pivot.</div>
-
-      <div class="callout eksempel"><span class="lbl">Eksamen H2025 · Finn k minste (12p)</span>
-        Finn de k minste elementene på tre måter: k runder av selection sort (O(k·n)), sorter alt
-        (O(n log n)), eller bruk en heap. Oppgaven er gjennomgått i
-        <a href="02-sok.html#fane=kminste">Søk → Finn k minste</a>.</div>
-
-      <div class="callout sensor"><span class="lbl">Eksamen: velg riktig sortering</span>
-        Flere eksamensoppgaver handler egentlig om å velge sorteringsalgoritme:
-        <ul>
-          <li><b>H2020 · Søk (Intersection)</b>, 12p: lønner det seg å sortere én gang før mange søk? –
-            <a href="02-sok.html#fane=sortersok">Søk → Sorter én gang</a></li>
-          <li><b>H2021 · Finn par som summerer til x</b>, 10p: radix sort gir O(n) og full pott; merge sort gir O(n log n) og
-            noe trekk. – <a href="02-sok.html#fane=triks">Søk → Array-triks</a></li>
-          <li><b>H2023 · Finn duplikat</b>: elementene kan bare sammenlignes, så bøtte og radix er utelukket –
-            merge sort eller heapsort. – <a href="02-sok.html#fane=duplikat">Søk → Finn duplikat</a></li>
-        </ul></div>
-
       <div class="callout uni"><span class="lbl">Universitetsnivå</span>
         O-notasjon skjuler konstanter. Alle de fire kvadratiske er O(n²), men gjør ulikt <i>antall</i>
         operasjoner: selection gjør færrest <b>bytter</b> (høyst n − 1), mens gnome gjør omtrent dobbelt så mange
         <b>sammenligninger</b> som insertion. «Lavere kjøretid» på eksamen betyr lavere O-klasse, ikke
         nødvendigvis færre bytter.</div>
+
+      <div class="callout snarvei"><span class="lbl">Snarvei på eksamen</span>
+        Trenger du garantert O(n log n)? Velg <b>merge</b> (stabil, men ikke in-place) eller <b>heapsort</b>
+        (in-place, men ustabil). <b>Ikke</b> quicksort når oppgaven krever O(n log n) i verste fall –
+        quicksort er O(n²) ved uheldig pivot.</div>
+
+      <div class="husk"><h4>Huskeregler</h4><ul>
+        <li>Ustabile: selection, quick og heapsort. De andre seks er stabile.</li>
+        <li>Ikke in-place: merge, bøtte og radix (hjelpearray eller bøtter).</li>
+        <li>Garantert O(n log n): merge og heapsort. Bedre enn O(n log n) i verste fall: bare bøtte og radix, som aldri sammenligner.</li>
+      </ul></div>
     </section>
 
     <!-- SELECTION -->
     <section data-panel="selection">
       <h3>Selection sort</h3>
+      <div class="callout eks-spor"><span class="lbl">Hva eksamen spør om</span>
+        <p><span class="tag merke kjerne">kommer ofte</span> Spurt H2021 og H2025.</p>
+        <ul>
+          <li><b>H2021 3</b> (e)–(h), sant/usant: hva er sortert etter i runder, bytter den bare naboer, og gjør den
+            færrest bytter? – <a href="#fane=test">Sant/usant-fanen</a></li>
+          <li><b>H2025 6a</b> (12p til sammen): finn de k minste med k runder av selection sort, O(k·n). –
+            <a href="02-sok.html#fane=kminste">Søk → Finn k minste</a></li>
+        </ul></div>
       <div id="intro-selection"></div>
       <div class="callout eli5"><span class="lbl">5-åring: let etter det minste kortet</span>
         Du har en haug med kort på bordet. Du leter gjennom hele haugen etter det minste og legger det først i
@@ -173,20 +200,31 @@
       <div class="callout eksempel"><span class="lbl">Legg merke til</span>
         Selection gjør høyst <b>ett bytte per runde</b> – høyst n − 1 bytter totalt. Men den må alltid
         skanne hele resten for å finne minste, så den gjør O(n²) <b>sammenligninger</b> uansett. Derfor er
-        «færrest bytter» ikke det samme som «raskest».</div>
+        «færrest bytter» ikke det samme som «raskest». Etter runde i står de i minste forrest, på endelig plass;
+        bakerst ligger resten fortsatt usortert.</div>
+      <h4>Koden, linje for linje</h4>
+      <div id="exp-selection"></div>
       <div class="callout felle"><span class="lbl">Felle: hvorfor er selection ustabil, mens bubble og insertion er stabile?</span>
         Selection sort bytter det minste elementet med det som står først i resten, og det byttet kan hoppe langt
         forbi et likt element. Eksempel: [2a, 2b, 1] blir [1, 2b, 2a]. Bubble og insertion flytter bare forbi
         naboer, og bare når de står strengt feil (<code>&gt;</code>). To like elementer bytter derfor aldri plass.</div>
+      <div class="husk"><h4>Huskeregler</h4><ul>
+        <li>Sortert del vokser <b>forfra</b>: de i første er ferdige etter i runder.</li>
+        <li>Høyst n − 1 bytter, men alltid O(n²) sammenligninger.</li>
+      </ul></div>
       <h4>Sjekk deg selv</h4>
       <div id="quiz-selection"></div>
-      <h4>Koden, linje for linje</h4>
-      <div id="exp-selection"></div>
     </section>
 
     <!-- BUBBLE -->
     <section data-panel="bubble">
       <h3>Bubble sort</h3>
+      <div class="callout eks-spor"><span class="lbl">Hva eksamen spør om</span>
+        <p><span class="tag merke eksbas">eksamensbasert</span> Spurt H2021.</p>
+        <ul>
+          <li><b>H2021 3</b> (a)–(d), sant/usant: er de i første eller de i siste sortert etter i runder, bytter den
+            bare naboer, og gjør den færrest bytter? – <a href="#fane=test">Sant/usant-fanen</a></li>
+        </ul></div>
       <div id="intro-bubble"></div>
       <div class="callout eli5"><span class="lbl">5-åring: bobler i brus</span>
         Tenk på bobler i et glass brus: den største stiger til toppen først. Vi sammenligner to naboer om gangen og
@@ -202,15 +240,27 @@
         (for eksempel med et flagg), blir beste tilfelle O(n). Det trikset passer for bubble fordi én runde
         sammenligner alle nabopar: ingen bytter betyr da at alt er sortert. Selection sammenligner ikke
         nabopar, så der betyr «ingen bytte» ikke «ferdig».</div>
-      <h4>Sjekk deg selv</h4>
-      <div id="quiz-bubble"></div>
       <h4>Koden, linje for linje</h4>
       <div id="exp-bubble"></div>
+      <div class="husk"><h4>Huskeregler</h4><ul>
+        <li>Sortert del vokser <b>bakfra</b>: de i siste er ferdige etter i runder.</li>
+        <li>Bytter bare naboer, og bare ved streng <code>&gt;</code>: stabil. Ett bytte per inversjon, så ikke færrest bytter.</li>
+      </ul></div>
+      <h4>Sjekk deg selv</h4>
+      <div id="quiz-bubble"></div>
     </section>
 
     <!-- INSERTION -->
     <section data-panel="insertion">
       <h3>Insertion sort</h3>
+      <div class="callout eks-spor"><span class="lbl">Hva eksamen spør om</span>
+        <p><span class="tag merke kjerne">kommer ofte</span> Spurt H2021 og H2023.</p>
+        <ul>
+          <li><b>H2021 3</b> (i)–(l), sant/usant: hva er sortert etter i runder, bytter den bare naboer, og gjør den
+            færrest bytter? – <a href="#fane=test">Sant/usant-fanen</a></li>
+          <li><b>H2023 4</b> (10p, gnome sort): full uttelling krever at du ser at gnome er nær i slekt med
+            insertion sort. – <a href="#fane=gnome">Gnome-fanen</a></li>
+        </ul></div>
       <div id="intro-insertion"></div>
       <div class="callout eli5"><span class="lbl">5-åring: kort på hånda</span>
         Slik sorterer de fleste kort på hånda. Du tar opp ett nytt kort og bytter det med kortet til venstre så
@@ -221,23 +271,36 @@
       </div>
       <div class="callout eksempel"><span class="lbl">Best på nesten-sorterte data</span>
         Antall bytter = antall <b>inversjoner</b> i arrayet. Er data nesten sortert, er det nesten
-        ingen inversjoner → nesten O(n). Insertion er derfor et godt valg når data allerede er nesten sortert.</div>
+        ingen inversjoner → nesten O(n). Insertion er derfor et godt valg når data allerede er nesten sortert.
+        Er arrayet helt sortert, blir hvert nytt element stående etter én sammenligning: O(n).</div>
+      <div class="callout eksempel"><span class="lbl">Sortert seg imellom, ikke ferdig</span>
+        Etter i runder er de første elementene sortert <i>seg imellom</i> (den stripete fargen i demoen), men de står
+        ikke på endelig plass: et senere, mindre element kan fortsatt byttes inn foran dem. Bakerst har insertion
+        sort ikke rørt noe ennå.</div>
+      <h4>Koden, linje for linje</h4>
+      <div id="exp-insertion"></div>
+      <div class="husk"><h4>Huskeregler</h4><ul>
+        <li>Antall bytter = antall inversjoner. Sortert input: O(n). Omvendt sortert: O(n²).</li>
+        <li>Venstre del er sortert seg imellom, men ikke ferdig før til slutt.</li>
+      </ul></div>
       <h4>Sjekk deg selv</h4>
       <div id="quiz-insertion"></div>
       <h4>Øv selv: sett linjene i riktig rekkefølge</h4>
       <div id="parsons-insertion"></div>
-      <h4>Koden, linje for linje</h4>
-      <div id="exp-insertion"></div>
     </section>
 
     <!-- GNOME (H2023) -->
     <section data-panel="gnome">
       <h3>Gnome sort <span class="tag">H2023 · 10p</span></h3>
-      <div class="callout sensor exam-jump ikke-pensum"><span class="lbl"><span class="tag merke ikke-pensum">Ikke pensum</span> <span class="tag merke eksbas">eksamensbasert</span></span>
-        Gnome sort står <b>ikke</b> i forelesningene. Den finnes bare i <b>H2023 4</b> (10p), der du
-        får en ukjent algoritme og skal drøfte den opp mot pensumalgoritmene. Du trenger ikke kunne den utenat:
-        det som gir poeng, er å kjenne den igjen som en slektning av insertion sort.
-        <a href="#fane=gnome&amp;oppg=H2023-4">Gå til oppgaven (H2023 4) →</a></div>
+      <div class="callout eks-spor exam-jump"><span class="lbl">Hva eksamen spør om</span>
+        <p><span class="tag merke eksbas">eksamensbasert</span> <span class="tag merke ikke-pensum">Ikke pensum</span>
+          Spurt H2023. Gnome sort står <b>ikke</b> i forelesningene.</p>
+        <ul>
+          <li><b>H2023 4</b> (10p): du får en ukjent algoritme og skal drøfte den opp mot pensumalgoritmene –
+            virkemåte, kjøretid, sammenligning og stabil/in-place. Du trenger ikke kunne den utenat: det som gir
+            poeng, er å kjenne den igjen som en slektning av insertion sort.
+            <a href="#fane=gnome&amp;oppg=H2023-4">Gå til oppgaven (H2023 4) →</a></li>
+        </ul></div>
       <div id="intro-gnome"></div>
       <div class="callout eli5"><span class="lbl">5-åring: nissen og blomsterpottene</span>
         En hagenisse går langs en rad blomsterpotter. Han ser på potten han står ved og potten rett bak. Står de
@@ -264,23 +327,36 @@
           <li><b>Egenskaper:</b> stabil (streng <code>&gt;</code>) og in-place (ingen ekstra datastruktur).</li>
         </ul></div>
 
+      <h4>Koden, linje for linje</h4>
+      <div id="exp-gnome"></div>
+
       <div class="callout felle"><span class="lbl">Vanlig felle</span>
         Å si at gnome er «raskere enn insertion fordi koden er kortere». Kortere kode ≠ færre operasjoner.
         Gnome gjør omtrent dobbelt så mange sammenligninger – samme O-klasse, men ikke raskere.</div>
 
-      <h4>Sjekk deg selv</h4>
-      <div id="quiz-gnome"></div>
-
-      <h4>Koden, linje for linje</h4>
-      <div id="exp-gnome"></div>
+      <div class="husk"><h4>Huskeregler</h4><ul>
+        <li>Gnome = insertion sort med bare én indeks: samme bytter, omtrent dobbelt så mange sammenligninger.</li>
+        <li>Best O(n), verst O(n²). Stabil og in-place.</li>
+      </ul></div>
 
       <h4 id="eksamen-gnome" class="exam-anchor">Eksamensoppgaver</h4>
       <div id="exam-gnome"></div>
+
+      <h4>Sjekk deg selv</h4>
+      <div id="quiz-gnome"></div>
     </section>
 
     <!-- MERGE -->
     <section data-panel="merge">
       <h3>Merge sort</h3>
+      <div class="callout eks-spor"><span class="lbl">Hva eksamen spør om</span>
+        <p><span class="tag merke kjerne">kommer ofte</span> Aldri en egen oppgave om flettingen, men brukt som det
+          trygge O(n log n)-valget i H2021, H2022, H2023 og H2025.</p>
+        <ul>
+          <li><b>H2022 2c</b>, sant/usant: «Kjøretidskompleksitet til Mergesort er O(n · log(n)).» (Sant.)</li>
+          <li><b>H2021 10b</b>, <b>H2023 3</b> og <b>H2025 6b</b>: sorter først med merge sort (O(n log n)), og løs
+            resten på sortert data. – <a href="02-sok.html#fane=duplikat">Søk → Finn duplikat</a></li>
+        </ul></div>
       <div id="intro-merge"></div>
       <div class="callout eli5"><span class="lbl">5-åring: del bunken med venner</span>
         Du skal sortere en stor bunke prøver etter poengsum. Del bunken i to og gi hver halvdel til en venn, som
@@ -297,25 +373,37 @@
         Demoen viser hvordan de to sorterte halvdelene A1 og A2 flettes tilbake i A. Neste ledige plass er
         alltid <code>A[i + j]</code>, fordi i + j elementer er skrevet. Tar vi fra venstre ved likhet
         (<code>≤</code>), blir sorteringen <b>stabil</b>. Halvdelene lages som nye arrayer, en ekstra
-        datastruktur, så merge sort er ikke in-place.</div>
+        datastruktur, så merge sort er ikke in-place. Halveringen gir omtrent log n nivåer uansett input, og på
+        hvert nivå fletter vi alle n elementene til sammen: O(n log n) også i verste tilfelle.</div>
       <div class="callout eksempel"><span class="lbl">Venstre halvdel er den minste</span>
         Kurset deler med <code>i ← ⌊n/2⌋</code> og tar <code>A[0..i − 1]</code> til venstre. Med n = 5 får
         venstre 2 elementer og høyre 3. Skal du tegne delingen på eksamen, del på samme måte.</div>
       <div class="callout uni"><span class="lbl">Fra ukesoppgavene: lenkede lister</span>
         Av merge, quick og heapsort er det merge sort som passer best på <b>lenkede lister</b>: den trenger
         ikke oppslag på indeks, og kan flette ved å flytte pekere.</div>
-      <h4>Sjekk deg selv</h4>
-      <div id="quiz-merge"></div>
       <h4>Koden, linje for linje</h4>
       <h5 class="muted">MergeSort (rekursiv hovedprosedyre)</h5>
       <div id="exp-merge"></div>
       <h5 class="muted" style="margin-top:1rem">Merge (selve flettingen)</h5>
       <div id="exp-merge2"></div>
+      <div class="husk"><h4>Huskeregler</h4><ul>
+        <li>O(n log n) i alle tilfeller: log n nivåer, O(n) fletting per nivå.</li>
+        <li>Stabil (ta fra venstre ved likhet, <code>≤</code>), men ikke in-place (A1 og A2).</li>
+      </ul></div>
+      <h4>Sjekk deg selv</h4>
+      <div id="quiz-merge"></div>
     </section>
 
     <!-- QUICK -->
     <section data-panel="quick">
       <h3>Quicksort</h3>
+      <div class="callout eks-spor"><span class="lbl">Hva eksamen spør om</span>
+        <p><span class="tag merke kjerne">kommer ofte</span> Aldri en egen oppgave om partisjoneringen, men
+          verste tilfelle O(n²) teller når du velger sortering. Spurt H2023 og H2025.</p>
+        <ul>
+          <li><b>H2023 3</b> (12p, finn duplikat): quicksort godtas, men du bør nevne at den er kvadratisk i verste tilfelle.</li>
+          <li><b>H2025 6b</b> (finn k minste ved å sortere): quicksort gir inntil 3 av 4 poeng, en O(n log n)-sortering 4.</li>
+        </ul></div>
       <div id="intro-quick"></div>
       <div class="callout eli5"><span class="lbl">5-åring: still deg rundt pivoten</span>
         Klassen skal stille seg etter høyde. Velg én elev som «pivot». Alle som er lavere, stiller seg til venstre,
@@ -333,10 +421,6 @@
         pivoten, <b>right</b> leter fra høyre etter et som er mindre. Står begge feil, bytter de plass. Når
         pekerne krysser, flyttes pivoten inn på plass <b>left</b> – da står den helt riktig (grønn), og vi
         sorterer hver side rekursivt.</div>
-      <div class="callout uni"><span class="lbl">Valg av pivot</span>
-        Kurset lar <code>ChoosePivot</code> velge <b>tilfeldig</b> eller ta <b>median-av-tre</b> (medianen av
-        første, midterste og siste element). Demoen tar bare siste element, så du kan se hva som går galt
-        når pivoten er dårlig.</div>
       <div class="callout eksempel"><span class="lbl">Verste tilfelle</span>
         Prøv «Sortert (verst)»: med siste element som pivot er pivoten alltid størst, partisjonen blir
         maksimalt skjev, og rekursjonstreet får høyde n − 1 → <b>O(n²)</b>. Quicksort er likevel ofte et
@@ -344,26 +428,42 @@
         nevne at den strengt tatt er kvadratisk i verste tilfelle. I H2025 6b gir den inntil 3 av 4
         poeng, mot 4 for en O(n log n)-sortering. Krever oppgaven O(n log n) i verste fall, er merge sort
         eller heapsort det trygge valget.</div>
-      <h4>Sjekk deg selv</h4>
-      <div id="quiz-quick"></div>
+      <div class="callout uni"><span class="lbl">Valg av pivot</span>
+        Kurset lar <code>ChoosePivot</code> velge <b>tilfeldig</b> eller ta <b>median-av-tre</b> (medianen av
+        første, midterste og siste element). Demoen tar bare siste element, så du kan se hva som går galt
+        når pivoten er dårlig. Heller ikke tilfeldig pivot <i>garanterer</i> O(n log n): uheldige valg kan
+        fortsatt gi O(n²), men det er svært lite sannsynlig.</div>
       <h4>Koden, linje for linje</h4>
       <h5 class="muted">Quicksort (rekursiv hovedprosedyre)</h5>
       <div id="exp-quick"></div>
       <h5 class="muted" style="margin-top:1rem">Partition (to pekere mot hverandre)</h5>
       <div id="exp-quick2"></div>
+      <div class="husk"><h4>Huskeregler</h4><ul>
+        <li>Snitt O(n log n), verst O(n²) (pivot stadig minst eller størst).</li>
+        <li>In-place, men ustabil. Etter Partition står pivoten på endelig plass.</li>
+      </ul></div>
+      <h4>Sjekk deg selv</h4>
+      <div id="quiz-quick"></div>
     </section>
 
     <!-- BØTTE (H2024) -->
     <section data-panel="bucket">
       <h3>Bøttesortering <span class="tag">H2024 · 10p</span></h3>
+      <div class="callout eks-spor exam-jump"><span class="lbl">Hva eksamen spør om</span>
+        <p><span class="tag merke kjerne">kommer ofte</span> Spurt H2020, H2021 og H2024 – hver gang som en
+          tilpasset bøttesortering der nøklene er få kategorier eller små heltall.</p>
+        <ul>
+          <li><b>H2024 3</b> (10p): sorter en alfabetisk ordliste stabilt etter kategori uten å kalle en
+            sorteringsalgoritme, og binærsøk så innenfor kategorien.</li>
+          <li><b>H2020 7d</b> (6p): sorter ord etter lengde, med ord av samme lengde fortsatt alfabetisk.</li>
+          <li><b>H2021 2</b> (3p): var sorteringen stabil, og hvilken sortering bør brukes når alder er 0–100?</li>
+        </ul>
+        <p><a href="#eksamen-bucket" data-jump="eksamen-bucket">Til oppgavene ↓</a></p></div>
       <div id="intro-bucket"></div>
       <div class="callout eli5"><span class="lbl">5-åring: én kurv per farge</span>
         Du skal sortere sokker etter farge, og du vet på forhånd hvilke farger som finnes. Da setter du fram én kurv
         per farge og legger hver sokk rett i sin kurv. Du sammenligner aldri to sokker med hverandre. Til slutt
         tømmer du kurvene i fast rekkefølge: først den hvite, så den røde, så den blå.</div>
-      <div class="callout sensor exam-jump"><span class="lbl">Eksamen</span>
-        <b>H2024 3</b> (10p), <b>H2021 2</b> (3p) og <b>H2020 7d</b> (6p).
-        <a href="#eksamen-bucket" data-jump="eksamen-bucket">Til oppgavene ↓</a></div>
       <div class="grid cols-2 demo-wide">
         <div><div id="tracer-bucket"></div>
           <p class="muted small">Nøklene er heltall 0–9. Like tall får en bokstav (a, b, …), så du ser at de
@@ -386,24 +486,38 @@
         at nøklene må være små heltall eller kategorier: er N konstant, blir det O(n), men er N mye større enn n,
         er det N-leddet som koster.</div>
 
+      <h4>Koden, linje for linje</h4>
+      <div id="exp-bucket"></div>
+
       <div class="callout felle"><span class="lbl">Vanlig felle</span>
         Å svare med en sammenligningsbasert sortering (merge, quick …) når nøklene er få kategorier. Det gir
         O(n log n), og koster poeng når O(n) var mulig. Og: legger du forrest i bøtta, ryker stabiliteten – og
         med den rekkefølgen innen hver kategori.</div>
 
-      <h4>Sjekk deg selv</h4>
-      <div id="quiz-bucket"></div>
-
-      <h4>Koden, linje for linje</h4>
-      <div id="exp-bucket"></div>
+      <div class="husk"><h4>Huskeregler</h4><ul>
+        <li>Fordel bakerst, samle forfra: stabil. O(N + n), og O(n) når N er en konstant.</li>
+        <li>Få kategorier eller små heltall som nøkler? Tenk bøttesortering før merge sort.</li>
+      </ul></div>
 
       <h4 id="eksamen-bucket" class="exam-anchor">Eksamensoppgaver</h4>
       <div id="exam-bucket"></div>
+
+      <h4>Sjekk deg selv</h4>
+      <div id="quiz-bucket"></div>
     </section>
 
     <!-- RADIX -->
     <section data-panel="radix">
       <h3>Radix sort</h3>
+      <div class="callout eks-spor"><span class="lbl">Hva eksamen spør om</span>
+        <p><span class="tag merke kjerne">kommer ofte</span> Aldri en egen oppgave, men du må vite når radix kan
+          brukes. Spurt H2021 og H2023.</p>
+        <ul>
+          <li><b>H2021 10b</b> (finn par som summerer til x): sorter heltallene med radix sort først, O(n), og få full pott.
+            – <a href="02-sok.html#fane=triks">Søk → Array-triks</a></li>
+          <li><b>H2023 3</b> (12p, finn duplikat): radix og bøtte kan <i>ikke</i> brukes når alt vi vet, er at
+            elementene kan sammenlignes. – <a href="02-sok.html#fane=duplikat">Søk → Finn duplikat</a></li>
+        </ul></div>
       <div id="intro-radix"></div>
       <div class="callout eli5"><span class="lbl">5-åring: ett siffer om gangen</span>
         Sorter tallene etter siste siffer først, så etter nest siste, og så videre. Hver gang bruker du ti bøtter,
@@ -423,20 +537,33 @@
         Kjøretiden er <span class="mono">O(d·(N + n))</span>: d siffer, N mulige sifferverdier (10 i
         titallsystemet), n tall. Er d og N små og faste, blir det O(n) – bedre enn O(n log n). Har tallene
         svært mange siffer, kan d-faktoren spise opp gevinsten.</div>
+
+      <h4>Koden, linje for linje</h4>
+      <div id="exp-radix"></div>
+
       <div class="callout felle"><span class="lbl">Vanlig felle</span>
         Å bruke en ustabil sortering i hver runde. Da kan en runde stokke om tall med likt siffer, og
         arbeidet fra de forrige rundene går tapt. Radix trenger en <b>stabil</b> bøttesortering per siffer.</div>
 
+      <div class="husk"><h4>Huskeregler</h4><ul>
+        <li>Enerplassen først, viktigste siffer sist. Hver runde må være stabil.</li>
+        <li>O(d·(N + n)): O(n) når d og N er faste. Krever nøkler som kan deles i siffer; det holder ikke at de kan sammenlignes.</li>
+      </ul></div>
+
       <h4>Sjekk deg selv</h4>
       <div id="quiz-radix"></div>
-
-      <h4>Koden, linje for linje</h4>
-      <div id="exp-radix"></div>
     </section>
 
     <!-- HEAPSORT -->
     <section data-panel="heap">
       <h3>Heapsort</h3>
+      <div class="callout eks-spor"><span class="lbl">Hva eksamen spør om</span>
+        <p><span class="tag merke eksbas">eksamensbasert</span> Spurt H2023. Selve heapen spørres ofte, men på
+          <a href="03-heap.html">Heap-siden</a>.</p>
+        <ul>
+          <li><b>H2023 3</b> (12p, finn duplikat): heapsort (eller merge sort) er et godt valg når elementene bare kan
+            sammenlignes og du vil ha O(n log n). – <a href="02-sok.html#fane=duplikat">Søk → Finn duplikat</a></li>
+        </ul></div>
       <p class="muted small">Bygger på <a href="03-heap.html#fane=hva">Blokk 3 · Heap</a> (fanene «Hva er en heap?»,
         «RemoveMin» og «BuildHeap»). Har du ikke sett heapen før, les dem først.</p>
       <div id="intro-heapsort"></div>
@@ -447,7 +574,9 @@
 
       <div class="heapviz hv-side"><div id="tracer-heapsort"></div></div>
       <p class="muted small">Treet viser bare heapdelen A[0..i − 1]. Den grønne halen i arrayet er ferdig sortert og
-        hører ikke lenger til heapen.</p>
+        hører ikke lenger til heapen. Heapen ligger i arrayet: barna til A[i] står på A[2i + 1] og A[2i + 2].
+        (Derfor er et stigende sortert array alltid en gyldig min-heap: hver forelder står foran barna sine og er
+        ikke større enn dem.)</p>
       <div class="grid cols-2">
         <div class="pc-stack">
           <h4>HeapSort (følger demoen)</h4><div id="pc-heapsort"></div>
@@ -475,22 +604,34 @@
         </ol>
         Heapsort er O(n log n) i alle tilfeller og in-place, men <b>ikke stabil</b>.</div>
 
+      <h4>Koden, linje for linje</h4>
+      <div id="exp-heapsort"></div>
+      <div id="exp-bdmax"></div>
+
       <div class="callout felle"><span class="lbl">Vanlig felle</span>
         Å kalle BubbleDown med hele lengden n i stedet for den nye heapstørrelsen i. Da ser BubbleDown de
         ferdig sorterte elementene bakerst som barn, og kan dra dem tilbake opp i heapen.</div>
 
+      <div class="husk"><h4>Huskeregler</h4><ul>
+        <li>Stigende sortering: bygg en <b>max</b>-heap, bytt roten bakerst, krymp heapen, boble ned.</li>
+        <li>O(n log n) i alle tilfeller, in-place, men ustabil.</li>
+      </ul></div>
+
       <div class="callout snarvei"><span class="lbl">Mer om heapen</span>
         Selve heapen – innsetting, removeMin og BuildMinHeap – får full interaktiv behandling i
         <a href="03-heap.html">Blokk 3 · Heap</a>. Her holder vi oss til hvordan heapen brukes <i>til å sortere</i>.</div>
-
-      <h4>Koden, linje for linje</h4>
-      <div id="exp-heapsort"></div>
-      <div id="exp-bdmax"></div>
     </section>
 
     <!-- SANT/USANT -->
     <section data-panel="test">
       <h3>Sant eller usant – sortering</h3>
+      <div class="callout eks-spor"><span class="lbl">Hva eksamen spør om</span>
+        <p><span class="tag merke kjerne">kommer ofte</span> Sant/usant om sortering er spurt H2021 og H2022.</p>
+        <ul>
+          <li><b>H2021 3</b> (10p): tolv påstander om bubble, selection og insertion sort – hva er sortert etter i
+            runder, bytter den bare naboer, og gjør den færrest bytter?</li>
+          <li><b>H2022 2c</b> (del av en sant/usant-oppgave på 10p): kjøretiden til merge sort.</li>
+        </ul></div>
       <p class="muted small">Prøv deg selv på påstander i eksamensstil. Svar Sant/Usant, trykk
         <b>Sjekk svar</b> for antall riktige, og åpne <b>Forklaring</b> under en påstand når du
         vil se mer. Svarene huskes i nettleseren din.</p>
@@ -518,24 +659,24 @@
 
   <footer class="footer">IN2010-guide · Blokk 1 · Sortering</footer>
 
-  <script src="assets/js/core.js?v=20261127f"></script>
-<script src="assets/js/eksamensvekt.js?v=20261127f"></script>
-  <script src="assets/js/symboler.js?v=20261127f"></script>
-  <script src="assets/js/begreper-data.js?v=20261127f"></script>
-  <script src="assets/js/begrep-tips.js?v=20261127f"></script>
-  <script src="assets/js/data-tf.js?v=20261127f"></script>
-  <script src="assets/js/pseudocode.js?v=20261127f"></script>
-  <script src="assets/js/stepplayer.js?v=20261127f"></script>
-  <script src="assets/js/varline.js?v=20261127f"></script>
-  <script src="assets/js/viz-bars.js?v=20261127f"></script>
-  <script src="assets/js/viz-buckets.js?v=20261127f"></script>
-  <script src="assets/js/data-algos.js?v=20261127f"></script>
-  <script src="assets/js/data-heap.js?v=20261127f"></script>
-  <script src="assets/js/perfekt/sortering.js?v=20261127f"></script>
-  <script src="assets/js/perfekt/delt.js?v=20261127f"></script>
-  <script src="assets/js/kort/sortering.js?v=20261127f"></script>
-  <script src="assets/js/dra.js?v=20261127f"></script>
-  <script src="assets/js/data-dra.js?v=20261127f"></script>
+  <script src="assets/js/core.js?v=20261127g"></script>
+<script src="assets/js/eksamensvekt.js?v=20261127g"></script>
+  <script src="assets/js/symboler.js?v=20261127g"></script>
+  <script src="assets/js/begreper-data.js?v=20261127g"></script>
+  <script src="assets/js/begrep-tips.js?v=20261127g"></script>
+  <script src="assets/js/data-tf.js?v=20261127g"></script>
+  <script src="assets/js/pseudocode.js?v=20261127g"></script>
+  <script src="assets/js/stepplayer.js?v=20261127g"></script>
+  <script src="assets/js/varline.js?v=20261127g"></script>
+  <script src="assets/js/viz-bars.js?v=20261127g"></script>
+  <script src="assets/js/viz-buckets.js?v=20261127g"></script>
+  <script src="assets/js/data-algos.js?v=20261127g"></script>
+  <script src="assets/js/data-heap.js?v=20261127g"></script>
+  <script src="assets/js/perfekt/sortering.js?v=20261127g"></script>
+  <script src="assets/js/perfekt/delt.js?v=20261127g"></script>
+  <script src="assets/js/kort/sortering.js?v=20261127g"></script>
+  <script src="assets/js/dra.js?v=20261127g"></script>
+  <script src="assets/js/data-dra.js?v=20261127g"></script>
   <script>
   (function () {
     var IN = window.IN, qs = IN.qs;

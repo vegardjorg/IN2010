@@ -336,7 +336,7 @@
     var L = IN.algos.levelOrder.lines;
     function cp(l) { var c = {}; for (var k in l) c[k] = l[k]; return c; }
     reg(IN.algos, "levelOrderBST", {
-      title: "Level-order av et binært søketre (H2025 b)",
+      title: "Level-order av et binært søketre (H2025 5b)",
       name: "LevelOrderBST", params: "v",
       input: "Roten v av et binært søketre med n noder",
       output: "En liste med elementene i søketreet i level-order",
@@ -743,7 +743,7 @@
     var L = base.lines;
     function cp(l, code) { var c = {}; for (var k in l) c[k] = l[k]; c.code = code; return c; }
     reg(IN.algos, "checkBSTArk", {
-      title: "Er binærtreet et søketre? (H2022 b)",
+      title: "Er binærtreet et søketre? (H2022 11b)",
       name: "CheckBST", params: "v",
       input: "Roten v til et binærtre med unike heltall",
       output: "true hvis treet er et binært søketre, ellers false",
@@ -810,7 +810,7 @@
      DIAMETER (H2023)
      ============================================================ */
   reg(IN.algos, "treDiameter", {
-    title: "Diameteren til et binærtre (H2023 c)",
+    title: "Diameteren til et binærtre (H2023 5c)",
     name: "Diameter", params: "v",
     input: "Roten v til et binærtre (kan være null)",
     output: "Et par (h, d): høyden h og diameteren d til treet med rot v",
@@ -865,7 +865,7 @@
       return c;
     });
     reg(IN.algos, "diameterArk", {
-      title: "Diameteren til et binærtre (H2023 c)",
+      title: "Diameteren til et binærtre (H2023 5c)",
       name: "Diameter", params: "v",
       input: "Rotnoden v til et binærtre",
       output: "Diameteren til treet",
@@ -892,7 +892,7 @@
      LAVESTE FELLES FORFEDER (H2024)
      ============================================================ */
   reg(IN.algos, "lca", {
-    title: "Laveste felles forfeder (H2024 b)",
+    title: "Laveste felles forfeder (H2024 6b)",
     name: "LCA", params: "u, v",
     input: "To noder u og v i samme tre. Hver node kjenner v.parent og v.depth",
     output: "Den laveste noden som har både u og v som etterkommere",
@@ -925,7 +925,7 @@
   });
 
   reg(IN.algos, "lcaBST", {
-    title: "Laveste felles forfeder i et binært søketre (H2024 c)",
+    title: "Laveste felles forfeder i et binært søketre (H2024 6c)",
     name: "LCABST", params: "v, x, y",
     input: "Roten v til et binært søketre med unike heltall, og x < y som begge finnes i treet",
     output: "Noden som er laveste felles forfeder til nodene med x og y",
@@ -966,9 +966,9 @@
       bigO: a.bigO
     });
   }
-  renamedAlgo("lowestCommonAncestor", "lca", "LowestCommonAncestor", { title: "Laveste felles forfeder (H2024 b)",
+  renamedAlgo("lowestCommonAncestor", "lca", "LowestCommonAncestor", { title: "Laveste felles forfeder (H2024 6b)",
     input: "To noder u og v. Hver node har bare v.parent, v.children og v.depth", output: "Laveste felles forfeder av u og v" });
-  renamedAlgo("lowestCommonAncestorBST", "lcaBST", "LowestCommonAncestorBST", { title: "Laveste felles forfeder i et binært søketre (H2024 c)",
+  renamedAlgo("lowestCommonAncestorBST", "lcaBST", "LowestCommonAncestorBST", { title: "Laveste felles forfeder i et binært søketre (H2024 6c)",
     input: "En node v, og to verdier x og y der x < y", output: "Laveste felles forfeder av nodene som har elementene x og y" });
 
   /* ============================================================
@@ -1947,7 +1947,7 @@
     var R = rec(root);
     var viaRoot = root && R.best.indexOf(root.id) >= 0;
     snap(cfg.outer ? 3 : 7, { found: root ? root.id : null }, t("Ferdig! Den lengste stien er " + R.d + " kanter lang (markert)." + (viaRoot ? "" : " Legg merke til at den ikke går gjennom roten!"),
-      "Diameter = " + R.d + ". Stien er markert." + (viaRoot ? " Her går den gjennom roten." : " Den går ikke gjennom roten (jf. H2023 b)."),
+      "Diameter = " + R.d + ". Stien er markert." + (viaRoot ? " Her går den gjennom roten." : " Den går ikke gjennom roten (jf. H2023 5b)."),
       NAME + "(rot) = (" + R.h + ", " + R.d + ")" + (cfg.outer ? ", og Diameter returnerer d = " + R.d : "") + ". Lineær tid: hver node ga ett kall." + (viaRoot ? "" : " Den lengste stien ligger helt i et subtre.")), "Diameter " + R.d, pathEdges(R.best),
       { svar: String(R.d), vars: cfg.outer ? [NV("v", root), VV("h", R.h), VV("d", R.d)] : (last || [NV("v", null)]), frame: cfg.outer ? "Diameter" : NAME });
     return steps;

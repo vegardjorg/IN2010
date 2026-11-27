@@ -7,9 +7,9 @@
   <title>Blokk 7 · Strategi · IN2010</title>
   <meta name="description" content="Strategi i IN2010: les kjøretiden ut av løkker og rekursjon, kjenn igjen algoritmestrategiene kurset bruker, forstå P, NP og reduksjoner, og svar slik sensor belønner – med drilloppgaver og eksamensoppgaver.">
   <script>(function(){try{var d=document.documentElement;var t=localStorage.getItem('in-theme');if(t!=='dark'&&t!=='system')t='light';if(t!=='system')d.setAttribute('data-theme',t);var l=localStorage.getItem('in-level');if(l!=='eli5'&&l!=='teknisk')l='normal';d.setAttribute('data-level',l);}catch(e){document.documentElement.setAttribute('data-theme','light');document.documentElement.setAttribute('data-level','normal');}})();</script>
-  <link rel="stylesheet" href="assets/css/styles.css?v=20261127f">
-  <link rel="stylesheet" href="assets/css/dra.css?v=20261127f">
-  <link rel="stylesheet" href="assets/css/begrep-tips.css?v=20261127f">
+  <link rel="stylesheet" href="assets/css/styles.css?v=20261127g">
+  <link rel="stylesheet" href="assets/css/dra.css?v=20261127g">
+  <link rel="stylesheet" href="assets/css/begrep-tips.css?v=20261127g">
 </head>
 <body data-page="strategi">
   <a class="skip-link" href="#main">Hopp til innhold</a>
@@ -21,13 +21,6 @@
       <p class="lead">Nesten hver eksamensoppgave ender med «oppgi kjøretiden» og «lavere kjøretid gir mer uttelling».
         Her lærer du å lese kjøretiden rett ut av koden, å kjenne igjen strategiene bak algoritmene i pensum,
         hva P og NP egentlig betyr, og hvordan du skriver svar som sensor gir poeng for.</p>
-      <div class="badges">
-        <span class="badge" data-go="pnp" data-card="h2021-6"><b>H2021</b> · P og NP · <span class="pts">8p</span></span>
-        <span class="badge" data-go="pnp" data-card="h2020-8"><b>H2020</b> · Verifikator og NP · <span class="pts">10p</span></span>
-        <span class="badge" data-go="kjoretid" data-card="h2020-7a"><b>H2020</b> · Kjøretid for subanagram · <span class="pts">4p</span></span>
-        <span class="badge" data-go="kjoretid" data-card="h2022-2"><b>H2022</b> · Litt av hvert · <span class="pts">10p</span></span>
-        <span class="badge" data-go="strategier" data-card="h2020-7c"><b>H2020</b> · To strategier · <span class="pts">6p</span></span>
-      </div>
     </div>
 
     <div class="tabs" role="tablist" aria-label="Emner om strategi">
@@ -38,8 +31,26 @@
       <button data-tab="test">Sant/usant</button>
     </div>
 
+    <div class="pagehead-info">
+      <div class="badges">
+        <span class="badge" data-go="pnp" data-card="h2021-6"><b>H2021</b> · P og NP · <span class="pts">8p</span></span>
+        <span class="badge" data-go="pnp" data-card="h2020-8"><b>H2020</b> · Verifikator og NP · <span class="pts">10p</span></span>
+        <span class="badge" data-go="kjoretid" data-card="h2020-7a"><b>H2020</b> · Kjøretid for subanagram · <span class="pts">4p</span></span>
+        <span class="badge" data-go="kjoretid" data-card="h2022-2"><b>H2022</b> · Litt av hvert · <span class="pts">10p</span></span>
+        <span class="badge" data-go="strategier" data-card="h2020-7c"><b>H2020</b> · To strategier · <span class="pts">6p</span></span>
+      </div>
+    </div>
+
     <!-- ===================== KJØRETIDSANALYSE ===================== -->
     <section data-panel="kjoretid">
+      <div class="callout eks-spor"><span class="lbl">Hva eksamen spør om</span>
+        <p><span class="tag merke kjerne">kommer ofte</span> Spurt som egen oppgave i H2020 og H2022. I tillegg ender nesten hver algoritmeoppgave med «oppgi kjøretiden».</p>
+        <ul>
+          <li><b>H2020 7a</b> (4p): les kjøretiden ut av en gitt algoritme (IsSubanagramOf1), med to variabler w og s, og velg riktig O-uttrykk.</li>
+          <li><b>H2022 2</b> (10p): sant/usant, blant annet om hva O(n) og kjøretidskompleksitet betyr, kjøretiden til Merge sort og om bedre kompleksitet alltid gir færre steg.</li>
+          <li>Kjøretid med begrunnelse i skriv-en-algoritme-oppgavene, for eksempel <b>H2021 8</b>, <b>H2023 3</b>, <b>H2023 5</b> og <b>H2024 6</b>. Se <a href="#fane=eksamensteknikk&amp;oppg=tek-trapp">kjøretidstrappen</a>.</li>
+        </ul>
+      </div>
       <div class="callout begrep"><span class="lbl">Begrep: kjøretidsanalyse</span>
         <p><b>Kjøretidsanalyse</b> er å telle hvor mange steg en algoritme bruker, som funksjon av størrelsen på input (n).
           En tilordning, en sammenligning, et regnestykke, et arrayoppslag og en <code>return</code> koster ett steg hver.
@@ -52,7 +63,7 @@
       </div>
       <div id="intro-kjoretid"></div>
 
-      <h3>Seks regler for å lese kode</h3>
+      <h4 class="del">1. Seks regler for å lese kode <span class="tag merke kjerne">kommer ofte</span></h4>
       <div class="st-rules">
         <div class="card st-rule"><span class="st-rule-n">1</span><h4>Sekvens: legg sammen</h4>
           <p class="small">To biter etter hverandre koster summen. Det største leddet vinner: O(n log n) + O(n) = O(n log n).</p></div>
@@ -71,17 +82,34 @@
         <p>Finn den innerste løkka. Tell hvor mange ganger den kjører totalt, og gang med arbeidet per gang. Det er nesten alltid svaret.
           Sjekk to ting før du svarer: om en linje skjuler et lineært kall (regel 5), og om det er rekursjon (regel 6).</p>
       </div>
+      <p class="small"><b>Rekursjon i praksis (regel 6).</b> Du trenger ikke løse rekurrensligninger på eksamen, og forelesningene bruker dem ikke.
+        Noen steder i guiden står likevel en formel som T(n) = T(n/2) + O(1). Les den som en kortversjon av argumentet, ikke som noe du må regne på.
+        På eksamen er argumentet: hvor mange nivåer eller runder, og hvor mye arbeid per nivå. Tegn kalltreet for deg: Merge sort har log n nivåer og O(n) arbeid per nivå, altså O(n log n). Quicksort med dårlig pivot har n nivåer med lineært arbeid, altså O(n²).</p>
+      <div class="callout felle"><span class="lbl">Feller i kjøretidsanalyse</span>
+        <ul>
+          <li><b>«O betyr verste tilfelle»</b> er feil. Tilfelle (beste/verste) og veksttakt er to forskjellige spørsmål. Rett-frem søk er O(1) i beste og O(n) i verste tilfelle. Begge skrives med O.</li>
+          <li><b>To løkker er ikke alltid n².</b> Står de etter hverandre, legges de sammen. Er den indre grensen en konstant, er den O(1).</li>
+          <li><b>Skjulte løkker.</b> En «enkel» linje som <code>if Contains(L, x)</code> kan koste O(n).</li>
+          <li><b>To variabler.</b> Har input to størrelser (n og k, w og s), skal svaret ha begge. Si alltid hva variablene betyr.</li>
+        </ul>
+      </div>
+      <div class="husk"><h4>Huskeregler</h4><ul>
+        <li>Etter hverandre: legg sammen. Inni hverandre: gang sammen.</li>
+        <li>Halvering eller dobling hver runde gir log n.</li>
+        <li>Se inni hvert kall, og tell kall × arbeid per kall i rekursjon.</li>
+      </ul></div>
 
-      <h3>Én kodebit per kompleksitetsklasse</h3>
-      <p class="muted small">Dette er de klassene kurset bruker, fra raskest til tregest. Hold musa over en linje for å se hva den koster.</p>
+      <h4 class="del">2. Kompleksitetsklassene <span class="tag merke kjerne">kommer ofte</span></h4>
+      <p class="muted small"><b>Én kodebit per klasse.</b> Dette er de klassene kurset bruker, fra raskest til tregest. Hold musa over en linje for å se hva den koster.</p>
       <div class="st-switch" role="group" aria-label="Velg kompleksitetsklasse" id="arketype-btns"></div>
       <div class="grid cols-2 st-arch">
         <div><div id="arketype-pc"></div><div id="arketype-bigo"></div></div>
         <div class="card" id="arketype-info" aria-live="polite"></div>
       </div>
+      <p class="small">Flere nøstede løkker gir høyere potenser: tre løkker inni hverandre som hver går n ganger, gir O(n³). Alt som er O(nᵏ) for en konstant k, kalles <b>polynomielt</b>.
+        Enda raskere enn O(2ⁿ) vokser O(n!), som er antall mulige rekkefølger av n elementer.</p>
 
-      <h3>Doblingstesten</h3>
-      <p class="muted small">Hva skjer med antall runder når n dobles? Svaret avslører klassen: dobbelt så mye er lineært, fire ganger så mye er kvadratisk, én runde ekstra er logaritmisk.</p>
+      <p class="muted small"><b>Doblingstesten.</b> Hva skjer med antall runder når n dobles? Svaret avslører klassen: dobbelt så mye er lineært, fire ganger så mye er kvadratisk, én runde ekstra er logaritmisk.</p>
       <div class="card">
         <div class="st-switch" role="group" aria-label="Velg kodebit" id="dobling-btns"></div>
         <div class="grid cols-2">
@@ -93,7 +121,7 @@
         </div>
       </div>
 
-      <h3>Samme problem, tre algoritmer</h3>
+      <h4 class="del">3. Samme problem, tre algoritmer <span class="tag merke kjerne">kommer ofte</span></h4>
       <p class="small">SumTo(n) skal regne ut 1 + 2 + … + n. Alle tre gir samme svar, men de er i hver sin klasse.
         Kjøretiden tilhører <b>algoritmen</b>, ikke problemet. Dette er også eksamens røde tråd: finn en løsning som virker, og se så om den kan gjøres raskere.</p>
       <div class="grid cols-3 st-sumto">
@@ -101,31 +129,19 @@
         <div><div id="pc-sumto2"></div><div id="bo-sumto2"></div></div>
         <div><div id="pc-sumto3"></div><div id="bo-sumto3"></div></div>
       </div>
-
-      <div class="callout uni"><span class="lbl">Universitetsnivå</span>
-        <p><b>Definisjonen av O.</b> f(n) er O(g(n)) hvis det finnes en konstant c &gt; 0 slik at f(n) ≤ c · g(n) for alle n som er store nok
-          (altså for alle n ≥ n₀, se <a href="00-begreper.html#fane=bigo">Blokk 0 → Kjøretid &amp; stor O</a>).
-          Eksempel: 3n² + 5n + 2 ≤ 4n² så snart n ≥ 6, så 3n² + 5n + 2 er O(n²).</p>
+      <div class="callout uni"><span class="lbl">Universitetsnivå: O er en øvre grense</span>
         <p>O er en <b>øvre grense</b>. En algoritme som er O(log n), er derfor også O(n) og O(n²). På eksamen bør du likevel oppgi den <b>laveste</b> klassen du kan begrunne. Å svare O(n²) på en lineær algoritme er ikke feil matematikk, men sensor ser etter kjøretiden løsningen faktisk har, og lavere kjøretid gir mer uttelling.</p>
-        <p><b>Rekursjon.</b> Du trenger ikke løse rekurrensligninger på eksamen, og forelesningene bruker dem ikke.
-          Noen steder i guiden står likevel en formel som T(n) = T(n/2) + O(1). Les den som en kortversjon av argumentet, ikke som noe du må regne på.
-          På eksamen er argumentet: hvor mange nivåer eller runder, og hvor mye arbeid per nivå. Tegn kalltreet for deg: Merge sort har log n nivåer og O(n) arbeid per nivå, altså O(n log n). Quicksort med dårlig pivot har n nivåer med lineært arbeid, altså O(n²).</p>
       </div>
-      <div class="callout felle"><span class="lbl">Feller i kjøretidsanalyse</span>
-        <ul>
-          <li><b>«O betyr verste tilfelle»</b> er feil. Tilfelle (beste/verste) og veksttakt er to forskjellige spørsmål. Rett-frem søk er O(1) i beste og O(n) i verste tilfelle. Begge skrives med O.</li>
-          <li><b>To løkker er ikke alltid n².</b> Står de etter hverandre, legges de sammen. Er den indre grensen en konstant, er den O(1).</li>
-          <li><b>Skjulte løkker.</b> En «enkel» linje som <code>if Contains(L, x)</code> kan koste O(n).</li>
-          <li><b>To variabler.</b> Har input to størrelser (n og k, w og s), skal svaret ha begge. Si alltid hva variablene betyr.</li>
-        </ul>
+      <details class="fordyp"><summary>Definisjonen av O <span class="tag merke fordyp">Fordypning, ikke nødvendig til eksamen</span></summary>
+        <div class="callout uni"><span class="lbl">Universitetsnivå</span>
+          <p><b>Definisjonen av O.</b> f(n) er O(g(n)) hvis det finnes en konstant c &gt; 0 slik at f(n) ≤ c · g(n) for alle n som er store nok
+            (altså for alle n ≥ n₀, se <a href="00-begreper.html#fane=bigo">Blokk 0 → Kjøretid &amp; stor O</a>).
+            Eksempel: 3n² + 5n + 2 ≤ 4n² så snart n ≥ 6, så 3n² + 5n + 2 er O(n²).</p>
+        </div>
+      </details>
+      <div class="callout felle"><span class="lbl">Felle: bedre klasse betyr ikke alltid færre steg</span>
+        <p>En O(n²)-algoritme er ikke alltid tregere enn en O(n)-algoritme. O sier noe om veksten når n blir stor. For små n kan konstantene gjøre at O(n²)-algoritmen bruker færre steg.</p>
       </div>
-
-      <h3>Drill: hva er kjøretiden?</h3>
-      <p class="muted small">Les koden, velg svar, og les forklaringen på nivået du vil. Prikkene viser hvor du er og hva du har svart. Oppgi verste tilfelle der ikke annet står.</p>
-      <div id="drill" class="card"></div>
-
-      <h3>Øv selv</h3>
-      <div id="quiz-kjoretid"></div>
 
       <h3>Eksamen</h3>
       <div id="exam-h2020-7a"></div>
@@ -138,10 +154,25 @@
           <li>For hashing: skriv både forventet O(1) og verste tilfelle O(n). Bare den ene ga trekk i H2025.</li>
         </ul>
       </div>
+
+      <h3>Drill: hva er kjøretiden?</h3>
+      <p class="muted small">Les koden, velg svar, og les forklaringen på nivået du vil. Prikkene viser hvor du er og hva du har svart. Oppgi verste tilfelle der ikke annet står.</p>
+      <div id="drill" class="card"></div>
+
+      <h3>Øv selv</h3>
+      <div id="quiz-kjoretid"></div>
     </section>
 
     <!-- ===================== STRATEGIER ===================== -->
     <section data-panel="strategier" hidden>
+      <div class="callout eks-spor"><span class="lbl">Hva eksamen spør om</span>
+        <p><span class="tag merke eksbas">eksamensbasert</span> Strategier som eget tema er spurt ett år, i H2020. Tanken «fra naiv til rask» går igjen i nesten alle algoritmeoppgavene.</p>
+        <ul>
+          <li><b>H2020 7c</b> (6p): drøft fordeler og ulemper ved to strategier for å finne subanagrammer, med tanke på kjøretid.</li>
+          <li>Kjøretidstrappen i <b>H2021 8</b>, <b>H2022 11</b>, <b>H2023 3</b>, <b>H2023 5</b> og <b>H2024 6</b>: en raskere strategi gir flere poeng.</li>
+          <li><b>H2021 7</b> (8p, står under Grafer): velg den raskeste korteste-vei-algoritmen for hver graftype, også når kantene kan være negative.</li>
+        </ul>
+      </div>
       <div class="callout begrep"><span class="lbl">Begrep: strategi</span>
         <p>En <b>strategi</b> er en måte å tenke på når du skal finne en algoritme. Kurset setter bare ett navn aktivt på algoritmene sine:
           <b>grådig</b> (Prim, Kruskal og Dijkstra). Det bruker også «brute force» og «naiv» om løsninger som følger definisjonen direkte.
@@ -160,6 +191,7 @@
       </div>
       <div id="intro-strategier"></div>
 
+      <h4 class="del">1. Sju strategier fra pensum <span class="tag merke eksbas">eksamensbasert</span></h4>
       <div class="st-strats">
         <div class="card st-strat">
           <h4>Rett fram (brute force)</h4>
@@ -205,7 +237,7 @@
         </div>
       </div>
 
-      <h3>Når det grådige valget slår feil</h3>
+      <h4 class="del">2. Når det grådige valget slår feil <span class="tag merke eksbas">eksamensbasert</span></h4>
       <div class="grid cols-2">
         <div class="card"><div id="greedy-graf"></div>
           <p class="muted small">Rettet graf med én negativ kant (B → A har vekt −4). Start i S. Det er samme graf som under <a href="06-grafer.html#fane=dijkstra">Grafer → Dijkstra</a>.</p></div>
@@ -225,7 +257,7 @@
         </div>
       </div>
 
-      <h3>Fra naiv til rask: samme oppgave, ulike strategier</h3>
+      <h4 class="del">3. Fra naiv til rask: samme oppgave, ulike strategier <span class="tag merke kjerne">kommer ofte</span></h4>
       <p class="small">Mange eksamensoppgaver kan løses på flere måter, og poengene følger kjøretiden. «Finn to like tall i A» er et typisk eksempel:</p>
       <div class="table-wrap">
         <table class="cmp-table">
@@ -238,9 +270,11 @@
         </table>
       </div>
       <p class="small">Se <a href="02-sok.html#fane=duplikat">Finn duplikat under Søk</a> for hele oppgaven fra H2023, og <a href="#fane=eksamensteknikk">kjøretidstrappen</a> for hvor mye hvert trinn ga.</p>
-
-      <h3>Øv selv: hvilken strategi?</h3>
-      <div id="quiz-strategier"></div>
+      <div class="husk"><h4>Huskeregler</h4><ul>
+        <li>Skriv først en løsning som virker, og oppgi kjøretiden.</li>
+        <li>Finn flaskehalsen: en løkke som leter, en sortering som gjentas, et par som sjekkes to ganger.</li>
+        <li>Fjern den med forarbeid (sorter én gang) eller riktig datastruktur (hashset, heap), og oppgi hva strukturen koster.</li>
+      </ul></div>
 
       <h3>Eksamen</h3>
       <div id="exam-h2020-7c"></div>
@@ -251,10 +285,21 @@
           <li>Begynner du med en rett-fram-løsning, skriv den ferdig og oppgi kjøretiden. En riktig, treg løsning gir som regel delvis uttelling, men ikke alltid: i H2020 7b og H2023 Finn duplikat (a) ga en løsning over kravet til kjøretid 0 poeng. En rask løsning som er feil, gir ofte 0.</li>
         </ul>
       </div>
+
+      <h3>Øv selv: hvilken strategi?</h3>
+      <div id="quiz-strategier"></div>
     </section>
 
     <!-- ===================== P OG NP ===================== -->
     <section data-panel="pnp" hidden>
+      <div class="callout eks-spor"><span class="lbl">Hva eksamen spør om</span>
+        <p><span class="tag merke kjerne">kommer ofte</span> Spurt i H2020 og H2021.</p>
+        <ul>
+          <li><b>H2020 8a</b> (7p): skriv pseudokode for en verifikator som sjekker et sertifikat for hamiltonsk sykel (Type2Verifier).</li>
+          <li><b>H2020 8b</b> (3p): forklar kort hvorfor verifikatoren viser at problemet er i NP.</li>
+          <li><b>H2021 6</b> (8p): åtte sant/usant-påstander om P, NP, NP-komplette problemer, reduksjoner og problemer som ingen datamaskin kan løse.</li>
+        </ul>
+      </div>
       <nav class="small" aria-label="Innhold i fanen P og NP"><p class="muted small"><b>På denne fanen:</b>
         <a href="#fane=pnp&amp;oppg=pnp-avg">Avgjørelsesproblemer</a> ·
         <a href="#fane=pnp&amp;oppg=pnp-p">P</a> ·
@@ -263,8 +308,8 @@
         <a href="#fane=pnp&amp;oppg=pnp-red">Reduksjoner</a> ·
         <a href="#fane=pnp&amp;oppg=pnp-hard">NP-hardt og NP-komplett</a> ·
         <a href="#fane=pnp&amp;oppg=pnp-halt">Uløselige problemer</a> ·
-        <a href="#fane=pnp&amp;oppg=pnp-ov">Øv selv</a> ·
-        <a href="#fane=pnp&amp;oppg=pnp-eks">Eksamen</a></p></nav>
+        <a href="#fane=pnp&amp;oppg=pnp-eks">Eksamen</a> ·
+        <a href="#fane=pnp&amp;oppg=pnp-ov">Øv selv</a></p></nav>
       <div class="callout begrep"><span class="lbl">Begrep: problemets vanskelighet</span>
         <p>Hittil har vi målt hvor rask en <b>algoritme</b> er. Nå spør vi hvor vanskelig et <b>problem</b> er. Det avgjøres av den beste algoritmen som <i>kan</i> finnes, ikke bare de vi kjenner.
           For å sammenligne problemer ser vi på <b>avgjørelsesproblemer</b>: en <b>instans</b> og et spørsmål med svaret JA eller NEI.</p>
@@ -275,7 +320,7 @@
       </div>
       <div id="intro-pnp"></div>
 
-      <h3 id="pnp-avg">Avgjørelsesproblemer</h3>
+      <h4 class="del" id="pnp-avg">1. Avgjørelsesproblemer <span class="tag merke kjerne">kommer ofte</span></h4>
       <div class="st-probs">
         <div class="card st-prob"><h4>PATH</h4><p class="small"><b>Instans:</b> en graf G og to noder s og t.<br><b>Spørsmål:</b> finnes det en sti fra s til t?</p><span class="tag st-tag-p">I P: BFS, O(|V| + |E|)</span></div>
         <div class="card st-prob"><h4>SORT</h4><p class="small"><b>Instans:</b> to arrayer A1 og A2.<br><b>Spørsmål:</b> er A2 den sorterte utgaven av A1?</p><span class="tag st-tag-p">I P</span></div>
@@ -287,29 +332,25 @@
       </div>
       <p class="muted small">Et rikere problem («finn den korteste stien») er minst like vanskelig som avgjørelsesversjonen («finnes en sti med lengde høyst k?»). Klarer vi det rike, klarer vi også JA/NEI-spørsmålet.</p>
 
-      <h3 id="pnp-p">P: kan løses i polynomiell tid</h3>
+      <h4 class="del" id="pnp-p">2. P: kan løses i polynomiell tid <span class="tag merke eksbas">eksamensbasert</span></h4>
       <div class="callout begrep"><span class="lbl">Begrep: P</span>
         <p><b>P</b> er avgjørelsesproblemene som kan løses i <b>polynomiell tid</b>, altså O(nᵏ) for en konstant k. Tenk «k nøstede løkker opp til n».
           Nesten alle algoritmene i pensum er polynomielle. O(2ⁿ) er ikke polynomielt, fordi n står i eksponenten.</p>
       </div>
-      <div class="callout uni"><span class="lbl">Universitetsnivå</span>
-        <p>Polynomiell betyr ikke automatisk rask. En O(n¹⁰⁰)-algoritme er polynomiell, men selv for n = 2 er 2¹⁰⁰ steg langt mer enn noen datamaskin rekker.
-          Slike eksponenter dukker heldigvis sjelden opp i praksis, og derfor kaller vi P de håndterbare problemene.</p>
-      </div>
+      <details class="fordyp"><summary>Polynomiell betyr ikke automatisk rask <span class="tag merke fordyp">Fordypning, ikke nødvendig til eksamen</span></summary>
+        <div class="callout uni"><span class="lbl">Universitetsnivå</span>
+          <p>Polynomiell betyr ikke automatisk rask. En O(n¹⁰⁰)-algoritme er polynomiell, men selv for n = 2 er 2¹⁰⁰ steg langt mer enn noen datamaskin rekker.
+            Slike eksponenter dukker heldigvis sjelden opp i praksis, og derfor kaller vi P de håndterbare problemene.</p>
+        </div>
+      </details>
 
-      <h3 id="pnp-np">NP: et JA-svar kan sjekkes i polynomiell tid</h3>
+      <h4 class="del" id="pnp-np">3. NP: et JA-svar kan sjekkes i polynomiell tid <span class="tag merke kjerne">kommer ofte</span></h4>
       <div class="callout begrep"><span class="lbl">Begrep: sertifikat og NP</span>
         <p>Et <b>sertifikat</b> er et løsningsforslag som beviser et JA-svar, for eksempel en utfylt Sudoku eller en rekkefølge av nodene.
           En <b>verifikator</b> sjekker sertifikatet. <b>NP</b> er avgjørelsesproblemene der JA-instanser kan <b>verifiseres i polynomiell tid</b> når vi får et sertifikat.
           Å <i>finne</i> sertifikatet kan være vanskelig. Å <i>sjekke</i> det skal være lett.</p>
       </div>
-      <div class="callout felle"><span class="lbl">Felle: NP betyr ikke «ikke polynomiell»</span>
-        <p><b>NP betyr ikke «ikke polynomiell».</b> Navnet står for <i>nondeterministic polynomial time</i>, fra en annen, likeverdig definisjon som ikke er pensum.
-          Alt i P er også i NP: kan du løse problemet raskt, kan du sjekke et svar raskt (bare løs det og sammenlign). Altså er P ⊆ NP.</p>
-      </div>
-
-      <h4>Prøv selv: vær verifikatoren</h4>
-      <p class="small">Klikk nodene i den rekkefølgen du vil foreslå. Forslaget C er sertifikatet. Verifikatoren sjekker bare at hver nabo i C har en kant, også fra den siste tilbake til den første. Den leter aldri etter en annen sykel.</p>
+      <p class="small"><b>Prøv selv: vær verifikatoren.</b> Klikk nodene i den rekkefølgen du vil foreslå. Forslaget C er sertifikatet. Verifikatoren sjekker bare at hver nabo i C har en kant, også fra den siste tilbake til den første. Den leter aldri etter en annen sykel.</p>
       <div class="grid cols-2">
         <div class="card">
           <div id="ham-graf"></div>
@@ -324,8 +365,12 @@
         </div>
         <div><div id="ham-pc"></div><div id="ham-bigo"></div></div>
       </div>
+      <div class="callout felle"><span class="lbl">Felle: NP betyr ikke «ikke polynomiell»</span>
+        <p><b>NP betyr ikke «ikke polynomiell».</b> Navnet står for <i>nondeterministic polynomial time</i>, fra en annen, likeverdig definisjon som ikke er pensum.
+          Alt i P er også i NP: kan du løse problemet raskt, kan du sjekke et svar raskt (bare løs det og sammenlign). Altså er P ⊆ NP.</p>
+      </div>
 
-      <h3 id="pnp-erlik">Er P = NP?</h3>
+      <h4 class="del" id="pnp-erlik">4. Er P = NP? <span class="tag merke eksbas">eksamensbasert</span></h4>
       <div class="grid cols-2">
         <div class="card st-venn-card">
           <svg class="st-venn" viewBox="0 0 440 250" role="img" aria-label="P ligger inni NP. NP-hardt overlapper NP, og overlappet er NP-komplett. Tegningen viser situasjonen hvis P er ulik NP.">
@@ -352,7 +397,7 @@
         </div>
       </div>
 
-      <h3 id="pnp-red">Reduksjoner: oversett ett problem til et annet</h3>
+      <h4 class="del" id="pnp-red">5. Reduksjoner: oversett ett problem til et annet <span class="tag merke eksbas">eksamensbasert</span></h4>
       <div class="callout begrep"><span class="lbl">Begrep: reduksjon</span>
         <p>En <b>reduksjon</b> fra A til B er en algoritme som i polynomiell tid gjør en instans av A om til en instans av B, slik at JA blir JA og NEI blir NEI.
           Da kan vi løse A ved å oversette og spørre en løser for B. Konklusjonen er at <b>B er minst like vanskelig som A</b>.</p>
@@ -362,6 +407,7 @@
         <span class="st-r-box">instans av B</span><span class="st-r-arrow">løs B →</span>
         <span class="st-r-box">JA/NEI for A</span>
       </div>
+      <p class="small">Under er det minste eksempelet: vi løser EVEN («er n et partall?») ved å spørre en løser for ODD om n + 1. Skriv inn et tall og se at svaret blir det samme.</p>
       <div class="grid cols-2">
         <div>
           <h4 style="margin:.2rem 0 .4rem">Det minste eksempelet: EVEN til ODD</h4>
@@ -372,18 +418,20 @@
           <div class="small" id="eo-out" aria-live="polite"></div>
         </div>
       </div>
-      <div class="callout uni"><span class="lbl">Universitetsnivå: en reduksjon som ser ut som juks</span>
-        <p>Reduksjoner kan virke som juks første gang. Forelesningen viser at SCC-k («har G minst k sterkt sammenhengende komponenter?») kan reduseres til SORT
-          («består A2 av de samme elementene som A1, i sortert rekkefølge?»). Trikset er å løse SCC-k direkte med Kosaraju, som går i polynomiell tid, og så lage en SORT-instans som vi vet svaret på:</p>
-        <ul>
-          <li><b>JA:</b> A1 = A2 = [1, 2, 3].</li>
-          <li><b>NEI:</b> A1 = [1, 2, 3] og A2 = [2, 1, 3].</li>
-        </ul>
-        <p><b>Hvorfor er det lov?</b> En reduksjon må bare oppfylle to krav: oversettelsen går i polynomiell tid, og svaret blir det samme.</p>
-        <p><b>Lærdom:</b> forelesningen sier at alle problemer i P kan reduseres til hverandre på denne måten. Ett lite forbehold: vi kan ikke redusere <i>til</i> de to trivielle problemene som alltid svarer JA eller alltid NEI, fordi de ikke har noen instans med motsatt svar å oversette til.</p>
-      </div>
+      <details class="fordyp"><summary>En reduksjon som ser ut som juks <span class="tag merke fordyp">Fordypning, ikke nødvendig til eksamen</span></summary>
+        <div class="callout uni"><span class="lbl">Universitetsnivå: en reduksjon som ser ut som juks</span>
+          <p>Reduksjoner kan virke som juks første gang. Forelesningen viser at SCC-k («har G minst k sterkt sammenhengende komponenter?») kan reduseres til SORT
+            («består A2 av de samme elementene som A1, i sortert rekkefølge?»). Trikset er å løse SCC-k direkte med Kosaraju, som går i polynomiell tid, og så lage en SORT-instans som vi vet svaret på:</p>
+          <ul>
+            <li><b>JA:</b> A1 = A2 = [1, 2, 3].</li>
+            <li><b>NEI:</b> A1 = [1, 2, 3] og A2 = [2, 1, 3].</li>
+          </ul>
+          <p><b>Hvorfor er det lov?</b> En reduksjon må bare oppfylle to krav: oversettelsen går i polynomiell tid, og svaret blir det samme.</p>
+          <p><b>Lærdom:</b> forelesningen sier at alle problemer i P kan reduseres til hverandre på denne måten. Ett lite forbehold: vi kan ikke redusere <i>til</i> de to trivielle problemene som alltid svarer JA eller alltid NEI, fordi de ikke har noen instans med motsatt svar å oversette til.</p>
+        </div>
+      </details>
 
-      <h3 id="pnp-hard">NP-hardt og NP-komplett</h3>
+      <h4 class="del" id="pnp-hard">6. NP-hardt og NP-komplett <span class="tag merke eksbas">eksamensbasert</span></h4>
       <div class="grid cols-2">
         <div class="callout begrep" style="margin-top:0"><span class="lbl">NP-hardt</span>
           <p>Et problem er <b>NP-hardt</b> hvis det er minst like vanskelig som <b>alle</b> problemer i NP: alt i NP kan reduseres til det. SAT var det første som ble bevist NP-hardt.
@@ -402,27 +450,31 @@
           <li>Vil du vise at X er NP-komplett, viser du i tillegg at X er i NP, for eksempel med en verifikator.</li>
         </ol>
       </div>
-      <div class="callout felle"><span class="lbl">Felle: retningen</span>
-        <p>Å redusere X <i>til</i> SAT viser bare at X ikke er vanskeligere enn SAT. Det sier ingenting om at X er vanskelig. Pilen skal gå <b>fra</b> det kjente vanskelige problemet <b>til</b> det nye.</p>
-      </div>
       <div class="callout eksempel"><span class="lbl">Derfor er NP-komplett så viktig</span>
         <p>Alt i NP kan reduseres til et NP-komplett problem. Finner noen en polynomiell algoritme for ett eneste NP-komplett problem, kan alt i NP løses i polynomiell tid, og da er P = NP.
           Alle NP-komplette problemer kan også reduseres til hverandre.</p>
       </div>
+      <div class="callout felle"><span class="lbl">Felle: retningen</span>
+        <p>Å redusere X <i>til</i> SAT viser bare at X ikke er vanskeligere enn SAT. Det sier ingenting om at X er vanskelig. Pilen skal gå <b>fra</b> det kjente vanskelige problemet <b>til</b> det nye.</p>
+      </div>
+      <div class="husk"><h4>Huskeregler</h4><ul>
+        <li>P: kan løses raskt. NP: et JA-svar kan sjekkes raskt. P ⊆ NP, og om P = NP, vet ingen.</li>
+        <li>NP-komplett = i NP og NP-hardt.</li>
+        <li>NP-hardt vises med en reduksjon fra det kjente vanskelige til det nye.</li>
+      </ul></div>
 
-      <h3 id="pnp-halt">Problemer som ingen algoritme kan løse</h3>
+      <h4 class="del" id="pnp-halt">7. Problemer som ingen algoritme kan løse <span class="tag merke eksbas">eksamensbasert</span></h4>
       <div class="callout begrep"><span class="lbl">Begrep: uløselig</span>
         <p>Noen avgjørelsesproblemer er <b>uløselige</b> (i andre bøker: uavgjørbare): det er bevist at ingen algoritme gir riktig svar på alle instanser i endelig tid. Det klassiske eksempelet er <b>stoppeproblemet</b> (HALT).
           Det hjelper ikke med en raskere datamaskin. Slike problemer ligger utenfor både P og NP.</p>
       </div>
-      <div class="callout uni"><span class="lbl">Universitetsnivå: hvorfor HALT ikke kan løses</span>
-        <p>Anta at det finnes en algoritme H(A, x) som alltid svarer riktig på om A stopper på x. Lag en ny algoritme D(A): spør H(A, A). Sier H «stopper», går D i evig løkke. Sier H «stopper ikke», svarer D JA og stopper.
-          Kjør nå D på seg selv. Stopper D(D)? Hvis ja, sa H «stopper ikke», og D stoppet likevel. Hvis nei, sa H «stopper», og D gikk likevel i evig løkke. Begge deler er umulig, så H kan ikke finnes.
-          Svaret kom først fra Alonzo Church og like etter fra Alan Turing, begge i 1936. Argumentet over er Turings, og det var hans bevis som fikk størst gjennomslag.</p>
-      </div>
-
-      <h3 id="pnp-ov">Øv selv</h3>
-      <div id="quiz-pnp"></div>
+      <details class="fordyp"><summary>Hvorfor HALT ikke kan løses <span class="tag merke fordyp">Fordypning, ikke nødvendig til eksamen</span></summary>
+        <div class="callout uni"><span class="lbl">Universitetsnivå: hvorfor HALT ikke kan løses</span>
+          <p>Anta at det finnes en algoritme H(A, x) som alltid svarer riktig på om A stopper på x. Lag en ny algoritme D(A): spør H(A, A). Sier H «stopper», går D i evig løkke. Sier H «stopper ikke», svarer D JA og stopper.
+            Kjør nå D på seg selv. Stopper D(D)? Hvis ja, sa H «stopper ikke», og D stoppet likevel. Hvis nei, sa H «stopper», og D gikk likevel i evig løkke. Begge deler er umulig, så H kan ikke finnes.
+            Svaret kom først fra Alonzo Church og like etter fra Alan Turing, begge i 1936. Argumentet over er Turings, og det var hans bevis som fikk størst gjennomslag.</p>
+        </div>
+      </details>
 
       <h3 id="pnp-eks">Eksamen</h3>
       <div id="exam-h2021-6"></div>
@@ -435,18 +487,29 @@
           <li>I H2021 ga et feil <b>eller blankt</b> svar −1, og summen ble aldri under 0. Svar på alle, men tenk deg om.</li>
         </ul>
       </div>
+
+      <h3 id="pnp-ov">Øv selv</h3>
+      <div id="quiz-pnp"></div>
     </section>
 
     <!-- ===================== EKSAMENSTEKNIKK ===================== -->
     <section data-panel="eksamensteknikk" hidden>
+      <div class="callout eks-spor"><span class="lbl">Hva eksamen spør om</span>
+        <p><span class="tag merke kjerne">kommer ofte</span> Rådene her gjelder hele eksamen. De bygger på sensorveiledningene H2020–H2025.</p>
+        <ul>
+          <li><b>Del 1</b> (H2023 32p, H2024 22p, H2025 26p): små sant/usant-oppgaver med poengregelen 2 · max(n − N/2, 0). Øvingen står nederst i fanen.</li>
+          <li><b>Skriv en algoritme:</b> poeng i trinn etter kjøretid, se kjøretidstrappen (H2021 8, H2022 11, H2023 3, H2023 5, H2024 6).</li>
+          <li><b>Drøft:</b> H2020 7c (6p), se fanen Strategier.</li>
+        </ul>
+      </div>
       <nav class="small" aria-label="Innhold i fanen Eksamensteknikk"><p class="muted small"><b>På denne fanen:</b>
         <a href="#fane=eksamensteknikk&amp;oppg=tek-typer">Oppgavetypene</a> ·
-        <a href="#fane=eksamensteknikk&amp;oppg=del1-ovelse">Del 1-øving</a> ·
         <a href="#fane=eksamensteknikk&amp;oppg=tek-trapp">Kjøretidstrappen</a> ·
         <a href="#fane=eksamensteknikk&amp;oppg=tek-mal">Svarmal</a> ·
         <a href="#fane=eksamensteknikk&amp;oppg=tek-bygg">Byggeklosser</a> ·
         <a href="#fane=eksamensteknikk&amp;oppg=tek-sikring">Sikringssetninger</a> ·
-        <a href="#fane=eksamensteknikk&amp;oppg=tek-sjekk">Sjekkliste</a></p></nav>
+        <a href="#fane=eksamensteknikk&amp;oppg=tek-sjekk">Sjekkliste</a> ·
+        <a href="#fane=eksamensteknikk&amp;oppg=del1-ovelse">Del 1-øving</a></p></nav>
       <div class="callout begrep"><span class="lbl">Begrep: hva sensor belønner</span>
         <p>Sensorveiledningene H2020–H2025 belønner det samme år etter år: en <b>riktig</b> løsning, så <b>rask</b> som mulig, skrevet <b>presist</b>, med <b>kjøretid og begrunnelse</b>.
           Her er oppgavetypene og hva sensor ser etter i hver.</p>
@@ -456,7 +519,7 @@
       </div>
       <div id="intro-teknikk"></div>
 
-      <h3 id="tek-typer">Oppgavetypene</h3>
+      <h4 class="del" id="tek-typer">1. Oppgavetypene</h4>
       <div class="st-types">
         <details class="card st-type" open><summary><b>Skriv en algoritme</b> <span class="muted small">pseudokode eller presis tekst</span></summary>
           <ul class="small">
@@ -465,6 +528,7 @@
             <li>Lavere kjøretid gir mer uttelling. Ofte er det et fast tak per kjøretid (se trappen under).</li>
             <li>Du kan bruke pensumalgoritmer og -datastrukturer som byggeklosser. Det står eksplisitt i oppgavesettene fra 2023.</li>
             <li>Riktig idé med feil i pseudokoden gir delvis uttelling. En idé som gir feil svar, gir lite eller ingenting.</li>
+            <li>Les kravene nøye. Ber oppgaven om en stabil sortering, trekkes det for en løsning som ikke er stabil (H2024 3).</li>
           </ul></details>
         <details class="card st-type" open><summary><b>Oppgi kjøretiden</b> <span class="muted small">ofte 1–2 poeng for seg</span></summary>
           <ul class="small">
@@ -478,6 +542,7 @@
             <li>Én påstand per setning. Svar på akkurat det som spørres om.</li>
             <li>Spørsmål av typen «gjelder det alltid?» besvares best med et moteksempel.</li>
             <li>Argumenter generelt, ikke bare ut fra eksempelet i oppgaven. Et eksempel viser ikke at noe alltid gjelder.</li>
+            <li>Den lille oppvarmingen først i settet (som H2025 1) krever ingen formell definisjon. Alle rimelige svar med egne ord gir full uttelling, så bruk lite tid der.</li>
           </ul></details>
         <details class="card st-type"><summary><b>Drøft</b> <span class="muted small">sammenlign to løsninger</span></summary>
           <ul class="small">
@@ -493,30 +558,19 @@
           </ul></details>
         <details class="card st-type"><summary><b>Sant/usant og flervalg</b> <span class="muted small">rettes automatisk</span></summary>
           <ul class="small">
-            <li>Blankt teller som galt. Fra 2023 regnes poengene i del 1 ut fra hvor mange flere enn halvparten du har riktig, så ren gjetting gir i snitt 0. Regelen og en øvingsrunde står rett under.</li>
+            <li>Blankt teller som galt. Fra 2023 regnes poengene i del 1 ut fra hvor mange flere enn halvparten du har riktig, så ren gjetting gir i snitt 0. Regelen og en øvingsrunde står nederst i fanen.</li>
             <li>Svar på alle, men tenk: hver påstand du faktisk kan, løfter deg over streken.</li>
           </ul></details>
       </div>
 
-      <div id="del1-ovelse">
-        <h3>Del 1-øving: sant/usant med ekte poengregel</h3>
-        <p class="small">Eksamen begynner med små oppgaver som rettes automatisk. Det gjorde også H2021 og H2022 (i H2021 6 ga feil og blankt −1). Fra 2023 heter det del 1, med poengregelen under: 32 poeng i H2023, 22 i H2024 og 26 i H2025.
-          Her trekkes en tilfeldig blanding fra alle blokkene i guiden, og svarene rettes med regelen fra sensorveiledningene.</p>
-        <div class="callout snarvei"><span class="lbl">Poengregelen i del 1 (H2023–H2025)</span>
-          <p>Det er N påstander, og n er antall riktige svar. Blankt og galt teller likt. Poengene blir <b>2 · max(n − N/2, 0)</b>.
-            Med halvparten riktig får du 0, og med alt riktig får du N.</p>
-        </div>
-        <div class="card" id="del1-host"></div>
-      </div>
-
-      <h3 id="tek-trapp">Kjøretidstrappen</h3>
+      <h4 class="del" id="tek-trapp">2. Kjøretidstrappen <span class="tag merke kjerne">kommer ofte</span></h4>
       <p class="muted small">Poengene følger kjøretiden. Velg en oppgave og se hvor mye hvert trinn ga ifølge sensorveiledningen.</p>
       <div class="card">
         <div class="st-switch" role="group" aria-label="Velg eksamensoppgave" id="trapp-btns"></div>
         <div id="trapp" aria-live="polite"></div>
       </div>
 
-      <h3 id="tek-mal">Svarmal for en algoritmeoppgave</h3>
+      <h4 class="del" id="tek-mal">3. Svarmal for en algoritmeoppgave</h4>
       <div class="card">
         <ol class="small st-mal">
           <li><b>Idé i én eller to setninger.</b> «Jeg går gjennom treet i postorder og returnerer høyde og diameter samtidig.» Selv om koden sklir, har sensor sett at du har forstått.</li>
@@ -528,7 +582,7 @@
         <p class="muted small">Mer om å skrive pseudokode: <a href="pseudokode.html#fane=skriveguide">Pseudokode-skolen → Skriveguide</a>.</p>
       </div>
 
-      <h3 id="tek-bygg">Pensum som byggeklosser</h3>
+      <h4 class="del" id="tek-bygg">4. Pensum som byggeklosser</h4>
       <p class="small">Du kan kalle pensumalgoritmer uten å skrive dem selv. Tre krav: si hva kallet returnerer, sørg for at det ikke ødelegger kjøretiden, og ta med kostnaden i analysen.</p>
       <div class="table-wrap">
         <table class="cmp-table">
@@ -548,6 +602,7 @@
           </tbody>
         </table>
       </div>
+      <p class="small">Velg den billigste byggeklossen som virker. På en uvektet graf eller et tre gir BFS korteste vei i O(|V| + |E|) uten prioritetskø. Dijkstra virker også der, men er tregere og ga mindre uttelling (H2023 6c).</p>
       <div class="callout felle"><span class="lbl">Når byggeklossen ikke er lov</span>
         <ul>
           <li>Når oppgaven ber deg skrive nettopp den algoritmen. Skal du skrive HeapInsert, kan du ikke bare kalle Insert.</li>
@@ -556,17 +611,31 @@
         </ul>
       </div>
 
-      <h3 id="tek-sikring">Sikringssetninger</h3>
+      <h4 class="del" id="tek-sikring">5. Sikringssetninger</h4>
       <p class="muted small">Korte setninger som gjør svaret entydig. Kopier og tilpass.</p>
       <div id="sikring"></div>
 
-      <h3 id="tek-sjekk">Sjekkliste før du leverer</h3>
+      <h4 class="del" id="tek-sjekk">6. Sjekkliste før du leverer</h4>
       <div class="card" id="sjekk"></div>
+
+      <div id="del1-ovelse">
+        <h3>Del 1-øving: sant/usant med ekte poengregel</h3>
+        <p class="small">Eksamen begynner med små oppgaver som rettes automatisk. Det gjorde også H2021 og H2022 (i H2021 6 ga feil og blankt −1). Fra 2023 heter det del 1, med poengregelen under: 32 poeng i H2023, 22 i H2024 og 26 i H2025.
+          Her trekkes en tilfeldig blanding fra alle blokkene i guiden, og svarene rettes med regelen fra sensorveiledningene.</p>
+        <div class="callout snarvei"><span class="lbl">Poengregelen i del 1 (H2023–H2025)</span>
+          <p>Det er N påstander, og n er antall riktige svar. Blankt og galt teller likt. Poengene blir <b>2 · max(n − N/2, 0)</b>.
+            Med halvparten riktig får du 0, og med alt riktig får du N.</p>
+        </div>
+        <div class="card" id="del1-host"></div>
+      </div>
     </section>
 
     <!-- ===================== SANT/USANT ===================== -->
     <section data-panel="test" hidden>
       <h3>Sant eller usant?</h3>
+      <div class="callout eks-spor"><span class="lbl">Hva eksamen spør om</span>
+        <p><span class="tag merke kjerne">kommer ofte</span> Sant/usant om kjøretid og P og NP er spurt i H2021 6 (8p) og H2022 2 (10p). Fra 2023 er sant/usant samlet i del 1, men hvilke påstander som sto der, er ikke kjent.</p>
+      </div>
       <p class="muted small">Ta stilling til hver påstand, og sjekk svarene. Forklaringen viser hvorfor.</p>
       <div id="tf-strategi"></div>
       <h4 style="margin-top:1.5rem">Dra og plasser</h4>
@@ -584,27 +653,27 @@
     <p class="muted small">IN2010 · Blokk 7 · Strategi. Egne forklaringer og demoer basert på pensum. Eksamensoppgavene er gjengitt ordrett fra eksamensarkene (UiO, IN2010), med kildelinje og eventuelle avvik på hvert kort.</p>
   </footer>
 
-  <script src="assets/js/core.js?v=20261127f"></script>
-<script src="assets/js/eksamensvekt.js?v=20261127f"></script>
-  <script src="assets/js/symboler.js?v=20261127f"></script>
-  <script src="assets/js/begreper-data.js?v=20261127f"></script>
-  <script src="assets/js/begrep-tips.js?v=20261127f"></script>
-  <script src="assets/js/data-tf.js?v=20261127f"></script>
-  <script src="assets/js/pseudocode.js?v=20261127f"></script>
-  <script src="assets/js/stepplayer.js?v=20261127f"></script>
-  <script src="assets/js/varline.js?v=20261127f"></script>
-  <script src="assets/js/viz-bars.js?v=20261127f"></script>
-  <script src="assets/js/viz-graph.js?v=20261127f"></script>
-  <script src="assets/js/data-algos.js?v=20261127f"></script>
-  <script src="assets/js/data-grafer.js?v=20261127f"></script>
-  <script src="assets/js/data-strategi.js?v=20261127f"></script>
-  <script src="assets/js/viz-hash.js?v=20261127f"></script>
-  <script src="assets/js/data-hashing.js?v=20261127f"></script>
-  <script src="assets/js/perfekt/strategi.js?v=20261127f"></script>
-  <script src="assets/js/perfekt/delt.js?v=20261127f"></script>
-  <script src="assets/js/kort/strategi.js?v=20261127f"></script>
-  <script src="assets/js/dra.js?v=20261127f"></script>
-  <script src="assets/js/data-dra.js?v=20261127f"></script>
+  <script src="assets/js/core.js?v=20261127g"></script>
+<script src="assets/js/eksamensvekt.js?v=20261127g"></script>
+  <script src="assets/js/symboler.js?v=20261127g"></script>
+  <script src="assets/js/begreper-data.js?v=20261127g"></script>
+  <script src="assets/js/begrep-tips.js?v=20261127g"></script>
+  <script src="assets/js/data-tf.js?v=20261127g"></script>
+  <script src="assets/js/pseudocode.js?v=20261127g"></script>
+  <script src="assets/js/stepplayer.js?v=20261127g"></script>
+  <script src="assets/js/varline.js?v=20261127g"></script>
+  <script src="assets/js/viz-bars.js?v=20261127g"></script>
+  <script src="assets/js/viz-graph.js?v=20261127g"></script>
+  <script src="assets/js/data-algos.js?v=20261127g"></script>
+  <script src="assets/js/data-grafer.js?v=20261127g"></script>
+  <script src="assets/js/data-strategi.js?v=20261127g"></script>
+  <script src="assets/js/viz-hash.js?v=20261127g"></script>
+  <script src="assets/js/data-hashing.js?v=20261127g"></script>
+  <script src="assets/js/perfekt/strategi.js?v=20261127g"></script>
+  <script src="assets/js/perfekt/delt.js?v=20261127g"></script>
+  <script src="assets/js/kort/strategi.js?v=20261127g"></script>
+  <script src="assets/js/dra.js?v=20261127g"></script>
+  <script src="assets/js/data-dra.js?v=20261127g"></script>
   <script>
   (function () {
     "use strict";
