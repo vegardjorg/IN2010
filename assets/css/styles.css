@@ -2178,7 +2178,15 @@ blockquote.sensor .et-sv-krit, blockquote.sensor .et-sv-fasit + .et-sv-fasit { m
 .vl-n, .vl-v { font-family: var(--font-mono); }
 .vl-v { font-weight: 600; color: var(--color-on-surface); }
 .vl-item.is-changed .vl-v {
-  font-weight: 800; text-decoration: underline 2px color-mix(in srgb, var(--color-primary) 65%, transparent); text-underline-offset: 2px;
+  /* Ikke fetere enn ellers: bredere tekst bryter linja annerledes. Understrek og farge markerer endringen. */
+  color: var(--color-primary); text-decoration: underline 2px color-mix(in srgb, var(--color-primary) 65%, transparent); text-underline-offset: 2px;
+}
+/* Små etiketter i nedskalerte SVG-er (heap-indekser, grafetiketter) blir under 8 px på mobil. */
+@media (max-width: 619.98px) {
+  .hv-idx { font-size: 13px; }
+  .gv-n .k.sm { font-size: 12px; }
+  .gv-lab { font-size: 13px; }
+  .gv-w text { font-size: 13.5px; }   /* boksen er 16 høy og 7 per tegn + 6: to sifre får fortsatt plass */
 }
 .vl-dot {
   display: inline-block; width: 7px; height: 7px; border-radius: 50%; margin-right: .25rem;

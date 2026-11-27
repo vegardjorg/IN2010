@@ -59,6 +59,10 @@
     on = !!v;
     try { localStorage.setItem(KEY, on ? "1" : "0"); } catch (e) { /* privat modus: gjelder bare denne visningen */ }
     paintAll();
+    // Variabellinja endrer scenehøyden: mål alle spillere på nytt så knappene står stille.
+    setTimeout(function () {
+      document.querySelectorAll(".stepplayer").forEach(function (w) { if (w._stabilize) w._stabilize(); });
+    }, 0);
   }
   window.addEventListener("storage", function (e) {
     if (e.key === KEY) { on = readOn(); paintAll(); }
