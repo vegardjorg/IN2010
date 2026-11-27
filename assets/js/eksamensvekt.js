@@ -48,7 +48,8 @@
     var tekst = IN.el("span", { class: "bv-tekst", html:
       "<b>Eksamensvekt " + AAR[0] + "–" + AAR[AAR.length - 1] + ":</b> i snitt " + snitt +
       " % av poengene per eksamen. " + (EKSTRA[side] ? EKSTRA[side] + " " : "") +
-      "Stolpene viser poeng per år. Sant/usant-delen fra 2023 er ikke fordelt på tema." });
+      "Stolpene viser poeng per år. Sant/usant-delen er holdt utenfor (fra 2023, 22–32 poeng per eksamen), " +
+      "fordi påstandene ikke er kjent og ikke kan fordeles på tema." });
     var spark = IN.el("span", { class: "bv-spark", role: "img",
       "aria-label": "Poeng per år: " + AAR.map(function (y, i) {
         return y + " " + mine[i] + " p (" + Math.round(andel(side, i)) + " %)";
