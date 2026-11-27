@@ -2605,3 +2605,13 @@ main :is(td, th) :is(p, li) { max-width: none; }
 .qz-fold > .qz { margin: 0; padding: 0 8px 8px; }
 .qz-fold > .qz .qz-list { border-radius: var(--radius-md); }
 @media print { .qz-fold > .qz { display: block; } }
+
+/* Eksamensvekt per tema (eksamensvekt.js, portert fra IN2120): snittandel og en stolpe per år. */
+.pagehead .blokk-vekt { font-size: var(--text-sm, .9rem); color: var(--color-on-surface-variant); margin: -.4rem 0 .8rem;
+  display: flex; flex-wrap: wrap; align-items: flex-end; gap: .3rem .9rem; }
+.pagehead p.blokk-vekt { max-width: none; }
+.bv-tekst { flex: 0 1 70ch; }
+.bv-spark { display: inline-flex; gap: 2px; align-items: flex-end; height: 2.4rem; padding-top: 2px; flex: none; }
+.bv-sparkc { display: flex; flex-direction: column; align-items: center; justify-content: flex-end; height: 100%; width: 1.05rem; }
+.bv-sparkc i { display: block; width: .75rem; background: var(--color-primary); border-radius: 1px 1px 0 0; }
+.bv-sparkc b { font-size: 9.5px; font-weight: 500; color: var(--color-on-surface-variant); line-height: 1.1; margin-top: 1px; font-variant-numeric: tabular-nums; }
