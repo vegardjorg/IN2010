@@ -7,9 +7,9 @@
   <title>Blokk 3 · Heap · IN2010</title>
   <meta name="description" content="Binære heaper i IN2010: array-representasjon, insert (boble opp), removeMin (boble ned), BuildMinHeap på O(n), level-order, mediankø, Heapsort og prioritetskøer – med stegvise demoer og eksamensoppgaver.">
   <script>(function(){try{var d=document.documentElement;var t=localStorage.getItem('in-theme');if(t!=='dark'&&t!=='system')t='light';if(t!=='system')d.setAttribute('data-theme',t);var l=localStorage.getItem('in-level');if(l!=='eli5'&&l!=='teknisk')l='normal';d.setAttribute('data-level',l);}catch(e){document.documentElement.setAttribute('data-theme','light');document.documentElement.setAttribute('data-level','normal');}})();</script>
-  <link rel="stylesheet" href="assets/css/styles.css?v=20261127e">
-  <link rel="stylesheet" href="assets/css/dra.css?v=20261127e">
-  <link rel="stylesheet" href="assets/css/begrep-tips.css?v=20261127e">
+  <link rel="stylesheet" href="assets/css/styles.css?v=20261127f">
+  <link rel="stylesheet" href="assets/css/dra.css?v=20261127f">
+  <link rel="stylesheet" href="assets/css/begrep-tips.css?v=20261127f">
 </head>
 <body data-page="heap">
   <a class="skip-link" href="#main">Hopp til innhold</a>
@@ -109,7 +109,8 @@
       <div class="callout felle"><span class="lbl">Vanlig felle: «sortert på hvert nivå»</span>
         Heap-egenskapen gjelder bare <b>forelder mot barn</b>. Søsken kan stå i hvilken som helst rekkefølge, og en node
         dypt nede kan godt være mindre enn en node høyere oppe på en annen gren. En heap er altså <i>ikke</i> sortert,
-        bortsett fra langs hver sti fra roten og ned.</div>
+        bortsett fra langs hver sti fra roten og ned. Derfor kan du ikke søke i en heap som i et søketre: for å finne
+        et vilkårlig element må du i verste tilfelle se på alle, O(n). Bare det minste ligger på en fast plass (roten).</div>
 
       <div class="callout uni"><span class="lbl">Universitetsnivå: høyde og «komplett»</span>
         Et komplett binærtre med n noder har høyde <span class="mono">⌊log n⌋</span>. Nivå d har plass til 2<sup>d</sup>
@@ -239,7 +240,7 @@
         </ul>
         Totalt: <span class="mono">n · (1/4 + 2/8 + 3/16 + …)</span>. Hvert ledd er høyden ganger andelen noder med den høyden.
         Nevneren dobles mens telleren bare vokser med 1, så leddene krymper raskt, og summen i parentesen blir nøyaktig 1.
-        Arbeidet er altså høyst n, og BuildMinHeap er O(n). Selve beviset er utenfor pensum. Det du må kunne, er
+        Arbeidet er altså høyst n, og BuildMinHeap er O(n). Selve beviset er ikke pensum. Det du må kunne, er
         <i>at</i> det er lineært, og intuisjonen: de mange nodene nederst er billige, og bare roten kan synke hele veien.</div>
 
       <div class="callout felle"><span class="lbl">Vanlig felle: feil retning</span>
@@ -274,7 +275,7 @@
         For en heap er svaret gratis: O(n) bare for å kopiere (eller O(1) om du bare returnerer A). For et vanlig
         binærtre med pekere må du gjøre et <b>bredde-først søk med en kø</b>: legg roten i køen, ta ut forrest, legg
         barna bakerst. Det er også O(n). Med en stakk i stedet for kø får du dybde-først, og det er <i>ikke</i>
-        level-order. Det trekker sensor for. Mer om trær og BFS i <a href="04-traer.html">Blokk 4 · Trær</a>.</div>
+        level-order. Det trekker sensor for. Mer om trær og bredde-først søk (BFS) i <a href="04-traer.html">Blokk 4 · Trær</a>.</div>
 
       <h4>Eksamensoppgaven</h4>
       <div id="exam-levelorder"></div>
@@ -312,7 +313,7 @@
       <h4>Eksamensoppgaven</h4>
       <div id="exam-median"></div>
 
-      <h4>(e) Hvordan ser BST-et av medianene ut?</h4>
+      <h4>(e) Hvordan ser det binære søketreet (BST) av medianene ut?</h4>
       <p>Med eksempelet 8, 3, 1, 5, 7 kommer medianene ut som 5, 3, 7, 1, 8. Settes de inn i et binært søketre i den
         rekkefølgen, blir første median roten, og resten blir vekselvis mindre og større enn alt som har kommet før:</p>
       <svg class="fig-svg" viewBox="0 0 320 190" role="img" aria-label="Skjevt Λ-formet binært søketre: rot 5, venstre kjede 3 og 1, høyre kjede 7 og 8">
@@ -395,7 +396,7 @@
             <tr><td>Sortert liste</td><td>O(n)</td><td>O(1)</td><td>Må finne plassen ved innsetting</td></tr>
             <tr><td><b>Binær heap</b></td><td><b>O(log n)</b></td><td><b>O(log n)</b></td><td>Standardvalget, rett i et array</td></tr>
             <tr><td>Balansert søketre (AVL)</td><td>O(log n)</td><td>O(log n)</td><td>Fungerer også (H2022 (e) er sant)</td></tr>
-            <tr><td>Bøttekø (prioritet 0 … N − 1)</td><td>O(1)</td><td>O(N)</td><td>O(1) når N er en konstant (H2022 oppg. 10)</td></tr>
+            <tr><td>Bøttekø (prioritet 0 … N − 1)</td><td>O(1)</td><td>O(N)</td><td>O(1) når N er en konstant (H2022 10)</td></tr>
           </tbody>
         </table>
       </div>
@@ -455,7 +456,7 @@
         prioritetene ligger i et fast, lite område. Da kan de brukes direkte som indeks, som i bøttesortering.</div>
 
       <div class="callout snarvei"><span class="lbl">Finn k minste (H2025)</span>
-        Heapen er nøkkelen til den raskeste løsningen på H2025 oppgave 6: enten en max-heap med plass til k
+        Heapen er nøkkelen til den raskeste løsningen på H2025 6: enten en max-heap med plass til k
         (<span class="mono">O(n log k)</span>), eller BuildMinHeap av hele arrayet og så removeMin k ganger
         (<span class="mono">O(n + k log n)</span>). Hele oppgaven, med demo og løsning, står i
         <a href="02-sok.html#fane=kminste">Blokk 2 · Søk → Finn k minste</a>.</div>
@@ -468,7 +469,7 @@
     <!-- ================= SANT/USANT ================= -->
     <section data-panel="test">
       <h3>Sant eller usant? (heaper og prioritetskøer)</h3>
-      <p>Påstandene fra H2022 oppgave 5, pluss noen ekstra fra samme tankegang. Svar på alle, og trykk så «Sjekk».</p>
+      <p>Påstandene fra H2022 5, pluss noen ekstra fra samme tankegang. Svar på alle, og trykk så «Sjekk».</p>
       <h4>Eksamensoppgaven</h4>
       <div id="exam-test"></div>
       <h4 style="margin-top:1.5rem">Påstandene</h4>
@@ -491,24 +492,24 @@
 
   <footer class="footer">IN2010-guide · Blokk 3 · Heap</footer>
 
-  <script src="assets/js/core.js?v=20261127e"></script>
-<script src="assets/js/eksamensvekt.js?v=20261127e"></script>
-  <script src="assets/js/varline.js?v=20261127e"></script>
-  <script src="assets/js/viz-tree.js?v=20261127e"></script>
-  <script src="assets/js/symboler.js?v=20261127e"></script>
-  <script src="assets/js/begreper-data.js?v=20261127e"></script>
-  <script src="assets/js/begrep-tips.js?v=20261127e"></script>
-  <script src="assets/js/data-tf.js?v=20261127e"></script>
-  <script src="assets/js/pseudocode.js?v=20261127e"></script>
-  <script src="assets/js/stepplayer.js?v=20261127e"></script>
-  <script src="assets/js/viz-bars.js?v=20261127e"></script>
-  <script src="assets/js/data-algos.js?v=20261127e"></script>
-  <script src="assets/js/data-heap.js?v=20261127e"></script>
-  <script src="assets/js/perfekt/heap.js?v=20261127e"></script>
-  <script src="assets/js/perfekt/delt.js?v=20261127e"></script>
-  <script src="assets/js/kort/heap.js?v=20261127e"></script>
-  <script src="assets/js/dra.js?v=20261127e"></script>
-  <script src="assets/js/data-dra.js?v=20261127e"></script>
+  <script src="assets/js/core.js?v=20261127f"></script>
+<script src="assets/js/eksamensvekt.js?v=20261127f"></script>
+  <script src="assets/js/varline.js?v=20261127f"></script>
+  <script src="assets/js/viz-tree.js?v=20261127f"></script>
+  <script src="assets/js/symboler.js?v=20261127f"></script>
+  <script src="assets/js/begreper-data.js?v=20261127f"></script>
+  <script src="assets/js/begrep-tips.js?v=20261127f"></script>
+  <script src="assets/js/data-tf.js?v=20261127f"></script>
+  <script src="assets/js/pseudocode.js?v=20261127f"></script>
+  <script src="assets/js/stepplayer.js?v=20261127f"></script>
+  <script src="assets/js/viz-bars.js?v=20261127f"></script>
+  <script src="assets/js/data-algos.js?v=20261127f"></script>
+  <script src="assets/js/data-heap.js?v=20261127f"></script>
+  <script src="assets/js/perfekt/heap.js?v=20261127f"></script>
+  <script src="assets/js/perfekt/delt.js?v=20261127f"></script>
+  <script src="assets/js/kort/heap.js?v=20261127f"></script>
+  <script src="assets/js/dra.js?v=20261127f"></script>
+  <script src="assets/js/data-dra.js?v=20261127f"></script>
   <script>
   (function () {
     var IN = window.IN, qs = IN.qs, el = IN.el;

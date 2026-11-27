@@ -47,7 +47,7 @@
     p.utsnitt = (p.utsnitt || []).concat([{ deler: deler, hvorfor: obj.hvorfor, merknad: obj.sensor && obj.sensor.merknad }]);
   }
 
-  /* ---------- H2025 · Oppgave 5 · Level-order (12 poeng) ----------
+  /* ---------- H2025 5 · Level-order (12 poeng) ----------
      03-heap.html og 04-traer.html. (a) og (b) viser sidens egen pseudokode når den finnes. */
   P["H2025-5"] = {
     type: "eksamen",
@@ -87,7 +87,7 @@
       teknisk: "<p>Level-order er bredde-først rekkefølge. FIFO-køen sørger for at alle nodene på dybde d tas ut før noen på dybde d + 1. For en heap er dette indeksrekkefølgen. I (d) kommer hver forelder før barna sine i level-order, så innsetting i den rekkefølgen gjenskaper nøyaktig det samme søketreet.</p>"
     },
     sensor: {
-      kilde: "Kilde: sensorveiledning IN2010 H2025, oppgave 5",
+      kilde: "Kilde: sensorveiledning IN2010 H2025 5",
       deler: [
         { fasit: "<p>Merk at output for algoritmene under er en liste, men det er en liten detalj som ikke er vesentlig for algoritmene. Vi trekker ikke poeng for dette alene, men det kan være med på å trekke i samspill med andre unøyaktigheter.</p>" },
         { del: "(a)", fasit: "<p>En heap er allerede i level-order, så det er tilstrekkelig å returnere heapen som en liste.</p>",
@@ -112,7 +112,7 @@
     }
   };
 
-  /* ---------- H2020 · Oppgave 8 · Fire typer grafer (38 poeng) ----------
+  /* ---------- H2020 8 · Fire typer grafer (38 poeng) ----------
      06-grafer.html viser (a)–(h), 07-strategi.html (a) og (b). */
   function sq(edges) {
     return { directed: false, nodes: [N("A", 0, 0), N("B", 90, 0), N("C", 0, 90), N("D", 90, 90)],
@@ -177,7 +177,7 @@
       teknisk: "<p>(a)–(b) tester hva en verifikator er og hvorfor den viser at Type2 er i NP. (c)–(d) bruker at en hamiltonsk sykel gir to veier mellom alle par. (e)–(h) tester minimale spenntrær (unikhet, kuttegenskapen) og korteste stier (BFS når alle vekter er like, Dijkstra ellers).</p>"
     },
     sensor: {
-      kilde: "Kilde: sensorveiledning IN2010 H2020, oppgave 8",
+      kilde: "Kilde: sensorveiledning IN2010 H2020 8",
       deler: [
         { del: "(a)",
           kode: PC("Type2Verifier", "G, C", "En graf G og et array av noder C", "Returner JA hvis C viser at G er av type 2, NEI ellers",
@@ -219,7 +219,7 @@
     merknad: "Sensor skriver kanten som et par (C[i], C[(i + 1) mod N]). Grafen er urettet, og kurset skriver en urettet kant som en mengde {u, v}, slik pseudokoden i vårt svar gjør. Det betyr det samme her."
   }];
 
-  /* ---------- H2020 · Oppgave 7 · Subanagram (a)–(c) ----------
+  /* ---------- H2020 7 · Subanagram (a)–(c) ----------
      05-hashing.html viser (a)–(c), 07-strategi.html (a) og (c). */
   P["H2020-7"] = {
     type: "eksamen",
@@ -252,7 +252,7 @@
       teknisk: "<p>(a): kostnaden er skjult i hjelpeoperasjonene. «c is in r» og «remove» er lineære i |r| ≤ w, og de kalles s ganger. (b): to lineære tellinger og w oppslag i O(1) gir O(w + s). (c): O(d · (w + s)) mot O(2ˢ) er en avveining mellom lineær avhengighet av ordboka og eksponentiell avhengighet av s. Med d stor og s liten vinner den eksponentielle.</p>"
     },
     sensor: {
-      kilde: "Kilde: sensorveiledning IN2010 H2020, oppgave 7",
+      kilde: "Kilde: sensorveiledning IN2010 H2020 7",
       deler: [
         { del: "(a)",
           fasit: "<ul><li>O(w + s)</li><li>O(s²)</li><li>O(w log(s))</li><li><b>O(s · w)</b> <span class=\"small muted\">(vår merking: sensorveiledningen markerer dette alternativet med blå tekst som riktig)</span></li><li>O(w²)</li></ul>" },
@@ -286,7 +286,7 @@
     }
   };
 
-  /* ---------- H2020 · Oppgave 7 (d) · Sortering av subanagrammer (6 poeng) ----------
+  /* ---------- H2020 7d · Sortering av subanagrammer (6 poeng) ----------
      01-sortering.html viser bare (d). */
   utvid("H2020-7", ["(d)"], {
     type: "eksamen",
@@ -308,7 +308,7 @@
       teknisk: "<p>Med hashmap som bøtter slipper vi å lage én bøtte for hver lengde opp til den lengste (den kan i prinsippet være lenger enn n). Prisen er at nøklene må sorteres: O(N log N) for N ≤ n nøkler. Fordelingen og samlingen er O(n). Stabiliteten gjør at den alfabetiske rekkefølgen overlever som sekundær orden, slik som i radix sort.</p>"
     },
     sensor: {
-      kilde: "Kilde: sensorveiledning IN2010 H2020, oppgave 7",
+      kilde: "Kilde: sensorveiledning IN2010 H2020 7",
       deler: [
         {
           del: "(d)",

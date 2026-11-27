@@ -91,7 +91,7 @@
         kjerne: t(
           "Eksamen er som et brettspill med faste regler. Først et lett spørsmål. Så mange små «sant eller usant», der det lønner seg å svare på alt. Til slutt større oppgaver der du forklarer, skriver pseudokode og sier hvor lang tid løsningen tar. Den som kan reglene, taper færre poeng på dumme ting.",
           "<p>Eksamen er 100 poeng: oppvarming (2 p), del 1 med sant/usant (32, 22 og 26 p i 2023–2025) og del 2 med 6–7 langsvarsoppgaver. I del 1 teller blankt og galt likt, så svar på alle. I del 2 gir lavere kjøretid flere poeng, og du kan bruke pensumalgoritmer uten å skrive dem selv (står i oppgavesettene fra 2023). Gjør rede for antagelsene dine.</p>",
-          "<p>Del 1 (2023–2025): N påstander, n riktige, poeng = 2 · max(n − N/2, 0). Ren gjetting gir i snitt 0. Del 2: sensorveiledningene gir poeng i trinn etter kjøretid (optimal løsning full pott). Hvor mye en tregere, riktig løsning gir, varierer: 4 av 5 for O(n log n) på H2023 Finn duplikat, inntil 5 av 8 for O(n²) på H2023 diameter og 4 av 6 for kvadratisk CheckBST på H2022, men høyst 1 p for verre enn O(n log n) på Finn duplikat. Mangler kjøretiden eller er den feil, mister du poengene for kjøretidsdelen (ofte 1–2 p), eller det trekkes (H2023: 1 p). Hva en riktig idé uten pseudokode gir, varierer: H2021 oppg. 12 ga opptil 5 av 10 for en setning med riktig idé, og H2024 oppg. 2 (c) sa at en god beskrivelse på naturlig språk gir like god uttelling. Presis tekst kan gi mer enn uklar pseudokode.</p>"),
+          "<p>Del 1 (2023–2025): N påstander, n riktige, poeng = 2 · max(n − N/2, 0). Ren gjetting gir i snitt 0. Del 2: sensorveiledningene gir poeng i trinn etter kjøretid (optimal løsning full pott). Hvor mye en tregere, riktig løsning gir, varierer: 4 av 5 for O(n log n) på H2023 Finn duplikat, inntil 5 av 8 for O(n²) på H2023 diameter og 4 av 6 for kvadratisk CheckBST på H2022, men høyst 1 p for verre enn O(n log n) på Finn duplikat. Mangler kjøretiden eller er den feil, mister du poengene for kjøretidsdelen (ofte 1–2 p), eller det trekkes (H2023: 1 p). Hva en riktig idé uten pseudokode gir, varierer: H2021 12 ga opptil 5 av 10 for en setning med riktig idé, og H2024 2c sa at en god beskrivelse på naturlig språk gir like god uttelling. Presis tekst kan gi mer enn uklar pseudokode.</p>"),
         les: [["strategi", "eksamensteknikk", "tek-typer", "Strategi → Oppgavetypene"], ["strategi", "eksamensteknikk", "tek-bygg", "Pensum som byggeklosser"]],
         oppskrift: [
           "<b>Del 1:</b> svar på alle påstandene. Blankt teller som galt.",
@@ -231,7 +231,7 @@
           { q: "Hvilket utsagn er riktig?", options: ["P = NP er bevist", "P ⊆ NP, men om P = NP er ukjent", "NP er problemene som ikke kan løses raskt", "Alle problemer i NP er NP-komplette"], answer: 1,
             explain: "Alt som kan løses raskt, kan også sjekkes raskt. Om det motsatte gjelder, er et åpent problem." },
           { q: "Hva er et NP-komplett problem?", options: ["Et problem som er i NP og NP-hardt", "Et problem som er NP-hardt, men ikke i NP", "Et problem som løses i polynomiell tid", "Et uløselig problem"], answer: 0,
-            explain: "NP-komplett = i NP og NP-hardt. Hamiltonsykel er et kjent eksempel (en sann påstand i H2021 oppgave 6)." }
+            explain: "NP-komplett = i NP og NP-hardt. Hamiltonsykel er et kjent eksempel (en sann påstand i H2021 6)." }
         ] }],
         feller: [
           "Å snu reduksjonen. X til SAT viser bare at X ikke er vanskeligere enn SAT, ikke at X er NP-hardt.",

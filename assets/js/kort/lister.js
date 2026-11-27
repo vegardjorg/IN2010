@@ -19,7 +19,7 @@
     { cls: "swap", label: "Tømt / feil" }
   ];
   function tags(s) { return LS.parseTags(s); }
-  /* ---------- Eksamen: H2020 oppgave 9, ordrett oppgavetekst med kildelinje.
+  /* ---------- Eksamen: H2020 9, ordrett oppgavetekst med kildelinje.
      Perfekt svar og sensorveiledningen står i assets/js/perfekt/lister.js. ---------- */
   var HTML_FIL = "&lt;div&gt;\n  &lt;div&gt;\n    Velkommen til nettsiden vår!\n  &lt;div&gt;\n   Se våre nyeste saker!\n    &lt;div&gt;\n    Vi har ansatt en ung person! Kanskje blir nettsiden oppdatert nå?\n    FØLG MED PÅ UTVIKLINGEN. Hilsen Kåre.\n    &lt;/div&gt;\n&lt;/div&gt;";
   function h20Oppg() {

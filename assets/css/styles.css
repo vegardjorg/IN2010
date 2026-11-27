@@ -2623,3 +2623,21 @@ main :is(td, th) :is(p, li) { max-width: none; }
 .bv-sparkc { display: flex; flex-direction: column; align-items: center; justify-content: flex-end; height: 100%; width: 1.05rem; }
 .bv-sparkc i { display: block; width: .75rem; background: var(--color-primary); border-radius: 1px 1px 0 0; }
 .bv-sparkc b { font-size: 9.5px; font-weight: 500; color: var(--color-on-surface-variant); line-height: 1.1; margin-top: 1px; font-variant-numeric: tabular-nums; }
+
+/* Fem faste merker (samme ord som IN2120, aldri andre varianter):
+   kjerne = «kommer ofte» (spurt flere år), eksbas = «eksamensbasert», fordyp = «Fordypning, ikke nødvendig til eksamen»,
+   ny = «pensum, ikke spurt før», ikke-pensum = «Ikke pensum». Bare temavariabler, så lys og mørk modus virker. */
+.tag.merke { font-weight: 700; vertical-align: middle; }
+.tag.merke.kjerne { background: var(--color-primary-container); color: var(--color-on-primary-container, var(--color-on-surface)); border-color: transparent; }
+.tag.merke.eksbas { background: var(--color-tone-warn); color: var(--color-on-tone-warn); border-color: transparent; }
+.tag.merke.fordyp, .tag.merke.ny { background: var(--color-surface-container-high); }
+.tag.merke.ikke-pensum { background: transparent; border-style: dashed; }
+.fane-eks { color: var(--color-on-surface-variant); margin: -.2rem 0 .8rem; }
+.fane-eks .merke { margin-right: .35rem; }
+
+/* Lange norske ord (prioritetskø, sammenhengende, separasjonsnode) deles ved linjeskift på smal skjerm.
+   lang="nb" på <html> gir riktige delingspunkter. Kode og tall deles aldri. */
+@media (max-width: 759.98px) {
+  main { -webkit-hyphens: auto; hyphens: auto; }
+  main :is(code, pre, .mono, .pseudo, .pcode, .sp-controls, .badge, .tag, th, svg) { -webkit-hyphens: manual; hyphens: manual; }
+}

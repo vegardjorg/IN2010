@@ -7,9 +7,9 @@
   <title>Blokk 1 · Sortering · IN2010</title>
   <meta name="description" content="Sorteringsalgoritmer i IN2010: selection, bubble, insertion, gnome, merge, quick, bøtte, radix og heapsort – med stegvise demoer og kjøretid i stor O.">
   <script>(function(){try{var d=document.documentElement;var t=localStorage.getItem('in-theme');if(t!=='dark'&&t!=='system')t='light';if(t!=='system')d.setAttribute('data-theme',t);var l=localStorage.getItem('in-level');if(l!=='eli5'&&l!=='teknisk')l='normal';d.setAttribute('data-level',l);}catch(e){document.documentElement.setAttribute('data-theme','light');document.documentElement.setAttribute('data-level','normal');}})();</script>
-  <link rel="stylesheet" href="assets/css/styles.css?v=20261127e">
-  <link rel="stylesheet" href="assets/css/dra.css?v=20261127e">
-  <link rel="stylesheet" href="assets/css/begrep-tips.css?v=20261127e">
+  <link rel="stylesheet" href="assets/css/styles.css?v=20261127f">
+  <link rel="stylesheet" href="assets/css/dra.css?v=20261127f">
+  <link rel="stylesheet" href="assets/css/begrep-tips.css?v=20261127f">
 </head>
 <body data-page="sortering">
   <a class="skip-link" href="#main">Hopp til innhold</a>
@@ -233,11 +233,11 @@
     <!-- GNOME (H2023) -->
     <section data-panel="gnome">
       <h3>Gnome sort <span class="tag">H2023 · 10p</span></h3>
-      <div class="callout sensor exam-jump ikke-pensum"><span class="lbl">Ikke pensum – eksamensoppgave</span>
-        Gnome sort står <b>ikke</b> i forelesningene. Den finnes bare i <b>H2023 · Oppgave 4</b> (10p), der du
+      <div class="callout sensor exam-jump ikke-pensum"><span class="lbl"><span class="tag merke ikke-pensum">Ikke pensum</span> <span class="tag merke eksbas">eksamensbasert</span></span>
+        Gnome sort står <b>ikke</b> i forelesningene. Den finnes bare i <b>H2023 4</b> (10p), der du
         får en ukjent algoritme og skal drøfte den opp mot pensumalgoritmene. Du trenger ikke kunne den utenat:
         det som gir poeng, er å kjenne den igjen som en slektning av insertion sort.
-        <a href="#fane=gnome&amp;oppg=H2023-4">Gå til oppgaven (H2023 · Oppgave 4) →</a></div>
+        <a href="#fane=gnome&amp;oppg=H2023-4">Gå til oppgaven (H2023 4) →</a></div>
       <div id="intro-gnome"></div>
       <div class="callout eli5"><span class="lbl">5-åring: nissen og blomsterpottene</span>
         En hagenisse går langs en rad blomsterpotter. Han ser på potten han står ved og potten rett bak. Står de
@@ -249,7 +249,7 @@
       </div>
 
       <div class="callout sensor"><span class="lbl">Slik drøfter du gnome på eksamen</span>
-        Sensorveiledningen for H2023 oppgave 4 gir poeng for forklaring, kjøretid, plassering blant de andre
+        Sensorveiledningen for H2023 4 gir poeng for forklaring, kjøretid, plassering blant de andre
         algoritmene, og stabil/in-place. For full uttelling må du se at gnome er i nær slekt med insertion sort.
         Punktene under er vår oppsummering:
         <ul>
@@ -340,8 +340,8 @@
       <div class="callout eksempel"><span class="lbl">Verste tilfelle</span>
         Prøv «Sortert (verst)»: med siste element som pivot er pivoten alltid størst, partisjonen blir
         maksimalt skjev, og rekursjonstreet får høyde n − 1 → <b>O(n²)</b>. Quicksort er likevel ofte et
-        greit valg: i H2023 oppgave 3c kaller sensorveiledningen den «også et godt valg», men sier at du bør
-        nevne at den strengt tatt er kvadratisk i verste tilfelle. I H2025 oppgave 6b gir den inntil 3 av 4
+        greit valg: i H2023 3c kaller sensorveiledningen den «også et godt valg», men sier at du bør
+        nevne at den strengt tatt er kvadratisk i verste tilfelle. I H2025 6b gir den inntil 3 av 4
         poeng, mot 4 for en O(n log n)-sortering. Krever oppgaven O(n log n) i verste fall, er merge sort
         eller heapsort det trygge valget.</div>
       <h4>Sjekk deg selv</h4>
@@ -362,7 +362,7 @@
         per farge og legger hver sokk rett i sin kurv. Du sammenligner aldri to sokker med hverandre. Til slutt
         tømmer du kurvene i fast rekkefølge: først den hvite, så den røde, så den blå.</div>
       <div class="callout sensor exam-jump"><span class="lbl">Eksamen</span>
-        <b>H2024 · Oppgave 3</b> (10p), <b>H2021 · Oppgave 2</b> (3p) og <b>H2020 · Oppgave 7d</b> (6p).
+        <b>H2024 3</b> (10p), <b>H2021 2</b> (3p) og <b>H2020 7d</b> (6p).
         <a href="#eksamen-bucket" data-jump="eksamen-bucket">Til oppgavene ↓</a></div>
       <div class="grid cols-2 demo-wide">
         <div><div id="tracer-bucket"></div>
@@ -494,10 +494,10 @@
       <p class="muted small">Prøv deg selv på påstander i eksamensstil. Svar Sant/Usant, trykk
         <b>Sjekk svar</b> for antall riktige, og åpne <b>Forklaring</b> under en påstand når du
         vil se mer. Svarene huskes i nettleseren din.</p>
-      <h3 id="eksamen-test" class="exam-anchor" style="margin-top:1rem">Eksamen H2021 · Oppgave 3 <span class="tag">10p</span></h3>
+      <h3 id="eksamen-test" class="exam-anchor" style="margin-top:1rem">Eksamen H2021 3 <span class="tag">10p</span></h3>
       <p class="muted small">A er et array med n elementer, og 0 ≤ i &lt; n. «Runde» betyr én iterasjon av den
         ytre løkka. Påstandene står ordrett som på eksamen.</p>
-      <p class="et-kilde">Oppgavetekst: UiO, IN2010, H2021, oppgave 3 · ordrett. Fasit og poeng: sensorveiledning IN2010 H2021, oppgave 3.</p>
+      <p class="et-kilde">Oppgavetekst: UiO, IN2010, H2021 3 · ordrett. Fasit og poeng: sensorveiledning IN2010 H2021 3.</p>
       <p class="muted small">Sensorveiledningen: «Maksimalt får man 10 poeng, som vil si at man kan få full uttelling med én feil.»
         Hvert riktig svar gir 1 poeng, og hvert feil eller ubesvart −1 (minst 0 totalt). Ubesvart koster like mye som feil, så svar på alle.</p>
       <div id="tf-h2021"></div>
@@ -518,24 +518,24 @@
 
   <footer class="footer">IN2010-guide · Blokk 1 · Sortering</footer>
 
-  <script src="assets/js/core.js?v=20261127e"></script>
-<script src="assets/js/eksamensvekt.js?v=20261127e"></script>
-  <script src="assets/js/symboler.js?v=20261127e"></script>
-  <script src="assets/js/begreper-data.js?v=20261127e"></script>
-  <script src="assets/js/begrep-tips.js?v=20261127e"></script>
-  <script src="assets/js/data-tf.js?v=20261127e"></script>
-  <script src="assets/js/pseudocode.js?v=20261127e"></script>
-  <script src="assets/js/stepplayer.js?v=20261127e"></script>
-  <script src="assets/js/varline.js?v=20261127e"></script>
-  <script src="assets/js/viz-bars.js?v=20261127e"></script>
-  <script src="assets/js/viz-buckets.js?v=20261127e"></script>
-  <script src="assets/js/data-algos.js?v=20261127e"></script>
-  <script src="assets/js/data-heap.js?v=20261127e"></script>
-  <script src="assets/js/perfekt/sortering.js?v=20261127e"></script>
-  <script src="assets/js/perfekt/delt.js?v=20261127e"></script>
-  <script src="assets/js/kort/sortering.js?v=20261127e"></script>
-  <script src="assets/js/dra.js?v=20261127e"></script>
-  <script src="assets/js/data-dra.js?v=20261127e"></script>
+  <script src="assets/js/core.js?v=20261127f"></script>
+<script src="assets/js/eksamensvekt.js?v=20261127f"></script>
+  <script src="assets/js/symboler.js?v=20261127f"></script>
+  <script src="assets/js/begreper-data.js?v=20261127f"></script>
+  <script src="assets/js/begrep-tips.js?v=20261127f"></script>
+  <script src="assets/js/data-tf.js?v=20261127f"></script>
+  <script src="assets/js/pseudocode.js?v=20261127f"></script>
+  <script src="assets/js/stepplayer.js?v=20261127f"></script>
+  <script src="assets/js/varline.js?v=20261127f"></script>
+  <script src="assets/js/viz-bars.js?v=20261127f"></script>
+  <script src="assets/js/viz-buckets.js?v=20261127f"></script>
+  <script src="assets/js/data-algos.js?v=20261127f"></script>
+  <script src="assets/js/data-heap.js?v=20261127f"></script>
+  <script src="assets/js/perfekt/sortering.js?v=20261127f"></script>
+  <script src="assets/js/perfekt/delt.js?v=20261127f"></script>
+  <script src="assets/js/kort/sortering.js?v=20261127f"></script>
+  <script src="assets/js/dra.js?v=20261127f"></script>
+  <script src="assets/js/data-dra.js?v=20261127f"></script>
   <script>
   (function () {
     var IN = window.IN, qs = IN.qs;
@@ -862,7 +862,7 @@
     /* ---- Faktiske eksamensoppgaver: kortene står i assets/js/kort/sortering.js ---- */
     IN.kortData.render("sortering");
 
-    /* ---- H2021 Oppgave 3: invarianter (sant/usant) ---- */
+    /* ---- H2021 3: invarianter (sant/usant) ---- */
     IN.tfTest("#tf-h2021", [
       { s: "(a) Etter i iterasjoner av den ytre loopen i Bubble sort, er de i første elementene sortert.", answer: false, kilde: "H2021",
         explain: "Usant. Bubble sort flytter det største gjenværende elementet bakerst i hver runde. Det er de i <i>siste</i> som er ferdige. Forrest kan et lite element ennå ligge langt bak." },

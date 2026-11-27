@@ -36,7 +36,7 @@
     { cls: "sorted", label: "skrevet tilbake i A" }
   ];
 
-  // H2023 oppgave 4: pseudokoden står som på arket (arket bruker A[i-1] og en kommentar)
+  // H2023 4: pseudokoden står som på arket (arket bruker A[i-1] og en kommentar)
   var GNOME_ARK = {
     name: "GnomeSort", params: "A",
     input: "Et array A med n elementer",
@@ -81,7 +81,7 @@
     ]
   }; });
 
-  // H2024 oppgave 3
+  // H2024 3
   function etyOppg() { return skel(IN.oppg({
     intro: "<p>En etymologisk ordliste er et oppslagsverk for et ords opphav. Her er et eksempel fra kategorien Matematikk:</p>" +
       "<blockquote><p>heksagon: seksvinklet figur. Av gresk hex «seks» + gonía «vinkel».</p><p class=\"small\">(Kilde: Norsk etymologisk ordbok – tematisk ordnet, Yann De Caprona)</p></blockquote>" +

@@ -466,6 +466,21 @@
     set: function (on) { IN.store.set(STRAKS_KEY, on ? "1" : "0"); straksEvent(on); }
   };
   window.addEventListener("storage", function (e) { if (e.key === STRAKS_KEY) straksEvent(e.newValue === "1"); });
+
+  /* Tilbake-knappen (bfcache): siden vises fra minnet med brytere slik de sto da du gikk.
+     Har du endret tema, nivå eller «Vis svar med en gang» på en annen side, synkes de her. */
+  window.addEventListener("pageshow", function (e) {
+    if (!e.persisted) return;
+    var th = IN.store.get("in-theme", null);
+    if (th && th !== currentTheme()) {
+      applyTheme(th);
+      var tb = document.querySelector(".theme-toggle");
+      if (tb) { tb.textContent = themeIcon(th); tb.setAttribute("aria-label", themeLabel(th)); }
+    }
+    var lv = IN.store.get("in-level", null);
+    if (lv && lv !== levelGet()) levelSet(lv);
+    straksEvent(IN.svarStraks.get());
+  });
   function plain(html) { var d = document.createElement("div"); d.innerHTML = html; return (d.textContent || "").trim(); }
 
   /* ---------- Kildehenvisning på et punkt (sant/usant, flervalg) ----------
@@ -491,11 +506,19 @@
       stripSitat(r);
       if (!r.ref) return;
       var ref = String(r.ref);
-      var vis = r.kort ? String(r.kort) : ref.replace(/\s*\([^)]*\)/g, "").replace(/\s{2,}/g, " ").trim();
+      var vis = eksRef(r.kort ? String(r.kort) : ref.replace(/\s*\([^)]*\)/g, "").replace(/\s{2,}/g, " ").trim());
       out.push({ ref: ref, vis: vis || ref, egneOrd: r.egneOrd !== false, eksamen: r.eksamen });
     });
     return out.length ? out : null;
   }
+  /* Felles form for eksamensreferanser i synlig tekst: «H2023 4», «H2024 2c» (som IN2120).
+     Kildefeltene i dataene kan stå som «Eksamen H2021, oppgave 3»; de vises som «Eksamen H2021 3».
+     Interne nøkler (H2023-4, exam-h2023-4) berøres ikke. */
+  function eksRef(s) {
+    return String(s).replace(/(?<![–-])\b([HV]20\d\d)(?:\s*·\s*|,?\s+)(?:oppgave|oppg\.?)\s*(\d+)(?:\s*\(?([a-h])\)?(?![\w]))?/gi,
+      function (m, y, n, d) { return y + " " + n + (d || ""); });
+  }
+  IN.eksRef = eksRef;
   function kildeLineEl(refs) {
     var p = el("p", { class: "qz-kilde" }, "Kilde: ");
     refs.forEach(function (r, i) {
@@ -1095,10 +1118,10 @@
     if (d.kilde === false) return null;
     var hasNew = typeof d.kilde === "string" || d.ark || d.ordrett != null || d.key;
     if (!hasNew) return null;
-    var txt = typeof d.kilde === "string" ? d.kilde : null;
+    var txt = typeof d.kilde === "string" ? eksRef(d.kilde) : null;
     if (!txt) {
       var y = examYear(d), nr = oppgNr(d);
-      if (y) txt = "Oppgavetekst: UiO, IN2010, " + y + (nr ? ", oppgave " + nr : "");
+      if (y) txt = "Oppgavetekst: UiO, IN2010, " + y + (nr ? " " + nr : "");
     }
     var bits = [];
     if (txt) bits.push(el("span", { class: "et-kilde-src", text: txt }));
@@ -1239,7 +1262,7 @@
     var sv = pf && pf.sensor, deler = d.deler || pf.deler || null;
     if (!sv) return;
     var y = examYear(d), nr = oppgNr(d);
-    var src = sv.kilde || ("Kilde: sensorveiledning IN2010" + (y ? " " + y : "") + (nr ? ", oppgave " + nr : ""));
+    var src = eksRef(sv.kilde || ("Kilde: sensorveiledning IN2010" + (y ? " " + y : "") + (nr ? " " + nr : "")));
     host.appendChild(el("p", { class: "et-pf-src", text: src }));
     host.appendChild(el("p", { class: "et-lead", text: "Ordrett fra sensorveiledningen. Fargemarkeringer (som blå tekst for riktig svar) og figurer kommer ikke med, så dem gjengir vi med vår egen merking. Vårt eget svar står under «Løsning»." }));
     var bq = el("blockquote", { class: "sensor" });
@@ -1923,7 +1946,7 @@
      mellomlager ved oppstart, når fanen blir synlig igjen og hver halvtime. Er den nyere, vises en
      liten melding med «Oppdater». Fremdrift og svar ligger i localStorage og overlever oppdateringen.
      Virker bare over http(s): via file:// finnes det ingen gammel kopi å bekymre seg for. */
-  IN.VERSION = "20261127e";
+  IN.VERSION = "20261127f";
   function initVersionCheck() {
     if (!/^https?:$/.test(location.protocol) || !window.fetch) return;
     var DISMISS = "in2010:ny-versjon-skjult", last = 0, shown = null;

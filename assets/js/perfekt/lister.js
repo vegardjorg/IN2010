@@ -12,7 +12,7 @@
   IN.PERFEKT = IN.PERFEKT || {};
   function L(code, indent) { return { code: code, indent: indent }; }
 
-  /* ---------- H2020 · Oppgave 9 · HTML (4 + 8 poeng) ---------- */
+  /* ---------- H2020 9 · HTML (4 + 8 poeng) ---------- */
   IN.PERFEKT["H2020-9"] = {
     type: "eksamen",
     svar: [
@@ -51,7 +51,7 @@
       teknisk: "<p>Invarianten er at stakken (i (a): telleren) holder akkurat de åpnetaggene som ennå ikke er lukket, med den sist åpnede øverst. En lukketagg er bare lov hvis den passer med toppen. Når løkka er ferdig, betyr «tom stakk» at alt som ble åpnet, også ble lukket. Med push, pop, isOpen og TagType på O(1) blir det O(n) tid og O(n) ekstra minne i (b), mens (a) klarer seg med O(1) minne fordi alle taggene har samme type.</p>"
     },
     sensor: {
-      kilde: "Kilde: sensorveiledning IN2010 H2020, oppgave 9",
+      kilde: "Kilde: sensorveiledning IN2010 H2020 9",
       deler: [
         {
           del: "(a)",

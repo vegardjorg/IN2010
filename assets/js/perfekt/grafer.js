@@ -37,7 +37,7 @@
       rows.map(function (r) { return "<tr>" + r.map(function (c, i) { return i ? "<td>" + c + "</td>" : '<th style="text-align:left">' + c + "</th>"; }).join("") + "</tr>"; }).join("") + "</table></div>";
   }
 
-  /* ---------- H2020 · Oppgave 3 · Grafegenskaper (8 poeng) ---------- */
+  /* ---------- H2020 3 · Grafegenskaper (8 poeng) ---------- */
   var H20_3 = [
     ["G sammenhengende", "den er allerede sammenhengende, så ingenting", "Alle de seks nodene henger sammen."],
     ["G ikke sammenhengende", "fjerne kanter", "Vi må kutte kanter til en node eller en del faller av."],
@@ -57,13 +57,13 @@
       teknisk: "<p>Egenskapene er monotone: sammenheng og «har en sykel» bevares når vi legger til kanter, og «er en DAG» bevares når vi fjerner kanter. Derfor er det bare én av «legge til» og «fjerne» som kan hjelpe i hvert spørsmål.</p>"
     },
     sensor: {
-      kilde: "Kilde: sensorveiledning IN2010 H2020, oppgave 3",
+      kilde: "Kilde: sensorveiledning IN2010 H2020 3",
       deler: H20_3.map(function (r, i) { return { del: String(i + 1), fasit: "<p>" + r[1] + "</p>" }; }),
       merknad: "Sensorveiledningen viser alternativene til hvert spørsmål og markerer det riktige. Her står bare det riktige alternativet. Sensorveiledningen sier ikke hvordan de 8 poengene fordeles."
     }
   };
 
-  /* ---------- H2021 · Oppgave 7 · Korteste avstander i grafer (8 poeng) ---------- */
+  /* ---------- H2021 7 · Korteste avstander i grafer (8 poeng) ---------- */
   var H21_7 = [["Ingen negative kanter", "Dijkstra", "Dijkstra er raskest når ingen vekter er negative: O((|V| + |E|) · log(|V|))."],
     ["Vektet DAG", "Topologisk sortering", "Relakser kantene i topologisk rekkefølge. Det virker også med negative vekter, siden en DAG ikke har sykler: O(|V| + |E|)."],
     ["Uvektet", "Bredde-først søk", "BFS gir korteste vei målt i antall kanter: O(|V| + |E|)."],
@@ -77,13 +77,13 @@
       teknisk: "<p>«Raskest» betyr den med lavest kjøretid som fortsatt er korrekt. BFS og DAG-metoden er O(|V| + |E|), Dijkstra O((|V| + |E|) · log(|V|)) og Bellman-Ford O(|V| · |E|). Merk: en «urettet» graf med en negativ kant har alltid en negativ sykel (gå fram og tilbake), så Bellman-Ford-raden gjelder i praksis rettede grafer når det finnes negative kanter.</p>"
     },
     sensor: {
-      kilde: "Kilde: sensorveiledning IN2010 H2021, oppgave 7",
+      kilde: "Kilde: sensorveiledning IN2010 H2021 7",
       deler: H21_7.map(function (r) { return { del: r[0], fasit: "<p>" + r[1] + "</p>" }; }).concat([{ kriterier: "<p>Det gis 2 poeng per riktig svar.</p>" }]),
       merknad: "I sensorveiledningen er svarene kryss i en tabell. Her står de som tekst."
     }
   };
 
-  /* ---------- H2021 · Oppgave 11 · To-fargelegge en graf (10 poeng) ---------- */
+  /* ---------- H2021 11 · To-fargelegge en graf (10 poeng) ---------- */
   P["H2021-11"] = {
     type: "eksamen",
     svar: [{
@@ -99,7 +99,7 @@
       teknisk: "<p>Tofarging er det samme som å sjekke om grafen er todelt (bipartitt). Søket gir hver node farge etter avstanden fra start (partall eller oddetall i DFS-treet), og en kant mellom to noder med samme farge lukker en odde sykel.</p>"
     },
     sensor: {
-      kilde: "Kilde: sensorveiledning IN2010 H2021, oppgave 11",
+      kilde: "Kilde: sensorveiledning IN2010 H2021 11",
       deler: [
         { fasit: "<p>Å fargelegge en graf med to farger kan gjøres enkelt med et dybde-først (eller bredde-først) søk, der vi flipper fargen mellom hvert rekursive kall i søket. Dersom vi når en node, som allerede har en satt farge, som er ulik den som skal settes, så kan vi avbryte med melding om at det ikke er mulig å fargelegge grafen med to farger. Grunnen til at denne strategien fungerer (riktig nok bare for to farger), er at hvert valg av farge tvinges av foreldrenoden i DFS-spenntreet.</p>",
           kode: PC("TwoColor", "G", "En sammenhengende graf G = (V, E)", "En graf der nodene er fargelagt hvis det er mulig", [[1, "v ← arbitrary v ∈ V"], [1, "TwoColorDFS(G, v, R)"]]) },
@@ -110,7 +110,7 @@
     }
   };
 
-  /* ---------- H2021 · Oppgave 12 · Whops!-oppgjør (10 poeng) ---------- */
+  /* ---------- H2021 12 · Whops!-oppgjør (10 poeng) ---------- */
   P["H2021-12"] = {
     type: "eksamen",
     svar: [{
@@ -126,7 +126,7 @@
       teknisk: "<p>Summen per komponent er invariant: en overføring endrer to tall i samme komponent med +x og −x. Sum 0 er derfor nødvendig. Den er også nok: i en sammenhengende komponent kan alle sende til én node langs stier, og den noden kan så betale ut.</p>"
     },
     sensor: {
-      kilde: "Kilde: sensorveiledning IN2010 H2021, oppgave 12",
+      kilde: "Kilde: sensorveiledning IN2010 H2021 12",
       deler: [
         { fasit: "<p>Innsikten som trengs for å løse denne oppgaven er at dersom summen (med hensyn til T) i hver av komponentene av grafen G er 0, så går oppgjøret opp med Whops!. Vi kan samle komponenten som tilhører en node v, ved å gjøre et dybde-først (eller bredde-først) fra v. Ved et fullt dybde-først søk samler vi komponentene for hver node v ∈ V. Til slutt kan vi gå gjennom hver komponent, og sjekke at summen av T[v] for alle v i komponenten er 0.</p>" +
             "<p>I denne oppgaven er det viktigere at studenten klarer å kommunisere idéen bak algoritmen godt, enn å skrive pseudokode som veldig enkelt lar seg oversette til et konkret programmeringsspråk. Det er helt greit om studenten gjør antagelser om representasjonen av grafen (for eksempel en nabomatrise, nabolister eller en mer objekt-orientert stil). Løsningsforslaget nedenfor er ganske detaljert, men binder seg ikke til noen spesifikk representasjon av grafen.</p>",
@@ -140,7 +140,7 @@
     }
   };
 
-  /* ---------- H2021 · Oppgave 13 · Whops!-logger (10 poeng) ---------- */
+  /* ---------- H2021 13 · Whops!-logger (10 poeng) ---------- */
   P["H2021-13"] = {
     type: "eksamen",
     svar: [{
@@ -156,7 +156,7 @@
       teknisk: "<p>Topologisk sortering er korrekt uansett hvilken struktur som holder de klare nodene. Med en min-heap på ts blir den grådige regelen «minst ts blant de klare» oppfylt i hvert steg. Grafen er en DAG (hendelser i en logg kan ikke gå i ring), så alle nodene blir skrevet ut.</p>"
     },
     sensor: {
-      kilde: "Kilde: sensorveiledning IN2010 H2021, oppgave 13",
+      kilde: "Kilde: sensorveiledning IN2010 H2021 13",
       deler: [{
         fasit: "<p>Denne oppgaven kan løses med en litt modifisert topologisk sortering. I en standard topologisk sortering av nodene plasserer alle noder med inngrad 0 på en stack. For hver node u som besøkes, så fjerner vi alle kanter (u, v), og plasserer v på stacken dersom den får inngrad 0 som en konsekvens av å ha besøkt u. Dette er tilstrekkelig for å garantere at dersom det er en sti fra u til v, så skrives u ut før v. Merk at det ikke spiller noen rolle for den topologiske sorteringen om vi bruker en stack, en kø, eller en annen datastruktur med konstant tid på innsetting og uttak.</p>" +
           "<p>Det andre kravet sier at dersom det ikke er en sti fra u til v, så skal u skrives ut før v hvis u.ts &lt; v.ts; med andre ord vil vi sortere nodene etter tidsstempelet, enn så lenge det ikke bryter med det første kravet.</p>" +
@@ -169,7 +169,7 @@
     }
   };
 
-  /* ---------- H2022 · Oppgave 3 · Grafegenskaper (10 poeng) ---------- */
+  /* ---------- H2022 3 · Grafegenskaper (10 poeng) ---------- */
   var H22_3 = [["Grafen er sammenhengende", "Begge", "Alle nodene henger sammen i begge grafene."],
     ["Grafen er 2-sammenhengende", "Ingen", "G1 er et tre, og G2 har separasjonsnodene C og E."],
     ["Grafen er et tre", "G1", "G1 har 6 noder, 5 kanter og er sammenhengende. G2 har 6 kanter og en sykel."],
@@ -189,13 +189,13 @@
       teknisk: "<p>Et tre med n noder har n − 1 kanter, og hver node med grad ≥ 2 er en separasjonsnode. Én ekstra kant lager nøyaktig én sykel, og nodene på sykelen kan ikke lenger skille resten fra hverandre langs sykelen.</p>"
     },
     sensor: {
-      kilde: "Kilde: sensorveiledning IN2010 H2022, oppgave 3",
+      kilde: "Kilde: sensorveiledning IN2010 H2022 3",
       deler: H22_3.map(function (r) { return { del: r[0], fasit: "<p>" + r[1] + "</p>" }; }).concat([{ kriterier: "<p>Det gis 1 poeng per riktig svar. Spørsmålet som er uthevet i rødt er uklart, og tas ut av vurderingen.</p>" }]),
       merknad: "I sensorveiledningen er svarene kryss i en tabell. Påstanden som er uthevet i rødt, er «Grafen blir ett tre hvis vi fjerner én kant»."
     }
   };
 
-  /* ---------- H2022 · Oppgave 6 · Kjøretid på grafalgoritmer (8 poeng) ---------- */
+  /* ---------- H2022 6 · Kjøretid på grafalgoritmer (8 poeng) ---------- */
   var H22_6 = [["DFSFull", "O(|V| + |E|)", "Hver node besøkes én gang, og hver kant sjekkes fra hver ende."],
     ["Prim", "O((|V| + |E|) · log(|V|))", "Hver kant går inn og ut av en prioritetskø à O(log |V|). Grafen er sammenhengende, så kurset skriver også O(|E| · log(|V|))."],
     ["TopSort", "O(|V| + |E|)", "Hver node og hver kant behandles én gang."],
@@ -209,13 +209,13 @@
       teknisk: "<p>Lineært er O(|V| + |E|). Prim (og Dijkstra) med binær heap gir en ekstra faktor log(|V|). Bellman-Ford er O(|V| · |E|) fordi den gjør |V| − 1 runder med O(|E|) arbeid.</p>"
     },
     sensor: {
-      kilde: "Kilde: sensorveiledning IN2010 H2022, oppgave 6",
+      kilde: "Kilde: sensorveiledning IN2010 H2022 6",
       deler: H22_6.map(function (r) { return { del: r[0], fasit: "<p>" + r[1] + "</p>" }; }).concat([{ kriterier: "<p>Det gis 2 poeng per riktig svar.</p>" }]),
       merknad: "I sensorveiledningen er svarene kryss i en tabell. Her står de som tekst."
     }
   };
 
-  /* ---------- H2022 · Oppgave 8 · Garbage collection (8 poeng) ---------- */
+  /* ---------- H2022 8 · Garbage collection (8 poeng) ---------- */
   P["H2022-8"] = {
     type: "eksamen",
     svar: [{
@@ -231,7 +231,7 @@
       teknisk: "<p>Felles visited er det som gir lineær tid: et objekt som nås fra flere røtter, besøkes bare første gang. Med et nytt visited per rot blir det O(|R| · (|V| + |E|)).</p>"
     },
     sensor: {
-      kilde: "Kilde: sensorveiledning IN2010 H2022, oppgave 8",
+      kilde: "Kilde: sensorveiledning IN2010 H2022 8",
       deler: [{
         fasit: "<p>Oppgaven løses enklest ved å gjøre et dybde-først søk (DFSVisit) fra hver node i R, og deretter frigjøre alle noder i V som ikke er blitt besøkt.</p>",
         kode: PC("GarbageCollect", "G, R", "En objektgraf G = (V, E) og en mengde R med objekter", "Frigjør alle objekter det ikke finnes en referanse til",
@@ -242,7 +242,7 @@
     }
   };
 
-  /* ---------- H2022 · Oppgave 12 · Minimal forside (10 poeng) ---------- */
+  /* ---------- H2022 12 · Minimal forside (10 poeng) ---------- */
   P["H2022-12"] = {
     type: "eksamen",
     svar: [
@@ -256,7 +256,7 @@
       teknisk: "<p>Komponentgrafen til en rettet graf er alltid en DAG. Derfor reduseres (c) til (b). Alle tre delene er lineære.</p>"
     },
     sensor: {
-      kilde: "Kilde: sensorveiledning IN2010 H2022, oppgave 12",
+      kilde: "Kilde: sensorveiledning IN2010 H2022 12",
       deler: [
         { del: "(a)", fasit: "<p>Opp til 3 poeng. Returner antall komponenter grafen består av.</p>" },
         { del: "(b)", fasit: "<p>Opp til 3 poeng. Returner antall noder med inngrad 0.</p>" },
@@ -265,7 +265,7 @@
     }
   };
 
-  /* ---------- H2023 · Oppgave 6 · Blindern-problemet (10 poeng) ---------- */
+  /* ---------- H2023 6 · Blindern-problemet (10 poeng) ---------- */
   P["H2023-6"] = {
     type: "eksamen",
     svar: [
@@ -284,7 +284,7 @@
       teknisk: "<p>(b): Prim med binær heap er O(|E| · log(|V|)), og for en komplett graf er |E| = |V| · (|V| − 1) / 2. (c): i et tre er stien unik, så BFS gir den i lineær tid. Vektene i oppgaven er kostnader for å grave, ikke gangtid.</p>"
     },
     sensor: {
-      kilde: "Kilde: sensorveiledning IN2010 H2023, oppgave 6",
+      kilde: "Kilde: sensorveiledning IN2010 H2023 6",
       deler: [
         { del: "(a)", fasit: "<p>Problemet bør tenkes på som en komplett, vektet og urettet graf, der hver node i representerer en bygning og hver kant representerer en tunnel som kan bygninges ut. Kantene er vektet etter hvor mye det koster å grave tunnelen.</p>",
           kriterier: "<p>Opptil 2 poeng for en god forklaring av hva slags graf oppgaven handler om.</p>" },
@@ -300,7 +300,7 @@
     }
   };
 
-  /* ---------- H2023 · Oppgave 7 · Dependency hell (12 poeng) ---------- */
+  /* ---------- H2023 7 · Dependency hell (12 poeng) ---------- */
   P["H2023-7"] = {
     type: "eksamen",
     svar: [
@@ -319,7 +319,7 @@
       teknisk: "<p>(a): G er en DAG hvis og bare hvis topologisk sortering behandler alle |V| nodene. (b): i en DAG betyr «nådd to ganger fra s» to ulike stier, ikke en sykel. Fordi visited nullstilles per startnode, teller ikke det at to startnoder når samme node.</p>"
     },
     sensor: {
-      kilde: "Kilde: sensorveiledning IN2010 H2023, oppgave 7",
+      kilde: "Kilde: sensorveiledning IN2010 H2023 7",
       deler: [
         { del: "(a)", fasit: "<p>Dette bør løses på lineær tid. Mest naturlig er å bruke topologisk sortering (som oppdager sykler). Algoritmen for topologisk sortering plasserer først alle noder med inngrad 0 på en stack. Noder plukkes av stacken så lenge den ikke er tom, og for hver node som plukkes av fjernes alle dens utgående kanter (som fører til at dens naboer får lavere inngrad). Hvis en node får inngrad 0 plasseres den på stacken. Grafen er asyklisk hvis og bare hvis alle nodene blir prosessert.</p>",
           kode: PC("isCyclic", "G", null, null, [[1, "stack ← empty stack"], [1, "processed ← 0"], [1, "for v ∈ V do"], [2, "if indegree of v is 0 then"], [3, "stack.push(v)"], [1, "while stack is not empty do"], [2, "u ← stack.pop()"], [2, "processed ← processed + 1"],
@@ -336,7 +336,7 @@
     }
   };
 
-  /* ---------- H2024 · Oppgave 4 · Jazz eller klassisk? (10 poeng) ---------- */
+  /* ---------- H2024 4 · Jazz eller klassisk? (10 poeng) ---------- */
   P["H2024-4"] = {
     type: "eksamen",
     svar: [
@@ -354,7 +354,7 @@
       teknisk: "<p>BFS gir korteste avstand (i antall kanter) første gang en node oppdages. Derfor er det trygt å merke noden med en gang, og testen dist[u] &lt; k stopper søket nøyaktig ved dybde k.</p>"
     },
     sensor: {
-      kilde: "Kilde: sensorveiledning IN2010 H2024, oppgave 4",
+      kilde: "Kilde: sensorveiledning IN2010 H2024 4",
       deler: [
         { del: "(a)", fasit: "<p>Maksimalt 1 poeng.</p><p>Dette er en urettet graf G = (V, E), der nodene er personer i nettkverket og kantene er vennskap. Det er også mulig å tenke at vennskap er asymmetrisk, som gjør grafen rettet; det gjør ingen forskjell for algoritmen under, og gir like mye uttelling.</p><p>Oppgaveteksten er litt uklar (selv om den blir klarere sett i sammenheng med resten av oppgaveteksten). Derfor er vi svært snille i poenggivningen på denne.</p>" },
         { del: "(b)", fasit: "<p>Maksimalt 7 poeng.</p><p>Dette kan løses med en traversering fra s som stopper ved dybde k, der vi teller opp antall jazz og klassisk. Det bør ikke gjøres en full traversering.</p>",
@@ -368,7 +368,7 @@
     }
   };
 
-  /* ---------- H2024 · Oppgave 8 · Rundtur med DNT (12 poeng) ---------- */
+  /* ---------- H2024 8 · Rundtur med DNT (12 poeng) ---------- */
   P["H2024-8"] = {
     type: "eksamen",
     svar: [
@@ -390,7 +390,7 @@
       teknisk: "<p>(a): med «høyst én sykel per node» er hver ikke-triviell sterkt sammenhengende komponent nøyaktig én sykel. (b): en sti s → … → t i G er en sti t → … → s i Gr med samme vekt. Én Dijkstra gir alle avstandene vi trenger, i stedet for |U| kjøringer.</p>"
     },
     sensor: {
-      kilde: "Kilde: sensorveiledning IN2010 H2024, oppgave 8",
+      kilde: "Kilde: sensorveiledning IN2010 H2024 8",
       deler: [
         { del: "(a)", fasit: "<p>Maksimalt 5 poeng.</p><p>Her er det tilstrekkelig å svare at vi finner de sterkt sammenhengende komponentene av G og returnerer alle komponenter som har størrelse større enn én. Dette er i O(|V| + |E|).</p>",
           kode: PC("RoundTrip", "G", "En graf G = (V, E)", "En mengde av mengder av noder",
@@ -406,7 +406,7 @@
     }
   };
 
-  /* ---------- H2025 · Oppgave 3 · Sykler i grafer (11 poeng) ---------- */
+  /* ---------- H2025 3 · Sykler i grafer (11 poeng) ---------- */
   var CYC_U = PC("isCyclicUndirected", "G", "En urettet graf G = (V, E)", "Returnerer true hvis grafen inneholder en sykel, og false ellers",
     [[1, "visited ← empty set"], [1, "for u ∈ V do"], [2, "if u ∉ visited then"], [3, "if HasCycleFrom(G, null, u, visited) then return true"], [1, "return false"]]);
   var CYC_F = PC("HasCycleFrom", "G, p, u, visited", null, null,
@@ -432,7 +432,7 @@
       teknisk: "<p>(a): i et DFS-tre for en urettet graf er hver kant enten en kant i DFS-treet eller en tilbakekant. En tilbakekant (til en besøkt node som ikke er forelderen) lukker en sykel. (b): G er en DAG hvis og bare hvis topologisk sortering behandler alle |V| nodene.</p>"
     },
     sensor: {
-      kilde: "Kilde: sensorveiledning IN2010 H2025, oppgave 3",
+      kilde: "Kilde: sensorveiledning IN2010 H2025 3",
       deler: [
         { del: "(a)", fasit: "<p>Det finnes flere gode løsninger i O(|V| + |E|). Den mest nærliggende er kanskje et dybde-først søk.</p>",
           kode: PC("isCyclicUndirected", "G", "En urettet graf G = (V, E)", "Returnerer true hvis grafen inneholder en sykel, og false ellers",
@@ -453,7 +453,7 @@
     }
   };
 
-  /* ---------- H2025 · Oppgave 7 · Kollektivtilbudet i Oslo (15 poeng) ---------- */
+  /* ---------- H2025 7 · Kollektivtilbudet i Oslo (15 poeng) ---------- */
   P["H2025-7"] = {
     type: "eksamen",
     svar: [
@@ -480,7 +480,7 @@
       teknisk: "<p>(c) bruker at et minimalt spenntre også minimerer den største kanten (det er et «flaskehals-spenntre»): for hver kant med vekt større enn treets største, finnes det et kutt der en lettere kant i treet holder. (e): en negativ toveis-strekning med c(u, v) + c(v, u) &lt; 0 er også en negativ sykel.</p>"
     },
     sensor: {
-      kilde: "Kilde: sensorveiledning IN2010 H2025, oppgave 7",
+      kilde: "Kilde: sensorveiledning IN2010 H2025 7",
       deler: [
         { del: "(a)", fasit: "<p>At grafen er sammenhengende vil si at en reisende kan reise mellom to vilkårlige holdeplasser ved å bruke kollektivtilbudet.</p><p>At grafen er urettet vil si at en som har reist en strekning alltid kan reise den samme strekningen tilbake.</p>", kriterier: ["Inntil 1 poeng."] },
         { del: "(b)", fasit: "<p>Her kan vi gjøre et dybde-først søk, der kanter med vekt som overstiger k ignoreres, og sjekke om alle noder nås gjennom én traversering.</p>",

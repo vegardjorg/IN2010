@@ -643,7 +643,7 @@
         teknisk: "Etter kallet er subtreet med rot i en max-heap." }
     ],
     bigO: { best: "O(n)", avg: "O(n)", worst: "O(n)", space: "O(log n)",
-      why: t("De fleste tallene trenger nesten ikke synke.", "Samme argument som for BuildMinHeap: O(n).", "Samme sum som for BuildMinHeap: n · (1/4 + 2/8 + 3/16 + …) = n, altså O(n). Beviset er utenfor pensum.") }
+      why: t("De fleste tallene trenger nesten ikke synke.", "Samme argument som for BuildMinHeap: O(n).", "Samme sum som for BuildMinHeap: n · (1/4 + 2/8 + 3/16 + …) = n, altså O(n). Beviset er ikke pensum.") }
   });
   def(IN.algos, "heapSort", {
     title: "Heapsort – sorter med en max-heap, rett i arrayet",
@@ -1324,7 +1324,7 @@
   };
 
   IN.heapGen = { insert: genInsert, removeMin: genRemoveMin, buildMin: genBuildMin, heapSort: genHeapSort, median: genMedian };
-  /* ===================== BØTTEKØ / BUCKET QUEUE (H2022 oppg. 10) =====================
+  /* ===================== BØTTEKØ / BUCKET QUEUE (H2022 10) =====================
      Navn, input og output som på eksamensarket; linjene følger løsningen i sensorveiledningen. */
   var BQ_IN = "En bucket queue Q med prioriteter fra 0 til N − 1";
   def(IN.algos, "bucketQueueInsert", {
@@ -1490,7 +1490,7 @@
     answer: function (s) { return s && s.out ? s.out.join(", ") : null; }
   });
 
-  /* ===================== H2025 oppg. 5 (b) og (d): søketre i level-order =====================
+  /* ===================== H2025 5b og (d): søketre i level-order =====================
      Input til demoene: tallene som settes inn i et tomt søketre, i rekkefølge (gir treet v).
      Noder { id, k, l, r } som i viz-tree.js. */
   function bstAdd(root, k, pre) {

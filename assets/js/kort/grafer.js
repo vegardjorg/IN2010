@@ -99,21 +99,21 @@
   var LEG_DIA = [{ cls: "compare", label: "Nå" }, { cls: "target", label: "Startnode (inngrad 0)" }, { color: DASH, label: "På stakken" }, { cls: "sorted", label: "Besøkt i dette søket" }, { cls: "swap", label: "Nådd for andre gang: diamant" }];
   var LEG_JAZZ = [{ cls: "compare", label: "Nå / kanten vi sjekker" }, { cls: "target", label: "Deg (s)" }, { color: DASH, label: "I køen" }, { cls: "sorted", label: "Talt med" }];
 
-  // H2020 oppg. 3: G (urettet) og H (rettet) med samme, umerkede noder
+  // H2020 3: G (urettet) og H (rettet) med samme, umerkede noder
   var POS20 = [["a", 40, 162], ["b", 180, 60], ["c", 318, 60], ["d", 455, 162], ["e", 110, 267], ["f", 387, 267]];
   function g20(directed, edges) { return { directed: directed, nodes: POS20.map(function (p) { return N(p[0], p[1], p[2], { label: "" }); }), edges: edges }; }
   var G20 = g20(false, [["a", "b"], ["b", "c"], ["b", "f"], ["c", "e"], ["c", "d"], ["a", "e"], ["e", "f"]]);
   var H20 = g20(true, [["a", "b"], ["b", "c"], ["c", "d"], ["a", "e"], ["c", "e"], ["b", "f"], ["e", "f"]]);
-  // H2020 oppg. 8 (e): fire små grafer på A, B, C, D (kvadrat)
+  // H2020 8e: fire små grafer på A, B, C, D (kvadrat)
   function sq(edges, w) { return { directed: false, nodes: [N("A", 0, 0), N("B", 90, 0), N("C", 0, 90), N("D", 90, 90)], edges: edges.map(function (e) { var diag = (e[0] + e[1] === "AD" || e[0] + e[1] === "BC"); return [e[0], e[1], w != null ? w : e[2], diag ? { t: e[0] === "A" ? 0.28 : 0.72 } : null]; }) }; }
   var T1 = sq([["A", "B"], ["A", "C"], ["A", "D"], ["B", "C"], ["B", "D"], ["C", "D"]], 10);
   var T2 = sq([["A", "B"], ["A", "C"], ["B", "C"], ["B", "D"], ["C", "D"]], 8);
   var T3 = sq([["A", "C"], ["A", "D"], ["B", "D"]], 3);
   var T4 = sq([["A", "D"], ["B", "C"]], 1);
   var S20 = sq([["A", "B", 8], ["C", "D", 8], ["A", "C", 3], ["B", "D", 3], ["A", "D", 1], ["B", "C", 1]]);
-  // H2020 oppg. 8 (a) og (d): egen eksempelgraf med den hamiltonske sykelen A, B, C, D, E, F og to korder (delt, data-grafer.js)
+  // H2020 8a og (d): egen eksempelgraf med den hamiltonske sykelen A, B, C, D, E, F og to korder (delt, data-grafer.js)
   var HEX = GR.hex;
-  // H2020 oppg. 8 (h): E1–E4 slått sammen (letteste kant per par; alle andre par har vekt 10 fra E1)
+  // H2020 8h: E1–E4 slått sammen (letteste kant per par; alle andre par har vekt 10 fra E1)
   var OCT = (function () {
     var pos = { A: [200, 20], B: [292, 58], C: [330, 150], D: [292, 242], E: [200, 280], F: [108, 242], G: [70, 150], H: [108, 58] }, V = "ABCDEFGH".split(""), w = {};
     function k(a, b) { return a < b ? a + b : b + a; }
@@ -122,37 +122,37 @@
     put("AB BC CD DE EF FG GH EH FH FA", 8); put("AC BC CD DE EF FG GH", 3); put("AD CD BD FG", 1);
     return { directed: false, nodes: V.map(function (v) { return N(v, pos[v][0], pos[v][1]); }), edges: Object.keys(w).map(function (p) { return [p[0], p[1], w[p]]; }) };
   })();
-  // H2021 oppg. 11: egen graf (todelt) + en variant med en odde sykel
+  // H2021 11: egen graf (todelt) + en variant med en odde sykel
   var TC = { directed: false, nodes: [N("A", 20, 90), N("B", 110, 20), N("C", 110, 160), N("D", 200, 90), N("E", 290, 90), N("F", 380, 90)],
     edges: [["A", "B"], ["A", "C"], ["B", "D"], ["C", "D"], ["D", "E"], ["E", "F"]] };
   var TC_ODD = copy(TC, { edges: TC.edges.concat([["B", "C"]]) });
-  // H2021 oppg. 12: Whops!-oppgjør
+  // H2021 12: Whops!-oppgjør
   var G1W = { directed: false, nodes: [N("0", 57, 0), N("1", 0, 40), N("4", 113, 40), N("2", 22, 107), N("3", 91, 107)], edges: [["0", "1"], ["1", "2"], ["4", "3"]] };
   var G2W = { directed: false, nodes: [N("0", 0, 0), N("1", 59, 0), N("2", 0, 59), N("3", 59, 59)], edges: [["0", "2"], ["1", "3"]] };
   var T1W = { 0: 500, 1: -200, 2: -300, 3: -50, 4: 50 }, T2W = { 0: 300, 1: -250, 2: 0, 3: -50 };
-  // H2021 oppg. 13: Whops!-logger (hendelsene som bokser, navn som på arket)
+  // H2021 13: Whops!-logger (hendelsene som bokser, navn som på arket)
   var LOGG = { directed: true, nodes: [
       N("A1", 90, 20, { label: "A sent 50 to B at 1", w: 170 }), N("A4", 330, 20, { label: "A sent 100 to C at 4", w: 178 }),
       N("C3", 330, 100, { label: "C received 100 from A at 3", w: 206 }), N("C5", 570, 100, { label: "C sent 200 to B at 5", w: 178 }),
       N("B2", 90, 180, { label: "B received 50 from A at 2", w: 198 }), N("B6", 570, 180, { label: "B received 200 from C at 6", w: 206 })],
     edges: [["A1", "A4"], ["A1", "B2"], ["B2", "B6"], ["A4", "C3"], ["C3", "C5"], ["C5", "B6"]] };
-  // H2022 oppg. 3: grafegenskaper
+  // H2022 3: grafegenskaper
   var G1P = { directed: false, nodes: [N("A", 0, 0), N("B", 79, 0), N("C", 40, 79), N("D", 118, 79), N("E", 99, 158), N("F", 79, 237)],
     edges: [["A", "B"], ["B", "C"], ["B", "D"], ["C", "F"], ["E", "F"]] };
   var G2P = { directed: false, nodes: [N("A", 0, 0), N("B", 79, 0), N("C", 40, 79), N("D", 118, 79), N("E", 99, 158), N("F", 79, 237)],
     edges: [["A", "C"], ["B", "C"], ["C", "E"], ["C", "F"], ["D", "E"], ["E", "F"]] };
-  // H2022 oppg. 8: egen objektgraf (A, E er røtter; D ↔ F er en ring ingen rot når)
+  // H2022 8: egen objektgraf (A, E er røtter; D ↔ F er en ring ingen rot når)
   var GCG = { directed: true, nodes: [N("A", 30, 30), N("B", 160, 30), N("C", 95, 130), N("E", 30, 230), N("D", 230, 150), N("F", 330, 210), N("G", 290, 30), N("H", 160, 230)],
     edges: [["A", "B"], ["B", "C"], ["C", "A"], ["E", "C"], ["D", "F"], ["F", "D", null, { bend: 0.25 }], ["G", "B"]] };
-  // H2023 oppg. 7: avhengigheter (som på arket) + egne varianter
+  // H2023 7: avhengigheter (som på arket) + egne varianter
   var SIRK = { directed: true, nodes: [N("A", 0, 60), N("B", 90, 60), N("C", 170, 0), N("D", 170, 120)], edges: [["A", "B"], ["B", "C"], ["C", "D"], ["D", "B"]] };
   var DIAM = { directed: true, nodes: [N("A", 0, 60), N("B", 90, 0), N("C", 90, 120), N("D", 180, 60)], edges: [["A", "B"], ["B", "D"], ["A", "C"], ["C", "D"]] };
   var NODIAM = copy(DIAM, { edges: [["A", "B"], ["B", "D"], ["A", "C"]] });
-  // H2024 oppg. 4: eget vennenettverk
+  // H2024 4: eget vennenettverk
   var JZ = { directed: false, nodes: [N("S", 30, 100), N("A", 130, 40), N("B", 130, 160), N("C", 230, 40), N("D", 230, 160), N("E", 330, 40), N("F", 330, 160)],
     edges: [["S", "A"], ["S", "B"], ["A", "B"], ["B", "D"], ["A", "C"], ["C", "E"], ["D", "F"]] };
   var JZM = { S: ["jazz"], A: ["jazz"], B: ["klassisk", "pop"], C: ["jazz", "folk"], D: ["pop"], E: ["klassisk"], F: ["klassisk"] };
-  // H2024 oppg. 8: eget turområde (to rundturer, ingen node på to sykler)
+  // H2024 8: eget turområde (to rundturer, ingen node på to sykler)
   var DNT = { directed: true, nodes: [N("G", 20, 90), N("A", 100, 30), N("B", 200, 30), N("C", 150, 130), N("D", 250, 130), N("E", 350, 130), N("F", 300, 220), N("H", 400, 220)],
     edges: [["G", "A"], ["A", "B"], ["B", "C"], ["C", "A"], ["C", "D"], ["D", "E"], ["E", "F"], ["F", "D"], ["F", "H"]] };
 
@@ -161,7 +161,7 @@
   var INSPERA = "Svaralternativene var et flervalg i Inspera og står ikke på arket. De er hentet fra sensorveiledningen.";
 
     def("H2020-3", { host: "#exam-h2020-3" }, function () { return { key: "H2020-3", year: "H2020", title: "Grafegenskaper", oppgave_nr: "Oppgave 3", points: 8,
-      kilde: "Oppgavetekst: UiO, IN2010, H2020, oppgave 3", ark: "Grafegenskaper", ordrett: true,
+      kilde: "Oppgavetekst: UiO, IN2010, H2020 3", ark: "Grafegenskaper", ordrett: true,
       oppgave: IN.oppg({
         intro: "<p>Vi er gitt en urettet graf G, og en rettet graf H som ser slik ut:</p>",
         figs: [gFig(G20, "G", {}, { scale: 0.6 }), gFig(H20, "H", {}, { scale: 0.6 })],
@@ -185,7 +185,7 @@
     }; });
 
     def("H2022-3", { host: "#exam-h2022-2" }, function () { return { key: "H2022-3", year: "H2022", title: "Grafegenskaper", oppgave_nr: "Oppgave 3", points: 10,
-      kilde: "Oppgavetekst: UiO, IN2010, H2022, oppgave 3", ark: "Grafegenskaper", ordrett: true, poengkilde: "sv",
+      kilde: "Oppgavetekst: UiO, IN2010, H2022 3", ark: "Grafegenskaper", ordrett: true, poengkilde: "sv",
       oppgave: IN.oppg({
         intro: "<p>Her er to grafer:</p>",
         figs: [gFig(G1P, "G1", {}, { scale: 0.75 }), gFig(G2P, "G2", {}, { scale: 0.75 })],
@@ -208,7 +208,7 @@
     }; });
 
     def("H2022-6", { host: "#exam-h2022-5" }, function () { return { key: "H2022-6", year: "H2022", title: "Kjøretid på grafalgoritmer", oppgave_nr: "Oppgave 6", points: 8,
-      kilde: "Oppgavetekst: UiO, IN2010, H2022, oppgave 6", ark: "Kjøretid på grafalgoritmer", ordrett: true, poengkilde: "sv",
+      kilde: "Oppgavetekst: UiO, IN2010, H2022 6", ark: "Kjøretid på grafalgoritmer", ordrett: true, poengkilde: "sv",
       oppgave: IN.oppg({
         intro: "<p>For hver grafalgoritme, kryss av på den (laveste) korrekte kjøretidskompleksiteten.</p>" +
           tab(["", "O(1)", "O(|V| + |E|)", "O((|V| + |E|) · log(|V|))", "O(|V| · |E|)"],
@@ -225,7 +225,7 @@
     }; });
 
     def("H2024-4", { host: "#exam-h2024-4" }, function () { return { key: "H2024-4", year: "H2024", title: "Jazz eller klassisk?", oppgave_nr: "Oppgave 4", points: 10,
-      kilde: "Oppgavetekst: UiO, IN2010, H2024, oppgave 4", ark: "Jazz eller klassisk?", ordrett: true, poengkilde: "sv",
+      kilde: "Oppgavetekst: UiO, IN2010, H2024 4", ark: "Jazz eller klassisk?", ordrett: true, poengkilde: "sv",
       oppgave: skel(IN.oppg({
         intro: "<p>Du ønsker å invitere venner med på konsert, og er usikker på om du skal invitere til jazz eller klassisk, som er de to eneste sjangrene du liker. Gjennom et lite musikknettverk har du god oversikt over din egen musikksmak, musikksmaken til dine venner, dine venners venner og dine venners venners venner etc. Musikksmaken til en venn (eller en venns venn etc.) v er gitt av en ordbok M, der M[v] er en mengde av sjangre. For eksempel, kan M[v] være {\"jazz\", \"pop\", \"folk\"}.</p>",
         parts: [{ t: "Hvordan kan du representere musikknettverket som en graf? Hva representerer nodene og kantene i grafen?", p: 1 },
@@ -246,7 +246,7 @@
     }; });
 
     def("H2022-8", { host: "#exam-h2022-7" }, function () { return { key: "H2022-8", year: "H2022", title: "Garbage collection", oppgave_nr: "Oppgave 8", points: 8,
-      kilde: "Oppgavetekst: UiO, IN2010, H2022, oppgave 8", ark: "Garbage collection", ordrett: true,
+      kilde: "Oppgavetekst: UiO, IN2010, H2022 8", ark: "Garbage collection", ordrett: true,
       oppgave: skel(IN.oppg({
         intro: "<p>Mange moderne programmeringsspråk har en garbage collector, som er en prosedyre som frigjør minne som garantert ikke vil brukes i programmet lenger. Du skal utlede en enkel algoritme for garbage collection.</p>" +
           "<p>Vi kan anta at alt som lagres er objekter, der et objekt kan referere til andre objekter. Vi lar en G = (V, E) være en objektgraf, der V representerer alle objektene som er opprettet, og en (rettet) kant fra u til v betyr at objektet u har en referanse til objektet v. I tillegg har vi en mengde R med alle objektene som kan refereres til direkte (typisk objekter som refereres til av programvariabler). Alle objekter i R er også i V. Objekter det ikke finnes en referanse til via objekter i R er garantert å ikke bli brukt i programmet, og skal derfor frigjøres.</p>" +
@@ -262,7 +262,7 @@
     }; });
 
     def("H2021-11", { host: "#exam-h2021-11" }, function () { return { key: "H2021-11", year: "H2021", title: "To-fargelegge en graf", oppgave_nr: "Oppgave 11", points: 10,
-      kilde: "Oppgavetekst: UiO, IN2010, H2021, oppgave 11", ark: "To-fargelegge en graf", ordrett: true,
+      kilde: "Oppgavetekst: UiO, IN2010, H2021 11", ark: "To-fargelegge en graf", ordrett: true,
       oppgave: skel(IN.oppg({
         intro: "<p>Du er gitt en urettet og sammenhengende graf G = (V, E). Du skal lage en algoritme som fargelegger nodene i V med to farger R(rød) og B(blå), slik at ingen naboer (u, v) ∈ E har samme farge; hvis dette ikke er mulig, så skal algoritmen skrive ut at det ikke er mulig.</p>" +
           "<p>Du kan anta at hver node i V har et felt v.color som initielt er satt til null, og at du har tilgang på en funksjon FlipColor der FlipColor(R) = B og FlipColor(B) = R.</p>" + SKEL
@@ -276,7 +276,7 @@
     }; });
 
     def("H2021-13", { host: "#exam-h2021-13" }, function () { return { key: "H2021-13", year: "H2021", title: "Whops!-logger", oppgave_nr: "Oppgave 13", points: 10,
-      kilde: "Oppgavetekst: UiO, IN2010, H2021, oppgave 13", ark: "Whops!-logger", ordrett: true,
+      kilde: "Oppgavetekst: UiO, IN2010, H2021 13", ark: "Whops!-logger", ordrett: true,
       oppgave: IN.oppg({
         intro: "<p>Tjenesten Whops! lar brukere overføre penger mellom hverandre gjennom en app. De prøver i så stor grad som mulig å unngå å lagre informasjon om brukerene sine sentralt, og lar heller informasjonen lagres på brukeren sin egen mobiltelefon.</p>" +
           "<p>En gang i blant har de behov for å anskaffe en komplett logg av overføringer for en periode for å kunne feilsøke systemene sine. Da henter de inn lokale logger fra noen utvalgte mobiltelefoner i systemet. En lokal logg er en liste av hendelser, der hver hendelse beskriver enten at et beløp er sent eller mottatt. I tillegg inneholder hver hendelse et tidsstempel som forteller når beløpet ble sendt eller motatt. For enkelhets skyld er tidsstemplene representert som positive heltall. Her er et lite eksempel på tre logger fra mobiltelefoner A, B og C.</p>" +
@@ -300,7 +300,7 @@
     }; });
 
     def("H2021-7", { host: "#exam-h2021-7" }, function () { return { key: "H2021-7", year: "H2021", title: "Korteste avstander i grafer", oppgave_nr: "Oppgave 7", points: 8,
-      kilde: "Oppgavetekst: UiO, IN2010, H2021, oppgave 7", ark: "Korteste avstander i grafer", ordrett: true, poengkilde: "sv",
+      kilde: "Oppgavetekst: UiO, IN2010, H2021 7", ark: "Korteste avstander i grafer", ordrett: true, poengkilde: "sv",
       oppgave: IN.oppg({
         intro: "<p>For hver graftype, velg den raskeste algoritmen som finner korteste avstander fra en startnode til alle andre noder i grafen.</p>" +
           tab(["", "Bredde-først søk", "Dijkstra", "Topologisk Sortering", "Bellman-Ford"],
@@ -318,7 +318,7 @@
     }; });
 
     def("H2023-6", { host: "#exam-h2023-6" }, function () { return { key: "H2023-6", year: "H2023", title: "Blindern-problemet", oppgave_nr: "Oppgave 6", points: 10,
-      kilde: "Oppgavetekst: UiO, IN2010, H2023, oppgave 6", ark: "Blindern-problemet", ordrett: true, poengkilde: "sv",
+      kilde: "Oppgavetekst: UiO, IN2010, H2023 6", ark: "Blindern-problemet", ordrett: true, poengkilde: "sv",
       oppgave: IN.oppg({
         intro: "<p>Blindern-problemet er en utfordring som er kjent for mange studenter ved Universitet i Oslo, som oppstår når man må gå fra en forelesning til en annen på motsatt side av campus på et knapt kvarter. Du er blitt bedt om å konsultere i UiO sitt nye prosjekt hvor det skal utvikles et tunnelsystem som forbinder alle bygningene som hører til campus.</p>" +
           "<p>Det er allerede kartlagt hvor mye det vil koste å grave tunnel mellom hvert par av bygninger (og anta at ingen av de kartlagte tunnelene kolliderer). Din oppgave er å finne den mest kostnadseffektive måten å grave et tunnelsystem på, ut ifra de kartlagte tunnelene, slik at man kan gå mellom alle bygningene kun ved å bruke tunnelsystemet.</p>",
@@ -337,7 +337,7 @@
     }; });
 
     def("H2025-7", { host: "#exam-h2025-6" }, function () { return { key: "H2025-7", year: "H2025", title: "Kollektivtilbudet i Oslo", oppgave_nr: "Oppgave 7", points: 15,
-      kilde: "Oppgavetekst: UiO, IN2010, H2025, oppgave 7", ark: "Kollektivtilbudet i Oslo", ordrett: true, poengkilde: "sv",
+      kilde: "Oppgavetekst: UiO, IN2010, H2025 7", ark: "Kollektivtilbudet i Oslo", ordrett: true, poengkilde: "sv",
       oppgave: IN.oppg({
         intro: "<p>I det siste bystyremøtet ble det sluttet flere vedtak vedrørende kollektivtilbudet i Oslo. La kollektivtilbudet være representert som en sammenhengende, urettet og vektet graf G = (V, E), der u ∈ V er en holdeplass, en kant {u, v} ∈ E er en strekning og vektfunksjonen w angir reisetid (i minutter) for en strekning.</p>",
         parts: [{ t: "Grafen er sammenhengende og urettet. Forklar kort hva hver av egenskapene vil si for en som reiser kollektivt i Oslo.", p: 1 },
@@ -361,7 +361,7 @@
     }; });
 
     def("H2020-8", { host: "#exam-h2020-8" }, function () { return { key: "H2020-8", year: "H2020", title: "Fire typer grafer", oppgave_nr: "Oppgave 8", points: 38,
-      kilde: "Oppgavetekst: UiO, IN2010, H2020, oppgave 8", ark: "Fire typer grafer", ordrett: true,
+      kilde: "Oppgavetekst: UiO, IN2010, H2020 8", ark: "Fire typer grafer", ordrett: true,
       oppgave: skel(IN.oppg({
         intro: "<p>Du ønsker å forbedre kommunikasjonsnettverket i en liten by. Historisk sett har all kommunikasjon mellom husstander i byen skjedd ved hjelp av brevduer. På denne måten kunne alle nå hverandres hus direkte. Men brevduer er upraktiske, så du skal finne bedre måter for husstandene å kommunisere med hverandre på. Du har utforsket følgende muligheter:</p>" +
           "<ul><li>Den nye startupen HamiltonBikes har begynt å bygge nye sykkelstier og kommer til å drifte brevlevering mellom alle hus. De garanterer at man kan ta seg en sykkeltur som går innom alle husene i byen, uten å måtte sykle forbi det samme huset to ganger.</li>" +
@@ -450,7 +450,7 @@
     }; });
 
     def("H2024-8", { host: "#exam-h2024-8" }, function () { return { key: "H2024-8", year: "H2024", title: "Rundtur med DNT", oppgave_nr: "Oppgave 8", points: 12,
-      kilde: "Oppgavetekst: UiO, IN2010, H2024, oppgave 8", ark: "Rundtur med Den Norske Turistforeningen (DNT)", ordrett: true, poengkilde: "sv",
+      kilde: "Oppgavetekst: UiO, IN2010, H2024 8", ark: "Rundtur med Den Norske Turistforeningen (DNT)", ordrett: true, poengkilde: "sv",
       oppgave: IN.oppg({
         intro: "<p>Fagutvalget ved institutt for informatikk har bestemt seg for å arrangere en rundtur i et vakkert norsk fjellandskap for alle IFI-studenter. Dette sammenfaller med at Den Norske Turistforeningen har lansert en ny app, sammen med offentlige datasett, slik at det er gode muligheter for å gjøre et godt informert rutevalg. Siden de fleste studenter på IFI har en forkjærlighet for grafer, er det ikke til å unngå at de vil bruke datasettet til å bygge en graf som fanger nok informasjon til å kunne algoritmisk bestemme den beste rundturen.</p>" +
           "<p>Grafen som bygges er en rettet graf G = (V, E), der hver node u ∈ V representerer en lokasjon, og en kant (u, v) ∈ E representerer en turvei fra u til v. Ingen noder har en kant til seg selv.</p>",
@@ -471,7 +471,7 @@
     }; });
 
     def("H2022-12", { host: "#exam-h2022-11" }, function () { return { key: "H2022-12", year: "H2022", title: "Minimal forside", oppgave_nr: "Oppgave 12", points: 10,
-      kilde: "Oppgavetekst: UiO, IN2010, H2022, oppgave 12", ark: "Minimal forside", ordrett: true, poengkilde: "sv",
+      kilde: "Oppgavetekst: UiO, IN2010, H2022 12", ark: "Minimal forside", ordrett: true, poengkilde: "sv",
       oppgave: IN.oppg({
         intro: "<p>Du er gitt en graf G = (V, E) som representerer et domene, der hver node representerer en side under domenet. Dersom det finnes en kant fra u til v, betyr det at det er en link på side u som linker til v.</p>" +
           "<p>Du har fått i oppdrag å lage en forside (som blir en ny node i grafen), som skal oppfylle følgende kriterer:</p><ul><li>Alle sider skal kunne nås fra forsiden.</li><li>Forsiden skal inneholde så få linker som mulig.</li></ul>" +
@@ -490,7 +490,7 @@
     }; });
 
     def("H2025-3", { host: "#exam-h2025-2" }, function () { return { key: "H2025-3", year: "H2025", title: "Sykler i grafer", oppgave_nr: "Oppgave 3", points: 11,
-      kilde: "Oppgavetekst: UiO, IN2010, H2025, oppgave 3", ark: "Sykler i grafer", ordrett: true, poengkilde: "sv",
+      kilde: "Oppgavetekst: UiO, IN2010, H2025 3", ark: "Sykler i grafer", ordrett: true, poengkilde: "sv",
       oppgave: skel(IN.oppg({
         parts: [{ t: "Anta at grafen G = (V, E) er en urettet graf. Grafen inneholder en sykel hvis det finnes en sti fra en node u tilbake til samme node u som går innom minst én annen node v.<br>Skriv en prosedyre som avgjør om grafen inneholder en sykel." + SKEL, p: 5 },
           { t: "Anta at grafen G = (V, E) er en rettet graf. Grafen inneholder en sykel hvis det finnes en sti fra en node u tilbake til samme node u.<br>Skriv en prosedyre som avgjør om grafen inneholder en sykel." + SKEL, p: 6 }]
@@ -512,7 +512,7 @@
     }; });
 
     def("H2023-7", { host: "#exam-h2023-7" }, function () { return { key: "H2023-7", year: "H2023", title: "Dependency hell", oppgave_nr: "Oppgave 7", points: 12,
-      kilde: "Oppgavetekst: UiO, IN2010, H2023, oppgave 7", ark: "Dependency hell", ordrett: true, poengkilde: "sv",
+      kilde: "Oppgavetekst: UiO, IN2010, H2023 7", ark: "Dependency hell", ordrett: true, poengkilde: "sv",
       oppgave: IN.oppg({
         intro: "<p>I moderne programvareutvikling er det vanlig at en applikasjon er avhengig av mange biblioteker, som igjen kan avhenge av andre biblioteker. Et bibliotek kan ses på som en samling med kode som er designet for gjenbruk. Bibliotekene som brukes for å bygge en applikasjon kalles avhengighetene til applikasjonen. Avhengighetene mellom biblioteker er gitt som en rettet graf G = (V, E), der en node representerer et bibliotek, og hvor det går en kant fra u til v dersom u bruker v som et bibliotek.</p>" +
           "<p>Eksemplene under er situasjonener ofte omtalt som dependency hell.</p>",
@@ -536,7 +536,7 @@
     }; });
 
     def("H2021-12", { host: "#exam-h2021-12" }, function () { return { key: "H2021-12", year: "H2021", title: "Whops!-oppgjør", oppgave_nr: "Oppgave 12", points: 10,
-      kilde: "Oppgavetekst: UiO, IN2010, H2021, oppgave 12", ark: "Whops!-oppgjør", ordrett: true,
+      kilde: "Oppgavetekst: UiO, IN2010, H2021 12", ark: "Whops!-oppgjør", ordrett: true,
       oppgave: IN.oppg({
         intro: "<p>Ansatte på Institutt for informatikk har vært på instituttseminar hvor det har sklidd helt ut med utlån av små beløp mellom hverandre. De skal alle gjøre opp for seg ved å overføre penger via tjenesten Whops!. Dessverre har det oppstått et virvar av interne stridigheter mellom de ansatte, hvor mange har endt opp med å blokkere hverandre på Whops!, som gjør det vanskelig å få oppgjøret til å gå opp. Administrasjonen ser fortvilet på situasjonen, og skjønner at dette problemet vil oppstå igjen i årene fremover, hvor det også skal ansettes vanvittig mange. De har rutiner på plass for å få oversikt over hvor mye hver ansatt har lagt ut eller skylder totalt. Nå ber de om hjelp fra studentene i IN2010 (som på dette tidspunktet har blitt eksperter på algoritmer og datastrukturer) til å finne en generell måte å sjekke om oppgjøret kan gjennomføres gjennom Whops! eller ikke, som også vil skalere etterhvert som Institutt for Informatikk får ubegripelig mange ansatte.</p>" +
           "<p>Du setter flittig i gang, og formaliserer problemet som et grafproblem. Du lar G = (V, E), der hver ansatt er representert ved en node v ∈ V, og lar det være en (urettet) kant {u, v} ∈ E mellom to ansatte dersom de ikke har blokkert hverandre på Whops!. For hver ansatt v ∈ V kan du slå opp i en tabell T, der T[v] er et heltall som angir hvor mye v skylder eller har lagt ut totalt. Dersom T[v] er negativ, betyr det at v skylder penger, men dersom T[v] er positiv betyr det at v har lagt ut penger. Du vet at summen av alle tallene i T er nøyaktig 0. Merk at det betyr at dersom alle kunne utveksle penger mellom hverandre gjennom Whops! (muligens via andre ansatte) ville oppgjøret alltid gått opp.</p>" +

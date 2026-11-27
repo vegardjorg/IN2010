@@ -3,7 +3,7 @@
    Pseudokode (IN.algos) og steg-generatorer (IN.gen) for
    dynamisk array (PushBack, EnsureCapacity, PopBack, Add, Remove),
    enkelt- og dobbeltlenket liste (NodeAt, InsertAfter, RemoveAfter,
-   RemoveNode), velformaterte tagger (H2020 oppgave 9) og «nylige søk»
+   RemoveNode), velformaterte tagger (H2020 9) og «nylige søk»
    (fra ukesoppgavene om hashing, ofte kalt LRU-cache).
    Alle nøkler har prefikset «ls». Steg tegnes av viz-list.js.
    Demoer med flere pseudokoder bruker linjenummer 100·a + linje.
@@ -281,7 +281,7 @@
         "O(1) gitt v. Derfor kan en dobbeltlenket liste fjerne bakerst på O(1), og det kan ikke en enkeltlenket.") }
   });
 
-  /* ---------- H2020 oppgave 9: velformaterte tagger ---------- */
+  /* ---------- H2020 9: velformaterte tagger ---------- */
   reg(IN.algos, "lsGoodDivs", {
     title: "GoodDivs (H2020 9a)", name: "GoodDivs", params: "A",
     input: "Et array A med n strenger, der hver er \"<div>\" eller \"</div>\"",

@@ -53,7 +53,7 @@
   }
   function seq(lines) { return '<div class="et-sv-seq">' + lines.join("\n") + "</div>"; }
 
-  /* ---------- H2020 · Oppgave 2 · Binære søketrær (4 poeng) ---------- */
+  /* ---------- H2020 2 · Binære søketrær (4 poeng) ---------- */
   IN.PERFEKT["H2020-2"] = {
     type: "eksamen",
     svar: [
@@ -72,7 +72,7 @@
       teknisk: "<p>(a) og (b) tester definisjonene: høyst to barn, og søketre-egenskapen for hele subtrær. (c) og (d) tester at AVL er et strengere krav enn BST: hvert AVL-tre er et BST, men ikke omvendt.</p>"
     },
     sensor: {
-      kilde: "Kilde: sensorveiledning IN2010 H2020, oppgave 2",
+      kilde: "Kilde: sensorveiledning IN2010 H2020 2",
       deler: [
         { del: "(a)", fasit: "<p>Noden som inneholder C.</p>" },
         { del: "(b)", fasit: "<p>Noden som inneholder 5.</p>" },
@@ -83,7 +83,7 @@
     }
   };
 
-  /* ---------- H2021 · Oppgave 8 · Intervall i et binært søketre (10 poeng) ---------- */
+  /* ---------- H2021 8 · Intervall i et binært søketre (10 poeng) ---------- */
   IN.PERFEKT["H2021-8"] = {
     type: "eksamen",
     intro: "<p>Vi antar at B er gitt ved rotnoden, at hver node har feltene <span class=\"mono\">v.element</span>, <span class=\"mono\">v.left</span> og <span class=\"mono\">v.right</span>, og at det tomme treet er <span class=\"mono\">null</span>. Kallet blir <span class=\"mono\">InRange(rot, a, b)</span>.</p>",
@@ -105,7 +105,7 @@
       teknisk: "<p>Hver node vi besøker, ligger enten på en av de to stiene mot a og b (O(h)), eller er et treff (k stykker). Det gir O(h + k). Med a = b er k ≤ 1, så O(log n) i et balansert tre.</p>"
     },
     sensor: {
-      kilde: "Kilde: sensorveiledning IN2010 H2021, oppgave 8",
+      kilde: "Kilde: sensorveiledning IN2010 H2021 8",
       deler: [
         { fasit: "<p>Vi gir ingen føringer på hvordan det binære treet skal være implementert. Studenten må selv gjøre rimelige antagelser her (som at det en node har et element x en venstre- og en høyrepeker). Her antar vi at B er representert ved rotnoden, og tar denne noden som input. Hver node har en venstre, høyre og en x. Vi representerer det tomme treet ved null.</p>" },
         { del: "(a)",
@@ -123,7 +123,7 @@
     }
   };
 
-  /* ---------- H2022 · Oppgave 11 · Er binærtreet et søketre? (10 poeng) ---------- */
+  /* ---------- H2022 11 · Er binærtreet et søketre? (10 poeng) ---------- */
   IN.PERFEKT["H2022-11"] = {
     type: "eksamen",
     svar: [
@@ -144,7 +144,7 @@
       teknisk: "<p>Invariant: CheckBSTHelper(v, low, high) er true hvis og bare hvis subtreet til v er et søketre med alle verdier i (low, high). Hver node gir O(1) arbeid, så O(n). Sensor starter med FindMin(v) og FindMax(v) og lukkede grenser, vi starter med −∞ og ∞ og åpne grenser. Med unike tall er det samme svar.</p>"
     },
     sensor: {
-      kilde: "Kilde: sensorveiledning IN2010 H2022, oppgave 11",
+      kilde: "Kilde: sensorveiledning IN2010 H2022 11",
       deler: [
         { del: "(a)", fasit: "<p>Verdien i hver node må være større enn alle verdier i venstre subtre og mindre enn alle verdier i høyre subtre.</p>",
           kriterier: "<p>Det gis 2 poeng for å oppgi riktig egenskap. Spørsmålet er gitt mest for å sørge for at studenten har dette klart for seg før neste deloppgave.</p>" },
@@ -168,7 +168,7 @@
     }
   };
 
-  /* ---------- H2023 · Oppgave 5 · Diameteren til et tre (12 poeng) ---------- */
+  /* ---------- H2023 5 · Diameteren til et tre (12 poeng) ---------- */
   IN.PERFEKT["H2023-5"] = {
     type: "eksamen",
     svar: [
@@ -195,7 +195,7 @@
       teknisk: "<p>Alle stier i subtreet til v går enten gjennom v, eller ligger helt i v.left eller v.right. Derfor er d(v) = Max(hL + hR + 2, dL, dR). Sensorløsningen holder i stedet en største d utenfor rekursjonen. Begge er O(n) og gir full uttelling.</p>"
     },
     sensor: {
-      kilde: "Kilde: sensorveiledning IN2010 H2023, oppgave 5",
+      kilde: "Kilde: sensorveiledning IN2010 H2023 5",
       deler: [
         { del: "(a)", fasit: "<p>Svaret er 5. Det gis 1 poeng for riktig svar.</p>" },
         { del: "(b)", fasit: "<p>Nei. Se for deg et komplett binærtre med mange noder; der vil den lengste stien gå gjennom rotnoden. Hvis du lager en ny rotnode som har det komplette binærtreet som sitt venstre subtre, så vil den lengste stien gå gjennom de samme nodene, og ikke gjennom den nye rotnoden.</p>",
@@ -217,7 +217,7 @@
     }
   };
 
-  /* ---------- H2024 · Oppgave 6 · Laveste felles forfeder (12 poeng) ---------- */
+  /* ---------- H2024 6 · Laveste felles forfeder (12 poeng) ---------- */
   IN.PERFEKT["H2024-6"] = {
     type: "eksamen",
     svar: [
@@ -242,7 +242,7 @@
       teknisk: "<p>(b): summen av dybdene synker med 1 per kall, så det blir høyst dybde(u) + dybde(v) + 1 kall. (c): over splittpunktet ligger x og y i samme subtre. I splittpunktet skilles stiene, eller en av dem er noden selv. Derfor er det første v med x ≤ v.element ≤ y den laveste felles forfederen.</p>"
     },
     sensor: {
-      kilde: "Kilde: sensorveiledning IN2010 H2024, oppgave 6",
+      kilde: "Kilde: sensorveiledning IN2010 H2024 6",
       deler: [
         { del: "(a)", fasit: "<p>Maksimalt 1 poeng. Hvert par av noder vil ha en felles forfeder, fordi rotnoden er en forfeder av alle noder i treet.</p>" },
         { del: "(b)", fasit: "<p>Maksimalt 5 poeng.</p>",
@@ -259,7 +259,7 @@
     }
   };
 
-  /* ---------- H2020 · Oppgave 6 · AVL (9 poeng) ---------- */
+  /* ---------- H2020 6 · AVL (9 poeng) ---------- */
   var AVLSEQ = [
     { lbl: "Etter innsetting av 5", t: [1, null, [2, null, [3, null, [4, null, [5]]]]], aria: "høyrekjeden 1, 2, 3, 4, 5" },
     { lbl: "L(3)", t: [1, null, [2, null, [4, [3], [5]]]], aria: "1, 2, og 4 med barna 3 og 5" },
@@ -289,7 +289,7 @@
       teknisk: "<p>Startreet er ikke et AVL-tre, så Balance kan finne ubalanse på flere nivåer etter én innsetting. Det skjer ikke når vi starter med et AVL-tre. Hver Balance-sjekk bruker høydene etter rotasjonene lenger ned.</p>"
     },
     sensor: {
-      kilde: "Kilde: sensorveiledning IN2010 H2020, oppgave 6",
+      kilde: "Kilde: sensorveiledning IN2010 H2020 6",
       deler: [
         { fasit: "<p class=\"muted\">[Vår beskrivelse av illustrasjonen: fem trær etter hverandre, med L(3), L(2), R(4) og L(1) på pilene mellom dem. Trærne er de samme som i vårt svar på (b).]</p>" },
         { del: "(a)", fasit: "<p>Se det andre treet i illustrasjonen.</p>" },
@@ -301,7 +301,7 @@
     }
   };
 
-  /* ---------- H2022 · Oppgave 4 · Balanserte søketrær (6 poeng) ---------- */
+  /* ---------- H2022 4 · Balanserte søketrær (6 poeng) ---------- */
   IN.PERFEKT["H2022-4"] = {
     type: "eksamen",
     svar: [
@@ -317,7 +317,7 @@
       teknisk: "<p>I (c) er det nok å se på stien fra roten ned til 5: en rotasjon skjer der en node på stien får høyre subtre to høyere enn venstre etter at 6 er satt inn.</p>"
     },
     sensor: {
-      kilde: "Kilde: sensorveiledning IN2010 H2022, oppgave 4",
+      kilde: "Kilde: sensorveiledning IN2010 H2022 4",
       deler: [
         { del: "(a)", fasit: "<p>5.</p>" },
         { del: "(b)", fasit: "<p>6. Alle AVL-trær kan fargelegges som et rød-svart tre.</p>" },
@@ -326,7 +326,7 @@
     }
   };
 
-  /* ---------- H2025 · Oppgave 4 · Anti-AVL (12 poeng) ---------- */
+  /* ---------- H2025 4 · Anti-AVL (12 poeng) ---------- */
   var ANTISEQ = [
     { lbl: "Sett inn 3", t: [3], aria: "bare 3" },
     { lbl: "Sett inn 1", t: [3, [1], null], aria: "3 med venstre barn 1" },
@@ -353,7 +353,7 @@
       teknisk: "<p>Invariant: etter hver innsetting har ingen node venstre barn. En ny node havner da enten bakerst i kjeden, eller som venstre barn av en node. Da roterer den noden én gang, og kjeden er hel igjen. Det gir høyst én rotasjon per innsetting.</p>"
     },
     sensor: {
-      kilde: "Kilde: sensorveiledning IN2010 H2025, oppgave 4",
+      kilde: "Kilde: sensorveiledning IN2010 H2025 4",
       deler: [
         { del: "(a)", fasit: "<p class=\"muted\">[Vår beskrivelse av illustrasjonen: trærne etter hver innsetting, med ↷ der det skjer en høyrerotasjon. Det siste treet er kjeden 1, 2, 3, 4, 5.]</p>" +
             "<p>Treet har 1 som rot, 2 som høyre-barn av roten, 3 som høyre barn av 2, og så videre. Altså er det en sortert lenket liste hvis du anser right som en neste-peker.</p><p>Det gjøres 2 rotasjoner total.</p>",
@@ -368,7 +368,7 @@
     }
   };
 
-  /* ---------- H2024 · Oppgave 2 · Huffman-trær (10 poeng) ---------- */
+  /* ---------- H2024 2 · Huffman-trær (10 poeng) ---------- */
   IN.PERFEKT["H2024-2"] = {
     type: "eksamen",
     svar: [
@@ -396,7 +396,7 @@
       teknisk: "<p>Kodelengden til et symbol er dybden til løvnoden. Ved lik frekvens kan valget gi et annet tre, men den totale lengden Σ f · lengde blir den samme. Her blir også hver kodelengde den samme.</p>"
     },
     sensor: {
-      kilde: "Kilde: sensorveiledning IN2010 H2024, oppgave 2",
+      kilde: "Kilde: sensorveiledning IN2010 H2024 2",
       deler: [
         { del: "(a)", fasit: "<p>2 poeng for riktig svar.</p><p>Kodelengdene for de ulike symbolene er:</p><table class=\"et-tab\"><tr><th>A</th><th>B</th><th>C</th><th>D</th></tr><tr><td>3</td><td>2</td><td>1</td><td>3</td></tr></table>" },
         { del: "(b)", fasit: "<p>1 poeng for riktig svar.</p><p>De vil inneholde symbolene og de relative frekvensene.</p>" },
@@ -411,7 +411,7 @@
     }
   };
 
-  /* ---------- H2021 · Oppgave 5 · Huffmantrær (5 poeng) ---------- */
+  /* ---------- H2021 5 · Huffmantrær (5 poeng) ---------- */
   IN.PERFEKT["H2021-5"] = {
     type: "eksamen",
     intro: "<p>Kodelengdene i Huffman-treet blir a = 3, b = 4, c = 1, d = 4, e = 2. b og d (1 og 1) slås sammen først, så den nye noden (2) med a (2), så resultatet (4) med e (4), og til slutt med c (12).</p>",
@@ -428,7 +428,7 @@
       teknisk: "<p>n symboler gir n − 1 sammenslåinger, altså 2n − 1 noder. Den lengste koden er n − 1, når hver sammenslåing tar med den forrige noden.</p>"
     },
     sensor: {
-      kilde: "Kilde: sensorveiledning IN2010 H2021, oppgave 5",
+      kilde: "Kilde: sensorveiledning IN2010 H2021 5",
       deler: [
         { del: "(a)", fasit: "<p>4.</p>" },
         { del: "(b)", fasit: "<p>2.</p>" },
@@ -441,7 +441,7 @@
     }
   };
 
-  /* ---------- H2022 · Oppgave 9 · Auto complete (6 poeng, skjønn) ---------- */
+  /* ---------- H2022 9 · Auto complete (6 poeng, skjønn) ---------- */
   IN.PERFEKT["H2022-9"] = {
     type: "skjonn",
     svar: [
@@ -459,7 +459,7 @@
       teknisk: "<p>Hovedpoenget er at oppslaget i hashmapet er O(1), men at resultatet uansett må skrives ut i tid lineært i antall forslag. Da forsvinner mye av fordelen, mens minnekostnaden er der hele tiden.</p>"
     },
     sensor: {
-      kilde: "Kilde: sensorveiledning IN2010 H2022, oppgave 9",
+      kilde: "Kilde: sensorveiledning IN2010 H2022 9",
       kriterier: "<p>Dette er en oppgave som går ut på å gjøre rimelige antagelser og anvende dem til å si noe fornuftig om hvilken fremgangsmåte man bør bruke. Dette er den oppgaven fra eksamenssettet hvor sensoren er nødt til å anvende mest skjønn i poengsettingen. Tanken bak oppgaven er å få studenten til å reflektere over hvilken fremgangsmåte man bør velge i lys av kjøretidskarakteristikkene til de to strategiene. Det bør legges vekt på at teksten er godt skrevet (dette betyr ikke at det skal trekkes poeng for enkle skrivefeil, men at teksten må være tydelig og enkel å forstå; en fin tommelfingerregel er at en setning man ikke forstår etter to gjennomlesninger ignoreres). Under er et eksempel på et svar som inneholder mange refleksjoner vi ønsker å se.</p>" +
         "<p>Strategi 1 bruker et prefiks-tre, som er en minneeffektiv representasjon av ordlisten. Det er viktig å merke seg at denne representasjonen kan være mer plassbesparende enn å kun lagre ordlisten som en liste av strenger. Desto flere ord som deler prefiks, desto mer plassbesparende er representasjonen i forhold til en ordliste.</p>" +
         "<p>Å legge til et nytt ord i prefiks-treet er veldig effektivt, med tidsbruk proporsjonalt med antall bokstaver i det nye ordet.</p>" +

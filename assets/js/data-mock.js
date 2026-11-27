@@ -177,7 +177,7 @@
   var mHeap = {
     id: "mock-heap-removemin", tema: "heap", operasjon: "RemoveMin i min-heap (array)",
     sannsynlighet: "høy",
-    begrunnelse: "RemoveMin står i forelesning 04_prioritetskoer, ukesoppgaver 04_prioritetskoeer (bubbleDown), og foreleseren gjennomgår boblingen nedover i detalj. Den ble spurt i Del 1 H2021 (oppg. 4 «Binære heaper», 6p, der RemoveMin-delen (a) gir 2p), men aldri som standardoppgave. Heap-innsetting var standardoppgaven H2023, så speilbildet er et naturlig neste valg. Innlevering 3 bruker en ferdig prioritetskø fra biblioteket, så der skriver du ikke RemoveMin selv.",
+    begrunnelse: "RemoveMin står i forelesningen om prioritetskøer, ukesoppgavene om prioritetskøer (bubbleDown), og foreleseren gjennomgår boblingen nedover i detalj. Den ble spurt i Del 1 H2021 (oppg. 4 «Binære heaper», 6p, der RemoveMin-delen (a) gir 2p), men aldri som standardoppgave. Heap-innsetting var standardoppgaven H2023, så speilbildet er et naturlig neste valg. Innlevering 3 bruker en ferdig prioritetskø fra biblioteket, så der skriver du ikke RemoveMin selv.",
     year: "Mock", title: "RemoveMin i en min-heap", points: 10, oppgave_nr: "Oppgave 1 (mock)",
     oppgave:
       "<p>En min-heap med n = 10 elementer er lagret i et array (0-indeksert):</p>" +
@@ -242,7 +242,7 @@
   var mProbe = {
     id: "mock-probing-slett", tema: "hashing", operasjon: "Linear probing: sletting som tetter hullet",
     sannsynlighet: "høy",
-    begrunnelse: "Begge slettestrategiene (markér som slettet, og tett hullet) står i forelesning 08_hashing. Notatet Hashing.html viser bare den som tetter hullet, og i innlevering 3 kan du velge Linear probing eller Separate chaining. Innsetting med probing var standardoppgaven H2022, og H2025 tok Separate chaining. Sletting er den delen som ennå ikke er spurt, og den er lett å lage poeng av.",
+    begrunnelse: "Begge slettestrategiene (markér som slettet, og tett hullet) står i forelesningen om hashing. Notatet om hashing viser bare den som tetter hullet, og i innlevering 3 kan du velge Linear probing eller Separate chaining. Innsetting med probing var standardoppgaven H2022, og H2025 tok Separate chaining. Sletting er den delen som ennå ikke er spurt, og den er lett å lage poeng av.",
     year: "Mock", title: "Linear probing: sletting", points: 10, oppgave_nr: "Oppgave 1 (mock)",
     oppgave:
       "<p>En hashtabell bruker Linear probing med N = 10 plasser og hashfunksjon h(k) = k mod 10. Tabellen er tom, og vi setter inn nøklene 31, 42, 11, 23, 51, 19, 29, 70 i denne rekkefølgen (ingen rehashing).</p>" +
@@ -321,7 +321,7 @@
   var mAvl = {
     id: "mock-avl", tema: "traer", operasjon: "AVL-tre: innsetting og sletting med rotasjoner",
     sannsynlighet: "høy",
-    begrunnelse: "AVL er hovedtemaet i forelesning 03_balanserte_soketraer, og innlevering 3 bruker det. (Ukesoppgavene om balanserte søketrær har ingen AVL-oppgave.) Det har kommet flere år (H2020 9p innsetting, H2022 Del 1 6p, H2025 Anti-AVL), men aldri som standardoppgaven. Sletting med rebalansering er ikke spurt.",
+    begrunnelse: "AVL er hovedtemaet i forelesningen om balanserte søketrær, og innlevering 3 bruker det. (Ukesoppgavene om balanserte søketrær har ingen AVL-oppgave.) Det har kommet flere år (H2020 9p innsetting, H2022 Del 1 6p, H2025 Anti-AVL), men aldri som standardoppgaven. Sletting med rebalansering er ikke spurt.",
     year: "Mock", title: "AVL-tre: innsetting og sletting", points: 10, oppgave_nr: "Oppgave 1 (mock)",
     oppgave:
       "<p>Sett inn 5, 9, 14, 3, 7, 6, 4 i denne rekkefølgen i et tomt AVL-tre. Bruk kursets definisjoner: høyden til en løvnode er 0, høyden til null er −1, og balansefaktoren er høyden til venstre subtre minus høyden til høyre subtre.</p>" +
@@ -389,7 +389,7 @@
   var mBst = {
     id: "mock-bst-remove", tema: "traer", operasjon: "Binært søketre: Remove (løvnode, ett barn, to barn)",
     sannsynlighet: "høy",
-    begrunnelse: "Remove med de tre tilfellene gjennomgås i forelesning 03_balanserte_soketraer, og ukesoppgaver 03_balanserte_soeketraer ber om hjelpeprosedyren FindMin som sletting bruker. Det er grunnlaget for AVL-sletting og har aldri vært standardoppgave. Rekursiv trepseudokode gir poeng hvert år.",
+    begrunnelse: "Remove med de tre tilfellene gjennomgås i forelesningen om balanserte søketrær, og ukesoppgavene om trær og søketrær ber om hjelpeprosedyren FindMin som sletting bruker. Det er grunnlaget for AVL-sletting og har aldri vært standardoppgave. Rekursiv trepseudokode gir poeng hvert år.",
     year: "Mock", title: "Sletting i binært søketre", points: 10, oppgave_nr: "Oppgave 1 (mock)",
     oppgave:
       "<p>Sett inn 50, 30, 80, 20, 40, 60, 90, 35, 70, 65 i denne rekkefølgen i et tomt binært søketre (uten balansering).</p>" +
@@ -462,7 +462,7 @@
   var mHs = {
     id: "mock-buildheap-heapsort", tema: "heap", operasjon: "BuildMaxHeap og Heapsort for hånd",
     sannsynlighet: "middels",
-    begrunnelse: "BubbleDown, BuildMaxHeap og HeapSort er pensum med egen pseudokode i forelesning 09_litt_mer_sortering. Heapsort er aldri spurt for hånd. Nærmest kommer BuildHeap O(n) i H2022 og sensorveiledningen H2023, som nevner Heapsort som et godt sorteringsvalg. Ukesoppgavene sammenligner Heapsort med Selection sort, men har ingen håndkjøring. Oppgaven kombinerer heap og sortering, men står svakere enn RemoveMin.",
+    begrunnelse: "BubbleDown, BuildMaxHeap og HeapSort er pensum med egen pseudokode i forelesningen «Litt mer sortering». Heapsort er aldri spurt for hånd. Nærmest kommer BuildHeap O(n) i H2022 og sensorveiledningen H2023, som nevner Heapsort som et godt sorteringsvalg. Ukesoppgavene sammenligner Heapsort med Selection sort, men har ingen håndkjøring. Oppgaven kombinerer heap og sortering, men står svakere enn RemoveMin.",
     year: "Mock", title: "BuildMaxHeap og Heapsort", points: 10, oppgave_nr: "Oppgave 1 (mock)",
     oppgave:
       "<p>Vi skal sortere arrayet A = [4, 10, 3, 5, 1, 8, 9, 2] (n = 8) stigende med kursets Heapsort, som først bygger en max-heap.</p>" +
@@ -542,7 +542,7 @@
   var mRehash = {
     id: "mock-rehash", tema: "hashing", operasjon: "Innsetting med rehashing (Load factor)",
     sannsynlighet: "middels",
-    begrunnelse: "Rehashing og Load factor står i forelesning 08_hashing, notatet Hashing.html (ensurecapacity) og ukesoppgaver 08_hashing. H2024 spurte om rehashing som begrep (Python-ordbok), men aldri som håndkjøring. Kombinert med probing er det en naturlig utvidelse av standardoppgaven fra H2022.",
+    begrunnelse: "Rehashing og Load factor står i forelesningen om hashing, notatet om hashing (ensureCapacity) og ukesoppgavene om hashing. H2024 spurte om rehashing som begrep (Python-ordbok), men aldri som håndkjøring. Kombinert med probing er det en naturlig utvidelse av standardoppgaven fra H2022.",
     year: "Mock", title: "Linear probing med rehashing", points: 10, oppgave_nr: "Oppgave 1 (mock)",
     oppgave:
       "<p>En hashtabell bruker Linear probing og h(k) = k mod N. Tabellen starter med N = 4 plasser. <i>Før</i> hver innsetting sjekkes Load factor n/N: er den 0,75 eller mer, dobles N, og alle nøklene settes inn på nytt i den nye tabellen i rekkefølgen de står i den gamle (fra plass 0 og oppover).</p>" +
@@ -617,7 +617,7 @@
   var mDijk = {
     id: "mock-dijkstra", tema: "grafer", operasjon: "Dijkstra for hånd med tabell",
     sannsynlighet: "middels",
-    begrunnelse: "Dijkstra er hovedalgoritmen i forelesning 06_vektede_grafer, notatet Utvalgte_grafalgoritmer og ukesoppgaver 06_vektede_grafer. Den ble kjørt for hånd i H2020 (8p) og valgt som riktig algoritme i et avkryssingsspørsmål i H2021, men siden bare brukt som verktøy i grafoppgaven. Som standardoppgave er den mulig, men grafhistorien tar som regel Dijkstra.",
+    begrunnelse: "Dijkstra er hovedalgoritmen i forelesningen om vektede grafer, notatet «Utvalgte grafalgoritmer» og ukesoppgavene om vektede grafer. Den ble kjørt for hånd i H2020 (8p) og valgt som riktig algoritme i et avkryssingsspørsmål i H2021, men siden bare brukt som verktøy i grafoppgaven. Som standardoppgave er den mulig, men grafhistorien tar som regel Dijkstra.",
     year: "Mock", title: "Dijkstra med tabell", points: 10, oppgave_nr: "Oppgave 1 (mock)",
     oppgave:
       "<p>Gitt den urettede, vektede grafen under. Naboene behandles i alfabetisk rekkefølge.</p>" +
@@ -698,7 +698,7 @@
   var mTop = {
     id: "mock-topsort", tema: "grafer", operasjon: "Topologisk sortering (TopSort med inngrad og stakk)",
     sannsynlighet: "middels",
-    begrunnelse: "TopSort med inngrad og stakk står i forelesning 05_grafer, og ukesoppgaver 05_grafer bruker den. (Ukesoppgaver 07_sammenhengende_grafer bruker DFS-varianten.) Den har kommet som del av grafoppgaven (avhengigheter), men aldri som ren håndkjøring. Den er kort og passer godt som standardoppgave.",
+    begrunnelse: "TopSort med inngrad og stakk står i forelesningen om grafer, og ukesoppgavene om grafer bruker den. (Ukesoppgavene om sammenhengende grafer bruker DFS-varianten.) Den har kommet som del av grafoppgaven (avhengigheter), men aldri som ren håndkjøring. Den er kort og passer godt som standardoppgave.",
     year: "Mock", title: "Topologisk sortering", points: 10, oppgave_nr: "Oppgave 1 (mock)",
     oppgave:
       "<p>Gitt den rettede grafen under med V = {A, B, C, D, E, F, G}. Nodene gås gjennom i alfabetisk rekkefølge.</p>" +
@@ -773,7 +773,7 @@
   var mMst = {
     id: "mock-mst", tema: "grafer", operasjon: "Minimalt spenntre: Kruskal og Prim for hånd",
     sannsynlighet: "middels",
-    begrunnelse: "Prim (med pseudokode) og Kruskal (idé) står i forelesning 06_vektede_grafer og ukesoppgaver 06_vektede_grafer. H2020 spurte om Kruskal (oppg. 8 (f), 4p for fire spørsmål, blant dem vekten til siste kant), og «minste terskel = største kant i spenntreet» har kommet i grafoppgavene. Det er sjelden standardoppgave, men en sterk kandidat i grafdelen.",
+    begrunnelse: "Prim (med pseudokode) og Kruskal (idé) står i forelesningen om vektede grafer og ukesoppgavene om vektede grafer. H2020 spurte om Kruskal (oppg. 8 (f), 4p for fire spørsmål, blant dem vekten til siste kant), og «minste terskel = største kant i spenntreet» har kommet i grafoppgavene. Det er sjelden standardoppgave, men en sterk kandidat i grafdelen.",
     year: "Mock", title: "Minimalt spenntre: Kruskal og Prim", points: 10, oppgave_nr: "Oppgave 1 (mock)",
     oppgave:
       "<p>Gitt den urettede, vektede grafen under.</p>" +
@@ -852,7 +852,7 @@
   var mQs = {
     id: "mock-quicksort", tema: "sortering", operasjon: "Quicksort: Partition og rekursjon for hånd",
     sannsynlighet: "middels",
-    begrunnelse: "Partition med to pekere og ChoosePivot står i forelesning 09_litt_mer_sortering, og ukesoppgaver 09_litt_mer_sortering spør om høyden til rekursjonstreet i verste fall. Quicksort er aldri spurt for hånd. Sensorveiledningene H2023 og H2025 nevner den som mulig sorteringsvalg, med O(n²) i verste tilfelle. Sortering har tapt plass på de siste eksamenene, så sannsynligheten er middels.",
+    begrunnelse: "Partition med to pekere og ChoosePivot står i forelesningen «Litt mer sortering», og ukesoppgavene om sortering spør om høyden til rekursjonstreet i verste fall. Quicksort er aldri spurt for hånd. Sensorveiledningene H2023 og H2025 nevner den som mulig sorteringsvalg, med O(n²) i verste tilfelle. Sortering har tapt plass på de siste eksamenene, så sannsynligheten er middels.",
     year: "Mock", title: "Quicksort med Partition", points: 10, oppgave_nr: "Oppgave 1 (mock)",
     oppgave:
       "<p>Sorter A = [7, 2, 9, 4, 3, 8, 6, 1, 5] med kursets Quicksort. ChoosePivot velger alltid siste element i delen som sorteres (indeks high).</p>" +
@@ -934,7 +934,7 @@
   var mRadix = {
     id: "mock-radix", tema: "sortering", operasjon: "Radix sort (minst signifikante siffer først)",
     sannsynlighet: "middels",
-    begrunnelse: "BucketSort og RadixSort med pseudokode står i forelesning 09_litt_mer_sortering. Stabil bøttesortering har kommet flere ganger (H2020 og som «sorter uten sort-kall»), men Radix sort for hånd er aldri spurt. Kjøretiden O(d·(N + n)) er typisk sant/usant-stoff.",
+    begrunnelse: "BucketSort og RadixSort med pseudokode står i forelesningen «Litt mer sortering». Stabil bøttesortering har kommet flere ganger (H2020 og som «sorter uten sort-kall»), men Radix sort for hånd er aldri spurt. Kjøretiden O(d·(N + n)) er typisk sant/usant-stoff.",
     year: "Mock", title: "Radix sort for hånd", points: 10, oppgave_nr: "Oppgave 1 (mock)",
     oppgave:
       "<p>Sorter A = [512, 87, 230, 415, 98, 302, 147, 85] stigende med kursets Radix sort, som bruker Bucket sort med N = 10 bøtter på ett siffer av gangen. Tall med færre enn tre sifre fylles ut med ledende nuller (87 = 087).</p>" +
@@ -1000,7 +1000,7 @@
   var mSep = {
     id: "mock-separasjonsnoder", tema: "grafer", operasjon: "Separasjonsnoder med depth og low (DFS)",
     sannsynlighet: "lav",
-    begrunnelse: "SeparationVertices med depth og low står i forelesning 07_sammenhengende_grafer og notatet Utvalgte_grafalgoritmer. Ukesoppgaver 07_sammenhengende_grafer tar separasjonsnoder bare som begrep, uten depth og low. H2025 spurte om separasjonsnoder som bruk i grafoppgaven, ikke som håndkjøring. Den er krevende å rette, så den er lite sannsynlig som standardoppgave, men nyttig øving for grafdelen.",
+    begrunnelse: "SeparationVertices med depth og low står i forelesningen om sammenhengende grafer og notatet «Utvalgte grafalgoritmer». Ukesoppgavene om sammenhengende grafer tar separasjonsnoder bare som begrep, uten depth og low. H2025 spurte om separasjonsnoder som bruk i grafoppgaven, ikke som håndkjøring. Den er krevende å rette, så den er lite sannsynlig som standardoppgave, men nyttig øving for grafdelen.",
     year: "Mock", title: "Separasjonsnoder", points: 10, oppgave_nr: "Oppgave 1 (mock)",
     oppgave:
       "<p>Gitt den urettede grafen under. Naboene behandles i alfabetisk rekkefølge.</p>" +

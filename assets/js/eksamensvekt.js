@@ -63,5 +63,30 @@
     var host = IN.el("p", { class: "blokk-vekt" }, [tekst, spark]);
     lead.parentNode.insertBefore(host, lead.nextSibling);
   }
-  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", bygg); else bygg();
+  /* Merke øverst i hver fane, ut fra eksamensmerkene under sidetittelen (.badges .badge[data-go]):
+     spurt i flere år → «kommer ofte», ett år → «eksamensbasert». Faner uten eksamensoppgave får ikke merke,
+     fordi sant/usant-delen kan ha spurt om dem uten at vi vet det. Faste merker: se .merke i styles.css. */
+  function merkFaner() {
+    var per = {};
+    document.querySelectorAll(".pagehead .badges .badge[data-go]").forEach(function (b) {
+      var fane = b.getAttribute("data-go"), aar = b.querySelector("b");
+      if (!fane || !aar) return;
+      (per[fane] = per[fane] || []).push({ aar: aar.textContent.trim(), tekst: b.textContent.replace(/\s+/g, " ").trim() });
+    });
+    Object.keys(per).forEach(function (fane) {
+      var sec = document.querySelector('section[data-panel="' + fane + '"]');
+      if (!sec || sec.querySelector(":scope > .fane-eks")) return;
+      var liste = per[fane], aar = {};
+      liste.forEach(function (x) { aar[x.aar] = 1; });
+      var ofte = Object.keys(aar).length > 1;
+      var rad = IN.el("p", { class: "fane-eks small" }, [
+        IN.el("span", { class: "tag merke " + (ofte ? "kjerne" : "eksbas"), text: ofte ? "kommer ofte" : "eksamensbasert" }),
+        " " + liste.map(function (x) { return x.tekst; }).join("; ")
+      ]);
+      var h = sec.querySelector(":scope > h3");
+      if (h) h.parentNode.insertBefore(rad, h.nextSibling); else sec.insertBefore(rad, sec.firstChild);
+    });
+  }
+  function start() { bygg(); merkFaner(); }
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", start); else start();
 })();

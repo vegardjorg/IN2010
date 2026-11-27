@@ -7,9 +7,9 @@
   <title>Blokk 7 · Strategi · IN2010</title>
   <meta name="description" content="Strategi i IN2010: les kjøretiden ut av løkker og rekursjon, kjenn igjen algoritmestrategiene kurset bruker, forstå P, NP og reduksjoner, og svar slik sensor belønner – med drilloppgaver og eksamensoppgaver.">
   <script>(function(){try{var d=document.documentElement;var t=localStorage.getItem('in-theme');if(t!=='dark'&&t!=='system')t='light';if(t!=='system')d.setAttribute('data-theme',t);var l=localStorage.getItem('in-level');if(l!=='eli5'&&l!=='teknisk')l='normal';d.setAttribute('data-level',l);}catch(e){document.documentElement.setAttribute('data-theme','light');document.documentElement.setAttribute('data-level','normal');}})();</script>
-  <link rel="stylesheet" href="assets/css/styles.css?v=20261127e">
-  <link rel="stylesheet" href="assets/css/dra.css?v=20261127e">
-  <link rel="stylesheet" href="assets/css/begrep-tips.css?v=20261127e">
+  <link rel="stylesheet" href="assets/css/styles.css?v=20261127f">
+  <link rel="stylesheet" href="assets/css/dra.css?v=20261127f">
+  <link rel="stylesheet" href="assets/css/begrep-tips.css?v=20261127f">
 </head>
 <body data-page="strategi">
   <a class="skip-link" href="#main">Hopp til innhold</a>
@@ -164,7 +164,7 @@
         <div class="card st-strat">
           <h4>Rett fram (brute force)</h4>
           <p class="small"><b>Idé:</b> gjør nøyaktig det definisjonen sier, uten triks.</p>
-          <p class="small"><b>Fra pensum:</b> finn separasjonsnoder ved å fjerne hver node og kjøre DFS, O(|V| · (|V| + |E|)). Sjekk alle par i en dobbel løkke, O(n²). CheckBST med FindMin og FindMax i hver node, O(n²).</p>
+          <p class="small"><b>Fra pensum:</b> finn separasjonsnoder ved å fjerne hver node og kjøre dybde-først søk (DFS), O(|V| · (|V| + |E|)). Sjekk alle par i en dobbel løkke, O(n²). CheckBST med FindMin og FindMax i hver node, O(n²).</p>
           <p class="small st-verdict"><b>Bra:</b> lett å få riktig, og et trygt utgangspunkt. <b>Men:</b> på eksamen gir det oftest bare delvis uttelling når det finnes noe raskere.</p>
         </div>
         <div class="card st-strat">
@@ -200,7 +200,7 @@
         <div class="card st-strat">
           <h4>Oversett til noe du kan</h4>
           <p class="small"><b>Idé:</b> skriv om problemet til et problem du allerede har en algoritme for.</p>
-          <p class="small"><b>Fra pensum:</b> gjør historien om til en graf og kjør BFS, Dijkstra eller Prim/Kruskal (minimalt spenntre). Snu kantene for å finne avstanden fra alle noder til ett mål på én kjøring (H2024). Samme tanke ligger bak <a href="#fane=pnp">reduksjoner</a>.</p>
+          <p class="small"><b>Fra pensum:</b> gjør historien om til en graf og kjør bredde-først søk (BFS), Dijkstra eller Prim/Kruskal (minimalt spenntre). Snu kantene for å finne avstanden fra alle noder til ett mål på én kjøring (H2024). Samme tanke ligger bak <a href="#fane=pnp">reduksjoner</a>.</p>
           <p class="small st-verdict"><b>På eksamen</b> kan du bruke pensumalgoritmer som byggeklosser. Si hva de returnerer og hva de koster.</p>
         </div>
       </div>
@@ -500,7 +500,7 @@
 
       <div id="del1-ovelse">
         <h3>Del 1-øving: sant/usant med ekte poengregel</h3>
-        <p class="small">Eksamen begynner med små oppgaver som rettes automatisk. Det gjorde også H2021 og H2022 (i H2021 oppgave 6 ga feil og blankt −1). Fra 2023 heter det del 1, med poengregelen under: 32 poeng i H2023, 22 i H2024 og 26 i H2025.
+        <p class="small">Eksamen begynner med små oppgaver som rettes automatisk. Det gjorde også H2021 og H2022 (i H2021 6 ga feil og blankt −1). Fra 2023 heter det del 1, med poengregelen under: 32 poeng i H2023, 22 i H2024 og 26 i H2025.
           Her trekkes en tilfeldig blanding fra alle blokkene i guiden, og svarene rettes med regelen fra sensorveiledningene.</p>
         <div class="callout snarvei"><span class="lbl">Poengregelen i del 1 (H2023–H2025)</span>
           <p>Det er N påstander, og n er antall riktige svar. Blankt og galt teller likt. Poengene blir <b>2 · max(n − N/2, 0)</b>.
@@ -542,7 +542,7 @@
             <tr><td>BuildHeap</td><td>Heap fra et usortert array</td><td class="mono">O(n)</td></tr>
             <tr><td>Søk i binært søketre</td><td>Oppslag, innsetting, fjerning</td><td class="mono">O(h), O(log n) i AVL</td></tr>
             <tr><td>BFS / DFS</td><td>Nåbarhet, korteste vei uten vekter, komponenter</td><td class="mono">O(|V| + |E|)</td></tr>
-            <tr><td>Topologisk sortering</td><td>Rekkefølge i en DAG</td><td class="mono">O(|V| + |E|)</td></tr>
+            <tr><td>Topologisk sortering</td><td>Rekkefølge i en DAG (rettet graf uten sykler)</td><td class="mono">O(|V| + |E|)</td></tr>
             <tr><td>Dijkstra (med heap)</td><td>Korteste vei, ingen negative kanter</td><td class="mono">O((|V| + |E|) · log(|V|))</td></tr>
             <tr><td>Bellman-Ford</td><td>Korteste vei med negative kanter</td><td class="mono">O(|V| · |E|)</td></tr>
           </tbody>
@@ -584,27 +584,27 @@
     <p class="muted small">IN2010 · Blokk 7 · Strategi. Egne forklaringer og demoer basert på pensum. Eksamensoppgavene er gjengitt ordrett fra eksamensarkene (UiO, IN2010), med kildelinje og eventuelle avvik på hvert kort.</p>
   </footer>
 
-  <script src="assets/js/core.js?v=20261127e"></script>
-<script src="assets/js/eksamensvekt.js?v=20261127e"></script>
-  <script src="assets/js/symboler.js?v=20261127e"></script>
-  <script src="assets/js/begreper-data.js?v=20261127e"></script>
-  <script src="assets/js/begrep-tips.js?v=20261127e"></script>
-  <script src="assets/js/data-tf.js?v=20261127e"></script>
-  <script src="assets/js/pseudocode.js?v=20261127e"></script>
-  <script src="assets/js/stepplayer.js?v=20261127e"></script>
-  <script src="assets/js/varline.js?v=20261127e"></script>
-  <script src="assets/js/viz-bars.js?v=20261127e"></script>
-  <script src="assets/js/viz-graph.js?v=20261127e"></script>
-  <script src="assets/js/data-algos.js?v=20261127e"></script>
-  <script src="assets/js/data-grafer.js?v=20261127e"></script>
-  <script src="assets/js/data-strategi.js?v=20261127e"></script>
-  <script src="assets/js/viz-hash.js?v=20261127e"></script>
-  <script src="assets/js/data-hashing.js?v=20261127e"></script>
-  <script src="assets/js/perfekt/strategi.js?v=20261127e"></script>
-  <script src="assets/js/perfekt/delt.js?v=20261127e"></script>
-  <script src="assets/js/kort/strategi.js?v=20261127e"></script>
-  <script src="assets/js/dra.js?v=20261127e"></script>
-  <script src="assets/js/data-dra.js?v=20261127e"></script>
+  <script src="assets/js/core.js?v=20261127f"></script>
+<script src="assets/js/eksamensvekt.js?v=20261127f"></script>
+  <script src="assets/js/symboler.js?v=20261127f"></script>
+  <script src="assets/js/begreper-data.js?v=20261127f"></script>
+  <script src="assets/js/begrep-tips.js?v=20261127f"></script>
+  <script src="assets/js/data-tf.js?v=20261127f"></script>
+  <script src="assets/js/pseudocode.js?v=20261127f"></script>
+  <script src="assets/js/stepplayer.js?v=20261127f"></script>
+  <script src="assets/js/varline.js?v=20261127f"></script>
+  <script src="assets/js/viz-bars.js?v=20261127f"></script>
+  <script src="assets/js/viz-graph.js?v=20261127f"></script>
+  <script src="assets/js/data-algos.js?v=20261127f"></script>
+  <script src="assets/js/data-grafer.js?v=20261127f"></script>
+  <script src="assets/js/data-strategi.js?v=20261127f"></script>
+  <script src="assets/js/viz-hash.js?v=20261127f"></script>
+  <script src="assets/js/data-hashing.js?v=20261127f"></script>
+  <script src="assets/js/perfekt/strategi.js?v=20261127f"></script>
+  <script src="assets/js/perfekt/delt.js?v=20261127f"></script>
+  <script src="assets/js/kort/strategi.js?v=20261127f"></script>
+  <script src="assets/js/dra.js?v=20261127f"></script>
+  <script src="assets/js/data-dra.js?v=20261127f"></script>
   <script>
   (function () {
     "use strict";

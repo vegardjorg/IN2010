@@ -7,8 +7,8 @@
   <title>IN2010 · interaktiv eksamensguide</title>
   <meta name="description" content="Interaktiv eksamensguide for IN2010 – Algoritmer og datastrukturer. Slik ser eksamen ut, og alle eksamensoppgavene fra H2020 til H2025.">
   <script>(function(){try{var d=document.documentElement;var t=localStorage.getItem('in-theme');if(t!=='dark'&&t!=='system')t='light';if(t!=='system')d.setAttribute('data-theme',t);var l=localStorage.getItem('in-level');if(l!=='eli5'&&l!=='teknisk')l='normal';d.setAttribute('data-level',l);}catch(e){document.documentElement.setAttribute('data-theme','light');document.documentElement.setAttribute('data-level','normal');}})();</script>
-  <link rel="stylesheet" href="assets/css/styles.css?v=20261127e">
-  <link rel="stylesheet" href="assets/css/begrep-tips.css?v=20261127e">
+  <link rel="stylesheet" href="assets/css/styles.css?v=20261127f">
+  <link rel="stylesheet" href="assets/css/begrep-tips.css?v=20261127f">
 </head>
 <body data-page="index">
   <a class="skip-link" href="#main">Hopp til innhold</a>
@@ -108,12 +108,12 @@
     IN2010-guide · laget for eksamensøving · fungerer frakoblet (file://) og på GitHub Pages.
   </footer>
 
-  <script src="assets/js/core.js?v=20261127e"></script>
-  <script src="assets/js/symboler.js?v=20261127e"></script>
-  <script src="assets/js/begreper-data.js?v=20261127e"></script>
-  <script src="assets/js/begrep-tips.js?v=20261127e"></script>
-  <script src="assets/js/data-mock.js?v=20261127e"></script>
-  <script src="assets/js/data-crash.js?v=20261127e"></script>
+  <script src="assets/js/core.js?v=20261127f"></script>
+  <script src="assets/js/symboler.js?v=20261127f"></script>
+  <script src="assets/js/begreper-data.js?v=20261127f"></script>
+  <script src="assets/js/begrep-tips.js?v=20261127f"></script>
+  <script src="assets/js/data-mock.js?v=20261127f"></script>
+  <script src="assets/js/data-crash.js?v=20261127f"></script>
   <script>
   /* Crash course-boksen øverst: samme utregning som løypesiden (IN.crashProgress) */
   (function () {
@@ -168,7 +168,7 @@
       var t = X[key], text = SOK[key] ? frag(SOK[key]) : frag(t[4]) + ",-Oppgave";
       return pageHref[t[0]] + "#fane=" + t[1] + "&oppg=" + t[6] + ":~:text=" + text;
     }
-    function taskName(t) { return t[2] + " Oppgave " + t[3] + " – " + t[4]; }
+    function taskName(t) { return t[2] + " " + t[3] + " – " + t[4]; }
     // Lenke med oppgaveikon og verktøytips. content = synlig tekst (årstall eller tittel).
     function taskLink(key, content, cls) {
       var t = X[key];
@@ -209,7 +209,7 @@
         text: "Ett problem per oppgave, ofte med en liten historie: trær, heap, søk i array, sortering, hashing. Lavere kjøretid gir flere poeng.",
         anchor: "eo-temaer" },
       { key: "graf", part: "Del 2, sist", name: "Grafhistorien", pts: "12–15 p", w: 14,
-        text: "Gjør en historie om til en graf: hva er nodene og kantene? Velg en pensumalgoritme (BFS/DFS, Dijkstra, minimalt spenntre (MST), topologisk sortering) og oppgi kjøretiden.",
+        text: "Gjør en historie om til en graf: hva er nodene og kantene? Velg en pensumalgoritme (bredde-først eller dybde-først søk, Dijkstra, minimalt spenntre (MST), topologisk sortering) og oppgi kjøretiden.",
         links: [["grafer", "begreper&oppg=historie", "Fra historie til graf"], ["grafer", "bfs", "BFS"], ["grafer", "dijkstra", "Dijkstra"], ["grafer", "mst", "MST"], ["grafer", "topologisk", "Topologisk sortering"]] }
     ];
     var flowHost = IN.qs("#exam-flow");

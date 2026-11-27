@@ -29,7 +29,7 @@
     return { cap: cap, draw: function (h) { if (IN.vizHash && IN.gen) IN.vizHash(h, step(), { compact: true }); } };
   }
 
-  /* ---------- H2025 · Oppgave 2 · Separate chaining (10 poeng) ---------- */
+  /* ---------- H2025 2 · Separate chaining (10 poeng) ---------- */
   var CH25 = [[21, "a"], [54, "b"], [82, "c"], [10, "d"], [20, "e"], [44, "f"], [10, "g"]];
   P["H2025-2"] = {
     type: "eksamen",
@@ -58,7 +58,7 @@
       teknisk: "<p>Innsetting koster O(1 + |B|) for bøtta B = A[h(k, N)], fordi vi må lete etter k for å unngå duplikater. Med god spredning og lav Load factor er |B| begrenset av en konstant, så forventet O(1). Verste tilfelle er at alle n nøklene ligger i samme bøtte: O(n).</p>"
     },
     sensor: {
-      kilde: "Kilde: sensorveiledning IN2010 H2025, oppgave 2",
+      kilde: "Kilde: sensorveiledning IN2010 H2025 2",
       deler: [
         { del: "(a)",
           fasit: "<p>Resultatet av innsettingen ser slik ut:</p><p class=\"mono\">0 : (10, g), (20, e)<br>1 : (21, a)<br>2 : (82, c)<br>3:<br>4 : (54, b), (44, f )<br>5:<br>6:<br>7:<br>8:<br>9:</p>",
@@ -78,7 +78,7 @@
     }
   };
 
-  /* ---------- H2020 · Oppgave 4 · Linear probing (2 poeng) ---------- */
+  /* ---------- H2020 4 · Linear probing (2 poeng) ---------- */
   var H20_4 = [29, "_", "_", 93, 74, 13, 45, "_", 48, 99];
   P["H2020-4"] = {
     type: "eksamen",
@@ -95,13 +95,13 @@
       teknisk: "<p>Linear probing prøver h(k, N), så (h(k, N) + 1) mod N og så videre, til første ledige plass. mod N gjør arrayet til en ring, og det er det 29 sjekker.</p>"
     },
     sensor: {
-      kilde: "Kilde: sensorveiledning IN2010 H2020, oppgave 4",
+      kilde: "Kilde: sensorveiledning IN2010 H2020 4",
       fasit: "<p>Det resulterende arrayet ser slik ut:</p>" + tab([29, "", "", 93, 74, 13, 45, "", 48, 99], "Det resulterende arrayet fra sensorveiledningen"),
       merknad: "Sensorveiledningen viser bare den ferdige tabellen og sier ikke noe om poengfordelingen. Oppgaven er på 2 poeng i eksamensarket. Tomme plasser står tomme hos sensor, mens vi skriver _."
     }
   };
 
-  /* ---------- H2022 · Oppgave 7 · Linear probing (10 poeng) ---------- */
+  /* ---------- H2022 7 · Linear probing (10 poeng) ---------- */
   var H22_7 = [10, 21, 82, 20, 54, 44, "_", "_", "_", "_"];
   P["H2022-7"] = {
     type: "eksamen",
@@ -124,7 +124,7 @@
       teknisk: "<p>Løkka stopper fordi arrayet ikke er fullt. Invarianten er at alle plassene fra h(k, N) fram til i er opptatt av andre nøkler. Derfor er første null eller første plass med nøkkelen k riktig sted å skrive.</p>"
     },
     sensor: {
-      kilde: "Kilde: sensorveiledning IN2010 H2022, oppgave 7",
+      kilde: "Kilde: sensorveiledning IN2010 H2022 7",
       deler: [
         { del: "(a)",
           fasit: "<p>Det resulterende arrayet ser slik ut:</p>" + tab([10, 21, 82, 20, 54, 44, "", "", "", ""], "Det resulterende arrayet fra sensorveiledningen"),
@@ -142,7 +142,7 @@
     }
   };
 
-  /* ---------- H2024 · Oppgave 5 · Python 3.6 (10 poeng) ---------- */
+  /* ---------- H2024 5 · Python 3.6 (10 poeng) ---------- */
   var PYFIX = { timmy: 13, barry: 9, guido: 7 };   // gir plass 5, 1 og 7 med N = 8, som i oppgaven
   var PY3 = [{ op: "ins", k: "timmy", v: "red" }, { op: "ins", k: "barry", v: "green" }, { op: "ins", k: "guido", v: "blue" }];
   P["H2024-5"] = {
@@ -179,7 +179,7 @@
       teknisk: "<p>indices er tabellen vi prober i, med Load factor n/N. entries er et dynamisk array med n par. Hver probe koster ett ekstra arrayoppslag, men iterasjon blir O(n) i stedet for O(N), og rehash bygger bare indices på nytt.</p>"
     },
     sensor: {
-      kilde: "Kilde: sensorveiledning IN2010 H2024, oppgave 5",
+      kilde: "Kilde: sensorveiledning IN2010 H2024 5",
       deler: [
         { del: "(a)",
           kriterier: "<p>Maksimalt 4 poeng. Omtrent 2 poeng for oppslag og 2 poeng for innsetting.</p>" +
@@ -202,7 +202,7 @@
     }
   };
 
-  /* ---------- H2021 · Oppgave 9 · Flest forekomster (8 poeng, skjønn) ---------- */
+  /* ---------- H2021 9 · Flest forekomster (8 poeng, skjønn) ---------- */
   P["H2021-9"] = {
     type: "skjonn",
     svar: [
@@ -221,7 +221,7 @@
       teknisk: "<p>Hashingen gir en forventet grense som er uavhengig av k, men ingen garanti. Telle-arrayet gir en garanti, men betaler O(k) for et array som kan være nesten tomt. Valget avhenger av forholdet mellom k og n, og av konstantene.</p>"
     },
     sensor: {
-      kilde: "Kilde: sensorveiledning IN2010 H2021, oppgave 9",
+      kilde: "Kilde: sensorveiledning IN2010 H2021 9",
       kriterier: "<p>Dette er en oppgave som går ut på å gjøre rimelige antagelser og anvende dem til å si noe fornuftig om hvilken fremgangsmåte man bør bruke. Dette er den oppgaven fra eksamenssettet hvor sensoren er nødt til å anvende mest skjønn i poengsettingen. Tanken bak oppgaven er å få studenten til å reflektere over hvilken fremgangsmåte man bør velge i lys av kjøretidskarakteristikkene til de to strategiene. Det bør legges vekt på at teksten er godt skrevet (dette betyr ikke at det skal trekkes poeng for enkle skrivefeil, men at teksten må være tydelig og enkel å forstå; en fin tommelfingerregel er at en setning man ikke forstår etter to gjennomlesninger ignoreres). Under lister vi noen refleksjoner vi ønsker å se.</p>" +
         "<p>Strategi 1 benytter seg av et hashmap, som i verste tilfelle har lineærtid på innsetting og oppslag. Den gjør O(n) innsettinger og oppslag i H, som tilsammen utgjør O(n²) kjøretidskompleksitet i verste tilfelle. (Merk at vi her antar et hashmap implementert med linear probing eller separate chaining, slik vi har sett i kurset, og ikke for eksempel Java sine hashmaps, som bruker separate chaining, hvor hver «bøtte» er et rød-svart tre og gir logaritmisk tid på alle operasjoner i verste tilfelle.) Hashmaps har derimot forventet konstant tid på innsetting og oppslag, og dermed får O(n) forventet kjøretidskompleksitet.</p>" +
         "<p>Strategi 2 bruker kun arrayer, som har konstant tid på alle operasjoner. I motsetning til Strategi 1 finner vi det største elementet k, og lager et array B med plass til k elementer, og initialiserer det med verdien 0. Å finne det største elementet er i O(n), og opprettelsen og initialiseringen av B er i O(k). Den siste løkken er også i O(n). Tilsammen gir dette O(n + k) i både verste og forventet kjøretidskompleksitet (fordi vi ikke benytter oss av hashing).</p>" +

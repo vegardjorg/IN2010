@@ -103,7 +103,7 @@
     ['"sle"', '"sleep", "sleepy"'], ['"slee"', '"sleep", "sleepy"'], ['"sleep"', '"sleep", "sleepy"'], ['"sleepy"', '"sleepy"']];
 
     def("H2020-2", { host: "#exam-h2020-2" }, function () { return { key: "H2020-2", year: "H2020", title: "Binære søketrær", oppgave_nr: "Oppgave 2", points: 4,
-      kilde: "Oppgavetekst: UiO, IN2010, H2020, oppgave 2", ark: "Binære søketrær", ordrett: true,
+      kilde: "Oppgavetekst: UiO, IN2010, H2020 2", ark: "Binære søketrær", ordrett: true,
       oppgave: IN.oppg({
         figs: [treFig(TR.genFrom(["A", ["B", ["E"], ["F"]], ["C"], ["D", ["G"], ["H"]]]), "Treet til (a)"),
                treFig(TR.fromNested([4, [2, [5], [3]], [6, null, [8]]]), "Treet til (b)")],
@@ -121,7 +121,7 @@
     }; });
 
     def("H2021-8", { host: "#exam-h2021-8" }, function () { return { key: "H2021-8", year: "H2021", title: "Verdier i et intervall (InRange)", oppgave_nr: "Oppgave 8", points: 10,
-      kilde: "Oppgavetekst: UiO, IN2010, H2021, oppgave 8", ark: "Intervall i et binært søketre", ordrett: true,
+      kilde: "Oppgavetekst: UiO, IN2010, H2021 8", ark: "Intervall i et binært søketre", ordrett: true,
       oppgave: skel(IN.oppg({
         intro: "<p>Du er gitt et binært søketre B og to heltall a og b der a ≤ b. Du skal gi en algoritme som skriver ut verdiene innenfor intervallet [a, b] i sortert rekkefølge (fra minst til størst). Det vil si at hvis x er verdien i en node, så skal denne noden skrives ut hvis og bare hvis a ≤ x ≤ b.</p>" + SKEL,
         figs: [treFig(TR.fromNested([10, [5, [2], [7]], [15, [12], [17]]]), "B₁")],
@@ -142,7 +142,7 @@
     }; });
 
     def("H2022-11", { host: "#exam-h2022-10" }, function () { return { key: "H2022-11", year: "H2022", title: "Er treet et søketre? (CheckBST)", oppgave_nr: "Oppgave 11", points: 10,
-      kilde: "Oppgavetekst: UiO, IN2010, H2022, oppgave 11", ark: "Er binærtreet et søketre?", ordrett: true, poengkilde: "sv",
+      kilde: "Oppgavetekst: UiO, IN2010, H2022 11", ark: "Er binærtreet et søketre?", ordrett: true, poengkilde: "sv",
       oppgave: skel(IN.oppg({
         intro: "<p>Anta at du er gitt et binærtre B med unike heltall. Hvis v er en node i det binære treet, så gir</p><ul><li><code>v.element</code> heltallet som er lagret i noden</li><li><code>v.left</code> venstre barn av v</li><li><code>v.right</code> høyre barn av v</li></ul>" +
           "<p>Vi ønsker å sjekke om det binære treet også er et binært søketre. Under finner du spesifikasjonen for algoritmen, og to eksempler på trær som henholdsvis bør gi true og false.</p>" + SKEL,
@@ -167,7 +167,7 @@
     }; });
 
     def("H2023-5", { host: "#exam-h2023-5" }, function () { return { key: "H2023-5", year: "H2023", title: "Diameteren til et tre", oppgave_nr: "Oppgave 5", points: 12,
-      kilde: "Oppgavetekst: UiO, IN2010, H2023, oppgave 5", ark: "Diameteren til et tre", ordrett: true, poengkilde: "sv",
+      kilde: "Oppgavetekst: UiO, IN2010, H2023 5", ark: "Diameteren til et tre", ordrett: true, poengkilde: "sv",
       oppgave: skel(IN.oppg({
         intro: "<p>Vi definerer diameteren til et tre som lengden til den lengste stien mellom to noder.</p>",
         figs: [treFig(TR.genFrom(["a", ["b", ["c"]]]), "T₁"),
@@ -194,7 +194,7 @@
     }; });
 
     def("H2024-6", { host: "#exam-h2024-6" }, function () { return { key: "H2024-6", year: "H2024", title: "Laveste felles forfeder", oppgave_nr: "Oppgave 6", points: 12,
-      kilde: "Oppgavetekst: UiO, IN2010, H2024, oppgave 6", ark: "Laveste felles forfeder", ordrett: true, poengkilde: "sv",
+      kilde: "Oppgavetekst: UiO, IN2010, H2024 6", ark: "Laveste felles forfeder", ordrett: true, poengkilde: "sv",
       oppgave: skel(IN.oppg({
         intro: "<p>Den laveste felles forfederen av to noder u og v i et tre T er den laveste (altså noden med høyest dybde) som har både u og v som en etterkommer.</p>" +
           "<p>Her er noen eksempler fra treet ved siden av:</p><ul><li>Laveste felles forfeder av a og a er a</li><li>Laveste felles forfeder av b og e er a</li><li>Laveste felles forfeder av g og j er e</li><li>Laveste felles forfeder av e og j er e</li></ul>",
@@ -223,7 +223,7 @@
     }; });
 
     def("H2020-6", { host: "#exam-h2020-6" }, function () { return { key: "H2020-6", year: "H2020", title: "AVL-innsetting", oppgave_nr: "Oppgave 6", points: 9,
-      kilde: "Oppgavetekst: UiO, IN2010, H2020, oppgave 6", ark: "AVL", ordrett: true,
+      kilde: "Oppgavetekst: UiO, IN2010, H2020 6", ark: "AVL", ordrett: true,
       oppgave: IN.oppg({
         intro: "<p>Vanligvis gjør vi AVL-innsetting på AVL-trær, men vi kan bruke samme prosedyre på et ordinært binært søketre (gitt at hver node inneholder høyden for sitt subtre). Til høyre ser du et binært søketre, som ikke er et AVL-tre. Sett inn 5 i treet ved bruk av AVL-innsetting.</p>",
         figs: [treFig(TR.fromNested([1, null, [2, null, [3, null, [4]]]]), "Det binære søketreet")],
@@ -246,7 +246,7 @@
     }; });
 
     def("H2022-4", { host: "#exam-h2022-3" }, function () { return { key: "H2022-4", year: "H2022", title: "Balanserte søketrær (AVL)", oppgave_nr: "Oppgave 4", points: 6,
-      kilde: "Oppgavetekst: UiO, IN2010, H2022, oppgave 4", ark: "Balanserte søketrær", ordrett: true,
+      kilde: "Oppgavetekst: UiO, IN2010, H2022 4", ark: "Balanserte søketrær", ordrett: true,
       oppgave: IN.oppg({
         intro: "<p>Følgende er alle AVL-trær som inneholder tallene 1 til 5.</p>",
         figs: AVL6.map(function (n, i) { return treFig(TR.fromNested(n), "(" + (i + 1) + ")"); }),
@@ -267,7 +267,7 @@
     }; });
 
     def("H2025-4", { host: "#exam-h2025-3" }, function () { return { key: "H2025-4", year: "H2025", title: "Anti-AVL", oppgave_nr: "Oppgave 4", points: 12,
-      kilde: "Oppgavetekst: UiO, IN2010, H2025, oppgave 4", ark: "Anti-AVL", ordrett: true, poengkilde: "sv",
+      kilde: "Oppgavetekst: UiO, IN2010, H2025 4", ark: "Anti-AVL", ordrett: true, poengkilde: "sv",
       oppgave: IN.oppg({
         intro: "<p>AVL-trær bruker venstre- og høyrerotasjoner for å sørge for at det binære søketreet ender opp balansert etter innsetting og sletting. Her er innsetting for en variant av AVL-trær som vi kaller Anti-AVL.</p>",
         figs: [pcFig(A.insertAntiAVL, true), pcFig(A.rightRotateAntiAVL, true)],
@@ -291,7 +291,7 @@
     }; });
 
     def("H2025-5", { host: "#exam-h2025-4" }, function () { return { key: "H2025-5", year: "H2025", title: "Level-order", oppgave_nr: "Oppgave 5", points: 12,
-      kilde: "Oppgavetekst: UiO, IN2010, H2025, oppgave 5", ark: "Level-order", ordrett: true, poengkilde: "sv",
+      kilde: "Oppgavetekst: UiO, IN2010, H2025 5", ark: "Level-order", ordrett: true, poengkilde: "sv",
       oppgave: (function (n) { IN.pseudo.render(qs(".et-cbst", n), CONSTRUCTBST, { tooltips: false }); return n; })(skel(IN.oppg({
         intro: "<p>En level-order-traversering besøker nodene i et tre etter dybde. Det vil si at roten besøkes først, så alle barna til roten, så alle barna til rotens barn, og så videre.</p><p>En level-order-traversering av følgende tre kan, for eksempel, besøke nodene i rekkefølgen 10, 15, 5, 12, 17, 7, 2.</p>",
         figs: [treFig(TR.fromNested([10, [15, [12], [17]], [5, [7], [2]]]), "Treet")],
@@ -313,7 +313,7 @@
     }; });
 
     def("H2024-2", { host: "#exam-h2024-2" }, function () { return { key: "H2024-2", year: "H2024", title: "Huffman", oppgave_nr: "Oppgave 2", points: 10,
-      kilde: "Oppgavetekst: UiO, IN2010, H2024, oppgave 2", ark: "Huffman-trær", ordrett: true, poengkilde: "sv",
+      kilde: "Oppgavetekst: UiO, IN2010, H2024 2", ark: "Huffman-trær", ordrett: true, poengkilde: "sv",
       oppgave: IN.oppg({
         intro: "<p>Vi vil komprimere tekststrenger som består av symbolene A, B, C og D ved hjelp av Huffman-koding. De relative frekvensene er gitt av følgende frekvenstabell:</p>" + freqTab([["A", 1], ["B", 3], ["C", 7], ["D", 2]]),
         parts: [{ t: "Hva blir kodelengdene for de ulike symbolene i det tilhørende Huffman-treet?", p: 2 },
@@ -333,7 +333,7 @@
     }; });
 
     def("H2021-5", { host: "#exam-h2021-5" }, function () { return { key: "H2021-5", year: "H2021", title: "Huffman-trær", oppgave_nr: "Oppgave 5", points: 5,
-      kilde: "Oppgavetekst: UiO, IN2010, H2021, oppgave 5", ark: "Huffmantrær", ordrett: true, poengkilde: "sv",
+      kilde: "Oppgavetekst: UiO, IN2010, H2021 5", ark: "Huffmantrær", ordrett: true, poengkilde: "sv",
       oppgave: IN.oppg({
         intro: "<p>En tekststreng vi vil komprimere består av 5 ulike tegn a,b,c,d og e. De relative frekvensene er gitt av følgende frekvenstabell:</p>" + freqTab([["a", 2], ["b", 1], ["c", 12], ["d", 1], ["e", 4]]),
         parts: [{ t: "Hva er den lengste kodelengden for et symbol i det tilhørende huffmantreet?", p: 1 }, { t: "Hvor mange bits blir koden for tegnet e?", p: 1 },
@@ -355,7 +355,7 @@
     }; });
 
     def("H2022-9", { host: "#exam-h2022-8" }, function () { return { key: "H2022-9", year: "H2022", title: "Autofullføring: prefikstre mot hashmap", oppgave_nr: "Oppgave 9", points: 6,
-      kilde: "Oppgavetekst: UiO, IN2010, H2022, oppgave 9", ark: "Auto complete", ordrett: true,
+      kilde: "Oppgavetekst: UiO, IN2010, H2022 9", ark: "Auto complete", ordrett: true,
       oppgave: IN.oppg({
         intro: "<p>De fleste teksteditorer har funksjonalitet for «auto completion», altså der det dukker opp en liten boks med mulige måter å fullføre et påbegynt ord. Nedenfor gir vi to mulige datastrukturer som kan brukes for å implementere en enkel mekanisme for å fullføre et påbegynt ord.</p>" +
           "<p>Vi viser eksempler på hvordan datastrukturene ser ut dersom de lagrer ordene: bin, binary, bind, head, headache, hello, help, slack, sleep, sleepy.</p>" +

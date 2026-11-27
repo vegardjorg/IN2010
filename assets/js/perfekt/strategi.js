@@ -21,7 +21,7 @@
     return rows.map(function (r) { return { del: r[0], fasit: "<p>" + (r[1] ? "Sant." : "Usant.") + "</p>" }; });
   }
 
-  /* ---------- H2021 · Oppgave 6 · Litt om beregnbarhet og kompleksitet (8 poeng) ---------- */
+  /* ---------- H2021 6 · Litt om beregnbarhet og kompleksitet (8 poeng) ---------- */
   var H21_6 = [
     ["(a)", false, "P mot NP er et åpent problem. Ingen har bevist noen av retningene."],
     ["(b)", false, "Heller ikke det er bevist. De fleste tror at P ≠ NP, men det er ikke et bevis."],
@@ -41,13 +41,13 @@
       teknisk: "<p>Påstandene tester definisjonene: NP er problemene med polynomielle verifikatorer, P ⊆ NP, og et NP-komplett problem er det vanskeligste i NP i den forstand at alt i NP kan reduseres til det. Det som er «bevist», er nesten alltid usant her, fordi P mot NP er åpent.</p>"
     },
     sensor: {
-      kilde: "Kilde: sensorveiledning IN2010 H2021, oppgave 6",
+      kilde: "Kilde: sensorveiledning IN2010 H2021 6",
       deler: tfSensor(H21_6).concat([{ kriterier: "<p>Det gis 1 poeng for riktig svar og −1 for feil eller ubesvart. Maksimalt får man 8 poeng og minimalt 0 poeng.</p>" }]),
       merknad: "I sensorveiledningen står påstandene og svarene etter hverandre. Her står bare svarene, fordi påstandene står i oppgaven over."
     }
   };
 
-  /* ---------- H2022 · Oppgave 2 · Litt av hvert (10 poeng) ---------- */
+  /* ---------- H2022 2 · Litt av hvert (10 poeng) ---------- */
   var H22_2 = [
     ["(a)", true, "Det er definisjonen av et binærtre: hver node har høyst to barn."],
     ["(b)", true, "O(n) er den lineære klassen. (Strengt tatt er O en øvre grense, men «bruker O(n) steg» leses her som lineær kjøretid.)"],
@@ -69,7 +69,7 @@
       teknisk: "<p>Påstandene skiller mellom veksttakt (O) og faktisk antall steg, og tester grunnbegreper om trær og grafer. For de usanne holder ett moteksempel. For de sanne trengs et argument som gjelder alle input.</p>"
     },
     sensor: {
-      kilde: "Kilde: sensorveiledning IN2010 H2022, oppgave 2",
+      kilde: "Kilde: sensorveiledning IN2010 H2022 2",
       deler: tfSensor(H22_2),
       merknad: "Sensorveiledningen sier ikke hvordan poengene fordeles på påstandene."
     }

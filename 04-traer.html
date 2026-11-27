@@ -7,9 +7,9 @@
   <title>Blokk 4 · Trær · IN2010</title>
   <meta name="description" content="Trær i IN2010: begreper, traverseringer, binære søketrær, diameter, laveste felles forfeder, AVL og rotasjoner, Anti-AVL og Huffman – med stegvise demoer, pseudokode og eksamensoppgaver.">
   <script>(function(){try{var d=document.documentElement;var t=localStorage.getItem('in-theme');if(t!=='dark'&&t!=='system')t='light';if(t!=='system')d.setAttribute('data-theme',t);var l=localStorage.getItem('in-level');if(l!=='eli5'&&l!=='teknisk')l='normal';d.setAttribute('data-level',l);}catch(e){document.documentElement.setAttribute('data-theme','light');document.documentElement.setAttribute('data-level','normal');}})();</script>
-  <link rel="stylesheet" href="assets/css/styles.css?v=20261127e">
-  <link rel="stylesheet" href="assets/css/dra.css?v=20261127e">
-  <link rel="stylesheet" href="assets/css/begrep-tips.css?v=20261127e">
+  <link rel="stylesheet" href="assets/css/styles.css?v=20261127f">
+  <link rel="stylesheet" href="assets/css/dra.css?v=20261127f">
+  <link rel="stylesheet" href="assets/css/begrep-tips.css?v=20261127f">
   <style>
     /* Sidelokalt: stakk-kolonner ved siden av treet (fanen «Uten rekursjon»). Bare designtokens fra styles.css. */
     .itv { display: flex; flex-direction: column; gap: .55rem; min-width: 0; }
@@ -107,7 +107,7 @@
           <li><b>Dybden</b> til en node er lengden på stien fra roten ned til den. Roten har dybde 0.</li>
           <li><b>Høyden</b> til en node er lengden på den lengste stien fra den ned til en løvnode. En løvnode har høyde 0, og et tomt tre (null) har høyde −1. Høyden til treet er høyden til roten.</li>
           <li><b>Nivå</b> <span class="muted small">(standardbegrep)</span>: alle noder med samme dybde. Nivå d er nodene med dybde d.</li>
-          <li><b>Forfeder / etterkommer:</b> u er forfeder til v hvis u ligger på stien fra roten til v. Eksamen H2024 (LCA-oppgaven) regner en node som etterkommer av seg selv.</li>
+          <li><b>Forfeder / etterkommer:</b> u er forfeder til v hvis u ligger på stien fra roten til v. Eksamen H2024 (oppgaven om laveste felles forfeder, LCA) regner en node som etterkommer av seg selv.</li>
           <li><b>Subtre</b> med rot v: v og alle etterkommerne til v.</li>
         </ul>
       </div>
@@ -688,24 +688,24 @@
     <p class="muted small">IN2010 · Blokk 4 · Trær. Egne forklaringer og demoer basert på pensum. Eksamensoppgavene er gjengitt ordrett fra eksamensarkene (UiO, IN2010), med kildelinje og eventuelle avvik på hvert kort.</p>
   </footer>
 
-  <script src="assets/js/core.js?v=20261127e"></script>
-<script src="assets/js/eksamensvekt.js?v=20261127e"></script>
-  <script src="assets/js/varline.js?v=20261127e"></script>
-  <script src="assets/js/symboler.js?v=20261127e"></script>
-  <script src="assets/js/begreper-data.js?v=20261127e"></script>
-  <script src="assets/js/begrep-tips.js?v=20261127e"></script>
-  <script src="assets/js/data-tf.js?v=20261127e"></script>
-  <script src="assets/js/pseudocode.js?v=20261127e"></script>
-  <script src="assets/js/stepplayer.js?v=20261127e"></script>
-  <script src="assets/js/viz-bars.js?v=20261127e"></script>
-  <script src="assets/js/viz-tree.js?v=20261127e"></script>
-  <script src="assets/js/data-algos.js?v=20261127e"></script>
-  <script src="assets/js/data-traer.js?v=20261127e"></script>
-  <script src="assets/js/perfekt/traer.js?v=20261127e"></script>
-  <script src="assets/js/perfekt/delt.js?v=20261127e"></script>
-  <script src="assets/js/kort/traer.js?v=20261127e"></script>
-  <script src="assets/js/dra.js?v=20261127e"></script>
-  <script src="assets/js/data-dra.js?v=20261127e"></script>
+  <script src="assets/js/core.js?v=20261127f"></script>
+<script src="assets/js/eksamensvekt.js?v=20261127f"></script>
+  <script src="assets/js/varline.js?v=20261127f"></script>
+  <script src="assets/js/symboler.js?v=20261127f"></script>
+  <script src="assets/js/begreper-data.js?v=20261127f"></script>
+  <script src="assets/js/begrep-tips.js?v=20261127f"></script>
+  <script src="assets/js/data-tf.js?v=20261127f"></script>
+  <script src="assets/js/pseudocode.js?v=20261127f"></script>
+  <script src="assets/js/stepplayer.js?v=20261127f"></script>
+  <script src="assets/js/viz-bars.js?v=20261127f"></script>
+  <script src="assets/js/viz-tree.js?v=20261127f"></script>
+  <script src="assets/js/data-algos.js?v=20261127f"></script>
+  <script src="assets/js/data-traer.js?v=20261127f"></script>
+  <script src="assets/js/perfekt/traer.js?v=20261127f"></script>
+  <script src="assets/js/perfekt/delt.js?v=20261127f"></script>
+  <script src="assets/js/kort/traer.js?v=20261127f"></script>
+  <script src="assets/js/dra.js?v=20261127f"></script>
+  <script src="assets/js/data-dra.js?v=20261127f"></script>
   <script>
   (function () {
     "use strict";

@@ -222,7 +222,7 @@
   });
 
   /* ============================================================
-     VERIFIKATOR – Hamiltonsykel (H2020 Oppgave 8a)
+     VERIFIKATOR – Hamiltonsykel (H2020 8a
      ============================================================ */
   reg(IN.algos, "stType2Verifier", {
     title: "Verifikator for hamiltonsk sykel", name: "Type2Verifier", params: "G, C",
@@ -287,7 +287,7 @@
   });
 
   /* ============================================================
-     SUBANAGRAM (H2020 Oppgave 7a)
+     SUBANAGRAM (H2020 7a
      ============================================================ */
   reg(IN.algos, "stSubanagram1", {
     title: "Subanagram, første forsøk", name: "IsSubanagramOf1", params: "W, S",

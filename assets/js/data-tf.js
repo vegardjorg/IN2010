@@ -64,7 +64,7 @@
     {
       "s": "En O(n log n)-algoritme bruker færre steg enn en O(n²)-algoritme for alle n.",
       "answer": false,
-      "explain": "O-notasjon sier noe om veksten når n blir stor. For små n kan konstantfaktorer gjøre den «dårligere» algoritmen raskere (H2022, oppgave 2).",
+      "explain": "O-notasjon sier noe om veksten når n blir stor. For små n kan konstantfaktorer gjøre den «dårligere» algoritmen raskere (H2022 2).",
       "tema": "O-notasjon",
       "kilde": false
     },
@@ -155,7 +155,7 @@
     {
       "s": "Det er bevist at alle problemer i NP er vanskeligere enn problemene i P.",
       "answer": false,
-      "explain": "Alle problemer i P er også i NP, og om P = NP er ikke avgjort. H2021 oppgave 6 testet begge disse punktene.",
+      "explain": "Alle problemer i P er også i NP, og om P = NP er ikke avgjort. H2021 6 testet begge disse punktene.",
       "tema": "P/NP",
       "kilde": false
     }

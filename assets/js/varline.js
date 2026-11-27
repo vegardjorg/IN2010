@@ -67,6 +67,10 @@
   window.addEventListener("storage", function (e) {
     if (e.key === KEY) { on = readOn(); paintAll(); }
   });
+  // Tilbake-knappen (bfcache): les bryteren på nytt, den kan være endret på en annen side.
+  window.addEventListener("pageshow", function (e) {
+    if (e.persisted && readOn() !== on) setOn(readOn());
+  });
 
   function VarLine(host, opts) {
     opts = opts || {};

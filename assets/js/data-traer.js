@@ -331,7 +331,7 @@
              "n Enqueue og n Dequeue à O(1) gir O(n). Køen holder høyst bredden av treet. I et komplett binærtre er det nederste nivået omtrent n/2 noder, så minnet er O(n).") }
   });
 
-  /* H2025 oppgave 5 b: samme kø-algoritme, men den returnerer elementene i en liste. */
+  /* H2025 5b: samme kø-algoritme, men den returnerer elementene i en liste. */
   (function () {
     var L = IN.algos.levelOrder.lines;
     function cp(l) { var c = {}; for (var k in l) c[k] = l[k]; return c; }
@@ -1251,7 +1251,7 @@
   /* ============================================================
      ANTI-AVL (H2025)
      ============================================================ */
-  // Linjene er som på eksamensarket H2025 oppgave 4, også de tomme linjene 8 og 11, så linjenumrene stemmer.
+  // Linjene er som på eksamensarket H2025 4, også de tomme linjene 8 og 11, så linjenumrene stemmer.
   reg(IN.algos, "insertAntiAVL", {
     title: "Innsetting i Anti-AVL (H2025)",
     name: "InsertAntiAVL", params: "v, x",
@@ -1292,7 +1292,7 @@
              "Anti-AVL-treet er alltid en høyrekjede, så høyden er n − 1. Innsetting av et stort tall går gjennom hele kjeden: O(n). Et tall mindre enn roten settes inn på ett skritt: O(1).",
              "h = n − 1 gir O(n) for innsetting og oppslag i verste fall. Rekursjonsstakken blir like dyp.") }
   });
-  // RightRotate slik den står på eksamensarket H2025 oppgave 4 (uten SetHeight, med tomme linjer 4 og 7).
+  // RightRotate slik den står på eksamensarket H2025 4 (uten SetHeight, med tomme linjer 4 og 7).
   reg(IN.algos, "rightRotateAntiAVL", {
     title: "Høyrerotasjon (H2025, Anti-AVL)",
     name: "RightRotate", params: "z",

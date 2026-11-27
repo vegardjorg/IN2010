@@ -23,7 +23,7 @@
     return { name: a0.name, params: a0.params, input: a0.input, output: a0.output, lines: lines };
   }
 
-  /* ---------- H2020 · Oppgave 5 · Søk (12 poeng) ---------- */
+  /* ---------- H2020 5 · Søk (12 poeng) ---------- */
   IN.PERFEKT["H2020-5"] = {
     type: "eksamen",
     intro: "<p>Først de to som aldri er riktig valg: Intersection2 binærsøker i A uten at A er sortert, så den kan gi feil svar. Intersection4 sorterer på nytt for hver x, og det er aldri lønnsomt. Igjen står Intersection1, O(n · k), og Intersection3, O(n log n + k log n).</p>",
@@ -39,7 +39,7 @@
       teknisk: "<p>Intersection1 er O(n · k) og Intersection3 er O(n log n + k log n). De er like når k = log n. For k = 1 dominerer sorteringen i Intersection3. For k = n og k = n² dominerer n · k i Intersection1, mens Intersection3 bare betaler log n per oppslag. Intersection2 er utelukket fordi binærsøk forutsetter sortert input, og Intersection4 gir k · n log n.</p>"
     },
     sensor: {
-      kilde: "Kilde: sensorveiledning IN2010 H2020, oppgave 5",
+      kilde: "Kilde: sensorveiledning IN2010 H2020 5",
       fasit: "<p>Intersection2 gir ikke nødvendigvis riktig svar, fordi man kan ikke uten videre anta at input er sortert. Intersection4 gir aldri best kjøretid, fordi å sortere for hver iterasjon er overflødig.</p>" +
         "<p>Det mest interessante tilfellet er der k = log(n). Da er Intersection1 i O(n · k) = O(n log(n)) og Intersection3 er i O(n log(n) + log(n) · k) = O(n log(n) + log(n) · log(n)) = O(n log(n)). Altså er begge svar korrekte, og gir full uttelling.</p>" +
         "<p class=\"small muted\">Vår merking av alternativene sensorveiledningen markerer med blå tekst: (a) Intersection1, (b) Intersection1 og Intersection3, (c) Intersection3, (d) Intersection3.</p>",
@@ -47,7 +47,7 @@
     }
   };
 
-  /* ---------- H2023 · Oppgave 3 · Finn duplikat (12 poeng) ---------- */
+  /* ---------- H2023 3 · Finn duplikat (12 poeng) ---------- */
   IN.PERFEKT["H2023-3"] = {
     type: "eksamen",
     svar: [
@@ -80,7 +80,7 @@
       teknisk: "<p>(a) bruker at like elementer er naboer i en sortert rekke, så én binærsøkning pluss to naboer gir O(log n). (b) kan ikke binærsøke, fordi vi ikke har noe å sammenligne midten med, men nabopar-skanning gir O(n). (c) mister ordningen, og da gir hashing forventet O(n). Den beste sammenligningsbaserte løsningen er O(n log n).</p>"
     },
     sensor: {
-      kilde: "Kilde: sensorveiledning IN2010 H2023, oppgave 3",
+      kilde: "Kilde: sensorveiledning IN2010 H2023 3",
       deler: [
         {
           del: "(a)",
@@ -126,7 +126,7 @@
     }
   };
 
-  /* ---------- H2025 · Oppgave 6 · Finn k minste (12 poeng) ---------- */
+  /* ---------- H2025 6 · Finn k minste (12 poeng) ---------- */
   IN.PERFEKT["H2025-6"] = {
     type: "eksamen",
     intro: "<p>En løsning på (c) er også en løsning på (a) og (b), fordi en raskere algoritme oppfyller de svakere kravene. Skriver du det, får du full uttelling for alle tre.</p><p>Oppgaven ber om en liste. Koden her gir et array. Det trekker ikke alene, men sensor kan trekke for det sammen med andre unøyaktigheter. Vil du være helt trygg, start med <code>list ← an empty list</code> og bruk <code>append</code>.</p>",
@@ -160,7 +160,7 @@
       teknisk: "<p>(a) er k ytre runder à O(n). (b) er O(n log n) for sorteringen og O(k) for uttaket. (c): BuildMinHeap er O(n), og k removeMin à O(log n) gir O(n + k log n). Med en max-heap av størrelse k koster hvert av de n elementene O(log k), altså O(n log k).</p>"
     },
     sensor: {
-      kilde: "Kilde: sensorveiledning IN2010 H2025, oppgave 6",
+      kilde: "Kilde: sensorveiledning IN2010 H2025 6",
       deler: [
         {
           del: "(a)",
@@ -198,7 +198,7 @@
     }
   };
 
-  /* ---------- H2021 · Oppgave 10 · Finn par som summerer til x (10 poeng) ---------- */
+  /* ---------- H2021 10 · Finn par som summerer til x (10 poeng) ---------- */
   IN.PERFEKT["H2021-10"] = {
     type: "eksamen",
     svar: [
@@ -226,7 +226,7 @@
       teknisk: "<p>To pekere: hvert steg flytter i eller j én plass, så det blir høyst n − 1 steg. Ingen par går tapt, fordi når summen er for stor, kan A[j] ikke danne par med noe til høyre for i (alt der er større). Hashsettet gir forventet O(1) per element, altså forventet O(n). Radix sort er mulig fordi tallene er heltall.</p>"
     },
     sensor: {
-      kilde: "Kilde: sensorveiledning IN2010 H2021, oppgave 10",
+      kilde: "Kilde: sensorveiledning IN2010 H2021 10",
       deler: [
         {
           del: "(a) og (b), kvadratisk",

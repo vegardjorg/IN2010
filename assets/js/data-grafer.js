@@ -89,7 +89,7 @@
     skog: { directed: false,
       nodes: [N("A", 40, 40), N("B", 150, 40), N("C", 95, 140), N("D", 260, 40), N("E", 370, 40), N("F", 315, 140)],
       edges: [["A", "B"], ["A", "C"], ["D", "E"], ["D", "F"], ["E", "F"]] },
-    // H2020 oppg. 8 (a) og (d): egen eksempelgraf med den hamiltonske sykelen A, B, C, D, E, F og to korder.
+    // H2020 8a og (d): egen eksempelgraf med den hamiltonske sykelen A, B, C, D, E, F og to korder.
     // Delt av kort/grafer.js (06-grafer) og kort/strategi.js (07-strategi).
     hex: { directed: false,
       nodes: [N("A", 150, 10), N("B", 255, 70), N("C", 255, 190), N("D", 150, 250), N("E", 45, 190), N("F", 45, 70)],
@@ -940,7 +940,7 @@
       L("return false", 1, "Vi lette i alle bitene og fant ingen ring. Da er grafen et tre, eller flere trær.", "Ingen komponent hadde en sykel: G er en skog.", "")
     ],
     bigO: { best: "O(1)", avg: "O(|V| + |E|)", worst: "O(|V| + |E|)", space: "O(|V|)",
-      why: t("Hver node besøkes høyst én gang, og hver kant ses på fra begge ender. Det tar like lang tid som et vanlig dybde-først søk.", "Hver node besøkes én gang; vi kan stoppe tidlig når vi finner en sykel.", "Som DFSFull: O(|V| + |E|), og det er svaret sensor forventer. (Ekstra, ikke pensum: før vi finner en sykel, har vi bare fulgt kanter i DFS-treet, og en skog har høyst |V| − 1 kanter. Derfor stopper søket etter O(|V|) arbeid.)") }
+      why: t("Hver node besøkes høyst én gang, og hver kant ses på fra begge ender. Det tar like lang tid som et vanlig dybde-først søk.", "Hver node besøkes én gang; vi kan stoppe tidlig når vi finner en sykel.", "Som DFSFull: O(|V| + |E|), og det er svaret sensor forventer. (Ikke pensum: før vi finner en sykel, har vi bare fulgt kanter i DFS-treet, og en skog har høyst |V| − 1 kanter. Derfor stopper søket etter O(|V|) arbeid.)") }
   });
   reg(IN.algos, "hasCycleFrom", {
     title: "DFS som leter etter en sykel (urettet)",

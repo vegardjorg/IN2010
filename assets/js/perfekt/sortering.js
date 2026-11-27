@@ -13,7 +13,7 @@
 
   function L(code, indent) { return { code: code, indent: indent }; }
 
-  /* ---------- H2023 · Oppgave 4 · Gnome sort (10 poeng) ---------- */
+  /* ---------- H2023 4 · Gnome sort (10 poeng) ---------- */
   IN.PERFEKT["H2023-4"] = {
     type: "eksamen",
     intro: "<p>En drøftingsoppgave uten én fasit. Svaret under dekker de fire punktene oppgaven ber om, og knytter Gnome sort tett til Insertion sort. Det er det sensor krever for full uttelling.</p>",
@@ -49,7 +49,7 @@
       teknisk: "<p>Svaret binder analysen til inversjoner: hvert nabobytte fjerner nøyaktig én inversjon, så antall bytter er det samme som i Insertion sort, og O(n²) følger av at det kan være n(n − 1)/2 inversjoner. Forskjellen ligger i sammenligningene, fordi Gnome sort ikke husker hvor den var og må sammenligne seg fram igjen etter hver innsetting. Stabiliteten følger av at bare naboer med streng ulikhet byttes.</p>"
     },
     sensor: {
-      kilde: "Kilde: sensorveiledning IN2010 H2023, oppgave 4",
+      kilde: "Kilde: sensorveiledning IN2010 H2023 4",
       fasit: "<p>Gnome sort fungerer ved å løpe over elementene, og når den finner et element som er større enn det foregående elementet skal et flyttes bakover i arrayet. Oppførselen til Gnome sort er nesten helt lik Insertion sort, men den gjør dette med å kun vedlikeholde én indeks. Den mest vesentlige forskjellen fra Insertion sort er at den vil gjøre dobbelt så mange sammenligninger i det som svarer til én innsetting i Insertion sort.</p>" +
         "<p>Det er altså en sorteringsalgoritme med kvadratisk kjøretidskompleksitet (i likhet med bubble sort og selection sort). Den gjør akkurat like mange bytter som Insertion sort, men en god del flere sammenligninger.</p>" +
         "<p>På grunn av kjøretidskompleksiteten vil den være langt mindre egnet for store arrayer enn de raskeste sammenligningsbaserte sorteringsalgoritmene vi kjenner fra pensum (Merge, Heap og Quick). Den er sammenligningsbasert, og er derfor vanskelig å sammenligne direkte mot Bucket- og Radix sort.</p>" +
@@ -64,7 +64,7 @@
     }
   };
 
-  /* ---------- H2024 · Oppgave 3 · Etymologisk ordliste (10 poeng) ---------- */
+  /* ---------- H2024 3 · Etymologisk ordliste (10 poeng) ---------- */
   IN.PERFEKT["H2024-3"] = {
     type: "eksamen",
     svar: [
@@ -89,7 +89,7 @@
       teknisk: "<p>Bøttesortering er O(N + n), og her er N &lt; 100 en konstant. Det er kjernen i (a). Stabiliteten er ikke pynt: den gjør at alfabetisk orden overlever som sekundær nøkkel, og det er akkurat den egenskapen (b) trenger. Binærsøket starter med low og high fra K[v.category] og halverer et intervall som høyst har n elementer, altså O(log n).</p>"
     },
     sensor: {
-      kilde: "Kilde: sensorveiledning IN2010 H2024, oppgave 3",
+      kilde: "Kilde: sensorveiledning IN2010 H2024 3",
       deler: [
         {
           del: "(a)",
@@ -122,7 +122,7 @@
     }
   };
 
-  /* ---------- H2021 · Oppgave 2 · Stabilitet (3 poeng) ---------- */
+  /* ---------- H2021 2 · Stabilitet (3 poeng) ---------- */
   IN.PERFEKT["H2021-2"] = {
     type: "eksamen",
     svar: [
@@ -148,7 +148,7 @@
       teknisk: "<p>(a) følger direkte av definisjonen: et par med lik nøkkel har snudd. (b) følger av at et sortert array er ikke-synkende, så A[7] = A[9] = 22 gir A[8] = 22. (c): nøkkeldomenet {0, …, 100} er konstant stort, så Bucket sort er O(N + n) = O(n).</p>"
     },
     sensor: {
-      kilde: "Kilde: sensorveiledning IN2010 H2021, oppgave 2",
+      kilde: "Kilde: sensorveiledning IN2010 H2021 2",
       deler: [
         { del: "(a)", fasit: "<p>Nei.</p>" },
         { del: "(b)", fasit: "<p>22.</p>" },

@@ -85,7 +85,7 @@
   });
 
   def("H2021-4", { host: "#exam-removemin" }, function () {
-    // H2021 oppg. 4: ordrett oppgavetekst (plan/gjennomgang/08-eksamenstekst-ordrett.md), demo per deloppgave, perfekt svar i perfekt/heap.js
+    // H2021 4: ordrett oppgavetekst (plan/gjennomgang/08-eksamenstekst-ordrett.md), demo per deloppgave, perfekt svar i perfekt/heap.js
     var H1 = [4, 28, 11, 43, 32, 27, 55, 59, 66];
     var h21Oppg = IN.oppg({
       intro: "<p>Du skal ta utgangspunkt i følgende binære heap H₁, hvor både tre-representasjonen og array-representasjonen er gitt:</p>",
@@ -130,7 +130,7 @@
   });
 
   def("H2025-5", { host: "#exam-levelorder", progressKey: "kort:traer:exam-h2025-4" }, function () {
-    // H2025 oppg. 5: ordrett oppgavetekst med skjelettene fra arket, tre demoer, perfekt svar i perfekt/heap.js
+    // H2025 5: ordrett oppgavetekst med skjelettene fra arket, tre demoer, perfekt svar i perfekt/heap.js
     var LO_FIG = { id: "f10", k: 10,
       l: { id: "f15", k: 15, l: { id: "f12", k: 12, l: null, r: null }, r: { id: "f17", k: 17, l: null, r: null } },
       r: { id: "f5", k: 5, l: { id: "f7", k: 7, l: null, r: null }, r: { id: "f2", k: 2, l: null, r: null } } };
@@ -190,7 +190,7 @@
   });
 
   def("H2024-7", { host: "#exam-median" }, function () {
-    // H2024 oppg. 7: ordrett oppgavetekst («elmentet» står slik på arket), demo for (a), perfekt svar i perfekt/heap.js
+    // H2024 7: ordrett oppgavetekst («elmentet» står slik på arket), demo for (a), perfekt svar i perfekt/heap.js
     return exam({
       key: "H2024-7", year: "H2024", oppgave_nr: "Oppgave 7", title: "Mediankø", points: 12,
       ark: "Mediankø", ordrett: true, poengkilde: "sv",
@@ -228,7 +228,7 @@
   });
 
   def("H2022-10", { host: "#exam-pk" }, function () {
-    // H2022 oppg. 10: ordrett oppgavetekst med skjelettene fra arket, egen demo-input, perfekt svar i perfekt/heap.js
+    // H2022 10: ordrett oppgavetekst med skjelettene fra arket, egen demo-input, perfekt svar i perfekt/heap.js
     var BQ_IN = "En bucket queue Q med prioriteter fra 0 til N − 1";
     var bqOppg = IN.oppg({
       intro: "<p>En bucket queue (eller en bøttekø) er en datastruktur som er inspirert av bucket sort og kan brukes som en prioritetskø.</p>" +
@@ -271,7 +271,7 @@
   });
 
   def("H2022-5", { host: "#exam-test" }, function () {
-    // H2022 oppg. 5: ordrett oppgavetekst, ingen demo (sant/usant), perfekt svar i perfekt/heap.js
+    // H2022 5: ordrett oppgavetekst, ingen demo (sant/usant), perfekt svar i perfekt/heap.js
     return exam({
       key: "H2022-5", year: "H2022", oppgave_nr: "Oppgave 5", title: "Prioritetskøer og binære heaps (sant/usant)", points: 10,
       ark: "Litt om prioritetskøer og binære heaps", ordrett: true,

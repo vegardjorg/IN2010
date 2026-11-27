@@ -54,7 +54,7 @@
     return '<svg viewBox="0 0 220 118" width="220" style="max-width:100%;height:auto;display:block;margin:.4rem 0" role="img" aria-label="Roten øverst. Fra roten går en kjede av venstre barn skrått ned mot venstre og en kjede av høyre barn skrått ned mot høyre. Stiplede linjer viser at kjedene fortsetter." stroke="currentColor" stroke-width="1.6" fill="currentColor">' + s + "</svg>";
   })();
 
-  /* ---------- H2023 · Oppgave 2 · Innsetting i heap (10 poeng) ---------- */
+  /* ---------- H2023 2 · Innsetting i heap (10 poeng) ---------- */
   IN.PERFEKT["H2023-2"] = {
     type: "eksamen",
     svar: [
@@ -102,7 +102,7 @@
       teknisk: "<p>Skrivingen til A[n] bevarer formen (komplett tre). Etter hvert bytte kan heap-egenskapen bare være brutt mellom i og foreldernoden, og løkka slutter når den er i orden eller i = 0. Antall runder er begrenset av høyden, ⌊log(n + 1)⌋ etter innsettingen, så O(log n). Det er akkurat den sammenhengen (form → høyde → kjøretid) sensor gir poeng for.</p>"
     },
     sensor: {
-      kilde: "Kilde: sensorveiledning IN2010 H2023, oppgave 2",
+      kilde: "Kilde: sensorveiledning IN2010 H2023 2",
       deler: [
         {
           del: "(a)",
@@ -147,7 +147,7 @@
     }
   };
 
-  /* ---------- H2021 · Oppgave 4 · Binære heaps (6 poeng) ---------- */
+  /* ---------- H2021 4 · Binære heaps (6 poeng) ---------- */
   IN.PERFEKT["H2021-4"] = {
     type: "eksamen",
     svar: [
@@ -187,7 +187,7 @@
       teknisk: "<p>RemoveMin bevarer formen ved å flytte siste element til roten, og reparerer ordenen med boble ned mot det minste barnet. Insert bevarer formen ved å skrive til A[n], og reparerer med boble opp. I (c) er den nedre grensen den minste verdien på dybde 3, 27, og den kan nås fordi heapen tillater duplikater. 28 ville vært svaret bare hvis alle verdiene måtte være ulike.</p>"
     },
     sensor: {
-      kilde: "Kilde: sensorveiledning IN2010 H2021, oppgave 4",
+      kilde: "Kilde: sensorveiledning IN2010 H2021 4",
       deler: [
         { del: "(a)", fasit: tab([11, 28, 27, 43, 32, 66, 55, 59], "Arrayet i sensorveiledningen for (a)") },
         { del: "(b)", fasit: tab([4, 7, 11, 43, 28, 27, 55, 59, 66, 32], "Arrayet i sensorveiledningen for (b)") },
@@ -198,7 +198,7 @@
     }
   };
 
-  /* ---------- H2022 · Oppgave 5 · Litt om prioritetskøer og binære heaps (10 poeng) ---------- */
+  /* ---------- H2022 5 · Litt om prioritetskøer og binære heaps (10 poeng) ---------- */
   var H22_5 = [
     ["(a)", true, "BuildMinHeap lar nodene boble ned nedenfra og opp. De fleste nodene er lave og billige, og summen av høydene er O(n)."],
     ["(b)", false, "Moteksempel: <span class=\"mono\">[1, 2, 5, 3, 4]</span> er en min-heap. Reversert blir den <span class=\"mono\">[4, 3, 5, 2, 1]</span>, og der er 5 barn av 4, så det er ikke en max-heap."],
@@ -222,7 +222,7 @@
       teknisk: "<p>Påstandene tester hva heap-egenskapen faktisk sier (bare forelder mot barn), formen (komplett tre, så mange noder nederst) og kjøretidene til køoperasjonene. For de usanne holder ett moteksempel. For de sanne trengs et argument som gjelder alle heaper.</p>"
     },
     sensor: {
-      kilde: "Kilde: sensorveiledning IN2010 H2022, oppgave 5",
+      kilde: "Kilde: sensorveiledning IN2010 H2022 5",
       deler: H22_5.map(function (r) {
         var p = { del: r[0], fasit: "<p>" + (r[1] ? "Sant." : "Usant.") + "</p>" };
         if (r[0] === "(g)") p.etter = "<p>Oppgaven er litt tvetydig om hvorvidt man skal ta med seg subtrærne eller ikke. Tanken var å kun bytte om elementene i nodene. " +
@@ -234,7 +234,7 @@
     }
   };
 
-  /* ---------- H2022 · Oppgave 10 · Bucket queue (10 poeng) ---------- */
+  /* ---------- H2022 10 · Bucket queue (10 poeng) ---------- */
   var BQ_IN = "En bucket queue Q med prioriteter fra 0 til N − 1";
   IN.PERFEKT["H2022-10"] = {
     type: "eksamen",
@@ -272,7 +272,7 @@
       teknisk: "<p>Når prioritetene er heltall i et kjent, fast område, kan prioriteten brukes som indeks. Insert blir O(1), og RemoveMin koster O(N) uavhengig av n. Med N = 100 er det O(1). En binær heap gir O(log n) og utnytter ikke at prioritetene er små heltall.</p>"
     },
     sensor: {
-      kilde: "Kilde: sensorveiledning IN2010 H2022, oppgave 10",
+      kilde: "Kilde: sensorveiledning IN2010 H2022 10",
       deler: [
         { del: "(a)", fasit: "<p>1 poeng. Siden vi har prioriteter fra 0 til et kjent maksimum N , passer et enkelt array av bøtter perfekt. Bøttene kan for eksempel være en enkeltlenket liste. Dette er helt tilsvarende bucket sort.</p>" },
         { del: "(b)", fasit: "<p>Opp til 3 poeng. Legg til x i bøtta på plass p i Q.</p>",
@@ -287,7 +287,7 @@
     }
   };
 
-  /* ---------- H2024 · Oppgave 7 · Mediankø (12 poeng) ---------- */
+  /* ---------- H2024 7 · Mediankø (12 poeng) ---------- */
   IN.PERFEKT["H2024-7"] = {
     type: "eksamen",
     svar: [
@@ -337,7 +337,7 @@
       teknisk: "<p>Invariantene max(Q.small) ≤ min(Q.large) og |Q.small| − |Q.large| ∈ {0, 1} gir medianen i roten av Q.small. Hver operasjon gjør O(1) heap-operasjoner à O(log n). I (e) gir removeMedian en rekkefølge der hvert nytt element er et nytt minimum eller maksimum blant dem som allerede er satt inn, og da blir søketreet to kjeder.</p>"
     },
     sensor: {
-      kilde: "Kilde: sensorveiledning IN2010 H2024, oppgave 7",
+      kilde: "Kilde: sensorveiledning IN2010 H2024 7",
       deler: [
         { del: "(a)", fasit: "<p>1 poeng for 3, 2, 4.</p>" },
         { del: "(b)", fasit: "<p>1 poeng for en forståelig forklaring. Må ses i sammenheng med neste deloppgave.</p>" },
